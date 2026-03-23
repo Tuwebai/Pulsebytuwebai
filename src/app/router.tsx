@@ -1,11 +1,13 @@
 import React, { Suspense, lazy } from 'react';
 import type { ComponentType } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import DashboardLayout from '@/components/DashboardLayout';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import TouchGestureProvider from '@/components/TouchGestureProvider';
 import ProtectedRoute from '@/features/auth/components/ProtectedRoute';
 import DashboardShell from '@/core/layout/DashboardLayout';
 import OnboardingGate from '@/features/onboarding/components/OnboardingGate';
+import { serviceWorkerManager } from '@/utils/serviceWorker';
 
 type LazyComponentModule = {
   default: ComponentType;
@@ -103,6 +105,16 @@ const PageLoader = () => {
       </div>
     </div>
   );
+};
+
+const ServiceWorkerInitializer = () => {
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'production') {
+      void serviceWorkerManager.register();
+    }
+  }, []);
+
+  return null;
 };
 
 function AppRoutes() {
@@ -434,8 +446,19 @@ function AppRoutes() {
 
 export function AppRouter() {
   return (
-    <Suspense fallback={<PageLoader />}>
-      <AppRoutes />
-    </Suspense>
+    <Router
+      basename={import.meta.env.BASE_URL || '/'}
+      future={{
+        v7_startTransition: false,
+        v7_relativeSplatPath: false
+      }}
+    >
+      <TouchGestureProvider enableGlobalGestures={true} enableNavigationGestures={true}>
+        <ServiceWorkerInitializer />
+        <Suspense fallback={<PageLoader />}>
+          <AppRoutes />
+        </Suspense>
+      </TouchGestureProvider>
+    </Router>
   );
 }
