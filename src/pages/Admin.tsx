@@ -4,6 +4,7 @@ import { useApp } from '@/contexts/AppContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { toast } from '@/hooks/use-toast';
+import { enablePulseAccess } from '@/features/admin/services/pulseAccessAdminService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,7 @@ import {
   Trash2,
   Eye,
   RefreshCw,
+  UserCheck,
   UserCog,
   Cog,
   FileText,
@@ -84,6 +86,7 @@ const Admin = React.memo(() => {
   // Estados para funciones avanzadas del admin
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [enablingPulseUserId, setEnablingPulseUserId] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState<any>(null);
@@ -613,6 +616,42 @@ const Admin = React.memo(() => {
         description: 'No se pudo actualizar el usuario.', 
         variant: 'destructive' 
       });
+    }
+  };
+
+  const handleEnablePulseAccess = async (targetUserId: string) => {
+    try {
+      setEnablingPulseUserId(targetUserId);
+
+      const result = await enablePulseAccess(targetUserId);
+
+      setUsuarios(prev =>
+        prev.map(currentUser =>
+          currentUser.id === targetUserId
+            ? {
+                ...currentUser,
+                onboarding_completed: result.onboarding_completed,
+                updated_at: new Date().toISOString()
+              }
+            : currentUser
+        )
+      );
+
+      toast({
+        title: 'Acceso a Pulse habilitado',
+        description: result.onboarding_completed
+          ? 'El cliente ya puede entrar a Pulse y aterrizar en su dashboard.'
+          : 'El cliente ya puede entrar a Pulse. Si todavia no tiene URL configurada, va a onboarding.'
+      });
+    } catch (error) {
+      console.error('Error enabling Pulse access:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo habilitar el acceso a Pulse.',
+        variant: 'destructive'
+      });
+    } finally {
+      setEnablingPulseUserId(null);
     }
   };
 
@@ -1195,6 +1234,20 @@ const Admin = React.memo(() => {
                                 
                                 {/* Botones de acción */}
                                 <div className="flex items-center space-x-2">
+                                  {usuario.role !== 'admin' ? (
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      disabled={enablingPulseUserId === usuario.id}
+                                      onClick={() => {
+                                        void handleEnablePulseAccess(usuario.id);
+                                      }}
+                                      className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 border-emerald-200 dark:border-emerald-700 hover:from-emerald-100 hover:to-teal-100 dark:hover:from-emerald-800/40 dark:hover:to-teal-800/40 text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition-all duration-200 px-3 py-2 h-9"
+                                    >
+                                      <UserCheck size={14} className="mr-1" />
+                                      {enablingPulseUserId === usuario.id ? 'Habilitando...' : 'Permitir acceso a Pulse'}
+                                    </Button>
+                                  ) : null}
                                   <Button 
                                     variant="outline" 
                                     size="sm" 

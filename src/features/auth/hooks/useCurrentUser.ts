@@ -8,7 +8,12 @@ import { clearCache, getCachedData, setCachedData } from '@/contexts/appContext.
 import type { User } from '@/contexts/appContext.types';
 
 interface UserUpdatePayload {
+  full_name?: string | null;
   avatar_url?: string;
+  role?: User['role'];
+  onboarding_completed?: boolean | null;
+  onboarding_completed_at?: string | null;
+  website?: string | null;
   updated_at?: string;
 }
 
@@ -168,34 +173,30 @@ export function useCurrentUser({
         },
         async (payload) => {
           const updatedUserData = payload.new as UserUpdatePayload;
-
-          if (updatedUserData.avatar_url && updatedUserData.avatar_url !== user.avatar_url) {
-            setUser((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    avatar_url: updatedUserData.avatar_url,
-                    avatar: updatedUserData.avatar_url,
-                    updated_at: updatedUserData.updated_at
-                  }
-                : prev
-            );
-
-            const cacheKey = `user_${user.id}`;
-            const cachedUser = getCachedData<User>(cacheKey);
-            if (cachedUser) {
-              setCachedData(
-                cacheKey,
-                {
-                  ...cachedUser,
-                  avatar_url: updatedUserData.avatar_url,
-                  avatar: updatedUserData.avatar_url,
-                  updated_at: updatedUserData.updated_at
-                },
-                10 * 60 * 1000
-              );
+          setUser((prev) => {
+            if (!prev) {
+              return prev;
             }
-          }
+
+            const nextUser: User = {
+              ...prev,
+              full_name: updatedUserData.full_name ?? prev.full_name,
+              role: updatedUserData.role ?? prev.role,
+              onboarding_completed: updatedUserData.onboarding_completed ?? prev.onboarding_completed,
+              onboarding_completed_at: updatedUserData.onboarding_completed_at ?? prev.onboarding_completed_at,
+              website: updatedUserData.website ?? prev.website,
+              updated_at: updatedUserData.updated_at ?? prev.updated_at
+            };
+
+            if (updatedUserData.avatar_url) {
+              nextUser.avatar_url = updatedUserData.avatar_url;
+              nextUser.avatar = updatedUserData.avatar_url;
+            }
+
+            setCachedData(`user_${user.id}`, nextUser, 10 * 60 * 1000);
+
+            return nextUser;
+          });
         }
       )
       .subscribe();
