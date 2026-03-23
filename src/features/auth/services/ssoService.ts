@@ -1,19 +1,22 @@
 import { FunctionsHttpError } from '@supabase/supabase-js';
-import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
-import { userService } from '@/lib/supabase/supabaseService';
 import { supabase } from '@/lib/supabase';
 
 interface SsoBridgeResponse {
   email: string;
   email_otp: string;
   verification_type: 'magiclink' | 'email';
+  redirect_path: '/admin' | '/dashboard' | '/onboarding';
 }
 
 interface SsoErrorPayload {
   error?: string;
 }
 
-export type SsoAccessErrorCode = 'access_pending' | 'invalid_token' | 'session_bridge_failed';
+export type SsoAccessErrorCode =
+  | 'access_pending'
+  | 'access_disabled'
+  | 'invalid_token'
+  | 'session_bridge_failed';
 
 export class SsoAccessError extends Error {
   code: SsoAccessErrorCode;
@@ -34,7 +37,10 @@ function isSsoBridgeResponse(value: unknown): value is SsoBridgeResponse {
   return (
     typeof response.email === 'string' &&
     typeof response.email_otp === 'string' &&
-    (response.verification_type === 'magiclink' || response.verification_type === 'email')
+    (response.verification_type === 'magiclink' || response.verification_type === 'email') &&
+    (response.redirect_path === '/admin' ||
+      response.redirect_path === '/dashboard' ||
+      response.redirect_path === '/onboarding')
   );
 }
 
@@ -47,13 +53,17 @@ async function getSsoBridge(token: string): Promise<SsoBridgeResponse> {
     if (error instanceof FunctionsHttpError) {
       const payload = (await error.context.json()) as SsoErrorPayload;
 
-      if (
-        error.context.status === 404 &&
-        (payload.error === 'Pulse user not found' || payload.error === 'Pulse auth user not found')
-      ) {
+      if (payload.error === 'USER_NOT_FOUND' || payload.error === 'AUTH_NOT_FOUND' || payload.error === 'ACCESS_PENDING') {
         throw new SsoAccessError(
           'access_pending',
           'Tu acceso a Pulse todavia no fue habilitado por un administrador.'
+        );
+      }
+
+      if (payload.error === 'ACCESS_DISABLED') {
+        throw new SsoAccessError(
+          'access_disabled',
+          'Tu acceso a Pulse fue revocado. Si crees que es un error, contacta al equipo de TuWebAI.'
         );
       }
     }
@@ -66,19 +76,6 @@ async function getSsoBridge(token: string): Promise<SsoBridgeResponse> {
   }
 
   return data;
-}
-
-async function resolvePostSsoPath(): Promise<string> {
-  const {
-    data: { user: authUser }
-  } = await supabase.auth.getUser();
-
-  if (!authUser?.id) {
-    throw new SsoAccessError('session_bridge_failed', 'No pudimos recuperar tu sesion en Pulse.');
-  }
-
-  const pulseUser = await userService.getUserById(authUser.id);
-  return getPostLoginPath(pulseUser ?? undefined);
 }
 
 export async function signInWithSsoToken(token: string): Promise<string> {
@@ -94,5 +91,5 @@ export async function signInWithSsoToken(token: string): Promise<string> {
     throw new SsoAccessError('session_bridge_failed', 'No pudimos abrir tu sesion en Pulse.');
   }
 
-  return resolvePostSsoPath();
+  return bridge.redirect_path;
 }

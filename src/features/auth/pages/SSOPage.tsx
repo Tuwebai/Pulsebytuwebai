@@ -27,7 +27,7 @@ function clearSsoToken() {
 export default function SSOPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [status, setStatus] = useState<'verifying' | 'access_pending'>('verifying');
+  const [status, setStatus] = useState<'verifying' | 'access_pending' | 'access_disabled'>('verifying');
 
   useEffect(() => {
     const token = readSsoToken(searchParams);
@@ -55,6 +55,12 @@ export default function SSOPage() {
         if (error instanceof SsoAccessError && error.code === 'access_pending') {
           clearSsoToken();
           setStatus('access_pending');
+          return;
+        }
+
+        if (error instanceof SsoAccessError && error.code === 'access_disabled') {
+          clearSsoToken();
+          setStatus('access_disabled');
           return;
         }
 
@@ -121,6 +127,20 @@ export default function SSOPage() {
                 </p>
                 <p className="text-sm text-[var(--text-secondary)]">
                   Un administrador tiene que confirmar tu alta en el dashboard antes de que puedas entrar.
+                </p>
+                <button
+                  className="rounded-full border border-[var(--border-default)] px-4 py-2 text-sm text-[var(--text-primary)] transition-colors hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)]"
+                  onClick={() => navigate('/login', { replace: true })}
+                  type="button"
+                >
+                  Volver al login
+                </button>
+              </div>
+            ) : status === 'access_disabled' ? (
+              <div className="space-y-3">
+                <p className="text-sm text-[var(--text-primary)]">Tu acceso a Pulse fue revocado.</p>
+                <p className="text-sm text-[var(--text-secondary)]">
+                  Si necesitas volver a entrar, pedile al equipo de TuWebAI que revise tu habilitacion.
                 </p>
                 <button
                   className="rounded-full border border-[var(--border-default)] px-4 py-2 text-sm text-[var(--text-primary)] transition-colors hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)]"
