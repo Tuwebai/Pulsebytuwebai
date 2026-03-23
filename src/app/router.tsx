@@ -2,11 +2,12 @@ import React, { Suspense, lazy } from 'react';
 import type { ComponentType } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import DashboardLayout from '@/components/DashboardLayout';
-import LoadingSpinner from '@/components/LoadingSpinner';
 import TouchGestureProvider from '@/components/TouchGestureProvider';
+import { useApp } from '@/contexts/AppContext';
 import ProtectedRoute from '@/features/auth/components/ProtectedRoute';
-import DashboardShell from '@/core/layout/DashboardLayout';
 import OnboardingGate from '@/features/onboarding/components/OnboardingGate';
+import DashboardShell from '@/core/layout/DashboardLayout';
+import { GitHubDashboard } from '@/pages/GitHubDashboard';
 import { serviceWorkerManager } from '@/utils/serviceWorker';
 
 type LazyComponentModule = {
@@ -14,13 +15,13 @@ type LazyComponentModule = {
 };
 
 const LazyLoadErrorFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100">
+  <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)] px-6">
     <div className="text-center">
-      <div className="mb-4 text-6xl text-red-500">!</div>
-      <h2 className="mb-2 text-2xl font-bold text-red-800">Error de Carga</h2>
-      <p className="mb-4 text-red-600">No se pudo cargar el componente</p>
+      <div className="mb-4 text-6xl text-[var(--danger)]">!</div>
+      <h2 className="mb-2 text-2xl font-bold text-[var(--text-primary)]">Error de carga</h2>
+      <p className="mb-4 text-[var(--text-secondary)]">No se pudo cargar el componente</p>
       <button
-        className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+        className="rounded bg-[var(--danger)] px-4 py-2 text-white hover:opacity-90"
         onClick={() => window.location.reload()}
       >
         Recargar pagina
@@ -73,39 +74,55 @@ const GitHubCallback = createLazyComponent(() => import('@/pages/GitHubCallback'
 const AdminGitHubProfile = createLazyComponent(() => import('@/pages/AdminGitHubProfile'));
 const EnvironmentVariables = createLazyComponent(() => import('@/pages/EnvironmentVariables'));
 const SSOPage = createLazyComponent(() => import('@/features/auth/pages/SSOPage'));
-import { GitHubDashboard } from '@/pages/GitHubDashboard';
 
-const PageLoader = () => {
-  const [showRetry, setShowRetry] = React.useState(false);
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowRetry(true);
-    }, 10000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="text-center">
-        <LoadingSpinner size="lg" />
-        <p className="mt-4 text-gray-600">Cargando...</p>
-        {showRetry ? (
-          <div className="mt-4">
-            <p className="mb-2 text-sm text-gray-500">¿Tarda mucho en cargar?</p>
-            <button
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm"
-              onClick={() => window.location.reload()}
-            >
-              Reintentar
-            </button>
-          </div>
-        ) : null}
-      </div>
+const PageLoader = () => (
+  <div className="relative min-h-screen overflow-hidden bg-[var(--bg-base)]">
+    <div className="absolute inset-0 flex items-center justify-center px-6">
+      <svg
+        aria-label="Pulse"
+        height="56"
+        role="img"
+        viewBox="0 0 100 100"
+        width="56"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <clipPath id="pulse-loader-react-clip">
+            <circle cx="50" cy="50" r="37" />
+          </clipPath>
+        </defs>
+        <circle
+          cx="50"
+          cy="50"
+          fill="none"
+          r="38"
+          stroke="rgba(255,255,255,0.15)"
+          strokeWidth="1.2"
+        />
+        <g clipPath="url(#pulse-loader-react-clip)">
+          <path
+            d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50"
+            fill="none"
+            stroke="rgba(255,255,255,0.9)"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+          />
+        </g>
+        <circle className="pulse-logo-dot" cx="60" cy="50" fill="#3B9EF5" r="2.5" />
+      </svg>
     </div>
-  );
-};
+
+    <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 px-6 pb-7 text-center">
+      <span className="text-[18px] font-medium uppercase tracking-[0.35em] text-[var(--text-primary)]">
+        Pulse
+      </span>
+      <span className="text-[11px] font-light tracking-[0.22em] text-[rgba(240,244,255,0.86)]">
+        by <span className="brand-gradient-text font-medium">TuWebAI</span>
+      </span>
+    </div>
+  </div>
+);
 
 const ServiceWorkerInitializer = () => {
   React.useEffect(() => {
@@ -116,6 +133,22 @@ const ServiceWorkerInitializer = () => {
 
   return null;
 };
+
+function PulseLoaderDismissBoundary({ children }: { children: React.ReactNode }) {
+  const { authReady } = useApp();
+
+  React.useEffect(() => {
+    if (!authReady || !window.__removePulseLoader) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      window.__removePulseLoader?.();
+    });
+  }, [authReady]);
+
+  return <>{children}</>;
+}
 
 function AppRoutes() {
   return (
@@ -456,7 +489,9 @@ export function AppRouter() {
       <TouchGestureProvider enableGlobalGestures={true} enableNavigationGestures={true}>
         <ServiceWorkerInitializer />
         <Suspense fallback={<PageLoader />}>
-          <AppRoutes />
+          <PulseLoaderDismissBoundary>
+            <AppRoutes />
+          </PulseLoaderDismissBoundary>
         </Suspense>
       </TouchGestureProvider>
     </Router>

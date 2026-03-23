@@ -68,60 +68,73 @@
         position: fixed;
         inset: 0;
         background: #0B0F1E;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 20px;
+        overflow: hidden;
         font-family: system-ui, sans-serif;
         z-index: 9999;
       ">
-        <svg
-          viewBox="0 0 100 100"
-          width="56"
-          height="56"
-          xmlns="http://www.w3.org/2000/svg"
-          role="img"
-          aria-label="Pulse"
-        >
-          <defs>
-            <clipPath id="lc">
-              <circle cx="50" cy="50" r="37"></circle>
-            </clipPath>
-          </defs>
-          <circle
-            cx="50"
-            cy="50"
-            r="38"
-            fill="none"
-            stroke="rgba(255,255,255,0.15)"
-            stroke-width="1.2"
-          ></circle>
-          <g clip-path="url(#lc)">
-            <path
-              d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50"
+        <div style="
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+        ">
+          <svg
+            viewBox="0 0 100 100"
+            width="56"
+            height="56"
+            xmlns="http://www.w3.org/2000/svg"
+            role="img"
+            aria-label="Pulse"
+          >
+            <defs>
+              <clipPath id="lc">
+                <circle cx="50" cy="50" r="37"></circle>
+              </clipPath>
+            </defs>
+            <circle
+              cx="50"
+              cy="50"
+              r="38"
               fill="none"
-              stroke="rgba(255,255,255,0.9)"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            ></path>
-          </g>
-          <circle cx="60" cy="50" r="2.5" fill="#3B9EF5">
-            <animate
-              attributeName="opacity"
-              values="1;0.3;1"
-              dur="2s"
-              repeatCount="indefinite"
-            ></animate>
-          </circle>
-        </svg>
+              stroke="rgba(255,255,255,0.15)"
+              stroke-width="1.2"
+            ></circle>
+            <g clip-path="url(#lc)">
+              <path
+                d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50"
+                fill="none"
+                stroke="rgba(255,255,255,0.9)"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </g>
+            <circle cx="60" cy="50" r="2.5" fill="#3B9EF5">
+              <animate
+                attributeName="opacity"
+                values="1;0.3;1"
+                dur="2s"
+                repeatCount="indefinite"
+              ></animate>
+            </circle>
+          </svg>
+        </div>
 
         <div style="
+          position: absolute;
+          left: 50%;
+          bottom: 0;
+          transform: translateX(-50%);
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 6px;
+          width: calc(100% - 48px);
+          padding: 0 24px 28px;
+          box-sizing: border-box;
+          text-align: center;
         ">
           <span style="
             font-size: 18px;
