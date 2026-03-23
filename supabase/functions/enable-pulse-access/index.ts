@@ -1,139 +1,121 @@
-// @ts-expect-error - Deno runtime
-/// <reference lib="deno.window" />
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
-// @ts-expect-error - Deno import for Supabase
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  corsHeaders,
+  ensureAuthenticatedAdmin,
+  ensureAuthUserExists,
+  type EnablePulseAccessBody,
+  type EnablePulseAccessResponse,
+  type TargetUserRow,
+  isPlainObject,
+  isValidEmail,
+  jsonResponse,
+  normalizeEmail
+} from './shared.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS'
-};
-
-interface EnablePulseAccessBody {
-  userId: string;
-}
-
-interface AdminUserRow {
-  id: string;
-  role: string;
-}
-
-interface TargetUserRow {
-  id: string;
-  email: string;
-  onboarding_completed: boolean | null;
-  website: string | null;
-}
-
-interface ProjectDomainRow {
-  domain: string | null;
-}
-
-function jsonResponse(status: number, body: Record<string, unknown>) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      ...corsHeaders,
-      'Content-Type': 'application/json'
-    }
-  });
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function createSupabaseAdminClient() {
-  const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
-}
-
-function createSupabaseUserClient(authHeader: string) {
-  const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-  const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
-
-  return createClient(supabaseUrl, anonKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    },
-    global: {
-      headers: {
-        Authorization: authHeader
-      }
-    }
-  });
-}
-
-function isValidEmail(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-async function ensureAuthenticatedAdmin(authorization: string) {
-  const userClient = createSupabaseUserClient(authorization);
-  const adminClient = createSupabaseAdminClient();
-
-  const {
-    data: { user: authUser },
-    error: authError
-  } = await userClient.auth.getUser();
-
-  if (authError || !authUser?.id) {
-    throw new Error('Unauthorized');
+function isInvokablePayload(body: unknown): body is EnablePulseAccessBody {
+  if (!isPlainObject(body)) {
+    return false;
   }
 
-  const { data: adminUser, error: adminUserError } = await adminClient
+  const userIdValid = typeof body.userId === 'string' && body.userId.trim().length > 0;
+  const emailValid = typeof body.email === 'string' && isValidEmail(body.email.trim());
+
+  return userIdValid || emailValid;
+}
+
+async function findTargetUser(
+  adminClient: Awaited<ReturnType<typeof ensureAuthenticatedAdmin>>['adminClient'],
+  body: EnablePulseAccessBody
+) {
+  if (typeof body.userId === 'string' && body.userId.trim()) {
+    const { data, error } = await adminClient
+      .from('users')
+      .select('id, email, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by')
+      .eq('id', body.userId.trim())
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    return data as TargetUserRow | null;
+  }
+
+  const normalizedEmail = normalizeEmail(body.email ?? '');
+  const { data, error } = await adminClient
     .from('users')
-    .select('id, role')
-    .eq('id', authUser.id)
+    .select('id, email, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by')
+    .eq('email', normalizedEmail)
     .maybeSingle();
-
-  if (adminUserError) {
-    throw adminUserError;
-  }
-
-  if ((adminUser as AdminUserRow | null)?.role !== 'admin') {
-    throw new Error('Forbidden');
-  }
-
-  return {
-    adminClient,
-    authUserId: authUser.id
-  };
-}
-
-async function ensureAuthUserExists(adminClient: ReturnType<typeof createSupabaseAdminClient>, email: string) {
-  const normalizedEmail = email.trim().toLowerCase();
-  const { data, error } = await adminClient.auth.admin.listUsers({
-    page: 1,
-    perPage: 1000
-  });
 
   if (error) {
     throw error;
   }
 
-  const existingUser = data.users.find((user) => user.email?.trim().toLowerCase() === normalizedEmail);
+  return data as TargetUserRow | null;
+}
 
-  if (existingUser) {
-    return false;
+async function createInvitedUser(
+  adminClient: Awaited<ReturnType<typeof ensureAuthenticatedAdmin>>['adminClient'],
+  email: string,
+  adminUserId: string
+) {
+  const timestamp = new Date().toISOString();
+  const { data, error } = await adminClient
+    .from('users')
+    .insert({
+      email: normalizeEmail(email),
+      role: 'user',
+      pulse_access_status: 'invited',
+      pulse_access_granted_at: timestamp,
+      pulse_access_granted_by: adminUserId,
+      updated_at: timestamp
+    })
+    .select('id, email, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by')
+    .single();
+
+  if (error) {
+    throw error;
   }
 
-  const inviteResult = await adminClient.auth.admin.inviteUserByEmail(normalizedEmail);
+  return data as TargetUserRow;
+}
 
-  if (inviteResult.error) {
-    throw inviteResult.error;
+async function promotePendingUser(
+  adminClient: Awaited<ReturnType<typeof ensureAuthenticatedAdmin>>['adminClient'],
+  userId: string,
+  adminUserId: string
+) {
+  const timestamp = new Date().toISOString();
+  const { data, error } = await adminClient
+    .from('users')
+    .update({
+      pulse_access_status: 'invited',
+      pulse_access_granted_at: timestamp,
+      pulse_access_granted_by: adminUserId,
+      pulse_access_disabled_at: null,
+      updated_at: timestamp
+    })
+    .eq('id', userId)
+    .select('id, email, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by')
+    .single();
+
+  if (error) {
+    throw error;
   }
 
-  return true;
+  return data as TargetUserRow;
+}
+
+function toResponse(user: TargetUserRow, invited: boolean): EnablePulseAccessResponse {
+  return {
+    invited,
+    user_id: user.id,
+    email: normalizeEmail(user.email),
+    pulse_access_status: user.pulse_access_status === 'active' ? 'active' : 'invited',
+    pulse_access_granted_at: user.pulse_access_granted_at,
+    pulse_access_granted_by: user.pulse_access_granted_by
+  };
 }
 
 serve(async (req) => {
@@ -159,74 +141,40 @@ serve(async (req) => {
     return jsonResponse(400, { error: 'Invalid JSON body' });
   }
 
-  if (!isPlainObject(body) || typeof body.userId !== 'string' || !body.userId.trim()) {
-    return jsonResponse(400, { error: 'userId is required' });
+  if (!isInvokablePayload(body)) {
+    return jsonResponse(400, { error: 'userId or email is required' });
   }
 
   try {
-    const { adminClient } = await ensureAuthenticatedAdmin(authorization);
-    const targetUserId = (body as EnablePulseAccessBody).userId.trim();
+    const { adminClient, authUserId } = await ensureAuthenticatedAdmin(authorization);
+    const payload = body as EnablePulseAccessBody;
+    const requestedEmail =
+      typeof payload.email === 'string' && isValidEmail(payload.email) ? normalizeEmail(payload.email) : null;
 
-    const { data: targetUser, error: targetUserError } = await adminClient
-      .from('users')
-      .select('id, email, onboarding_completed, website')
-      .eq('id', targetUserId)
-      .maybeSingle();
+    let user = await findTargetUser(adminClient, payload);
 
-    if (targetUserError) {
-      throw targetUserError;
-    }
-
-    const user = targetUser as TargetUserRow | null;
-
-    if (!user?.id || !isValidEmail(user.email)) {
-      return jsonResponse(404, { error: 'Pulse user not found' });
-    }
-
-    const { data: latestProject, error: latestProjectError } = await adminClient
-      .from('projects')
-      .select('domain')
-      .eq('created_by', user.id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (latestProjectError) {
-      throw latestProjectError;
-    }
-
-    const project = latestProject as ProjectDomainRow | null;
-    const invited = await ensureAuthUserExists(adminClient, user.email);
-    const hasConfiguredUrl = Boolean(user.website?.trim() || project?.domain?.trim());
-
-    if (hasConfiguredUrl && !user.onboarding_completed) {
-      const { error: updateError } = await adminClient
-        .from('users')
-        .update({
-          onboarding_completed: true,
-          onboarding_completed_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (updateError) {
-        throw updateError;
+    if (!user) {
+      if (!requestedEmail) {
+        return jsonResponse(404, { error: 'USER_NOT_FOUND' });
       }
+
+      user = await createInvitedUser(adminClient, requestedEmail, authUserId);
+    } else if (user.pulse_access_status === 'disabled') {
+      return jsonResponse(409, { error: 'ACCESS_DISABLED' });
+    } else if (user.pulse_access_status === 'pending') {
+      user = await promotePendingUser(adminClient, user.id, authUserId);
     }
 
-    return jsonResponse(200, {
-      invited,
-      onboarding_completed: hasConfiguredUrl ? true : Boolean(user.onboarding_completed),
-      status: 'enabled'
-    });
+    const invited = await ensureAuthUserExists(adminClient, user.email);
+    return jsonResponse(200, toResponse(user, invited));
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
 
-    if (message === 'Unauthorized') {
+    if (message === 'UNAUTHORIZED') {
       return jsonResponse(401, { error: message });
     }
 
-    if (message === 'Forbidden') {
+    if (message === 'FORBIDDEN') {
       return jsonResponse(403, { error: message });
     }
 

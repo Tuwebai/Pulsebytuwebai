@@ -630,7 +630,9 @@ const Admin = React.memo(() => {
           currentUser.id === targetUserId
             ? {
                 ...currentUser,
-                onboarding_completed: result.onboarding_completed,
+                pulse_access_status: result.pulse_access_status,
+                pulse_access_granted_at: result.pulse_access_granted_at,
+                pulse_access_granted_by: result.pulse_access_granted_by,
                 updated_at: new Date().toISOString()
               }
             : currentUser
@@ -639,9 +641,10 @@ const Admin = React.memo(() => {
 
       toast({
         title: 'Acceso a Pulse habilitado',
-        description: result.onboarding_completed
-          ? 'El cliente ya puede entrar a Pulse y aterrizar en su dashboard.'
-          : 'El cliente ya puede entrar a Pulse. Si todavia no tiene URL configurada, va a onboarding.'
+        description:
+          result.pulse_access_status === 'active'
+            ? 'El cliente ya tiene acceso activo a Pulse.'
+            : 'El cliente ya puede entrar a Pulse. Si todavia no completa onboarding, va a onboarding.'
       });
     } catch (error) {
       console.error('Error enabling Pulse access:', error);
