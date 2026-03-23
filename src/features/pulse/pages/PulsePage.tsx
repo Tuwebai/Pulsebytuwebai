@@ -1,6 +1,6 @@
 import { ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { MetricCard, Skeleton } from '@/core/components';
+import { FadeIn, MetricCard, Skeleton } from '@/core/components';
 import AnimatedList from '@/core/components/AnimatedList';
 import type { Period } from '@/data/types/pulse';
 import { useUserProject } from '@/features/project/hooks/useUserProject';
@@ -119,23 +119,33 @@ export default function PulsePage() {
                 {loading ? (
                   Array.from({ length: 5 }).map((_, index) => (
                     <tr key={`skeleton-${index}`} className="border-b border-[var(--border-subtle)] last:border-b-0">
-                      <td className="px-5 py-3" colSpan={3}>
-                        <Skeleton height="16px" rounded="sm" />
+                      <td className="px-5 py-3 text-sm" colSpan={3}>
+                        <div className="grid grid-cols-[minmax(0,1fr)_96px_96px] items-center gap-4 transition-opacity duration-150 ease-out">
+                          <Skeleton height="16px" rounded="sm" width="100%" />
+                          <Skeleton height="16px" rounded="sm" width="64px" />
+                          <Skeleton height="16px" rounded="sm" width="72px" />
+                        </div>
                       </td>
                     </tr>
                   ))
                 ) : data?.topPages.length ? (
                   data.topPages.map((page, index) => (
                     <tr key={page.path} className={index === data.topPages.length - 1 ? '' : 'border-b border-[var(--border-subtle)]'}>
-                      <td className="px-5 py-3 text-sm text-[var(--text-secondary)]">{page.path}</td>
-                      <td className="px-5 py-3 font-data text-sm text-[var(--text-primary)]">{page.visits}</td>
-                      <td className="px-5 py-3 font-data text-sm text-[var(--text-primary)]">{page.percentage}%</td>
+                      <td className="px-5 py-3 text-sm text-[var(--text-secondary)]">
+                        <FadeIn>{page.path}</FadeIn>
+                      </td>
+                      <td className="px-5 py-3 font-data text-sm text-[var(--text-primary)]">
+                        <FadeIn>{page.visits}</FadeIn>
+                      </td>
+                      <td className="px-5 py-3 font-data text-sm text-[var(--text-primary)]">
+                        <FadeIn>{page.percentage}%</FadeIn>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td className="px-5 py-8 text-center text-sm text-[var(--text-tertiary)]" colSpan={3}>
-                      Todavia no hay datos suficientes para este periodo.
+                      <FadeIn>Todavia no hay datos suficientes para este periodo.</FadeIn>
                     </td>
                   </tr>
                 )}

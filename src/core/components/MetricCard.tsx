@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useCountUp } from '@/core/hooks/useCountUp';
 import { cn } from '@/lib/utils';
+import FadeIn from './FadeIn';
 import Skeleton from './Skeleton';
 
 export interface MetricCardProps {
@@ -86,7 +87,7 @@ export default function MetricCard({
   return (
     <article
       className={cn(
-        'rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 transition-[border-color,transform] duration-150',
+        'min-h-[152px] rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 transition-[border-color,transform] duration-150',
         clickable && 'cursor-pointer hover:border-[var(--border-strong)]',
         className
       )}
@@ -110,25 +111,37 @@ export default function MetricCard({
 
       <div className="mt-5 flex items-start justify-between gap-4">
         {loading ? (
-          <Skeleton height="40px" width="60%" rounded="sm" />
+          <div className="transition-opacity duration-150 ease-out">
+            <Skeleton height="40px" rounded="sm" width="60%" />
+          </div>
         ) : (
-          <p
-            className={cn(
-              'font-data text-[40px] font-light leading-none text-[var(--text-primary)]',
-              isEmpty && 'text-[var(--text-tertiary)]'
-            )}
-            style={{ fontFamily: 'var(--font-data)' }}
-          >
-            {isEmpty ? '—' : formatValue(displayValue, unit)}
-          </p>
+          <FadeIn>
+            <p
+              className={cn(
+                'font-data text-[40px] font-light leading-none text-[var(--text-primary)]',
+                isEmpty && 'text-[var(--text-tertiary)]'
+              )}
+              style={{ fontFamily: 'var(--font-data)' }}
+            >
+              {isEmpty ? '—' : formatValue(displayValue, unit)}
+            </p>
+          </FadeIn>
         )}
 
         <div className="pt-2">
-          {loading ? <Skeleton height="12px" width="72px" rounded="sm" /> : renderDelta(delta)}
+          {loading ? (
+            <div className="transition-opacity duration-150 ease-out">
+              <Skeleton height="12px" rounded="sm" width="72px" />
+            </div>
+          ) : (
+            <FadeIn>{renderDelta(delta)}</FadeIn>
+          )}
         </div>
       </div>
 
-      <p className="mt-4 text-[11px] text-[var(--text-tertiary)]">{loading ? '\u00A0' : displayPeriod}</p>
+      <div className="mt-4 min-h-[16px] text-[11px] text-[var(--text-tertiary)]">
+        {loading ? '\u00A0' : <FadeIn>{displayPeriod}</FadeIn>}
+      </div>
     </article>
   );
 }
