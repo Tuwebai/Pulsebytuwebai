@@ -243,7 +243,7 @@ function AppRoutes() {
       <Route
         path="/admin"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="admin">
             <DashboardLayout>
               <Admin />
             </DashboardLayout>
@@ -253,7 +253,7 @@ function AppRoutes() {
       <Route
         path="/admin/websy-ai"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="admin">
             <WebsyAI />
           </ProtectedRoute>
         }
@@ -261,7 +261,7 @@ function AppRoutes() {
       <Route
         path="/admin/fases-tareas"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="admin">
             <DashboardLayout>
               <AdminPhasesAndTasksPage />
             </DashboardLayout>
@@ -291,7 +291,7 @@ function AppRoutes() {
       <Route
         path="/proyectos/:userId"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="admin">
             <DashboardLayout key="proyectos-user">
               <ProjectsPage key="proyectos-user-content" />
             </DashboardLayout>
@@ -311,7 +311,7 @@ function AppRoutes() {
       <Route
         path="/perfil/:userId"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="admin">
             <DashboardLayout key="user-profile">
               <UserProfileView key="user-profile-content" />
             </DashboardLayout>
@@ -331,7 +331,7 @@ function AppRoutes() {
       <Route
         path="/profile/:userId/github"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="admin">
             <AdminGitHubProfile />
           </ProtectedRoute>
         }
@@ -419,7 +419,7 @@ function AppRoutes() {
       <Route
         path="/team"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="admin">
             <DashboardLayout>
               <Team />
             </DashboardLayout>
@@ -429,7 +429,7 @@ function AppRoutes() {
       <Route
         path="/environment"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="admin">
             <DashboardLayout>
               <EnvironmentVariables />
             </DashboardLayout>
@@ -439,7 +439,7 @@ function AppRoutes() {
       <Route
         path="/analytics"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="admin">
             <DashboardLayout>
               <AdvancedAnalytics />
             </DashboardLayout>
@@ -459,7 +459,7 @@ function AppRoutes() {
       <Route
         path="/user-management"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="admin">
             <DashboardLayout>
               <AdvancedUserManagement />
             </DashboardLayout>
