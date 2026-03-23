@@ -3,7 +3,7 @@ import type { ComponentType } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import DashboardLayout from '@/components/DashboardLayout';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import ProtectedRoute from '@/features/auth/components/ProtectedRoute';
 import DashboardShell from '@/core/layout/DashboardLayout';
 import OnboardingGate from '@/features/onboarding/components/OnboardingGate';
 
