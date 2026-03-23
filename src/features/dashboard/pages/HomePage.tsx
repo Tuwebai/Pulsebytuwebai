@@ -1,6 +1,7 @@
 import { CreditCard, FolderOpen, LifeBuoy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, PulseEmptyState, Skeleton } from '@/core/components';
+import AnimatedList, { AnimatedReveal } from '@/core/components/AnimatedList';
 import { useApp } from '@/contexts/AppContext';
 import PulseChart from '@/features/pulse/components/PulseChart';
 import { usePulseMetrics } from '@/features/pulse/hooks/usePulseMetrics';
@@ -58,7 +59,11 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[20px] border border-[var(--signal-border)] bg-[var(--bg-surface)] p-5 md:p-7">
+      <AnimatedReveal
+        className="rounded-[20px] border border-[var(--signal-border)] bg-[var(--bg-surface)] p-5 md:p-7"
+        disabled={loading}
+        key={`${period}-${loading ? 'loading' : hasDomain && data?.hasData ? 'ready' : 'empty'}`}
+      >
         {!hasProject && !loading ? (
           <div className="space-y-3">
             <h2 className="text-2xl font-medium text-[var(--text-primary)]">Tu proyecto se esta configurando.</h2>
@@ -135,9 +140,9 @@ export default function HomePage() {
             </div>
           </div>
         )}
-      </section>
+      </AnimatedReveal>
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <AnimatedList className="grid gap-4 md:grid-cols-3" staggerMs={80}>
         <button
           className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 text-left transition-colors hover:border-[var(--border-strong)]"
           onClick={() => navigate('/dashboard/proyecto')}
@@ -188,7 +193,7 @@ export default function HomePage() {
           <p className="mt-3 text-sm text-[var(--text-secondary)]">Tu equipo de TuWebAI sigue disponible.</p>
           <p className="mt-4 text-sm text-[var(--signal)]">Abrir ticket →</p>
         </button>
-      </section>
+      </AnimatedList>
     </div>
   );
 }

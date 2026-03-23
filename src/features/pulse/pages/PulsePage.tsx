@@ -1,6 +1,7 @@
 import { ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { MetricCard, Skeleton } from '@/core/components';
+import AnimatedList from '@/core/components/AnimatedList';
 import type { Period } from '@/data/types/pulse';
 import { useUserProject } from '@/features/project/hooks/useUserProject';
 import PulseChart from '../components/PulseChart';
@@ -60,7 +61,12 @@ export default function PulsePage() {
         </div>
       ) : null}
 
-      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <AnimatedList
+        className="grid gap-3 md:grid-cols-2 xl:grid-cols-4"
+        disabled={loading}
+        key={`${period}-${loading ? 'loading' : 'ready'}`}
+        staggerMs={60}
+      >
         <MetricCard
           label="Visitas este mes"
           value={data?.visits ?? null}
@@ -85,7 +91,7 @@ export default function PulsePage() {
           unit="visitas/dia"
           loading={loading}
         />
-      </section>
+      </AnimatedList>
 
       <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
         <p className="text-[12px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Visitas por dia</p>
