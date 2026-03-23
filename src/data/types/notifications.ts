@@ -1,21 +1,20 @@
-export type NotificationType =
-  | 'admin'
-  | 'project_message'
-  | 'project_approved'
-  | 'project_rejected'
-  | 'new_consultation'
-  | 'monthly_summary'
-  | 'system';
+export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'critical';
+
+export type NotificationCategory = 'system' | 'project' | 'ticket' | 'payment' | 'security' | 'user';
 
 export interface Notification {
   id: string;
   user_id: string;
   type: NotificationType;
+  category: NotificationCategory;
   title: string;
-  body: string | null;
-  read: boolean;
+  message: string | null;
+  is_read: boolean;
+  is_urgent: boolean;
+  action_url: string | null;
   metadata: Record<string, unknown> | null;
   created_at: string;
+  updated_at: string | null;
 }
 
 export interface NotificationPreferences {

@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { Notification, NotificationPreferences, NotificationType } from '@/data/types/notifications';
+import type { Notification, NotificationCategory, NotificationPreferences, NotificationType } from '@/data/types/notifications';
 
 interface NotificationRow {
   id: string;
@@ -9,9 +9,11 @@ interface NotificationRow {
   type: string;
   category: string;
   is_read: boolean | null;
+  is_urgent?: boolean | null;
   metadata: unknown;
   created_at: string | null;
   action_url?: string | null;
+  updated_at?: string | null;
 }
 
 interface UserPreferenceRow {
@@ -40,45 +42,29 @@ function normalizeMetadata(row: NotificationRow): Record<string, unknown> | null
 }
 
 function normalizeType(row: NotificationRow): NotificationType {
-  const rawType = row.type;
-  const rawCategory = row.category;
-  const title = row.title.toLowerCase();
-  const message = row.message.toLowerCase();
-
   if (
-    rawType === 'admin' ||
-    rawType === 'project_message' ||
-    rawType === 'project_approved' ||
-    rawType === 'project_rejected' ||
-    rawType === 'new_consultation' ||
-    rawType === 'monthly_summary' ||
-    rawType === 'system'
+    row.type === 'info' ||
+    row.type === 'success' ||
+    row.type === 'warning' ||
+    row.type === 'error' ||
+    row.type === 'critical'
   ) {
-    return rawType;
+    return row.type;
   }
 
-  if (rawCategory === 'admin' || title.includes('admin') || message.includes('mensaje del admin')) {
-    return 'admin';
-  }
+  return 'info';
+}
 
-  if (rawCategory === 'project' && (title.includes('aprobado') || message.includes('aprobado'))) {
-    return 'project_approved';
-  }
-
-  if (rawCategory === 'project' && (title.includes('rechaz') || message.includes('rechaz'))) {
-    return 'project_rejected';
-  }
-
-  if (rawCategory === 'project') {
-    return 'project_message';
-  }
-
-  if (title.includes('consulta') || message.includes('consulta')) {
-    return 'new_consultation';
-  }
-
-  if (title.includes('resumen') || message.includes('resumen')) {
-    return 'monthly_summary';
+function normalizeCategory(row: NotificationRow): NotificationCategory {
+  if (
+    row.category === 'system' ||
+    row.category === 'project' ||
+    row.category === 'ticket' ||
+    row.category === 'payment' ||
+    row.category === 'security' ||
+    row.category === 'user'
+  ) {
+    return row.category;
   }
 
   return 'system';
@@ -89,11 +75,15 @@ function mapNotification(row: NotificationRow): Notification {
     id: row.id,
     user_id: row.user_id || '',
     type: normalizeType(row),
+    category: normalizeCategory(row),
     title: row.title,
-    body: row.message || null,
-    read: row.is_read ?? false,
+    message: row.message || null,
+    is_read: row.is_read ?? false,
+    is_urgent: row.is_urgent ?? false,
+    action_url: row.action_url ?? null,
     metadata: normalizeMetadata(row),
-    created_at: row.created_at || new Date(0).toISOString()
+    created_at: row.created_at || new Date(0).toISOString(),
+    updated_at: row.updated_at || null
   };
 }
 
@@ -114,7 +104,7 @@ export async function fetchNotifications(limit = 20): Promise<Notification[]> {
   const userId = await getCurrentUserId();
   const { data, error } = await supabase
     .from('notifications')
-    .select('id, user_id, title, message, type, category, is_read, metadata, created_at, action_url')
+    .select('id, user_id, title, message, type, category, is_read, is_urgent, metadata, created_at, updated_at, action_url')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(limit);

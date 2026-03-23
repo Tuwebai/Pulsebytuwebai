@@ -312,7 +312,8 @@ serve(async (req) => {
             .from('notifications')
             .select('id')
             .eq('user_id', project.created_by)
-            .eq('type', 'new_consultation')
+            .eq('type', 'warning')
+            .eq('category', 'system')
             .contains('metadata', { project_id: project.id, date: dateStr })
             .limit(1)
             .maybeSingle();
@@ -325,7 +326,7 @@ serve(async (req) => {
             const conversionLabel = `${ga4Data.conversions} consulta${ga4Data.conversions > 1 ? 's' : ''} nueva${ga4Data.conversions > 1 ? 's' : ''}`;
             const { error: notificationError } = await supabase.from('notifications').insert({
               user_id: project.created_by,
-              type: 'new_consultation',
+              type: 'warning',
               category: 'system',
               title: conversionLabel,
               message: 'Alguien se contactó a través de tu web.',

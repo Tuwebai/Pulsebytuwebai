@@ -233,7 +233,7 @@ serve(async (req) => {
 
       const { error: notificationError } = await supabase.from('notifications').insert({
         user_id: user.id,
-        type: 'monthly_summary',
+        type: 'success',
         category: 'system',
         title: `Tu resumen de ${monthName} está listo`,
         message: `Tu web tuvo ${current.visits} visitas y ${current.contacts} consultas.`,

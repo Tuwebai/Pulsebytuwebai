@@ -1,6 +1,6 @@
-import { BarChart2, Bell, CheckCircle, MessageSquare, XCircle } from 'lucide-react';
+import { AlertTriangle, BarChart2, Bell, CheckCircle, MessageSquare, ShieldAlert, XCircle } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import type { Notification, NotificationType } from '@/data/types/notifications';
+import type { Notification } from '@/data/types/notifications';
 import { cn } from '@/lib/utils';
 import { formatNotificationTime } from '../services/notifications.service';
 
@@ -16,14 +16,23 @@ type NotificationVisual = {
   borderColor: string;
 };
 
-const baseNotificationIconMap: Record<NotificationType, { icon: LucideIcon; color: string }> = {
-  admin: { icon: MessageSquare, color: '#3B9EF5' },
+type NotificationDisplayType =
+  | 'project_message'
+  | 'project_approved'
+  | 'project_rejected'
+  | 'new_consultation'
+  | 'monthly_summary'
+  | 'security'
+  | 'system';
+
+const baseNotificationIconMap: Record<NotificationDisplayType, { icon: LucideIcon; color: string }> = {
   project_message: { icon: MessageSquare, color: '#3B9EF5' },
   project_approved: { icon: CheckCircle, color: '#22C55E' },
   project_rejected: { icon: XCircle, color: '#EF4444' },
   new_consultation: { icon: Bell, color: '#F59E0B' },
   monthly_summary: { icon: BarChart2, color: '#22C55E' },
-  system: { icon: Bell, color: '#8B9AC0' }
+  security: { icon: ShieldAlert, color: '#EF4444' },
+  system: { icon: AlertTriangle, color: '#8B9AC0' }
 };
 
 const notificationIconMap = Object.fromEntries(
@@ -35,7 +44,7 @@ const notificationIconMap = Object.fromEntries(
       borderColor: hexToRgba(value.color, 0.28)
     }
   ])
-) as Record<NotificationType, NotificationVisual>;
+) as Record<NotificationDisplayType, NotificationVisual>;
 
 function hexToRgba(hex: string, alpha: number) {
   const normalizedHex = hex.replace('#', '');
@@ -46,42 +55,44 @@ function hexToRgba(hex: string, alpha: number) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function getNotificationIcon(notification: Notification): NotificationVisual {
-  const mappedIcon = notificationIconMap[notification.type as NotificationType];
-
-  if (mappedIcon) {
-    return mappedIcon;
-  }
-
+function getDisplayType(notification: Notification): NotificationDisplayType {
   const title = notification.title.toLowerCase();
-  const body = notification.body?.toLowerCase() ?? '';
-  const content = `${title} ${body}`;
-
-  if (content.includes('mensaje del admin')) {
-    return notificationIconMap.admin;
-  }
+  const message = notification.message?.toLowerCase() ?? '';
+  const content = `${title} ${message}`;
 
   if (content.includes('mensaje en proyecto') || content.includes('ha enviado un mensaje en el proyecto')) {
-    return notificationIconMap.project_message;
+    return 'project_message';
   }
 
   if (content.includes('aprobado')) {
-    return notificationIconMap.project_approved;
+    return 'project_approved';
   }
 
   if (content.includes('rechaz')) {
-    return notificationIconMap.project_rejected;
+    return 'project_rejected';
   }
 
   if (content.includes('consulta')) {
-    return notificationIconMap.new_consultation;
+    return 'new_consultation';
   }
 
   if (content.includes('resumen')) {
-    return notificationIconMap.monthly_summary;
+    return 'monthly_summary';
   }
 
-  return notificationIconMap.system;
+  if (notification.category === 'security' || notification.type === 'critical' || notification.type === 'error') {
+    return 'security';
+  }
+
+  if (notification.category === 'project') {
+    return 'project_message';
+  }
+
+  return 'system';
+}
+
+function getNotificationIcon(notification: Notification): NotificationVisual {
+  return notificationIconMap[getDisplayType(notification)];
 }
 
 export function NotificationItem({ notification, onRead }: NotificationItemProps) {
@@ -91,7 +102,7 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
     <button
       className={cn(
         'flex w-full items-start gap-3 border-b border-[var(--border-subtle)] px-5 py-3.5 text-left transition-colors duration-200 hover:bg-[var(--bg-elevated)]',
-        notification.read ? 'bg-transparent' : 'bg-[color:rgba(59,158,245,0.08)]'
+        notification.is_read ? 'bg-transparent' : 'bg-[color:rgba(59,158,245,0.08)]'
       )}
       type="button"
       onClick={() => onRead(notification.id)}
@@ -104,7 +115,7 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
         <span
           className={cn(
             'absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full transition-colors',
-            notification.read ? 'bg-[var(--text-tertiary)]/40' : 'bg-[var(--signal)]'
+            notification.is_read ? 'bg-[var(--text-tertiary)]/40' : 'bg-[var(--signal)]'
           )}
         />
       </div>
@@ -116,8 +127,8 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
             {formatNotificationTime(notification.created_at)}
           </span>
         </div>
-        {notification.body ? (
-          <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">{notification.body}</p>
+        {notification.message ? (
+          <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">{notification.message}</p>
         ) : null}
       </div>
     </button>
