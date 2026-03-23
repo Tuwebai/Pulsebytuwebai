@@ -2,21 +2,13 @@ import React from 'react';
 import type { ComponentType } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Suspense, lazy, useEffect } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { I18nextProvider } from 'react-i18next';
-import i18n from './lib/config/i18n';
-import { AppProvider } from './contexts/AppContext';
-import { TutorialProvider } from './contexts/TutorialContext';
-import { ThemeProvider } from './contexts/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './components/DashboardLayout';
 import PulseDashboardLayout from './core/layout/DashboardLayout';
 import OnboardingGate from './features/onboarding/components/OnboardingGate';
-import { Toaster } from '@/components/ui/toaster';
-import { Toaster as Sonner } from '@/components/ui/sonner';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { AppProviders } from './app/providers';
 import { serviceWorkerManager } from './utils/serviceWorker';
 import TouchGestureProvider from './components/TouchGestureProvider';
 
@@ -122,17 +114,6 @@ const PageLoader = () => {
     </div>
   );
 };
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000,
-      gcTime: 10 * 60 * 1000,
-      retry: 1,
-      refetchOnWindowFocus: false
-    }
-  }
-});
 
 const ServiceWorkerInitializer = () => {
   useEffect(() => {
@@ -480,34 +461,22 @@ function AppRoutes() {
 function App() {
   return (
     <ErrorBoundary>
-      <I18nextProvider i18n={i18n}>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider>
-            <TooltipProvider>
-              <AppProvider>
-                <TutorialProvider>
-                  <Router
-                    basename={import.meta.env.BASE_URL || '/'}
-                    future={{
-                      v7_startTransition: false,
-                      v7_relativeSplatPath: false
-                    }}
-                  >
-                    <TouchGestureProvider enableGlobalGestures={true} enableNavigationGestures={true}>
-                      <ServiceWorkerInitializer />
-                      <Suspense fallback={<PageLoader />}>
-                        <AppRoutes />
-                      </Suspense>
-                      <Toaster />
-                      <Sonner />
-                    </TouchGestureProvider>
-                  </Router>
-                </TutorialProvider>
-              </AppProvider>
-            </TooltipProvider>
-          </ThemeProvider>
-        </QueryClientProvider>
-      </I18nextProvider>
+      <AppProviders>
+        <Router
+          basename={import.meta.env.BASE_URL || '/'}
+          future={{
+            v7_startTransition: false,
+            v7_relativeSplatPath: false
+          }}
+        >
+          <TouchGestureProvider enableGlobalGestures={true} enableNavigationGestures={true}>
+            <ServiceWorkerInitializer />
+            <Suspense fallback={<PageLoader />}>
+              <AppRoutes />
+            </Suspense>
+          </TouchGestureProvider>
+        </Router>
+      </AppProviders>
     </ErrorBoundary>
   );
 }
