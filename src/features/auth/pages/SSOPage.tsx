@@ -5,7 +5,7 @@ import { SsoAccessError, signInWithSsoToken } from '@/features/auth/services/sso
 const SSO_TOKEN_STORAGE_KEY = 'pulse_sso_token';
 
 let activeSsoToken: string | null = null;
-let activeSsoRequest: Promise<void> | null = null;
+let activeSsoRequest: Promise<string> | null = null;
 
 function readSsoToken(searchParams: URLSearchParams): string | null {
   const tokenFromUrl = searchParams.get('token');
@@ -48,9 +48,9 @@ export default function SSOPage() {
           activeSsoRequest = signInWithSsoToken(token);
         }
 
-        await activeSsoRequest;
+        const redirectPath = await activeSsoRequest;
         clearSsoToken();
-        navigate('/dashboard', { replace: true });
+        navigate(redirectPath, { replace: true });
       } catch (error) {
         if (error instanceof SsoAccessError && error.code === 'access_pending') {
           clearSsoToken();

@@ -1,4 +1,6 @@
 import { FunctionsHttpError } from '@supabase/supabase-js';
+import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
+import { userService } from '@/lib/supabase/supabaseService';
 import { supabase } from '@/lib/supabase';
 
 interface SsoBridgeResponse {
@@ -63,7 +65,20 @@ async function getSsoBridge(token: string): Promise<SsoBridgeResponse> {
   return data;
 }
 
-export async function signInWithSsoToken(token: string): Promise<void> {
+async function resolvePostSsoPath(): Promise<string> {
+  const {
+    data: { user: authUser }
+  } = await supabase.auth.getUser();
+
+  if (!authUser?.id) {
+    throw new SsoAccessError('session_bridge_failed', 'No pudimos recuperar tu sesion en Pulse.');
+  }
+
+  const pulseUser = await userService.getUserById(authUser.id);
+  return getPostLoginPath(pulseUser ?? undefined);
+}
+
+export async function signInWithSsoToken(token: string): Promise<string> {
   const bridge = await getSsoBridge(token);
 
   const { error } = await supabase.auth.verifyOtp({
@@ -75,4 +90,6 @@ export async function signInWithSsoToken(token: string): Promise<void> {
   if (error) {
     throw new SsoAccessError('session_bridge_failed', 'No pudimos abrir tu sesion en Pulse.');
   }
+
+  return resolvePostSsoPath();
 }
