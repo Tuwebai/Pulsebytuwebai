@@ -1,0 +1,14 @@
+{
+  "name": "pulse-preview",
+  "version": "1.0.0",
+  "description": "Edge Function publica para preview minimo de Pulse dentro del panel de TuWebAI",
+  "main": "index.ts",
+  "imports": {
+    "supabase": "https://esm.sh/@supabase/supabase-js@2"
+  },
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["deno.window", "deno.ns"],
+    "strict": true
+  }
+}
