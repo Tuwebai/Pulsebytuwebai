@@ -1,1 +1,3 @@
-// project/components - ver docsproyecto/06-ARCHITECTURE.md
+export { default as ProjectCard } from './ProjectCard';
+export { default as ProjectFilters } from './ProjectFilters';
+export { default as ProjectStatsRow } from './ProjectStatsRow';
