@@ -1,15 +1,38 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { signInWithSsoToken } from '@/features/auth/services/ssoService';
+import { SsoAccessError, signInWithSsoToken } from '@/features/auth/services/ssoService';
+
+const SSO_TOKEN_STORAGE_KEY = 'pulse_sso_token';
+
+let activeSsoToken: string | null = null;
+let activeSsoRequest: Promise<void> | null = null;
+
+function readSsoToken(searchParams: URLSearchParams): string | null {
+  const tokenFromUrl = searchParams.get('token');
+
+  if (tokenFromUrl) {
+    sessionStorage.setItem(SSO_TOKEN_STORAGE_KEY, tokenFromUrl);
+    return tokenFromUrl;
+  }
+
+  return sessionStorage.getItem(SSO_TOKEN_STORAGE_KEY);
+}
+
+function clearSsoToken() {
+  sessionStorage.removeItem(SSO_TOKEN_STORAGE_KEY);
+  activeSsoToken = null;
+  activeSsoRequest = null;
+}
 
 export default function SSOPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [status, setStatus] = useState<'verifying' | 'access_pending'>('verifying');
 
   useEffect(() => {
-    const token = searchParams.get('token');
+    const token = readSsoToken(searchParams);
 
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && searchParams.get('token')) {
       window.history.replaceState({}, document.title, '/auth/sso');
     }
 
@@ -20,9 +43,22 @@ export default function SSOPage() {
 
     const processSso = async () => {
       try {
-        await signInWithSsoToken(token);
+        if (activeSsoToken !== token || !activeSsoRequest) {
+          activeSsoToken = token;
+          activeSsoRequest = signInWithSsoToken(token);
+        }
+
+        await activeSsoRequest;
+        clearSsoToken();
         navigate('/dashboard', { replace: true });
-      } catch {
+      } catch (error) {
+        if (error instanceof SsoAccessError && error.code === 'access_pending') {
+          clearSsoToken();
+          setStatus('access_pending');
+          return;
+        }
+
+        clearSsoToken();
         navigate('/login?error=sso_invalid', { replace: true });
       }
     };
@@ -78,7 +114,25 @@ export default function SSOPage() {
               </p>
             </div>
 
-            <p className="text-sm text-[var(--text-secondary)]">Verificando acceso...</p>
+            {status === 'access_pending' ? (
+              <div className="space-y-3">
+                <p className="text-sm text-[var(--text-primary)]">
+                  Tu acceso a Pulse todavia no fue habilitado.
+                </p>
+                <p className="text-sm text-[var(--text-secondary)]">
+                  Un administrador tiene que confirmar tu alta en el dashboard antes de que puedas entrar.
+                </p>
+                <button
+                  className="rounded-full border border-[var(--border-default)] px-4 py-2 text-sm text-[var(--text-primary)] transition-colors hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)]"
+                  onClick={() => navigate('/login', { replace: true })}
+                  type="button"
+                >
+                  Volver al login
+                </button>
+              </div>
+            ) : (
+              <p className="text-sm text-[var(--text-secondary)]">Verificando acceso...</p>
+            )}
           </div>
         </div>
       </div>
