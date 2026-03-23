@@ -19,12 +19,46 @@ const notificationIconMap: Record<NotificationType, { icon: LucideIcon; color: s
   system: { icon: Bell, color: '#8B9AC0' }
 };
 
-function getNotificationIcon(type: string): { icon: LucideIcon; color: string } {
-  return notificationIconMap[type as NotificationType] ?? notificationIconMap.system;
+function getNotificationIcon(notification: Notification): { icon: LucideIcon; color: string } {
+  const mappedIcon = notificationIconMap[notification.type as NotificationType];
+
+  if (mappedIcon) {
+    return mappedIcon;
+  }
+
+  const title = notification.title.toLowerCase();
+  const body = notification.body?.toLowerCase() ?? '';
+  const content = `${title} ${body}`;
+
+  if (content.includes('mensaje del admin')) {
+    return notificationIconMap.admin;
+  }
+
+  if (content.includes('mensaje en proyecto') || content.includes('ha enviado un mensaje en el proyecto')) {
+    return notificationIconMap.project_message;
+  }
+
+  if (content.includes('aprobado')) {
+    return notificationIconMap.project_approved;
+  }
+
+  if (content.includes('rechaz')) {
+    return notificationIconMap.project_rejected;
+  }
+
+  if (content.includes('consulta')) {
+    return notificationIconMap.new_consultation;
+  }
+
+  if (content.includes('resumen')) {
+    return notificationIconMap.monthly_summary;
+  }
+
+  return notificationIconMap.system;
 }
 
 export function NotificationItem({ notification, onRead }: NotificationItemProps) {
-  const { icon: Icon, color } = getNotificationIcon(notification.type);
+  const { icon: Icon, color } = getNotificationIcon(notification);
 
   return (
     <button
