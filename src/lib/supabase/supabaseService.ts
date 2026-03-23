@@ -10,6 +10,9 @@ export interface User {
   created_at: string;
   updated_at: string;
   avatar_url?: string; // Campo para la URL del avatar
+  onboarding_completed?: boolean;
+  onboarding_completed_at?: string | null;
+  website?: string | null;
 }
 
 export interface Project {
@@ -214,7 +217,9 @@ export class SupabaseService {
       // Intentar obtener el usuario con manejo de errores específicos
       const { data, error } = await supabase
         .from('users')
-        .select('id, email, full_name, role, created_at, updated_at, avatar_url')
+        .select(
+          'id, email, full_name, role, created_at, updated_at, avatar_url, onboarding_completed, onboarding_completed_at, website'
+        )
         .eq('id', id)
         .maybeSingle(); // Usar maybeSingle en lugar de single para evitar errores
 

@@ -20,6 +20,8 @@ export interface Project {
   updated_at: string;
   created_by?: string;
   is_active: boolean;
+  domain?: string | null;
+  ga4_property_id?: string | null;
   // Campos extendidos para compatibilidad
   type?: 'Web' | 'App' | 'Landing' | 'Ecommerce' | string;
   funcionalidades?: string[];
@@ -49,6 +51,9 @@ export interface User {
   updated_at: string;
   // Avatar del usuario
   avatar?: string;
+  avatar_url?: string;
+  onboarding_completed?: boolean;
+  onboarding_completed_at?: string | null;
   // Perfil extendido
   phone?: string;
   company?: string;

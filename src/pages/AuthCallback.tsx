@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
+import { userService } from '@/lib/supabaseService';
 
 export default function AuthCallback() {
   const navigate = useNavigate();
@@ -10,8 +12,11 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
+        const {
+          data: { session },
+          error
+        } = await supabase.auth.getSession();
+
         if (error) {
           console.error('Error en callback de autenticación:', error);
           navigate('/login?error=auth_callback_failed');
@@ -19,33 +24,28 @@ export default function AuthCallback() {
         }
 
         if (session?.user) {
-          // Mostrar notificación de bienvenida
           toast({
             title: '¡Bienvenido!',
-            description: 'Has iniciado sesión correctamente.',
+            description: 'Has iniciado sesión correctamente.'
           });
-          
-          // Redirigir según el rol del usuario
-          const email = session.user.email;
-          if (email && email.toLowerCase() === 'tuwebai@gmail.com') {
-            navigate('/admin');
-          } else {
-            navigate('/dashboard');
-          }
-        } else {
-          navigate('/login');
+
+          const appUser = await userService.getUserById(session.user.id);
+          navigate(getPostLoginPath(appUser));
+          return;
         }
+
+        navigate('/login');
       } catch (error) {
         console.error('Error procesando callback:', error);
         navigate('/login?error=callback_processing_failed');
       }
     };
 
-    handleAuthCallback();
+    void handleAuthCallback();
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <div className="text-center">
         <LoadingSpinner size="lg" />
         <p className="mt-4 text-white">Procesando autenticación...</p>

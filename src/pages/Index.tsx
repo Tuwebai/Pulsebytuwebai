@@ -1,9 +1,10 @@
 import { Navigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { useEffect, useState } from 'react';
+import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
 
 const Index = () => {
-  const { isAuthenticated, loading } = useApp();
+  const { isAuthenticated, loading, user } = useApp();
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -27,7 +28,7 @@ const Index = () => {
   }
 
   // Si está autenticado, ir al dashboard, si no, ir al login
-  return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />;
+  return <Navigate to={isAuthenticated ? getPostLoginPath(user) : "/login"} replace />;
 };
 
 export default Index;
