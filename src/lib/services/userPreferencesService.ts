@@ -150,6 +150,36 @@ const normalizeDashboardLayout = (value: unknown, index: number): DashboardLayou
   };
 };
 
+const shouldParseAsJson = (value: string): boolean => {
+  const normalized = value.trim();
+
+  if (!normalized) {
+    return false;
+  }
+
+  return (
+    normalized.startsWith('{') ||
+    normalized.startsWith('[') ||
+    normalized.startsWith('"') ||
+    normalized === 'true' ||
+    normalized === 'false' ||
+    normalized === 'null' ||
+    /^-?\d+(\.\d+)?$/.test(normalized)
+  );
+};
+
+const parseStoredPreferenceValue = (value: string): JsonValue => {
+  if (!shouldParseAsJson(value)) {
+    return value;
+  }
+
+  try {
+    return JSON.parse(value) as JsonValue;
+  } catch {
+    return value;
+  }
+};
+
 export class UserPreferencesService {
   // Obtener preferencias del usuario
   async getUserPreferences(userId: string, preferenceType?: string): Promise<UserPreferences[]> {
@@ -305,13 +335,8 @@ export class UserPreferencesService {
       for (const migration of migrations) {
         const value = migration.getValue();
         if (value) {
-          try {
-            const parsedValue = JSON.parse(value);
-            await this.saveUserPreference(userId, migration.type, migration.key, parsedValue);
-          } catch {
-            // Si no es JSON vÃ¡lido, guardar como string
-            await this.saveUserPreference(userId, migration.type, migration.key, value);
-          }
+          const parsedValue = parseStoredPreferenceValue(value);
+          await this.saveUserPreference(userId, migration.type, migration.key, parsedValue);
         }
       }
 
