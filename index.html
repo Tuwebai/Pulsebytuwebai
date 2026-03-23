@@ -52,11 +52,115 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate icon" href="/favicon.ico" />
 
+    <style>
+      body {
+        margin: 0;
+        background: #0b0f1e;
+      }
+    </style>
+
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="pulse-loader" style="
+        position: fixed;
+        inset: 0;
+        background: #0B0F1E;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        font-family: system-ui, sans-serif;
+        z-index: 9999;
+      ">
+        <svg
+          viewBox="0 0 100 100"
+          width="56"
+          height="56"
+          xmlns="http://www.w3.org/2000/svg"
+          role="img"
+          aria-label="Pulse"
+        >
+          <defs>
+            <clipPath id="lc">
+              <circle cx="50" cy="50" r="37"></circle>
+            </clipPath>
+          </defs>
+          <circle
+            cx="50"
+            cy="50"
+            r="38"
+            fill="none"
+            stroke="rgba(255,255,255,0.15)"
+            stroke-width="1.2"
+          ></circle>
+          <g clip-path="url(#lc)">
+            <path
+              d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50"
+              fill="none"
+              stroke="rgba(255,255,255,0.9)"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </g>
+          <circle cx="60" cy="50" r="2.5" fill="#3B9EF5">
+            <animate
+              attributeName="opacity"
+              values="1;0.3;1"
+              dur="2s"
+              repeatCount="indefinite"
+            ></animate>
+          </circle>
+        </svg>
+
+        <div style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+        ">
+          <span style="
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 6px;
+            color: #F0F4FF;
+            text-transform: uppercase;
+          ">PULSE</span>
+
+          <span style="
+            font-size: 11px;
+            font-weight: 300;
+            letter-spacing: 2.5px;
+            color: rgba(240,244,255,0.86);
+          ">
+            by
+            <span style="
+              background: linear-gradient(135deg, #3B9EF5 0%, #7B4CD4 40%, #E040A0 75%, #FF9D00 100%);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+              color: transparent;
+              font-weight: 500;
+            ">TuWebAI</span>
+          </span>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      window.__removePulseLoader = function() {
+        var el = document.getElementById('pulse-loader');
+        if (!el) return;
+        el.style.transition = 'opacity 300ms ease';
+        el.style.opacity = '0';
+        setTimeout(function() {
+          if (el && el.parentNode) el.parentNode.removeChild(el);
+        }, 300);
+      };
+    </script>
   </body>
 </html>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { useApp } from '@/contexts/AppContext';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useApp } from '@/contexts/AppContext';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import { useAvatarSync } from '@/hooks/useAvatarSync';
@@ -29,9 +29,9 @@ interface DashboardLayoutProps {
 
 const WIDGETS = [
   { key: 'projects', label: 'Proyectos' },
-  { key: 'stats', label: 'Estadísticas' },
+  { key: 'stats', label: 'Estadisticas' },
   { key: 'team', label: 'Equipo' },
-  { key: 'help', label: 'Ayuda' },
+  { key: 'help', label: 'Ayuda' }
 ];
 
 export default function DashboardLayout({ children, dashboardProps }: DashboardLayoutProps) {
@@ -39,25 +39,21 @@ export default function DashboardLayout({ children, dashboardProps }: DashboardL
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [visibleWidgets, setVisibleWidgets] = useState<string[]>(() => {
     const saved = localStorage.getItem('dashboard_widgets');
-    return saved ? JSON.parse(saved) : WIDGETS.map(w => w.key);
+    return saved ? JSON.parse(saved) : WIDGETS.map((widget) => widget.key);
   });
   const [widgetsLoaded, setWidgetsLoaded] = useState(false);
   const location = useLocation();
-  
-  // Configurar accesibilidad
+
   const { announceToScreenReader } = useAccessibility({
     enableKeyboardNavigation: true,
     enableScreenReader: true,
     enableFocusManagement: true
   });
-  
-  // SOLUCIÓN FINAL: Key dinámico basado en la ruta actual
+
   const routeKey = location.pathname.replace(/\//g, '-').substring(1) || 'root';
 
-  // Sincronizar avatar automáticamente
   useAvatarSync();
 
-  // Cargar widgets del usuario desde la base de datos
   useEffect(() => {
     const loadUserWidgets = async () => {
       if (isAuthenticated && user && !widgetsLoaded) {
@@ -76,58 +72,39 @@ export default function DashboardLayout({ children, dashboardProps }: DashboardL
       }
     };
 
-    loadUserWidgets();
+    void loadUserWidgets();
   }, [isAuthenticated, user, widgetsLoaded]);
 
   useEffect(() => {
-    // Guardar en localStorage como fallback
     localStorage.setItem('dashboard_widgets', JSON.stringify(visibleWidgets));
-    
-    // Guardar en base de datos si el usuario está autenticado
+
     if (isAuthenticated && user && widgetsLoaded) {
-      userPreferencesService.saveDashboardWidgets(user.id, visibleWidgets).catch(error => {
+      userPreferencesService.saveDashboardWidgets(user.id, visibleWidgets).catch((error) => {
         console.error('Error saving user widgets:', error);
       });
     }
   }, [visibleWidgets, isAuthenticated, user, widgetsLoaded]);
 
-  // Anunciar cambios de página a lectores de pantalla
   useEffect(() => {
     const pageTitle = document.title || 'Pulse by TuWebAI';
     announceToScreenReader(`Navegando a ${pageTitle}`, 'polite');
   }, [location.pathname, announceToScreenReader]);
 
-  // Cerrar sidebar móvil al cambiar de página
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Mostrar loading mientras se verifica la autenticación
   if (!authReady) {
-    return (
-      <div className="h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div 
-            className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"
-            role="status"
-            aria-label="Cargando..."
-          ></div>
-          <p className="text-muted-foreground">Verificando sesión...</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
-  // Redirigir solo si no está autenticado y no está cargando
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // Detectar si estamos en la página de admin o dashboard del cliente
   const isAdminPage = location.pathname === '/admin';
   const isClientDashboardPage = location.pathname === '/dashboard';
 
-  // Función para refrescar datos (solo para admin)
   const handleRefreshData = () => {
     if (isAdminPage) {
       window.location.reload();
@@ -136,34 +113,30 @@ export default function DashboardLayout({ children, dashboardProps }: DashboardL
 
   return (
     <>
-      {/* Skip Link para accesibilidad */}
       <SkipLink targetId="main-content" />
-      
-      {/* Live Region para anuncios a lectores de pantalla */}
-      <LiveRegion 
+
+      <LiveRegion
         message=""
         priority="polite"
         autoClear={true}
         clearDelay={3000}
       />
-      
+
       <div key={routeKey} className="h-screen w-full bg-background flex">
-        {/* Desktop sidebar */}
         <div className="hidden md:block">
           <Sidebar />
         </div>
 
-        {/* Mobile sidebar overlay */}
-        {isMobileMenuOpen && (
+        {isMobileMenuOpen ? (
           <div className="md:hidden fixed inset-0 z-50 flex">
-            <div 
-              className="fixed inset-0 bg-black/50" 
+            <div
+              className="fixed inset-0 bg-black/50"
               onClick={() => setIsMobileMenuOpen(false)}
               role="button"
               tabIndex={0}
-              aria-label="Cerrar menú móvil"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+              aria-label="Cerrar menu movil"
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
                   setIsMobileMenuOpen(false);
                 }
               }}
@@ -172,28 +145,36 @@ export default function DashboardLayout({ children, dashboardProps }: DashboardL
               <Sidebar />
             </div>
           </div>
-        )}
+        ) : null}
 
-        {/* Main content */}
         <div className="flex-1 flex flex-col overflow-hidden w-full">
-          <Topbar 
+          <Topbar
             onMenuClick={() => setIsMobileMenuOpen(true)}
             showMobileMenu={true}
             onRefreshData={isAdminPage ? handleRefreshData : undefined}
             lastUpdate={isAdminPage || isClientDashboardPage ? new Date() : undefined}
             isAdmin={isAdminPage}
             isClientDashboard={isClientDashboardPage}
-            clientDashboardStats={isClientDashboardPage && dashboardProps?.stats ? dashboardProps.stats : undefined}
-            onClientRefresh={isClientDashboardPage && dashboardProps?.onRefresh ? dashboardProps.onRefresh : undefined}
-            onClientSearch={isClientDashboardPage && dashboardProps?.onSearch ? dashboardProps.onSearch : undefined}
-            clientSearchTerm={isClientDashboardPage && dashboardProps?.searchTerm ? dashboardProps.searchTerm : ''}
+            clientDashboardStats={
+              isClientDashboardPage && dashboardProps?.stats ? dashboardProps.stats : undefined
+            }
+            onClientRefresh={
+              isClientDashboardPage && dashboardProps?.onRefresh
+                ? dashboardProps.onRefresh
+                : undefined
+            }
+            onClientSearch={
+              isClientDashboardPage && dashboardProps?.onSearch ? dashboardProps.onSearch : undefined
+            }
+            clientSearchTerm={
+              isClientDashboardPage && dashboardProps?.searchTerm ? dashboardProps.searchTerm : ''
+            }
           />
           <main id="main-content" className="flex-1 overflow-y-auto w-full">
             {children}
           </main>
         </div>
-        
-        {/* Sistema de Tutorial y Ayuda */}
+
         <TutorialOverlay />
         <FloatingHelpButton />
       </div>
