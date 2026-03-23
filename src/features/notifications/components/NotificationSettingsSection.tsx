@@ -1,0 +1,58 @@
+import { BarChart2, FolderOpen, MessageSquare } from 'lucide-react';
+import Skeleton from '@/core/components/Skeleton';
+import type { NotificationPreferences } from '@/data/types/notifications';
+import { useNotificationPreferences } from '../hooks/useNotificationPreferences';
+import { NotificationPreferenceToggle } from './NotificationPreferenceToggle';
+
+const ITEMS: Array<{
+  key: keyof NotificationPreferences;
+  title: string;
+  description: string;
+  icon: typeof MessageSquare;
+}> = [
+  {
+    key: 'notif_new_consultation',
+    title: 'Nueva consulta en tu web',
+    description: 'Te avisamos cada vez que alguien se contacta.',
+    icon: MessageSquare
+  },
+  {
+    key: 'notif_monthly_summary',
+    title: 'Resumen mensual',
+    description: 'Recibís el resumen de tu web el primer día de cada mes.',
+    icon: BarChart2
+  },
+  {
+    key: 'notif_project_update',
+    title: 'Actualizaciones del proyecto',
+    description: 'Novedades del equipo de TuWebAI sobre tu proyecto.',
+    icon: FolderOpen
+  }
+];
+
+export function NotificationSettingsSection() {
+  const { prefs, isLoading, updatePreference, isSaving } = useNotificationPreferences();
+
+  return (
+    <div className="space-y-4">
+      {isLoading
+        ? Array.from({ length: 3 }).map((_, index) => <Skeleton key={index} height="88px" rounded="lg" />)
+        : ITEMS.map((item) => {
+            const Icon = item.icon;
+            const checked = prefs?.[item.key] ?? false;
+
+            return (
+              <NotificationPreferenceToggle
+                key={item.key}
+                checked={checked}
+                description={item.description}
+                disabled={isSaving}
+                icon={<Icon className="h-5 w-5" strokeWidth={1.75} />}
+                title={item.title}
+                onChange={(next) => updatePreference({ [item.key]: next })}
+              />
+            );
+          })}
+    </div>
+  );
+}

@@ -54,6 +54,9 @@ export interface User {
   avatar_url?: string;
   onboarding_completed?: boolean;
   onboarding_completed_at?: string | null;
+  notif_new_consultation?: boolean;
+  notif_monthly_summary?: boolean;
+  notif_project_update?: boolean;
   // Perfil extendido
   phone?: string;
   company?: string;

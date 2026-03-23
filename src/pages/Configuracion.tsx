@@ -38,6 +38,7 @@ import {
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/lib/i18n';
+import { NotificationSettingsSection } from '@/features/notifications/components/NotificationSettingsSection';
 
 // Estilos CSS personalizados para animaciones
 const customStyles = `
@@ -369,7 +370,7 @@ const Configuracion = React.memo(() => {
             transition={{ duration: 0.6, delay: 0.3 }}
           >
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className={`grid w-full ${user?.role === 'admin' ? 'grid-cols-5' : 'grid-cols-4'} bg-card dark:bg-slate-800/50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border/50 dark:border-slate-700/50 p-1 backdrop-blur-sm`}>
+              <TabsList className={`grid w-full ${user?.role === 'admin' ? 'grid-cols-6' : 'grid-cols-5'} bg-card dark:bg-slate-800/50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border/50 dark:border-slate-700/50 p-1 backdrop-blur-sm`}>
                 <TabsTrigger 
                   value="general" 
                   className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white rounded-xl transition-all duration-300 hover:scale-105 data-[state=active]:shadow-lg text-slate-700 dark:text-slate-300 font-medium"
@@ -407,6 +408,19 @@ const Configuracion = React.memo(() => {
                   >
                     <Monitor className="h-4 w-4" />
                     <span className="font-medium">Rendimiento</span>
+                  </motion.div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="notificaciones" 
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-600 data-[state=active]:text-white rounded-xl transition-all duration-300 hover:scale-105 data-[state=active]:shadow-lg text-slate-700 dark:text-slate-300 font-medium"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Bell className="h-4 w-4" />
+                    <span className="font-medium">Notificaciones</span>
                   </motion.div>
                 </TabsTrigger>
                 <TabsTrigger 
@@ -809,6 +823,23 @@ const Configuracion = React.memo(() => {
                         Guardar cambios
                       </Button>
                     </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="notificaciones" className="space-y-6">
+                <Card className="bg-card dark:bg-slate-800/50 rounded-2xl shadow-lg border border-border/50 dark:border-slate-700/50">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-slate-800 dark:text-white flex items-center gap-2">
+                      <Bell className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
+                      Notificaciones
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground dark:text-slate-300">
+                      Elegí qué novedades querés recibir de Pulse y de tu proyecto.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <NotificationSettingsSection />
                   </CardContent>
                 </Card>
               </TabsContent>
