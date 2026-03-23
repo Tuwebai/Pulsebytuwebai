@@ -1,5 +1,6 @@
 import { Activity, FolderOpen, LayoutDashboard, LifeBuoy } from 'lucide-react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { usePrefersReducedMotion } from '@/core/hooks/usePrefersReducedMotion';
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -11,7 +12,7 @@ const bottomNavItems = [
 ] as const;
 
 export default function BottomNav() {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] pb-[env(safe-area-inset-bottom)] md:hidden">

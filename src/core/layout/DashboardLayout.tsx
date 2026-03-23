@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { usePrefersReducedMotion } from '@/core/hooks/usePrefersReducedMotion';
 import { useLocation } from 'react-router-dom';
 import BottomNav from './BottomNav';
 import Header from './Header';
@@ -11,7 +12,7 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
     <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg-base)]">
