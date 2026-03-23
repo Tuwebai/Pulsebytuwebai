@@ -7,6 +7,11 @@ import { userPreferencesService } from '@/lib/services/userPreferencesService';
 import { clearCache, getCachedData, setCachedData } from '@/contexts/appContext.cache';
 import type { User } from '@/contexts/appContext.types';
 
+interface UserUpdatePayload {
+  avatar_url?: string;
+  updated_at?: string;
+}
+
 interface UseCurrentUserParams {
   authLoading: boolean;
   clearAuthError: () => void;
@@ -160,7 +165,7 @@ export function useCurrentUser({
           filter: `id=eq.${user.id}`
         },
         async (payload) => {
-          const updatedUserData = payload.new as any;
+          const updatedUserData = payload.new as UserUpdatePayload;
 
           if (updatedUserData.avatar_url && updatedUserData.avatar_url !== user.avatar_url) {
             setUser((prev) =>

@@ -3,7 +3,7 @@ export interface Project {
   name: string;
   description?: string;
   technologies: string[];
-  environment_variables?: Record<string, any>;
+  environment_variables?: Record<string, unknown>;
   status: 'development' | 'production' | 'paused' | 'maintenance';
   github_repository_url?: string;
   customicon?: string;
