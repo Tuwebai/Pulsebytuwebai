@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import { PulseLogo } from '@/core/components';
 import Skeleton from '@/core/components/Skeleton';
 import { useNotifications } from '../hooks/useNotifications';
 import { NotificationItem } from './NotificationItem';
@@ -101,9 +102,12 @@ export function NotificationsPanel({ open, onClose }: NotificationsPanelProps) {
               {!isLoading && !hasNotifications ? (
                 <div className="flex h-full min-h-[320px] flex-col items-center justify-center px-8 text-center">
                   <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-elevated)]">
-                    <Bell className="h-8 w-8 text-[var(--text-tertiary)]" strokeWidth={1.5} />
+                    <PulseLogo className="opacity-40" size={32} variant="night" />
                   </div>
-                  <p className="mt-4 text-[14px] text-[var(--text-tertiary)]">No tenés notificaciones nuevas</p>
+                  <p className="mt-4 text-[14px] text-[var(--text-primary)]">No tenés notificaciones nuevas</p>
+                  <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
+                    Cuando haya novedades de tu proyecto, las vas a ver acá.
+                  </p>
                 </div>
               ) : null}
 

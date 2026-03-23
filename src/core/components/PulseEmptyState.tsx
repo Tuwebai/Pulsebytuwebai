@@ -11,8 +11,8 @@ export default function PulseEmptyState({ onConnect }: PulseEmptyStateProps) {
   return (
     <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 px-6 py-10 text-center">
       <div
-        className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--signal-glow)]"
-        style={{ boxShadow: '0 0 40px var(--signal-glow)' }}
+        className="pulse-empty-float flex h-20 w-20 items-center justify-center rounded-full bg-[color:rgba(59,158,245,0.08)]"
+        style={{ filter: 'drop-shadow(0 0 16px rgba(59,158,245,0.3))' }}
       >
         <PulseLogo animated size={56} variant="night" />
       </div>

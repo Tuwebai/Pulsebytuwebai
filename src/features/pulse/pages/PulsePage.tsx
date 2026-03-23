@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { FadeIn, MetricCard, Skeleton } from '@/core/components';
 import AnimatedList from '@/core/components/AnimatedList';
@@ -151,8 +151,20 @@ export default function PulsePage() {
                   ))
                 ) : (
                   <tr>
-                    <td className="px-5 py-8 text-center text-sm text-[var(--text-tertiary)]" colSpan={3}>
-                      <FadeIn>Todavia no hay datos suficientes para este periodo.</FadeIn>
+                    <td className="px-5 py-8" colSpan={3}>
+                      <FadeIn>
+                        <div className="flex min-h-[180px] flex-col items-center justify-center px-4 text-center">
+                          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-elevated)]">
+                            <Globe className="h-8 w-8 text-[var(--text-tertiary)]" strokeWidth={1.5} />
+                          </div>
+                          <p className="mt-4 text-[14px] font-medium text-[var(--text-primary)]">
+                            Las páginas aparecen cuando tu web tenga visitas
+                          </p>
+                          <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
+                            Este estado se completa solo a medida que llegan datos reales.
+                          </p>
+                        </div>
+                      </FadeIn>
                     </td>
                   </tr>
                 )}
