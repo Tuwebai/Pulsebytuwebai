@@ -20,6 +20,10 @@ interface ProjectRow {
   created_by: string | null;
 }
 
+interface UserPreferenceRow {
+  notif_new_consultation: boolean | null;
+}
+
 interface Ga4Metrics {
   sessions: number;
   conversions: number;
@@ -290,6 +294,54 @@ serve(async (req) => {
 
       if (upsertError) {
         throw upsertError;
+      }
+
+      if (ga4Data.conversions > 0 && project.created_by) {
+        const { data: userPrefs, error: userPrefsError } = await supabase
+          .from('users')
+          .select('notif_new_consultation')
+          .eq('id', project.created_by)
+          .maybeSingle();
+
+        if (userPrefsError) {
+          throw userPrefsError;
+        }
+
+        if ((userPrefs as UserPreferenceRow | null)?.notif_new_consultation !== false) {
+          const { data: existingNotification, error: existingNotificationError } = await supabase
+            .from('notifications')
+            .select('id')
+            .eq('user_id', project.created_by)
+            .eq('type', 'new_consultation')
+            .contains('metadata', { project_id: project.id, date: dateStr })
+            .limit(1)
+            .maybeSingle();
+
+          if (existingNotificationError) {
+            throw existingNotificationError;
+          }
+
+          if (!existingNotification?.id) {
+            const conversionLabel = `${ga4Data.conversions} consulta${ga4Data.conversions > 1 ? 's' : ''} nueva${ga4Data.conversions > 1 ? 's' : ''}`;
+            const { error: notificationError } = await supabase.from('notifications').insert({
+              user_id: project.created_by,
+              type: 'new_consultation',
+              category: 'system',
+              title: conversionLabel,
+              message: 'Alguien se contactó a través de tu web.',
+              is_read: false,
+              metadata: {
+                project_id: project.id,
+                date: dateStr,
+                count: ga4Data.conversions
+              }
+            });
+
+            if (notificationError) {
+              throw notificationError;
+            }
+          }
+        }
       }
 
       results.success += 1;

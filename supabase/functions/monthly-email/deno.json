@@ -1,0 +1,14 @@
+{
+  "name": "monthly-email",
+  "version": "1.0.0",
+  "description": "Edge Function para enviar el resumen mensual de Pulse",
+  "main": "index.ts",
+  "imports": {
+    "supabase": "https://esm.sh/@supabase/supabase-js@2"
+  },
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["deno.window", "deno.ns"],
+    "strict": true
+  }
+}
