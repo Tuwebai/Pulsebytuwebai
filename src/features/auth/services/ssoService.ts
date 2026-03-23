@@ -1,9 +1,25 @@
+import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
 interface SsoBridgeResponse {
   email: string;
   email_otp: string;
   verification_type: 'magiclink' | 'email';
+}
+
+interface SsoErrorPayload {
+  error?: string;
+}
+
+export type SsoAccessErrorCode = 'access_pending' | 'invalid_token' | 'session_bridge_failed';
+
+export class SsoAccessError extends Error {
+  code: SsoAccessErrorCode;
+
+  constructor(code: SsoAccessErrorCode, message: string) {
+    super(message);
+    this.code = code;
+  }
 }
 
 function isSsoBridgeResponse(value: unknown): value is SsoBridgeResponse {
@@ -26,11 +42,22 @@ async function getSsoBridge(token: string): Promise<SsoBridgeResponse> {
   });
 
   if (error) {
-    throw new Error('No pudimos validar tu acceso unificado.');
+    if (error instanceof FunctionsHttpError) {
+      const payload = (await error.context.json()) as SsoErrorPayload;
+
+      if (error.context.status === 404 && payload.error === 'Pulse user not found') {
+        throw new SsoAccessError(
+          'access_pending',
+          'Tu acceso a Pulse todavia no fue habilitado por un administrador.'
+        );
+      }
+    }
+
+    throw new SsoAccessError('invalid_token', 'No pudimos validar tu acceso unificado.');
   }
 
   if (!isSsoBridgeResponse(data)) {
-    throw new Error('La respuesta del acceso unificado vino incompleta.');
+    throw new SsoAccessError('session_bridge_failed', 'La respuesta del acceso unificado vino incompleta.');
   }
 
   return data;
@@ -46,6 +73,6 @@ export async function signInWithSsoToken(token: string): Promise<void> {
   });
 
   if (error) {
-    throw new Error('No pudimos abrir tu sesion en Pulse.');
+    throw new SsoAccessError('session_bridge_failed', 'No pudimos abrir tu sesion en Pulse.');
   }
 }
