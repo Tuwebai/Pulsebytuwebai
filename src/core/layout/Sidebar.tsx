@@ -29,7 +29,7 @@ export default function Sidebar() {
   const { user } = useApp();
 
   return (
-    <aside className="hidden w-[240px] shrink-0 flex-col border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] md:flex">
+    <aside className="sticky top-0 hidden h-screen w-[240px] shrink-0 flex-col overflow-hidden border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] md:flex">
       <div className="h-0.5 w-full bg-[var(--gradient-brand)]" />
 
       <div className="px-5 py-6">

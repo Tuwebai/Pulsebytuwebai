@@ -15,10 +15,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg-base)]">
+    <div className="flex h-screen overflow-hidden bg-[var(--bg-base)]">
       <Sidebar />
 
-      <div className="flex min-h-screen flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header />
         <motion.main
           animate={prefersReducedMotion ? { opacity: 1, x: 0 } : { opacity: 1, x: 0 }}
