@@ -43,6 +43,10 @@ export interface User {
   avatar_url?: string;
   onboarding_completed?: boolean;
   onboarding_completed_at?: string | null;
+  pulse_access_status?: 'pending' | 'invited' | 'active' | 'disabled';
+  pulse_access_granted_at?: string | null;
+  pulse_access_granted_by?: string | null;
+  pulse_access_disabled_at?: string | null;
   notif_new_consultation?: boolean;
   notif_monthly_summary?: boolean;
   notif_project_update?: boolean;

@@ -13,6 +13,10 @@ export interface User {
   onboarding_completed?: boolean;
   onboarding_completed_at?: string | null;
   website?: string | null;
+  pulse_access_status?: 'pending' | 'invited' | 'active' | 'disabled';
+  pulse_access_granted_at?: string | null;
+  pulse_access_granted_by?: string | null;
+  pulse_access_disabled_at?: string | null;
 }
 
 export interface Project {
@@ -218,7 +222,7 @@ export class SupabaseService {
       const { data, error } = await supabase
         .from('users')
         .select(
-          'id, email, full_name, role, created_at, updated_at, avatar_url, onboarding_completed, onboarding_completed_at, website'
+          'id, email, full_name, role, created_at, updated_at, avatar_url, onboarding_completed, onboarding_completed_at, website, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by, pulse_access_disabled_at'
         )
         .eq('id', id)
         .maybeSingle(); // Usar maybeSingle en lugar de single para evitar errores

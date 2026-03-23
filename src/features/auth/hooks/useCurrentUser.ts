@@ -14,6 +14,10 @@ interface UserUpdatePayload {
   onboarding_completed?: boolean | null;
   onboarding_completed_at?: string | null;
   website?: string | null;
+  pulse_access_status?: User['pulse_access_status'];
+  pulse_access_granted_at?: string | null;
+  pulse_access_granted_by?: string | null;
+  pulse_access_disabled_at?: string | null;
   updated_at?: string;
 }
 
@@ -185,6 +189,10 @@ export function useCurrentUser({
               onboarding_completed: updatedUserData.onboarding_completed ?? prev.onboarding_completed,
               onboarding_completed_at: updatedUserData.onboarding_completed_at ?? prev.onboarding_completed_at,
               website: updatedUserData.website ?? prev.website,
+              pulse_access_status: updatedUserData.pulse_access_status ?? prev.pulse_access_status,
+              pulse_access_granted_at: updatedUserData.pulse_access_granted_at ?? prev.pulse_access_granted_at,
+              pulse_access_granted_by: updatedUserData.pulse_access_granted_by ?? prev.pulse_access_granted_by,
+              pulse_access_disabled_at: updatedUserData.pulse_access_disabled_at ?? prev.pulse_access_disabled_at,
               updated_at: updatedUserData.updated_at ?? prev.updated_at
             };
 
