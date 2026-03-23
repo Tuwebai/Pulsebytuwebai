@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { useCountUp } from '@/core/hooks/useCountUp';
 import { cn } from '@/lib/utils';
 import Skeleton from './Skeleton';
 
@@ -12,9 +14,12 @@ export interface MetricCardProps {
   className?: string;
 }
 
+const numberFormatter = new Intl.NumberFormat('es-AR');
+
 function formatValue(value: number | string, unit?: string) {
   if (typeof value === 'number') {
-    return unit ? `${value} ${unit}` : value.toLocaleString('es-AR');
+    const formattedValue = numberFormatter.format(value);
+    return unit ? `${formattedValue} ${unit}` : formattedValue;
   }
 
   return value;
@@ -46,9 +51,37 @@ export default function MetricCard({
   onClick,
   className
 }: MetricCardProps) {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const isEmpty = value === null && !loading;
   const displayPeriod = isEmpty ? 'sin datos disponibles' : period;
   const clickable = typeof onClick === 'function';
+  const numericTarget = typeof value === 'number' && !loading ? value : 0;
+  const animatedValue = useCountUp({
+    target: numericTarget,
+    enabled: !prefersReducedMotion && !loading && typeof value === 'number',
+  });
+  const displayValue = typeof value === 'number' && !loading ? animatedValue : value;
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const syncPreference = () => {
+      setPrefersReducedMotion(mediaQuery.matches);
+    };
+
+    syncPreference();
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', syncPreference);
+      return () => mediaQuery.removeEventListener('change', syncPreference);
+    }
+
+    mediaQuery.addListener(syncPreference);
+    return () => mediaQuery.removeListener(syncPreference);
+  }, []);
 
   return (
     <article
@@ -86,7 +119,7 @@ export default function MetricCard({
             )}
             style={{ fontFamily: 'var(--font-data)' }}
           >
-            {isEmpty ? '—' : formatValue(value, unit)}
+            {isEmpty ? '—' : formatValue(displayValue, unit)}
           </p>
         )}
 
