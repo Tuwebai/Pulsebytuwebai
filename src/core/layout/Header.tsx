@@ -1,7 +1,5 @@
 import { Bell } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { PulseLogo } from '@/core/components';
+import { AvatarMenu, PulseLogo } from '@/core/components';
 import { useApp } from '@/contexts/AppContext';
 import { NotificationsPanel } from '@/features/notifications/components/NotificationsPanel';
 import { useNotifications } from '@/features/notifications/hooks/useNotifications';
@@ -22,20 +20,8 @@ function getGreeting(date = new Date()) {
   return 'Buenas noches';
 }
 
-function getInitials(name?: string | null, email?: string) {
-  if (name?.trim()) {
-    return name
-      .split(' ')
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase())
-      .join('');
-  }
-
-  return email?.slice(0, 2).toUpperCase() || 'PU';
-}
-
 export default function Header() {
-  const { user } = useApp();
+  const { logout, user } = useApp();
   const [panelOpen, setPanelOpen] = useSessionStorageState(`pulse:header:${user?.id ?? 'anon'}:notifications-open`, false);
   const { unreadCount } = useNotifications();
   useNotificationsRealtime(user?.id || null);
@@ -79,14 +65,7 @@ export default function Header() {
             ) : null}
           </button>
 
-          <NavLink to="/dashboard/configuracion">
-            <Avatar className="h-9 w-9 ring-0">
-              <AvatarImage alt={user?.full_name || user?.email || 'Usuario Pulse'} src={user?.avatar || user?.avatar_url} />
-              <AvatarFallback className="bg-[var(--bg-elevated)] text-[var(--text-primary)]">
-                {getInitials(user?.full_name, user?.email)}
-              </AvatarFallback>
-            </Avatar>
-          </NavLink>
+          <AvatarMenu onLogout={logout} onOpenNotifications={() => setPanelOpen(true)} user={user} />
         </div>
       </header>
 

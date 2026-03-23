@@ -9,3 +9,4 @@ export { default as PulseEmptyState } from './PulseEmptyState';
 export type { PulseEmptyStateProps } from './PulseEmptyState';
 export { default as Badge } from './Badge';
 export type { BadgeProps } from './Badge';
+export { default as AvatarMenu } from './AvatarMenu';
