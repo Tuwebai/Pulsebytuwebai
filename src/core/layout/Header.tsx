@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Bell } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -7,6 +6,7 @@ import { useApp } from '@/contexts/AppContext';
 import { NotificationsPanel } from '@/features/notifications/components/NotificationsPanel';
 import { useNotifications } from '@/features/notifications/hooks/useNotifications';
 import { useNotificationsRealtime } from '@/features/notifications/hooks/useNotificationsRealtime';
+import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 
 function getGreeting(date = new Date()) {
   const hours = date.getHours();
@@ -36,7 +36,7 @@ function getInitials(name?: string | null, email?: string) {
 
 export default function Header() {
   const { user } = useApp();
-  const [panelOpen, setPanelOpen] = useState(false);
+  const [panelOpen, setPanelOpen] = useSessionStorageState(`pulse:header:${user?.id ?? 'anon'}:notifications-open`, false);
   const { unreadCount } = useNotifications();
   useNotificationsRealtime(user?.id || null);
   const greeting = getGreeting();

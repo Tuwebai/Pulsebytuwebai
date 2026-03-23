@@ -39,6 +39,7 @@ import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/comp
 import { useTranslation } from 'react-i18next';
 import i18n from '@/lib/i18n';
 import { NotificationSettingsSection } from '@/features/notifications/components/NotificationSettingsSection';
+import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 
 // Estilos CSS personalizados para animaciones
 const customStyles = `
@@ -60,7 +61,7 @@ const customStyles = `
 const Configuracion = React.memo(() => {
   const { user, updateUserSettings, getUserProjects } = useApp() as AppContextType;
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useSessionStorageState(`pulse:configuracion:${user?.id ?? 'anon'}:active-tab`, 'general');
   const { t } = useTranslation();
   
   // Configuración general

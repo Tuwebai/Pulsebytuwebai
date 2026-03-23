@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useApp } from '@/contexts/AppContext';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
 import { Navigate } from 'react-router-dom';
@@ -13,6 +13,7 @@ import { MessageSquare, Send, Clock, CheckCircle, AlertCircle, HelpCircle, FileT
 import { toast } from '@/hooks/use-toast';
 import { sendSupportTicketEmail, sendTicketConfirmationEmail } from '@/lib/emailService';
 import { formatDateSafe } from '@/utils/formatDateSafe';
+import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 
 interface Ticket {
   id: string;
@@ -32,20 +33,31 @@ interface Ticket {
   fecha_respuesta_cliente?: string;
 }
 
+const SUPPORT_DRAFT_INITIAL_STATE = {
+  title: '',
+  description: '',
+  priority: 'medium' as 'low' | 'medium' | 'high'
+};
+
 export default function Soporte() {
   const { user, getUserProjects } = useApp();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    priority: 'medium' as 'low' | 'medium' | 'high'
-  });
+  const [formData, setFormData] = useSessionStorageState(
+    `pulse:soporte:${user?.id ?? 'anon'}:new-ticket-draft`,
+    SUPPORT_DRAFT_INITIAL_STATE
+  );
 
   // Sistema de respuestas del cliente
-  const [respondingTicket, setRespondingTicket] = useState<Ticket | null>(null);
-  const [responseText, setResponseText] = useState('');
+  const [respondingTicketId, setRespondingTicketId] = useSessionStorageState<string | null>(
+    `pulse:soporte:${user?.id ?? 'anon'}:responding-ticket-id`,
+    null
+  );
+  const [responseText, setResponseText] = useSessionStorageState(`pulse:soporte:${user?.id ?? 'anon'}:response-draft`, '');
+  const respondingTicket = useMemo(
+    () => tickets.find((ticket) => ticket.id === respondingTicketId) ?? null,
+    [respondingTicketId, tickets]
+  );
 
   useEffect(() => {
     if (!user) return;
@@ -82,8 +94,7 @@ export default function Soporte() {
 
     // Confirmación instantánea y limpieza del formulario
     toast({ title: 'Ticket enviado', description: 'Tu ticket de soporte fue enviado. Procesando en segundo plano...' });
-    setFormData({ title: '', description: '', priority: 'medium' });
-    setShowForm(false);
+    setFormData(SUPPORT_DRAFT_INITIAL_STATE);
 
     // Procesamiento real en segundo plano
     (async () => {
@@ -176,7 +187,7 @@ export default function Soporte() {
         variant: 'default'
       });
 
-      setRespondingTicket(null);
+      setRespondingTicketId(null);
       setResponseText('');
     } catch (error) {
       console.error('Error sending response:', error);
@@ -477,7 +488,7 @@ export default function Soporte() {
                                                  {/* Botón para responder al admin */}
                          {ticket.status !== 'closed' && (
                           <Button
-                            onClick={() => setRespondingTicket(ticket)}
+                            onClick={() => setRespondingTicketId(ticket.id)}
                             className="mt-3 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 h-8"
                           >
                             <MessageSquare className="h-3 w-3 mr-1" />
@@ -515,12 +526,12 @@ export default function Soporte() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-slate-800">
-                Responder al equipo de soporte
-              </h2>
+                <h2 className="text-2xl font-bold text-slate-800">
+                  Responder al equipo de soporte
+                </h2>
               <button
                 onClick={() => {
-                  setRespondingTicket(null);
+                  setRespondingTicketId(null);
                   setResponseText('');
                 }}
                 className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors duration-200 group"
@@ -565,7 +576,7 @@ export default function Soporte() {
                   type="button"
                   variant="outline"
                   onClick={() => {
-                    setRespondingTicket(null);
+                    setRespondingTicketId(null);
                     setResponseText('');
                   }}
                   className="px-6 py-2 bg-white border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 hover:text-slate-800 transition-all duration-200 font-medium"
