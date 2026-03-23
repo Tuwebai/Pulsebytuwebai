@@ -57,8 +57,6 @@ export function useCurrentUser({
             userData = await userService.getUserById(supabaseUser.id);
           } catch {
             const { email, user_metadata } = supabaseUser;
-            let role: 'admin' | 'user' = 'user';
-            if (email && email.toLowerCase() === 'tuwebai@gmail.com') role = 'admin';
 
             const avatar =
               user_metadata?.avatar_url || user_metadata?.picture || user_metadata?.photoURL || user_metadata?.image;
@@ -67,7 +65,7 @@ export function useCurrentUser({
               id: supabaseUser.id,
               email: supabaseUser.email || '',
               full_name: user_metadata?.full_name || user_metadata?.name || email?.split('@')[0] || '',
-              role,
+              role: 'user',
               avatar_url: avatar,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
