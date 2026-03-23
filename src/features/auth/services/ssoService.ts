@@ -47,7 +47,10 @@ async function getSsoBridge(token: string): Promise<SsoBridgeResponse> {
     if (error instanceof FunctionsHttpError) {
       const payload = (await error.context.json()) as SsoErrorPayload;
 
-      if (error.context.status === 404 && payload.error === 'Pulse user not found') {
+      if (
+        error.context.status === 404 &&
+        (payload.error === 'Pulse user not found' || payload.error === 'Pulse auth user not found')
+      ) {
         throw new SsoAccessError(
           'access_pending',
           'Tu acceso a Pulse todavia no fue habilitado por un administrador.'

@@ -25,6 +25,10 @@ interface PulseUserRow {
   email: string;
 }
 
+interface AuthUserRecord {
+  email?: string | null;
+}
+
 function jsonResponse(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
     status,
@@ -45,6 +49,39 @@ function createSupabaseAdminClient() {
       persistSession: false
     }
   });
+}
+
+async function findAuthUserByEmail(
+  supabase: ReturnType<typeof createSupabaseAdminClient>,
+  email: string
+): Promise<AuthUserRecord | null> {
+  const normalizedEmail = email.trim().toLowerCase();
+  let page = 1;
+
+  while (page <= 10) {
+    const { data, error } = await supabase.auth.admin.listUsers({
+      page,
+      perPage: 200
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    const authUser = data.users.find((user) => user.email?.trim().toLowerCase() === normalizedEmail);
+
+    if (authUser) {
+      return authUser;
+    }
+
+    if (data.users.length < 200) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  return null;
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -183,6 +220,12 @@ serve(async (req) => {
 
     if (!user?.id) {
       return jsonResponse(404, { error: 'Pulse user not found' });
+    }
+
+    const authUser = await findAuthUserByEmail(supabase, email);
+
+    if (!authUser?.email) {
+      return jsonResponse(404, { error: 'Pulse auth user not found' });
     }
 
     const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({

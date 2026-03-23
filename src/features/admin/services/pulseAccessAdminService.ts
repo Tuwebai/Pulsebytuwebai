@@ -1,3 +1,4 @@
+import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/supabase';
 
 interface EnablePulseAccessResponse {
@@ -87,13 +88,36 @@ async function enablePulseAccessFallback(userId: string): Promise<EnablePulseAcc
 
 export async function enablePulseAccess(userId: string): Promise<EnablePulseAccessResponse> {
   try {
+    const {
+      data: { session }
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      throw new Error('Tu sesion de administrador no esta disponible para habilitar Pulse.');
+    }
+
     const { data, error } = await supabase.functions.invoke('enable-pulse-access', {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`
+      },
       body: {
         userId
       }
     });
 
     if (error) {
+      if (error instanceof FunctionsHttpError) {
+        throw new Error('No pudimos autorizar la habilitacion de acceso a Pulse.');
+      }
+
+      if (error instanceof FunctionsRelayError) {
+        throw new Error('El relay de Supabase rechazo la solicitud para habilitar Pulse.');
+      }
+
+      if (error instanceof FunctionsFetchError) {
+        return enablePulseAccessFallback(userId);
+      }
+
       return enablePulseAccessFallback(userId);
     }
 
@@ -102,7 +126,14 @@ export async function enablePulseAccess(userId: string): Promise<EnablePulseAcce
     }
 
     return data;
-  } catch {
-    return enablePulseAccessFallback(userId);
+  } catch (error) {
+    if (
+      error instanceof FunctionsFetchError ||
+      (error instanceof Error && error.message === 'Failed to fetch')
+    ) {
+      return enablePulseAccessFallback(userId);
+    }
+
+    throw error;
   }
 }
