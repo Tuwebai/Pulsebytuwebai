@@ -58,9 +58,10 @@ export default function PulseChart({ data, loading = false, height = 180 }: Puls
         <AreaChart data={chartData}>
           <defs>
             <linearGradient id="pulse-area-gradient" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor="#3B9EF5" stopOpacity={0.12} />
-              <stop offset="60%" stopColor="#3B9EF5" stopOpacity={0.04} />
-              <stop offset="100%" stopColor="#3B9EF5" stopOpacity={0} />
+              <stop offset="0%" stopColor="#3B9EF5" stopOpacity={0.08} />
+              <stop offset="40%" stopColor="#7B4CD4" stopOpacity={0.05} />
+              <stop offset="75%" stopColor="#E040A0" stopOpacity={0.03} />
+              <stop offset="100%" stopColor="#FF9D00" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid horizontal stroke="var(--border-subtle)" strokeDasharray="3 3" vertical={false} />

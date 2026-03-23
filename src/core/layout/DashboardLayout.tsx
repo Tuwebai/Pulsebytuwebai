@@ -15,6 +15,21 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="flex min-h-screen flex-1 flex-col">
         <Header />
         <main className="flex-1 overflow-y-auto px-4 py-4 pb-24 md:px-8 md:py-8 md:pb-8">{children}</main>
+        <footer className="hidden border-t border-[var(--border-subtle)] px-8 py-4 md:block">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
+            Pulse by{' '}
+            <span
+              className="font-medium text-transparent"
+              style={{
+                backgroundImage: 'var(--gradient-brand)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+              }}
+            >
+              TuWebAI
+            </span>
+          </p>
+        </footer>
       </div>
 
       <BottomNav />

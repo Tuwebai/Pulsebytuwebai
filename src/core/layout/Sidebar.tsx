@@ -37,7 +37,19 @@ export default function Sidebar() {
           <PulseLogo size={28} variant="night" />
           <div>
             <div className="text-[14px] font-medium tracking-[0.28em] text-[var(--text-primary)]">PULSE</div>
-            <div className="text-[10px] font-light tracking-[0.1em] text-[var(--text-tertiary)]">by TuWebAI</div>
+            <div className="text-[10px] font-light tracking-[0.1em] text-[var(--text-tertiary)]">
+              by{' '}
+              <span
+                className="font-medium text-transparent"
+                style={{
+                  backgroundImage: 'var(--gradient-brand)',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                }}
+              >
+                TuWebAI
+              </span>
+            </div>
           </div>
         </div>
       </div>
