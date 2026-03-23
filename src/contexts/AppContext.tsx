@@ -6,6 +6,7 @@ import { projectService } from '@/lib/services/projectService';
 import { toast as toastGlobal } from '@/hooks/use-toast';
 import { SupabaseError } from '@/components/SupabaseError';
 import { userPreferencesService } from '@/lib/services/userPreferencesService';
+import { clearCache, deleteCachedData, getCachedData, setCachedData } from '@/contexts/appContext.cache';
 
 export interface Project {
   id: string;
@@ -147,25 +148,6 @@ export interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Cache para optimizar consultas
-const cache = new Map<string, { data: any; timestamp: number; ttl: number }>();
-
-const getCachedData = (key: string) => {
-  const cached = cache.get(key);
-  if (cached && Date.now() - cached.timestamp < cached.ttl) {
-    return cached.data;
-  }
-  return null;
-};
-
-const setCachedData = (key: string, data: any, ttl: number = 5 * 60 * 1000) => {
-  cache.set(key, { data, timestamp: Date.now(), ttl });
-};
-
-const clearCache = () => {
-  cache.clear();
-};
-
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -180,7 +162,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     user: supabaseUser, 
     session, 
     loading: authLoading, 
-    error: authError,
     signInWithEmail,
     signUpWithEmail,
     signInWithGoogle,
@@ -614,7 +595,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       
       // Limpiar cache de proyectos
-      cache.delete(`projects_${user.email}`);
+      deleteCachedData(`projects_${user.email}`);
       
     } catch (error) {
       setError('Error al crear el proyecto');
@@ -665,7 +646,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
        } as any);
       
       if (user) {
-        cache.delete(`projects_${user.email}`);
+        deleteCachedData(`projects_${user.email}`);
       }
     } catch (error) {
       setError('Error al actualizar el proyecto');
@@ -691,7 +672,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       
       // Limpiar cache de proyectos
       if (user) {
-        cache.delete(`projects_${user.email}`);
+        deleteCachedData(`projects_${user.email}`);
       }
       
     } catch (error) {
@@ -718,7 +699,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       
       // Limpiar cache de proyectos
       if (user) {
-        cache.delete(`projects_${user.email}`);
+        deleteCachedData(`projects_${user.email}`);
       }
       
     } catch (error) {
@@ -763,7 +744,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       
       // Limpiar cache de proyectos
       if (user) {
-        cache.delete(`projects_${user.email}`);
+        deleteCachedData(`projects_${user.email}`);
       }
       
     } catch (error) {
@@ -781,7 +762,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       
       // Limpiar cache de logs
       if (user) {
-        cache.delete(`logs_${user.email}`);
+        deleteCachedData(`logs_${user.email}`);
       }
       
     } catch (error) {
