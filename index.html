@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pulse by TuWebAI</title>
+
+    <!-- FORZAR MODO CLARO DESDE EL INICIO -->
+    <script>
+      document.documentElement.style.colorScheme = 'light';
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.style.colorScheme = 'light';
+        document.documentElement.classList.add('light');
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
+    <meta
+      name="description"
+      content="Monitorea el rendimiento de tu sitio web en tiempo real. Consultas, conversiones y metricas de negocio, todo en un panel."
+    />
+    <meta
+      name="keywords"
+      content="dashboard, desarrollo web, IA, inteligencia artificial, automatizacion, proyectos, gestion, notificaciones, analitica, premium, profesional, TuWebAI, Pulse"
+    />
+    <meta name="author" content="TuWebAI" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://tuweb-ai.com/" />
+    <meta name="theme-color" content="#181824" />
+
+    <meta property="og:title" content="Pulse by TuWebAI" />
+    <meta
+      property="og:description"
+      content="Monitorea el rendimiento de tu sitio web en tiempo real. Consultas, conversiones y metricas de negocio, todo en un panel."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://tuweb-ai.com/" />
+    <meta property="og:image" content="/logoweb.jpg" />
+    <meta property="og:site_name" content="Pulse" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@tuwebai" />
+    <meta name="twitter:title" content="Pulse by TuWebAI" />
+    <meta
+      name="twitter:description"
+      content="Monitorea el rendimiento de tu sitio web en tiempo real. Consultas, conversiones y metricas de negocio, todo en un panel."
+    />
+    <meta name="twitter:image" content="/logoweb.jpg" />
+
+    <link rel="icon" type="image/jpeg" href="/logoweb.jpg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

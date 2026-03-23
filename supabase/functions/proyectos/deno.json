@@ -1,0 +1,18 @@
+{
+  "name": "proyectos",
+  "version": "1.0.0",
+  "description": "Edge Function para operaciones CRUD de proyectos",
+  "main": "index.ts",
+  "scripts": {
+    "start": "deno run --allow-net --allow-env --allow-read index.ts"
+  },
+  "dependencies": {},
+  "imports": {
+    "supabase": "https://esm.sh/@supabase/supabase-js@2"
+  },
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["deno.window"],
+    "strict": true
+  }
+}
