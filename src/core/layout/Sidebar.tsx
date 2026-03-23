@@ -59,6 +59,7 @@ export default function Sidebar() {
           {navItems.map(({ icon: Icon, label, to }) => (
             <li key={to}>
               <NavLink
+                end={to === '/dashboard'}
                 className={({ isActive }) =>
                   cn(
                     'flex items-center gap-3 rounded-lg px-3 py-[9px] text-[13px] text-[var(--text-secondary)] transition-colors duration-150 hover:bg-[var(--bg-elevated)]',

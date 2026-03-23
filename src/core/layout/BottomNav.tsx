@@ -20,6 +20,7 @@ export default function BottomNav() {
         {bottomNavItems.map(({ icon: Icon, label, to }) => (
           <li key={to} className="flex-1">
             <NavLink
+              end={to === '/dashboard'}
               className={({ isActive }) =>
                 cn(
                   'flex min-h-11 flex-col items-center justify-center gap-1 px-2 py-1 text-[10px] text-[var(--text-tertiary)]',
