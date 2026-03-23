@@ -49,6 +49,10 @@ export function useCurrentUser({
       try {
         setLoading(true);
 
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('tuwebai_auth');
+        }
+
         const cacheKey = `user_${supabaseUser.id}`;
         let userData = getCachedData<User>(cacheKey);
 
@@ -202,6 +206,8 @@ export function useCurrentUser({
   }, [user]);
 
   useEffect(() => {
+    localStorage.removeItem('tuwebai_auth');
+
     if (isAuthenticated && user) {
       localStorage.setItem(
         'tuwebai_auth',
