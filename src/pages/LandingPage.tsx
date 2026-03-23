@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useLandingStats } from '@/hooks/useLandingStats';
+import PulseLogo from '@/core/components/PulseLogo';
 import { 
   Eye, 
   EyeOff, 
@@ -269,8 +270,8 @@ const LandingPage = React.memo(() => {
           <div className="flex items-center justify-between py-3">
             {/* Logo y nombre - IZQUIERDA */}
             <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
-              <div className="bg-gradient-to-r from-cyan-500 to-emerald-600 rounded-lg sm:rounded-xl p-1.5 sm:p-2">
-                <img src="/logoweb.jpg" alt="Pulse by TuWebAI" className="h-6 w-6 sm:h-8 sm:w-8 object-contain rounded" loading="eager" />
+              <div className="rounded-lg sm:rounded-xl p-1.5 sm:p-2 bg-white/5 ring-1 ring-white/10">
+                <PulseLogo size={32} variant={theme === 'light' ? 'day' : 'night'} animated />
               </div>
               <span className="text-sm sm:text-lg lg:text-xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent hidden sm:block">
                 Pulse by TuWebAI
@@ -2003,8 +2004,8 @@ const LandingPage = React.memo(() => {
           <div className="grid md:grid-cols-5 gap-8">
             <div className="md:col-span-2 space-y-6">
               <div className="flex items-center space-x-3">
-                <div className="bg-gradient-to-r from-cyan-500 to-emerald-600 rounded-xl p-2">
-                  <img src="/logoweb.jpg" alt="Pulse by TuWebAI" className="h-8 w-8 object-contain rounded-lg" loading="lazy" />
+                <div className="rounded-xl p-2 bg-white/5 ring-1 ring-white/10">
+                  <PulseLogo size={32} variant="night" />
                 </div>
                 <span className="text-xl font-bold">Pulse by TuWebAI</span>
               </div>
@@ -2080,7 +2081,8 @@ const LandingPage = React.memo(() => {
                 </div>
               </div>
               <div className="text-gray-400 text-sm">
-                Pulse by TuWebAI · Tu web, en numeros reales.
+                <span>Pulse by </span>
+                <span className="brand-gradient-text">TuWebAI</span>
               </div>
             </div>
           </div>

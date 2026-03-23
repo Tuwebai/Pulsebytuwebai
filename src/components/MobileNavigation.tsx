@@ -20,6 +20,7 @@ import {
   ChevronRight,
   type LucideIcon
 } from 'lucide-react';
+import PulseLogo from '@/core/components/PulseLogo';
 
 interface NavigationItem {
   id: string;
@@ -202,11 +203,7 @@ export default function MobileNavigation({ className = '' }: MobileNavigationPro
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-                  <span className="text-primary-foreground font-semibold text-sm">
-                    {user?.email?.charAt(0).toUpperCase() || 'U'}
-                  </span>
-                </div>
+                <PulseLogo size={32} variant="signal" animated />
                 <div>
                   <p className="font-medium text-sm">{user?.email || 'Usuario'}</p>
                   <p className="text-xs text-muted-foreground">{user?.role || 'Usuario'}</p>
@@ -301,7 +298,8 @@ export default function MobileNavigation({ className = '' }: MobileNavigationPro
             {/* Footer */}
             <div className="p-4 border-t">
               <div className="text-xs text-muted-foreground text-center">
-                Pulse by TuWebAI
+                <span>Pulse by </span>
+                <span className="brand-gradient-text">TuWebAI</span>
               </div>
             </div>
           </div>

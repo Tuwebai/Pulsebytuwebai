@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import PulseLogo from '@/core/components/PulseLogo';
 
 export default function PoliticaPrivacidad() {
   return (
@@ -11,12 +12,8 @@ export default function PoliticaPrivacidad() {
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <img
-                src="/logoweb.jpg"
-                alt="Pulse by TuWebAI"
-                className="h-6 w-6 sm:h-8 sm:w-8 object-contain rounded-lg"
-              />
-              <h1 className="text-base sm:text-lg lg:text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+              <PulseLogo size={32} variant="signal" />
+              <h1 className="text-base sm:text-lg lg:text-xl font-bold text-foreground">
                 <span className="hidden sm:inline">Pulse by TuWebAI</span>
                 <span className="sm:hidden">Pulse</span>
               </h1>
@@ -138,7 +135,7 @@ export default function PoliticaPrivacidad() {
                 <div className="mt-3 p-4 bg-muted rounded-lg">
                   <p className="text-foreground font-medium">Pulse by TuWebAI</p>
                   <p className="text-muted-foreground">Email: tuwebai@gmail.com</p>
-                  <p className="text-muted-foreground">Soporte: dashboard.tuweb-ai.com/soporte</p>
+                  <p className="text-muted-foreground">Soporte: pulse.tuweb-ai.com/soporte</p>
                 </div>
               </section>
             </CardContent>
@@ -153,7 +150,7 @@ export default function PoliticaPrivacidad() {
               Pulse by TuWebAI - Tu web, en numeros reales.
             </p>
             <p className="text-muted-foreground text-xs mt-1">
-              2026 TuWebAI - tuweb-ai.com
+              2026 TuWebAI - pulse.tuweb-ai.com
             </p>
           </div>
         </div>

@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
+import PulseLogo from '@/core/components/PulseLogo';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -17,6 +19,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useApp();
+  const { theme } = useTheme();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,12 +69,8 @@ export default function Register() {
       <div className="w-full max-w-sm sm:max-w-md space-y-6 sm:space-y-8">
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
-            <img
-              src="/logoweb.jpg"
-              alt="Pulse by TuWebAI"
-              className="h-8 w-8 sm:h-10 sm:w-10 object-contain rounded-lg sm:rounded-xl"
-            />
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+            <PulseLogo size={40} variant={theme === 'light' ? 'day' : 'night'} animated />
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
               <span className="hidden sm:inline">Pulse by TuWebAI</span>
               <span className="sm:hidden">Pulse</span>
             </h1>

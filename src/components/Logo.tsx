@@ -1,4 +1,6 @@
 import React from 'react';
+import PulseLogo from '@/core/components/PulseLogo';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -8,11 +10,12 @@ interface LogoProps {
 }
 
 export default function Logo({ size = 'md', showText = true, className = '', glow = true }: LogoProps) {
+  const { theme } = useTheme();
   const sizeClasses = {
-    sm: 'w-6 h-6',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
-    xl: 'w-16 h-16'
+    sm: 24,
+    md: 32,
+    lg: 48,
+    xl: 64
   };
 
   const textSizes = {
@@ -24,15 +27,16 @@ export default function Logo({ size = 'md', showText = true, className = '', glo
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <img
-        src="/logoweb.jpg"
-        alt="Pulse by TuWebAI"
-        className={`${sizeClasses[size]} object-contain ${glow ? 'animate-avatar-glow' : ''}`}
+      <PulseLogo
+        size={sizeClasses[size]}
+        variant={theme === 'light' ? 'day' : 'night'}
+        animated={glow}
+        className="shrink-0"
       />
       
       {showText && (
         <div className="flex flex-col leading-none">
-          <span className={`font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent ${textSizes[size]}`}>
+          <span className={`font-bold ${theme === 'light' ? 'text-foreground' : 'text-white'} ${textSizes[size]}`}>
             Pulse
           </span>
           <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">

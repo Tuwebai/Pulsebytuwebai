@@ -18,7 +18,9 @@ export default {
 			}
 		},
 		fontFamily: {
-			sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+			sans: ['DM Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+			display: ['DM Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+			data: ['JetBrains Mono', 'Fira Code', 'monospace'],
 		},
 		fontSize: {
 			'xs': ['12px', '1.4'],
@@ -41,6 +43,41 @@ export default {
 		},
 		extend: {
 			colors: {
+				bg: {
+					base: 'var(--bg-base)',
+					surface: 'var(--bg-surface)',
+					elevated: 'var(--bg-elevated)',
+					subtle: 'var(--bg-subtle)'
+				},
+				signal: {
+					DEFAULT: 'var(--signal)',
+					dim: 'var(--signal-dim)',
+					glow: 'var(--signal-glow)',
+					border: 'var(--signal-border)'
+				},
+				text: {
+					primary: 'var(--text-primary)',
+					secondary: 'var(--text-secondary)',
+					tertiary: 'var(--text-tertiary)',
+					disabled: 'var(--text-disabled)'
+				},
+				stroke: {
+					subtle: 'var(--border-subtle)',
+					DEFAULT: 'var(--border-default)',
+					strong: 'var(--border-strong)'
+				},
+				success: {
+					DEFAULT: 'var(--success)',
+					dim: 'var(--success-dim)'
+				},
+				warning: {
+					DEFAULT: 'var(--warning)',
+					dim: 'var(--warning-dim)'
+				},
+				danger: {
+					DEFAULT: 'var(--danger)',
+					dim: 'var(--danger-dim)'
+				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',

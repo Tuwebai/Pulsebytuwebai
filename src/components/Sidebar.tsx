@@ -40,6 +40,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { useTranslation } from 'react-i18next';
 import { useSafeSupabase } from '@/hooks/useSafeSupabase';
+import PulseLogo from '@/core/components/PulseLogo';
 
 export default function Sidebar() {
   const { user, logout } = useApp();
@@ -234,9 +235,17 @@ export default function Sidebar() {
 
   return (
     <aside className="w-64 h-screen bg-sidebar-background dark:bg-slate-900 border-r border-sidebar-border dark:border-slate-700 flex flex-col shadow-xl">
+      <div className="h-0.5 w-full" style={{ background: 'var(--gradient-brand)' }} />
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
         {/* Header visual mejorado */}
         <div className="p-6 border-b border-sidebar-border dark:border-slate-700 bg-gradient-to-r from-sidebar-accent to-sidebar-background dark:from-slate-800 dark:to-slate-900">
+          <div className="mb-5 flex items-center justify-center gap-3">
+            <PulseLogo size={34} variant={theme === 'light' ? 'day' : 'night'} animated />
+            <div className="leading-none">
+              <div className="text-sm font-semibold text-sidebar-foreground dark:text-slate-100">Pulse</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-sidebar-foreground/60 dark:text-slate-400">by TuWebAI</div>
+            </div>
+          </div>
           {/* Información del usuario */}
           <div className="flex flex-col items-center gap-3">
             {/* Avatar del usuario - usar imagen real si existe */}
@@ -478,6 +487,10 @@ export default function Sidebar() {
           </TooltipProvider>
           <span>{t('Cerrar Sesión')}</span>
         </Button>
+        <div className="mt-3 text-center text-xs text-sidebar-foreground/70 dark:text-slate-400">
+          <span>Pulse by </span>
+          <span className="brand-gradient-text">TuWebAI</span>
+        </div>
       </div>
     </aside>
   );

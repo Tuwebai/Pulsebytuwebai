@@ -1,0 +1,39 @@
+:root {
+  --bg-base: #0b0f1e;
+  --bg-surface: #111827;
+  --bg-elevated: #1a2234;
+  --bg-subtle: #222d42;
+
+  --signal: #3b9ef5;
+  --signal-dim: #1e6bb8;
+  --signal-glow: rgba(59, 158, 245, 0.15);
+  --signal-border: rgba(59, 158, 245, 0.25);
+
+  --text-primary: #f0f4ff;
+  --text-secondary: #8b9ac0;
+  --text-tertiary: #4a5580;
+  --text-disabled: #2d3a55;
+
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.18);
+
+  --success: #22c55e;
+  --success-dim: rgba(34, 197, 94, 0.15);
+  --warning: #f59e0b;
+  --warning-dim: rgba(245, 158, 11, 0.15);
+  --danger: #ef4444;
+  --danger-dim: rgba(239, 68, 68, 0.15);
+
+  --gradient-brand: linear-gradient(135deg, #3b9ef5 0%, #7b4cd4 40%, #e040a0 75%, #ff9d00 100%);
+  --gradient-subtle: linear-gradient(
+    135deg,
+    rgba(59, 158, 245, 0.08) 0%,
+    rgba(123, 76, 212, 0.06) 50%,
+    rgba(224, 64, 160, 0.04) 100%
+  );
+
+  --font-display: 'DM Sans', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-data: 'JetBrains Mono', 'Fira Code', monospace;
+}
