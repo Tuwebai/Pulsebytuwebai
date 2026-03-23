@@ -5,7 +5,22 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  {
+    ignores: [
+      "dist",
+      "skills/**",
+      "src/components/**",
+      "src/pages/**",
+      "src/hooks/**",
+      "src/lib/**",
+      "src/services/**",
+      "src/utils/**",
+      "src/types/**",
+      "src/config/performance.ts",
+      "supabase/functions/github-token-exchange/**",
+      "tailwind.config.ts"
+    ]
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
