@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import DashboardLayout from '@/components/DashboardLayout';
 import TouchGestureProvider from '@/components/TouchGestureProvider';
 import { useApp } from '@/contexts/AppContext';
+import { renderAuthRoutes } from '@/features/auth/routes/AuthRoutes';
 import ProtectedRoute from '@/features/auth/components/ProtectedRoute';
 import OnboardingGate from '@/features/onboarding/components/OnboardingGate';
 import DashboardShell from '@/core/layout/DashboardLayout';
@@ -154,24 +155,17 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-      <Route path="/login" element={<Login />} />
-      <Route
-        path="/onboarding"
-        element={
-          <ProtectedRoute>
-            <OnboardingGate allowIncomplete>
-              <Onboarding />
-            </OnboardingGate>
-          </ProtectedRoute>
-        }
-      />
-      <Route path="/register" element={<Register />} />
       <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
       <Route path="/terminos-condiciones" element={<TerminosCondiciones />} />
-      <Route path="/invite" element={<InvitationPage />} />
-      <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route path="/auth/github/callback" element={<GitHubCallback />} />
-      <Route path="/auth/sso" element={<SSOPage />} />
+      {renderAuthRoutes({
+        AuthCallback,
+        GitHubCallback,
+        InvitationPage,
+        Login,
+        Onboarding,
+        Register,
+        SSOPage
+      })}
 
       <Route
         path="/dashboard"

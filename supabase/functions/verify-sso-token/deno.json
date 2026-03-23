@@ -1,0 +1,14 @@
+{
+  "name": "verify-sso-token",
+  "version": "1.0.0",
+  "description": "Edge Function para verificar el token SSO de TuWebAI y abrir una sesion segura en Pulse",
+  "main": "index.ts",
+  "imports": {
+    "supabase": "https://esm.sh/@supabase/supabase-js@2"
+  },
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["deno.window", "deno.ns"],
+    "strict": true
+  }
+}
