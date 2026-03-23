@@ -41,18 +41,37 @@ function normalizeMetadata(row: NotificationRow): Record<string, unknown> | null
 
 function normalizeType(row: NotificationRow): NotificationType {
   const rawType = row.type;
+  const rawCategory = row.category;
+  const title = row.title.toLowerCase();
+  const message = row.message.toLowerCase();
 
   if (
+    rawType === 'admin' ||
+    rawType === 'project_message' ||
+    rawType === 'project_approved' ||
+    rawType === 'project_rejected' ||
     rawType === 'new_consultation' ||
     rawType === 'monthly_summary' ||
-    rawType === 'project_update' ||
     rawType === 'system'
   ) {
     return rawType;
   }
 
-  const title = row.title.toLowerCase();
-  const message = row.message.toLowerCase();
+  if (rawCategory === 'admin' || title.includes('admin') || message.includes('mensaje del admin')) {
+    return 'admin';
+  }
+
+  if (rawCategory === 'project' && (title.includes('aprobado') || message.includes('aprobado'))) {
+    return 'project_approved';
+  }
+
+  if (rawCategory === 'project' && (title.includes('rechaz') || message.includes('rechaz'))) {
+    return 'project_rejected';
+  }
+
+  if (rawCategory === 'project') {
+    return 'project_message';
+  }
 
   if (title.includes('consulta') || message.includes('consulta')) {
     return 'new_consultation';
@@ -60,10 +79,6 @@ function normalizeType(row: NotificationRow): NotificationType {
 
   if (title.includes('resumen') || message.includes('resumen')) {
     return 'monthly_summary';
-  }
-
-  if (row.category === 'project') {
-    return 'project_update';
   }
 
   return 'system';

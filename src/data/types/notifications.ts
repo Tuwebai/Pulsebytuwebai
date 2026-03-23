@@ -1,4 +1,11 @@
-export type NotificationType = 'new_consultation' | 'monthly_summary' | 'project_update' | 'system';
+export type NotificationType =
+  | 'admin'
+  | 'project_message'
+  | 'project_approved'
+  | 'project_rejected'
+  | 'new_consultation'
+  | 'monthly_summary'
+  | 'system';
 
 export interface Notification {
   id: string;

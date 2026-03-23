@@ -1,4 +1,4 @@
-import { BarChart2, Bell, FolderOpen, MessageSquare } from 'lucide-react';
+import { BarChart2, Bell, CheckCircle, MessageSquare, XCircle } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { Notification, NotificationType } from '@/data/types/notifications';
 import { cn } from '@/lib/utils';
@@ -9,22 +9,22 @@ interface NotificationItemProps {
   onRead: (id: string) => void;
 }
 
-const iconByType: Record<NotificationType, LucideIcon> = {
-  new_consultation: MessageSquare,
-  monthly_summary: BarChart2,
-  project_update: FolderOpen,
-  system: Bell
+const notificationIconMap: Record<NotificationType, { icon: LucideIcon; color: string }> = {
+  admin: { icon: MessageSquare, color: '#3B9EF5' },
+  project_message: { icon: MessageSquare, color: '#3B9EF5' },
+  project_approved: { icon: CheckCircle, color: '#22C55E' },
+  project_rejected: { icon: XCircle, color: '#EF4444' },
+  new_consultation: { icon: Bell, color: '#F59E0B' },
+  monthly_summary: { icon: BarChart2, color: '#22C55E' },
+  system: { icon: Bell, color: '#8B9AC0' }
 };
 
-const iconColorByType: Record<NotificationType, string> = {
-  new_consultation: 'text-[var(--signal)]',
-  monthly_summary: 'text-[var(--success)]',
-  project_update: 'text-[var(--warning)]',
-  system: 'text-[var(--text-secondary)]'
-};
+function getNotificationIcon(type: string): { icon: LucideIcon; color: string } {
+  return notificationIconMap[type as NotificationType] ?? notificationIconMap.system;
+}
 
 export function NotificationItem({ notification, onRead }: NotificationItemProps) {
-  const Icon = iconByType[notification.type];
+  const { icon: Icon, color } = getNotificationIcon(notification.type);
 
   return (
     <button
@@ -36,7 +36,7 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
       onClick={() => onRead(notification.id)}
     >
       <div className="relative mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-elevated)]">
-        <Icon className={cn('h-4 w-4', iconColorByType[notification.type])} strokeWidth={1.75} />
+        <Icon className="h-[18px] w-[18px]" color={color} strokeWidth={1.5} />
         <span
           className={cn(
             'absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full transition-colors',
