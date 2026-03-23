@@ -2,8 +2,11 @@ import { CreditCard, FolderOpen, LifeBuoy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, PulseEmptyState, Skeleton } from '@/core/components';
 import { useApp } from '@/contexts/AppContext';
-import { usePulseOverview } from '@/hooks/usePulseOverview';
-import PulseTrendBars from '@/features/pulse/components/PulseTrendBars';
+import PulseChart from '@/features/pulse/components/PulseChart';
+import { usePulseMetrics } from '@/features/pulse/hooks/usePulseMetrics';
+import { usePulsePeriod } from '@/features/pulse/hooks/usePulsePeriod';
+import { usePulseRealtime } from '@/features/pulse/hooks/usePulseRealtime';
+import { useUserProject } from '@/features/project/hooks/useUserProject';
 
 function getProjectStatusVariant(status?: string | null): 'signal' | 'success' | 'default' {
   if (!status) {
@@ -42,71 +45,34 @@ export default function HomePage() {
   const { getUserProjects } = useApp();
   const projects = getUserProjects();
   const primaryProject = projects[0];
-  const projectDomain = primaryProject?.domain || '#';
-  const { loading, hasDomain, data } = usePulseOverview('this_month');
-  const hasMetrics = Boolean(data?.hasMetrics);
-  const activityItems =
-    data?.recentHighlights.length
-      ? data.recentHighlights
-      : [
-          { label: 'Nueva consulta recibida en tu web', timestamp: 'Hoy' },
-          { label: 'Ticket #3 resuelto', timestamp: 'Ayer' },
-          { label: '47 visitas en tu web', timestamp: 'Lunes' }
-        ];
+  const { period } = usePulsePeriod();
+  const { projectId, domain, loading: projectLoading } = useUserProject();
+  const { data, isLoading } = usePulseMetrics(projectId, period);
+
+  usePulseRealtime(projectId);
+
+  const loading = projectLoading || isLoading;
+  const hasProject = Boolean(projectId);
+  const hasDomain = Boolean(domain);
+  const canOpenSite = Boolean(domain);
 
   return (
     <div className="space-y-6">
       <section className="rounded-[20px] border border-[var(--signal-border)] bg-[var(--bg-surface)] p-5 md:p-7">
-        {!hasDomain ? (
-          <PulseEmptyState onConnect={() => navigate('/dashboard/configuracion')} />
-        ) : loading ? (
-          <div className="space-y-6">
-            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-              <div className="space-y-2">
-                <Skeleton height="14px" rounded="sm" width="180px" />
-                <Skeleton height="14px" rounded="sm" width="120px" />
-              </div>
-              <Skeleton height="32px" rounded="full" width="96px" />
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              <Skeleton height="96px" rounded="md" />
-              <Skeleton height="96px" rounded="md" />
-            </div>
-
-            <PulseTrendBars data={[]} loading />
-          </div>
-        ) : !hasMetrics ? (
-          <div className="space-y-4">
-            <p className="text-[10px] uppercase tracking-[0.1em] text-[var(--text-tertiary)]">Este mes tu web tuvo</p>
-            <h2 className="text-2xl font-medium text-[var(--text-primary)]">Tu sitio ya esta conectado.</h2>
+        {!hasProject && !loading ? (
+          <div className="space-y-3">
+            <h2 className="text-2xl font-medium text-[var(--text-primary)]">Tu proyecto se esta configurando.</h2>
             <p className="max-w-2xl text-sm text-[var(--text-secondary)]">
-              Apenas entre la primera sincronizacion vas a ver aca visitas, consultas y las paginas que mejor estan funcionando.
+              Apenas tu equipo termine la configuracion inicial, vas a ver aca el rendimiento real de tu web.
             </p>
-            <div className="flex flex-wrap items-center gap-3 text-[12px] text-[var(--text-tertiary)]">
-              <button
-                className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)]"
-                onClick={() => navigate('/dashboard/pulse')}
-                type="button"
-              >
-                Ir a Pulse
-              </button>
-              <button
-                className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)]"
-                onClick={() => window.open(projectDomain, '_blank', 'noopener,noreferrer')}
-                type="button"
-              >
-                Ver mi sitio ↗
-              </button>
-            </div>
           </div>
+        ) : !hasDomain || !data?.hasData ? (
+          <PulseEmptyState onConnect={() => navigate('/dashboard/configuracion')} />
         ) : (
           <div className="space-y-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.1em] text-[var(--text-tertiary)]">
-                  Este mes tu web tuvo
-                </p>
+                <p className="text-[10px] uppercase tracking-[0.1em] text-[var(--text-tertiary)]">Este mes tu web tuvo</p>
               </div>
 
               <button
@@ -120,32 +86,47 @@ export default function HomePage() {
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-2">
                 <div className="font-data text-[52px] font-light leading-none text-[var(--text-primary)] md:text-[64px]">
-                  {data.visits.toLocaleString('es-AR')}
+                  {loading ? <Skeleton height="64px" rounded="sm" width="180px" /> : data.visits.toLocaleString('es-AR')}
                 </div>
                 <p className="text-[13px] text-[var(--text-secondary)]">visitas</p>
                 <p className="text-[13px] font-medium text-[var(--success)]">
-                  {typeof data.visitsDelta === 'number' ? `▲ ${data.visitsDelta}% vs periodo anterior` : 'Primer periodo con datos'}
+                  {loading
+                    ? '...'
+                    : data.visitsDelta !== null
+                      ? `▲ ${data.visitsDelta}% vs periodo anterior`
+                      : 'Sin comparativa disponible'}
                 </p>
               </div>
 
               <div className="space-y-2">
                 <div className="font-data text-[52px] font-light leading-none text-[var(--text-primary)] md:text-[64px]">
-                  {data.contacts.toLocaleString('es-AR')}
+                  {loading ? <Skeleton height="64px" rounded="sm" width="180px" /> : data.contacts.toLocaleString('es-AR')}
                 </div>
                 <p className="text-[13px] text-[var(--text-secondary)]">consultas recibidas</p>
                 <p className="text-[13px] font-medium text-[var(--success)]">
-                  {typeof data.contactsDelta === 'number' ? `▲ ${data.contactsDelta}% vs periodo anterior` : 'Primer periodo con datos'}
+                  {loading
+                    ? '...'
+                    : data.contactsDelta !== null
+                      ? `▲ ${data.contactsDelta}% vs periodo anterior`
+                      : 'Sin comparativa disponible'}
                 </p>
               </div>
             </div>
 
             <div className="space-y-3">
-              <PulseTrendBars data={data.series} />
+              <PulseChart data={data?.chartData ?? []} height={80} loading={loading || !projectId} />
               <div className="flex flex-wrap items-center justify-between gap-3 text-[12px] text-[var(--text-tertiary)]">
-                <span>Visitas por dia durante {data.periodLabel}</span>
+                <span>Visitas por dia</span>
                 <button
-                  className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)]"
-                  onClick={() => window.open(projectDomain, '_blank', 'noopener,noreferrer')}
+                  className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={!canOpenSite}
+                  onClick={() => {
+                    if (domain) {
+                      window.open(`https://${domain}`, '_blank', 'noopener,noreferrer');
+                    } else {
+                      navigate('/dashboard/configuracion');
+                    }
+                  }}
                   type="button"
                 >
                   Ver mi sitio ↗
@@ -207,22 +188,6 @@ export default function HomePage() {
           <p className="mt-3 text-sm text-[var(--text-secondary)]">Tu equipo de TuWebAI sigue disponible.</p>
           <p className="mt-4 text-sm text-[var(--signal)]">Abrir ticket →</p>
         </button>
-      </section>
-
-      <section className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)]">
-        <div className="border-b border-[var(--border-subtle)] px-5 py-4">
-          <h2 className="text-sm font-medium text-[var(--text-primary)]">Actividad reciente</h2>
-        </div>
-
-        <div className="divide-y divide-[var(--border-subtle)]">
-          {activityItems.map((item, index) => (
-            <div key={`${item.label}-${item.timestamp}`} className="flex items-center gap-3 px-5 py-4">
-              <span className={`h-1.5 w-1.5 rounded-full ${index === 0 ? 'bg-[var(--signal)]' : 'bg-[var(--text-tertiary)]'}`} />
-              <span className="text-[13px] text-[var(--text-secondary)]">{item.label}</span>
-              <span className="ml-auto text-[12px] text-[var(--text-tertiary)]">{item.timestamp}</span>
-            </div>
-          ))}
-        </div>
       </section>
     </div>
   );

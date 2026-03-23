@@ -1,36 +1,45 @@
 import { ExternalLink } from 'lucide-react';
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MetricCard, Skeleton } from '@/core/components';
-import { useApp } from '@/contexts/AppContext';
-import { usePulseOverview } from '@/hooks/usePulseOverview';
-import type { PulsePeriod } from '@/services/pulse/pulseMetricsService';
+import type { Period } from '@/data/types/pulse';
+import { useUserProject } from '@/features/project/hooks/useUserProject';
+import PulseChart from '../components/PulseChart';
 import PeriodSelector from '../components/PeriodSelector';
-import PulseTrendBars from '../components/PulseTrendBars';
+import { usePulseMetrics } from '../hooks/usePulseMetrics';
+import { usePulsePeriod } from '../hooks/usePulsePeriod';
+import { getDaysInRange } from '../services/pulse.service';
 
 export default function PulsePage() {
   const navigate = useNavigate();
-  const { getUserProjects } = useApp();
-  const [period, setPeriod] = useState<PulsePeriod>('this_month');
-  const primaryProject = getUserProjects()[0];
-  const domain = primaryProject?.domain;
-  const hasDomain = Boolean(domain);
-  const { loading, error, data } = usePulseOverview(period);
-  const hasMetrics = Boolean(data?.hasMetrics);
+  const { period, setPeriod } = usePulsePeriod();
+  const { projectId, domain, ga4PropertyId, loading: projectLoading } = useUserProject();
+  const { data, isLoading } = usePulseMetrics(projectId, period);
+
+  const loading = projectLoading || isLoading;
+  const hasProject = Boolean(projectId);
+  const hasGa4 = Boolean(ga4PropertyId);
+  const averagePerDay = data ? Math.round(data.visits / getDaysInRange(period)) : null;
 
   return (
     <div className="space-y-6">
       <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-[22px] font-medium text-[var(--text-primary)]">Tu web este mes</h1>
-          <p className="text-[13px] text-[var(--text-tertiary)]">{data?.periodLabel || 'sin datos todavia'}</p>
+          <p className="text-[13px] text-[var(--text-tertiary)]">
+            {data ? `${data.dateRange.from} → ${data.dateRange.to}` : 'sin datos todavia'}
+          </p>
         </div>
 
         <div className="flex flex-col gap-3 md:flex-row md:items-center">
-          <PeriodSelector disabled={!hasDomain} onChange={(nextPeriod) => setPeriod(nextPeriod as PulsePeriod)} value={period} />
+          <PeriodSelector value={period} onChange={(nextPeriod) => setPeriod(nextPeriod as Period)} disabled={!projectId} />
           <button
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-2 text-sm text-[var(--text-secondary)]"
-            onClick={() => window.open(domain || '#', '_blank', 'noopener,noreferrer')}
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-2 text-sm text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={!domain}
+            onClick={() => {
+              if (domain) {
+                window.open(`https://${domain}`, '_blank', 'noopener,noreferrer');
+              }
+            }}
             type="button"
           >
             Ver mi sitio <ExternalLink size={14} strokeWidth={1.5} />
@@ -38,63 +47,51 @@ export default function PulsePage() {
         </div>
       </section>
 
-      {!hasDomain ? (
-        <button
-          className="w-full rounded-[14px] border border-[var(--signal-border)] bg-[var(--signal-glow)] px-4 py-3 text-left text-sm text-[var(--signal)]"
-          onClick={() => navigate('/dashboard/configuracion')}
-          type="button"
-        >
-          Conecta tu dominio para ver los datos reales →
-        </button>
+      {!hasProject && !loading ? (
+        <div className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-6 text-sm text-[var(--text-secondary)]">
+          Tu proyecto esta siendo configurado. Volve pronto.
+        </div>
       ) : null}
 
-      {error ? (
-        <div className="rounded-[14px] border border-[var(--danger)]/30 bg-[var(--danger)]/10 px-4 py-3 text-sm text-[var(--text-secondary)]">
-          {error}
+      {hasProject && !hasGa4 ? (
+        <div className="sticky top-20 rounded-[14px] border border-[var(--warning)] bg-[var(--warning-dim)] px-4 py-3 text-sm text-[var(--warning)]">
+          <p className="font-medium">Conecta tu dominio para ver los datos reales.</p>
+          <p className="mt-1 text-[var(--text-secondary)]">Tu equipo de TuWebAI lo configura automaticamente al entregar tu proyecto.</p>
         </div>
       ) : null}
 
       <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          delta={data?.visitsDelta}
           label="Visitas este mes"
+          value={data?.visits ?? null}
+          delta={data?.visitsDelta === null ? undefined : data?.visitsDelta}
           loading={loading}
-          period={data?.periodLabel}
-          value={hasMetrics ? data?.visits ?? 0 : null}
         />
         <MetricCard
-          delta={data?.contactsDelta}
           label="Consultas recibidas"
+          value={data?.contacts ?? null}
+          delta={data?.contactsDelta === null ? undefined : data?.contactsDelta}
           loading={loading}
-          period={data?.periodLabel}
-          value={hasMetrics ? data?.contacts ?? 0 : null}
         />
         <MetricCard
           label="Pagina mas visitada"
+          value={data?.topPages[0]?.path ?? null}
+          period={data?.topPages[0] ? `${data.topPages[0].visits} visitas` : undefined}
           loading={loading}
-          period={hasMetrics ? `${data?.topPageVisits || 0} visitas` : undefined}
-          value={hasMetrics ? data?.topPage || 'Sin dato' : null}
         />
         <MetricCard
-          label="Tiempo promedio"
+          label="Promedio por dia"
+          value={averagePerDay}
+          unit="visitas/dia"
           loading={loading}
-          period="en el sitio"
-          value={hasMetrics ? data?.averageTime || '0:00' : null}
         />
       </section>
 
       <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
         <p className="text-[12px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Visitas por dia</p>
         <div className="mt-4">
-          <PulseTrendBars
-            data={data?.series || []}
-            emptyMessage="Tu sitio ya esta conectado. Apenas entre la primera sincronizacion vas a ver la tendencia diaria aca."
-            loading={loading}
-          />
+          <PulseChart data={data?.chartData ?? []} height={180} loading={loading} />
         </div>
-        <p className="mt-3 text-[12px] italic text-[var(--text-tertiary)]">
-          {hasMetrics ? `Serie real para ${data?.periodLabel}.` : 'La tendencia aparece cuando entre la primera sincronizacion.'}
-        </p>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
@@ -121,23 +118,18 @@ export default function PulsePage() {
                       </td>
                     </tr>
                   ))
-                ) : hasMetrics && data?.pages.length ? (
-                  data.pages.map((page, index) => (
-                    <tr key={page.path} className={index === data.pages.length - 1 ? '' : 'border-b border-[var(--border-subtle)]'}>
-                      <td className="px-5 py-3 text-sm text-[var(--text-secondary)]">
-                        <span className="inline-flex items-center gap-2">
-                          {page.path}
-                          {page.path.startsWith('/') ? <ExternalLink size={12} strokeWidth={1.5} /> : null}
-                        </span>
-                      </td>
+                ) : data?.topPages.length ? (
+                  data.topPages.map((page, index) => (
+                    <tr key={page.path} className={index === data.topPages.length - 1 ? '' : 'border-b border-[var(--border-subtle)]'}>
+                      <td className="px-5 py-3 text-sm text-[var(--text-secondary)]">{page.path}</td>
                       <td className="px-5 py-3 font-data text-sm text-[var(--text-primary)]">{page.visits}</td>
-                      <td className="px-5 py-3 font-data text-sm text-[var(--text-primary)]">{page.percent}%</td>
+                      <td className="px-5 py-3 font-data text-sm text-[var(--text-primary)]">{page.percentage}%</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td className="px-5 py-8 text-center text-sm text-[var(--text-tertiary)]" colSpan={3}>
-                      Todavia no hay paginas registradas para este periodo.
+                      Todavia no hay datos suficientes para este periodo.
                     </td>
                   </tr>
                 )}
@@ -146,40 +138,38 @@ export default function PulsePage() {
           </div>
         </div>
 
-        {hasDomain ? (
-          <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
-            <div>
-              <h2 className="text-sm font-medium text-[var(--text-primary)]">Actividad de tu web</h2>
-              <p className="mt-1 text-[12px] text-[var(--text-tertiary)]">Resumen reciente de Pulse</p>
-            </div>
-
-            <div className="mt-5 space-y-3">
-              {loading ? (
-                Array.from({ length: 3 }).map((_, index) => <Skeleton key={`activity-${index}`} height="16px" rounded="sm" />)
-              ) : data?.recentHighlights.length ? (
-                data.recentHighlights.map((contact) => (
-                  <div key={`${contact.label}-${contact.timestamp}`} className="flex items-center gap-3 border-b border-[var(--border-subtle)] pb-3 last:border-b-0">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)]" />
-                    <span className="text-[13px] text-[var(--text-secondary)]">{contact.label}</span>
-                    <span className="ml-auto text-[12px] text-[var(--text-tertiary)]">{contact.timestamp}</span>
-                  </div>
-                ))
-              ) : (
-                <div className="rounded-[14px] border border-dashed border-[var(--border-default)] px-4 py-6 text-sm text-[var(--text-tertiary)]">
-                  Tu sitio ya esta conectado. Cuando entren datos vamos a mostrar aca el movimiento reciente de visitas y consultas.
-                </div>
-              )}
-            </div>
-
-            <button
-              className="mt-4 text-sm text-[var(--signal)]"
-              onClick={() => navigate('/dashboard/configuracion')}
-              type="button"
-            >
-              Queres recibir notificaciones? Activar alertas →
-            </button>
+        <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
+          <div>
+            <h2 className="text-sm font-medium text-[var(--text-primary)]">Resumen del periodo</h2>
+            <p className="mt-1 text-[12px] text-[var(--text-tertiary)]">Lectura rapida de tus metricas</p>
           </div>
-        ) : null}
+
+          <div className="mt-5 space-y-3">
+            <div className="flex items-center gap-3 border-b border-[var(--border-subtle)] pb-3">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)]" />
+              <span className="text-[13px] text-[var(--text-secondary)]">Total de visitas</span>
+              <span className="ml-auto font-data text-[13px] text-[var(--text-primary)]">{data?.visits ?? 0}</span>
+            </div>
+            <div className="flex items-center gap-3 border-b border-[var(--border-subtle)] pb-3">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--success)]" />
+              <span className="text-[13px] text-[var(--text-secondary)]">Consultas recibidas</span>
+              <span className="ml-auto font-data text-[13px] text-[var(--text-primary)]">{data?.contacts ?? 0}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--text-tertiary)]" />
+              <span className="text-[13px] text-[var(--text-secondary)]">Promedio de sesion</span>
+              <span className="ml-auto font-data text-[13px] text-[var(--text-primary)]">{data?.avgSessionSec ?? 0}s</span>
+            </div>
+          </div>
+
+          <button
+            className="mt-4 text-sm text-[var(--signal)]"
+            onClick={() => navigate('/dashboard/configuracion')}
+            type="button"
+          >
+            Revisar configuracion →
+          </button>
+        </div>
       </section>
     </div>
   );

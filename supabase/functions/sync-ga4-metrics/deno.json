@@ -1,0 +1,14 @@
+{
+  "name": "sync-ga4-metrics",
+  "version": "1.0.0",
+  "description": "Edge Function para sincronizar metricas de GA4 hacia pulse_metrics",
+  "main": "index.ts",
+  "imports": {
+    "supabase": "https://esm.sh/@supabase/supabase-js@2"
+  },
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["deno.window", "deno.ns"],
+    "strict": true
+  }
+}
