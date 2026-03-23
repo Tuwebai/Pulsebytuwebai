@@ -9,7 +9,14 @@ interface NotificationItemProps {
   onRead: (id: string) => void;
 }
 
-const notificationIconMap: Record<NotificationType, { icon: LucideIcon; color: string }> = {
+type NotificationVisual = {
+  icon: LucideIcon;
+  color: string;
+  backgroundColor: string;
+  borderColor: string;
+};
+
+const baseNotificationIconMap: Record<NotificationType, { icon: LucideIcon; color: string }> = {
   admin: { icon: MessageSquare, color: '#3B9EF5' },
   project_message: { icon: MessageSquare, color: '#3B9EF5' },
   project_approved: { icon: CheckCircle, color: '#22C55E' },
@@ -19,7 +26,27 @@ const notificationIconMap: Record<NotificationType, { icon: LucideIcon; color: s
   system: { icon: Bell, color: '#8B9AC0' }
 };
 
-function getNotificationIcon(notification: Notification): { icon: LucideIcon; color: string } {
+const notificationIconMap = Object.fromEntries(
+  Object.entries(baseNotificationIconMap).map(([type, value]) => [
+    type,
+    {
+      ...value,
+      backgroundColor: hexToRgba(value.color, 0.16),
+      borderColor: hexToRgba(value.color, 0.28)
+    }
+  ])
+) as Record<NotificationType, NotificationVisual>;
+
+function hexToRgba(hex: string, alpha: number) {
+  const normalizedHex = hex.replace('#', '');
+  const r = Number.parseInt(normalizedHex.slice(0, 2), 16);
+  const g = Number.parseInt(normalizedHex.slice(2, 4), 16);
+  const b = Number.parseInt(normalizedHex.slice(4, 6), 16);
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function getNotificationIcon(notification: Notification): NotificationVisual {
   const mappedIcon = notificationIconMap[notification.type as NotificationType];
 
   if (mappedIcon) {
@@ -58,7 +85,7 @@ function getNotificationIcon(notification: Notification): { icon: LucideIcon; co
 }
 
 export function NotificationItem({ notification, onRead }: NotificationItemProps) {
-  const { icon: Icon, color } = getNotificationIcon(notification);
+  const { icon: Icon, color, backgroundColor, borderColor } = getNotificationIcon(notification);
 
   return (
     <button
@@ -69,7 +96,10 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
       type="button"
       onClick={() => onRead(notification.id)}
     >
-      <div className="relative mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-elevated)]">
+      <div
+        className="relative mt-0.5 flex h-8 w-8 items-center justify-center rounded-full border"
+        style={{ backgroundColor, borderColor, boxShadow: `0 0 0 1px ${hexToRgba(color, 0.08)} inset` }}
+      >
         <Icon className="h-[18px] w-[18px]" color={color} strokeWidth={1.5} />
         <span
           className={cn(
