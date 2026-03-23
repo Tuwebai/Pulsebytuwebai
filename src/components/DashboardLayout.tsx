@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { Navigate, useLocation, Outlet } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import { useAvatarSync } from '@/hooks/useAvatarSync';
@@ -10,7 +10,6 @@ import LiveRegion from './LiveRegion';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { userPreferencesService } from '@/lib/userPreferencesService';
 import TutorialOverlay from './tutorial/TutorialOverlay';
-import HelpButton from './tutorial/HelpButton';
 import { FloatingHelpButton } from './tutorial/ContextualHelp';
 
 interface DashboardLayoutProps {
@@ -36,7 +35,7 @@ const WIDGETS = [
 ];
 
 export default function DashboardLayout({ children, dashboardProps }: DashboardLayoutProps) {
-  const { isAuthenticated, loading, user } = useApp();
+  const { isAuthenticated, authReady, user } = useApp();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [visibleWidgets, setVisibleWidgets] = useState<string[]>(() => {
     const saved = localStorage.getItem('dashboard_widgets');
@@ -104,7 +103,7 @@ export default function DashboardLayout({ children, dashboardProps }: DashboardL
   }, [location.pathname]);
 
   // Mostrar loading mientras se verifica la autenticación
-  if (loading) {
+  if (!authReady) {
     return (
       <div className="h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">

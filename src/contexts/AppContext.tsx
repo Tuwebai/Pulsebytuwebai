@@ -119,6 +119,7 @@ export interface AppContextType {
   user: User | null;
   projects: Project[];
   isAuthenticated: boolean;
+  authReady: boolean;
   logs: ProjectLog[];
   loading: boolean;
   error: string | null;
@@ -169,6 +170,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
   const [logs, setLogs] = useState<ProjectLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -345,6 +347,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       } catch (error) {
         setError('Error de autenticación');
       } finally {
+        setAuthReady(true);
         setLoading(false);
       }
     } else {
@@ -357,6 +360,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (user && user.id) {
         await userPreferencesService.deleteUserPreference(user.id, 'welcome_back', 'tuwebai_welcome_back');
       }
+      setAuthReady(true);
       setLoading(false);
     }
   }, [supabaseUser, session, authLoading]);
@@ -822,6 +826,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       user,
       projects,
       isAuthenticated,
+      authReady,
       logs,
       loading,
       error,
@@ -845,6 +850,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     user,
     projects,
     isAuthenticated,
+    authReady,
     logs,
     loading,
     error,
@@ -896,6 +902,7 @@ export function useApp() {
       user: null,
       projects: [],
       isAuthenticated: false,
+      authReady: false,
       logs: [],
       loading: true,
       error: 'Contexto no disponible',

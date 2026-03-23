@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
 
 const Index = () => {
-  const { isAuthenticated, loading, user } = useApp();
+  const { isAuthenticated, authReady, user } = useApp();
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const Index = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  if (loading || !isReady) {
+  if (!authReady || !isReady) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <div className="text-center">
