@@ -97,7 +97,7 @@ export const EMAIL_VARIABLES = {
       </div>
       
       <div style="text-align: center; margin-top: 30px;">
-        <a href="https://tuweb-ai.com/admin/support" class="action-btn">Ver en Panel de Admin</a>
+        <a href="https://pulse.tuweb-ai.com/admin/support" class="action-btn">Ver en Panel de Admin</a>
       </div>
     `,
     footer_text: 'Sistema de Soporte Técnico',
@@ -241,7 +241,7 @@ export const EMAIL_VARIABLES = {
       </div>
       
       <div style="text-align: center; margin-top: 30px;">
-        <a href="https://tuweb-ai.com/support" class="action-btn">Ver en Mi Panel</a>
+        <a href="https://pulse.tuweb-ai.com/support" class="action-btn">Ver en Mi Panel</a>
       </div>
       
       <div class="contact-info">

@@ -324,7 +324,7 @@ ${cleanMessage}
 
 ---
 *Evento programado por Websy AI - Pulse by TuWebAI*
-*Para más información: https://dashboard.tuweb-ai.com*`;
+*Para mas informacion: https://pulse.tuweb-ai.com*`;
       }
 
       // Descripción genérica profesional
@@ -348,7 +348,7 @@ ${cleanMessage}
 
 ---
 *Evento programado por Websy AI - Pulse by TuWebAI*
-*Para más información: https://dashboard.tuweb-ai.com*`;
+*Para mas informacion: https://pulse.tuweb-ai.com*`;
     };
 
     // Generar ubicación profesional si no se proporciona

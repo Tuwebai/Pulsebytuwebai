@@ -6,7 +6,7 @@ export const GITHUB_OAUTH_CONFIG = {
   // 1. Ve a https://github.com/settings/developers
   // 2. Crea una nueva OAuth App
   // 3. Para desarrollo: http://localhost:8083/auth/github/callback
-  // 4. Para producción: https://dashboard.tuweb-ai.com/auth/github/callback
+  // 4. Para producción: https://pulse.tuweb-ai.com/auth/github/callback
   // 5. Reemplaza estos valores con tus credenciales reales:
   CLIENT_ID: 'your_github_client_id_here',
   CLIENT_SECRET: 'your_github_client_secret_here',
@@ -26,7 +26,7 @@ export const getGitHubOAuthCredentials = () => {
       clientId: envClientId,
       clientSecret: envClientSecret,
       redirectUri: envRedirectUri || (import.meta.env.PROD 
-        ? 'https://dashboard.tuweb-ai.com/auth/github/callback'
+        ? `${config.app.publicUrl}/auth/github/callback`
         : 'http://localhost:8083/auth/github/callback'),
     };
   }
@@ -40,3 +40,4 @@ export const getGitHubOAuthCredentials = () => {
     redirectUri: GITHUB_OAUTH_CONFIG.REDIRECT_URI,
   };
 };
+import config from './environment';

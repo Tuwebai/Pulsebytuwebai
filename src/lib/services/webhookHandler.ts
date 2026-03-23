@@ -79,7 +79,7 @@ export const syncPaymentsFromMainSite = async (userEmail: string) => {
     // En producciÃ³n, aquÃ­ harÃ­as una llamada a la API de tu pÃ¡gina principal
     // para obtener los pagos que se realizaron allÃ­
     
-    const response = await fetch(`https://tuweb-ai.com/api/payments/${userEmail}`, {
+    const response = await fetch(`https://pulse.tuweb-ai.com/api/payments/${userEmail}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

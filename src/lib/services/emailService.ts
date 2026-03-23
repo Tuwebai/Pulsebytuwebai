@@ -103,7 +103,7 @@ export const sendSupportTicketEmail = async (ticketData: {
   fecha: string;
 }) => {
   const data = {
-    to_email: EMAIL_CONFIG.EMAILS.SUPPORT, // admin@tuweb-ai.com RECIBE
+    to_email: EMAIL_CONFIG.EMAILS.SUPPORT, // admin@pulse.tuweb-ai.com RECIBE
     from_name: 'Cliente Pulse by TuWebAI',
     from_email: ticketData.email, // Email del cliente que ENVÃA
     reply_to: ticketData.email, // Para responder directamente al cliente
@@ -183,7 +183,7 @@ export const sendDailySummaryEmail = async (summaryData: {
   }>;
 }) => {
   const data = {
-    to_email: EMAIL_CONFIG.EMAILS.SUPPORT, // admin@tuweb-ai.com RECIBE
+    to_email: EMAIL_CONFIG.EMAILS.SUPPORT, // admin@pulse.tuweb-ai.com RECIBE
     from_name: 'Pulse by TuWebAI',
     from_email: EMAIL_CONFIG.EMAILS.FROM_EMAIL, // Tu email de EmailJS ENVÃA
     reply_to: EMAIL_CONFIG.EMAILS.SUPPORT,

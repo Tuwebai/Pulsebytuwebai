@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pulse by TuWebAI — Sistema de Identidad Visual</title>
+<style>
+  :root {
+    --navy: #0B0F1E;
+    --signal: #3B9EF5;
+    --warm-bg: #F5F4F2;
+    --border: rgba(0,0,0,0.1);
+    --text-primary: #0B0F1E;
+    --text-secondary: #555;
+    --text-tertiary: #999;
+    --bg-secondary: #F0EEE9;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --mono: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --border: rgba(255,255,255,0.1);
+      --text-primary: #F0EEE9;
+      --text-secondary: #aaa;
+      --text-tertiary: #666;
+      --bg-secondary: #151928;
+      --warm-bg: #0f1320;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: var(--warm-bg);
+    color: var(--text-primary);
+    padding: 48px 32px 80px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 26px; font-weight: 500; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 48px; }
+  .sec { margin-bottom: 52px; }
+  .sec-label {
+    font-size: 10px; font-weight: 500; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--text-tertiary);
+    margin-bottom: 16px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+  /* checkerboard transparent tiles */
+  .tile {
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 36px 24px; min-height: 160px; position: relative;
+    background-color: #fff;
+    background-image:
+      linear-gradient(45deg,#f0f0f0 25%,transparent 25%),
+      linear-gradient(-45deg,#f0f0f0 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,#f0f0f0 75%),
+      linear-gradient(-45deg,transparent 75%,#f0f0f0 75%);
+    background-size: 12px 12px;
+    background-position: 0 0, 0 6px, 6px -6px, -6px 0;
+    border: 1px solid #ddd;
+  }
+  .tile.dk {
+    background-color: #0B0F1E;
+    background-image:
+      linear-gradient(45deg,#0d1222 25%,transparent 25%),
+      linear-gradient(-45deg,#0d1222 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,#0d1222 75%),
+      linear-gradient(-45deg,transparent 75%,#0d1222 75%);
+    border-color: rgba(255,255,255,0.08);
+  }
+  .vlabel { font-size: 11px; color: var(--text-tertiary); margin-bottom: 6px; }
+  /* swatches */
+  .sw { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .sw-c { height: 56px; }
+  .sw-i { padding: 10px 12px; background: var(--bg-secondary); }
+  .sw-n { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+  .sw-v { font-size: 10px; color: var(--text-tertiary); font-family: var(--mono); margin-top: 3px; line-height: 1.7; }
+  /* tests */
+  .ti { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .ti:last-child { border-bottom: none; }
+  .tp { font-size: 15px; color: #1A7A4A; flex-shrink: 0; }
+  .tn { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 2px; }
+  .td { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+  /* code */
+  .code {
+    background: var(--bg-secondary); border-radius: 8px;
+    padding: 16px 18px; font-family: var(--mono); font-size: 11px;
+    color: var(--text-secondary); line-height: 1.75;
+    overflow-x: auto; white-space: pre;
+    border: 1px solid var(--border);
+  }
+  /* construction */
+  .cf { display: flex; gap: 24px; align-items: flex-start; }
+  .ci { flex: 0 0 200px; }
+  .info { font-size: 12px; color: var(--text-secondary); line-height: 1.75; }
+  .info-h { font-size: 11px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px; margin-top: 12px; }
+  .info-h:first-child { margin-top: 0; }
+  .mono { font-family: var(--mono); color: var(--text-primary); }
+  .accent { font-family: var(--mono); color: #3B9EF5; }
+  /* rules */
+  .rule-row { display: flex; gap: 8px; align-items: flex-start; padding: 4px 0; font-size: 12px; color: var(--text-secondary); }
+  .good { color: #1A7A4A; font-weight: 600; flex-shrink:0; }
+  .bad { color: #c0392b; font-weight: 600; flex-shrink:0; }
+  /* sizes */
+  .sizes { display: flex; gap: 0; align-items: flex-end; justify-content: space-around; padding: 28px 24px; }
+  .size-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .size-label { font-size: 10px; color: rgba(255,255,255,0.35); font-family: var(--mono); }
+  /* typo preview */
+  .typo-card { background: var(--bg-secondary); border-radius: 10px; padding: 20px; border: 1px solid var(--border); }
+  .typo-label { font-size: 10px; letter-spacing: .1em; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 14px; }
+  @media (max-width: 600px) {
+    .g2, .g4 { grid-template-columns: 1fr; }
+    .g3 { grid-template-columns: 1fr 1fr; }
+    .cf { flex-direction: column; }
+    .ci { flex: none; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Pulse by TuWebAI</h1>
+<div class="subtitle">Sistema de identidad visual · Dirección D4 · Círculo ultra fino + onda señal · Fondos 100% transparentes</div>
+
+<!-- SÍMBOLO -->
+<div class="sec">
+  <div class="sec-label">Símbolo solo — todas las versiones</div>
+  <div class="g4">
+    <div>
+      <div class="vlabel">Primario / Día</div>
+      <div class="tile">
+        <svg viewBox="0 0 100 100" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#0B0F1E" stroke-width="1.2" opacity="0.18"/>
+          <clipPath id="c1"><circle cx="50" cy="50" r="37"/></clipPath>
+          <g clip-path="url(#c1)">
+            <path d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50" fill="none" stroke="#0B0F1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <circle cx="60" cy="50" r="2.5" fill="#3B9EF5"/>
+        </svg>
+      </div>
+    </div>
+    <div>
+      <div class="vlabel">Acento / Señal</div>
+      <div class="tile">
+        <svg viewBox="0 0 100 100" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#3B9EF5" stroke-width="1.2" opacity="0.3"/>
+          <clipPath id="c2"><circle cx="50" cy="50" r="37"/></clipPath>
+          <g clip-path="url(#c2)">
+            <path d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50" fill="none" stroke="#3B9EF5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <circle cx="60" cy="50" r="2.5" fill="#3B9EF5"/>
+          <circle cx="60" cy="50" r="5.5" fill="#3B9EF5" opacity="0.15"/>
+        </svg>
+      </div>
+    </div>
+    <div>
+      <div class="vlabel">Noche / Dark</div>
+      <div class="tile dk">
+        <svg viewBox="0 0 100 100" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.15"/>
+          <clipPath id="c3"><circle cx="50" cy="50" r="37"/></clipPath>
+          <g clip-path="url(#c3)">
+            <path d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+          </g>
+          <circle cx="60" cy="50" r="2.5" fill="#3B9EF5"/>
+          <circle cx="60" cy="50" r="5.5" fill="#3B9EF5" opacity="0.2"/>
+        </svg>
+      </div>
+    </div>
+    <div>
+      <div class="vlabel">Monocromático B&W</div>
+      <div class="tile">
+        <svg viewBox="0 0 100 100" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#000" stroke-width="1.2" opacity="0.2"/>
+          <clipPath id="c4"><circle cx="50" cy="50" r="37"/></clipPath>
+          <g clip-path="url(#c4)">
+            <path d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <circle cx="60" cy="50" r="2.5" fill="#000"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGO HORIZONTAL -->
+<div class="sec">
+  <div class="sec-label">Logo completo — horizontal</div>
+  <div class="g2">
+    <div>
+      <div class="vlabel">Día — fondo transparente</div>
+      <div class="tile" style="justify-content:flex-start;padding:28px 32px;">
+        <svg viewBox="0 0 260 60" width="260" height="60" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="22" fill="none" stroke="#0B0F1E" stroke-width="1" opacity="0.2"/>
+          <clipPath id="ch1"><circle cx="30" cy="30" r="21"/></clipPath>
+          <g clip-path="url(#ch1)">
+            <path d="M8 30 L15 30 L20 17 L26 43 L31 23 L36 30 L52 30" fill="none" stroke="#0B0F1E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <circle cx="36" cy="30" r="1.8" fill="#3B9EF5"/>
+          <text x="64" y="24" font-family="-apple-system,system-ui,sans-serif" font-size="18" font-weight="500" fill="#0B0F1E" letter-spacing="5">PULSE</text>
+          <text x="65" y="43" font-family="-apple-system,system-ui,sans-serif" font-size="9" font-weight="300" fill="#0B0F1E" opacity="0.4" letter-spacing="2.5">by TuWebAI</text>
+        </svg>
+      </div>
+    </div>
+    <div>
+      <div class="vlabel">Noche — fondo transparente</div>
+      <div class="tile dk" style="justify-content:flex-start;padding:28px 32px;">
+        <svg viewBox="0 0 260 60" width="260" height="60" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="22" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.15"/>
+          <clipPath id="ch2"><circle cx="30" cy="30" r="21"/></clipPath>
+          <g clip-path="url(#ch2)">
+            <path d="M8 30 L15 30 L20 17 L26 43 L31 23 L36 30 L52 30" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+          </g>
+          <circle cx="36" cy="30" r="1.8" fill="#3B9EF5"/>
+          <text x="64" y="24" font-family="-apple-system,system-ui,sans-serif" font-size="18" font-weight="500" fill="#ffffff" letter-spacing="5">PULSE</text>
+          <text x="65" y="43" font-family="-apple-system,system-ui,sans-serif" font-size="9" font-weight="300" fill="#ffffff" opacity="0.35" letter-spacing="2.5">by TuWebAI</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGO VERTICAL + FAVICON -->
+<div class="sec">
+  <div class="sec-label">Logo vertical + app icon</div>
+  <div class="g2">
+    <div>
+      <div class="vlabel">Vertical — día</div>
+      <div class="tile" style="flex-direction:column;gap:14px;min-height:180px;">
+        <svg viewBox="0 0 100 100" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#0B0F1E" stroke-width="1.2" opacity="0.18"/>
+          <clipPath id="cv1"><circle cx="50" cy="50" r="37"/></clipPath>
+          <g clip-path="url(#cv1)">
+            <path d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50" fill="none" stroke="#0B0F1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <circle cx="60" cy="50" r="2.5" fill="#3B9EF5"/>
+        </svg>
+        <div style="text-align:center;">
+          <div style="font-family:-apple-system,system-ui,sans-serif;font-size:14px;font-weight:500;letter-spacing:5px;color:#0B0F1E;">PULSE</div>
+          <div style="font-family:-apple-system,system-ui,sans-serif;font-size:8px;font-weight:300;letter-spacing:2.5px;color:#0B0F1E;opacity:.38;margin-top:4px;">by TuWebAI</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="vlabel">Favicon — escalas</div>
+      <div class="tile dk">
+        <div class="sizes">
+          <div class="size-item">
+            <svg viewBox="0 0 100 100" width="48" height="48">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#fff" stroke-width="1.2" opacity="0.15"/>
+              <clipPath id="cf1"><circle cx="50" cy="50" r="37"/></clipPath>
+              <g clip-path="url(#cf1)">
+                <path d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+              </g>
+              <circle cx="60" cy="50" r="2.5" fill="#3B9EF5"/>
+            </svg>
+            <div class="size-label">48px</div>
+          </div>
+          <div class="size-item">
+            <svg viewBox="0 0 100 100" width="32" height="32">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.15"/>
+              <clipPath id="cf2"><circle cx="50" cy="50" r="37"/></clipPath>
+              <g clip-path="url(#cf2)">
+                <path d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+              </g>
+              <circle cx="60" cy="50" r="3" fill="#3B9EF5"/>
+            </svg>
+            <div class="size-label">32px</div>
+          </div>
+          <div class="size-item">
+            <svg viewBox="0 0 100 100" width="20" height="20">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#fff" stroke-width="2" opacity="0.2"/>
+              <clipPath id="cf3"><circle cx="50" cy="50" r="37"/></clipPath>
+              <g clip-path="url(#cf3)">
+                <path d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50" fill="none" stroke="#3B9EF5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+            </svg>
+            <div class="size-label">20px</div>
+          </div>
+          <div class="size-item">
+            <svg viewBox="0 0 100 100" width="14" height="14">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#fff" stroke-width="2.5" opacity="0.2"/>
+              <clipPath id="cf4"><circle cx="50" cy="50" r="37"/></clipPath>
+              <g clip-path="url(#cf4)">
+                <path d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50" fill="none" stroke="#3B9EF5" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+            </svg>
+            <div class="size-label">14px</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SISTEMA DE COLOR -->
+<div class="sec">
+  <div class="sec-label">Sistema de color</div>
+  <div class="g4">
+    <div class="sw">
+      <div class="sw-c" style="background:#0B0F1E;"></div>
+      <div class="sw-i">
+        <div class="sw-n">Navy profundo</div>
+        <div class="sw-v">#0B0F1E<br>11 · 15 · 30<br>C95 M88 Y42 K52<br>Pantone 296 C</div>
+      </div>
+    </div>
+    <div class="sw">
+      <div class="sw-c" style="background:#3B9EF5;"></div>
+      <div class="sw-i">
+        <div class="sw-n">Señal activa</div>
+        <div class="sw-v">#3B9EF5<br>59 · 158 · 245<br>C76 M35 Y0 K4<br>Pantone 2995 C</div>
+      </div>
+    </div>
+    <div class="sw">
+      <div class="sw-c" style="background:#FFFFFF;border:1px solid #ddd;"></div>
+      <div class="sw-i">
+        <div class="sw-n">Blanco puro</div>
+        <div class="sw-v">#FFFFFF<br>255 · 255 · 255<br>Logo sobre dark<br>Fondo día</div>
+      </div>
+    </div>
+    <div class="sw">
+      <div class="sw-c" style="background:#F5F4F2;border:1px solid #ddd;"></div>
+      <div class="sw-i">
+        <div class="sw-n">Fondo cálido</div>
+        <div class="sw-v">#F5F4F2<br>245 · 244 · 242<br>Cards, superficies<br>UI secundaria</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TIPOGRAFÍA -->
+<div class="sec">
+  <div class="sec-label">Sistema tipográfico</div>
+  <div class="g2">
+    <div class="typo-card">
+      <div class="typo-label">Wordmark</div>
+      <div style="font-family:-apple-system,system-ui,sans-serif;font-size:26px;font-weight:500;letter-spacing:6px;color:var(--text-primary);margin-bottom:12px;">PULSE</div>
+      <div class="info">
+        <div>Fuente: <span class="mono">Sistema sans-serif</span></div>
+        <div>Peso: <span class="mono">500 Medium</span></div>
+        <div>Tracking: <span class="accent">+0.3em (300‰)</span></div>
+        <div>Case: <span class="mono">ALL CAPS</span></div>
+        <div style="margin-top:6px;font-size:11px;color:var(--text-tertiary);">El espaciado es la customización. El tracking amplio convierte la palabra en señal.</div>
+      </div>
+    </div>
+    <div class="typo-card">
+      <div class="typo-label">Subbrand</div>
+      <div style="font-family:-apple-system,system-ui,sans-serif;font-size:11px;font-weight:300;letter-spacing:3px;color:var(--text-tertiary);margin-bottom:12px;">by TuWebAI</div>
+      <div class="info">
+        <div>Fuente: <span class="mono">Sistema sans-serif</span></div>
+        <div>Peso: <span class="mono">300 Light</span></div>
+        <div>Tracking: <span class="accent">+0.2em (200‰)</span></div>
+        <div>Opacidad: <span class="mono">35–40%</span></div>
+        <div>Relación: <span class="mono">9px / 18px = 50%</span></div>
+        <div style="margin-top:6px;font-size:11px;color:var(--text-tertiary);">La marca madre subordinada. Presente pero sin competir.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- USOS -->
+<div class="sec">
+  <div class="sec-label">Reglas de uso</div>
+  <div class="g2">
+    <div>
+      <div style="font-size:11px;font-weight:600;color:#1A7A4A;margin-bottom:10px;">✓ Siempre correcto</div>
+      <div class="rule-row"><span class="good">✓</span><span>Sobre fondo transparente en cualquier contexto digital</span></div>
+      <div class="rule-row"><span class="good">✓</span><span>Símbolo solo en favicon, avatar, app icon</span></div>
+      <div class="rule-row"><span class="good">✓</span><span>Punto activo en azul aunque el resto sea monocromático</span></div>
+      <div class="rule-row"><span class="good">✓</span><span>Logo horizontal en header del dashboard</span></div>
+      <div class="rule-row"><span class="good">✓</span><span>Logo vertical en splash screen y onboarding</span></div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:600;color:#c0392b;margin-bottom:10px;">✗ Nunca</div>
+      <div class="rule-row"><span class="bad">✗</span><span>Agregar fondo sólido detrás del logo</span></div>
+      <div class="rule-row"><span class="bad">✗</span><span>Cambiar el círculo a filled / relleno</span></div>
+      <div class="rule-row"><span class="bad">✗</span><span>Modificar las proporciones de la onda</span></div>
+      <div class="rule-row"><span class="bad">✗</span><span>Agregar sombra, glow, o drop shadow</span></div>
+      <div class="rule-row"><span class="bad">✗</span><span>Rotar o reflejar el logo</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 8 TESTS -->
+<div class="sec">
+  <div class="sec-label">8 tests de validación — enterprise</div>
+  <div>
+    <div class="ti"><span class="tp">✓</span><div><div class="tn">Test de silueta</div><div class="td">El pico + valle de la onda dentro del círculo es reconocible como silueta pura. Sin color ni texto, la forma comunica actividad y monitoreo.</div></div></div>
+    <div class="ti"><span class="tp">✓</span><div><div class="tn">Test de escala</div><div class="td">A 14px: el pico de la onda domina, el punto activo es el único color. A 400px: el grosor ultra fino del círculo crea tensión con el trazo más grueso de la señal.</div></div></div>
+    <div class="ti"><span class="tp">✓</span><div><div class="tn">Test de tiempo</div><div class="td">El círculo y la onda sinusoidal son geometrías universales sin fecha. No hay referencia a ninguna tendencia de UI ni año específico.</div></div></div>
+    <div class="ti"><span class="tp">✓</span><div><div class="tn">Test de unicidad</div><div class="td">El contraste de opacidad entre círculo fantasma (15–18%) y onda sólida es inusual. Los competidores usan círculos rellenos o sin contraste de peso.</div></div></div>
+    <div class="ti"><span class="tp">✓</span><div><div class="tn">Test de separación</div><div class="td">El símbolo funciona solo como app icon. "PULSE by TuWebAI" funciona solo en texto plano, footer de emails, documentos PDF.</div></div></div>
+    <div class="ti"><span class="tp">✓</span><div><div class="tn">Test B&W</div><div class="td">En negro puro sobre blanco la forma funciona perfectamente. El azul del punto activo es contextual, nunca estructural.</div></div></div>
+    <div class="ti"><span class="tp">✓</span><div><div class="tn">Test de inversión</div><div class="td">La versión nocturna es la versión principal del producto — el dashboard vive en dark navy. Diseñada primero para ese contexto.</div></div></div>
+    <div class="ti"><span class="tp">✓</span><div><div class="tn">Test de explicación</div><div class="td">"Un círculo que contiene la señal de tu negocio. El punto azul es el dato llegando ahora mismo." — menos de 10 segundos.</div></div></div>
+  </div>
+</div>
+
+<!-- SVG CODE -->
+<div class="sec">
+  <div class="sec-label">SVG production-ready</div>
+  <div class="code">&lt;!-- SÍMBOLO SOLO — copiar tal cual --&gt;
+&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"
+     role="img" aria-label="Pulse by TuWebAI"&gt;
+  &lt;title&gt;Pulse&lt;/title&gt;
+  &lt;defs&gt;
+    &lt;clipPath id="pulse-clip"&gt;
+      &lt;circle cx="50" cy="50" r="37"/&gt;
+    &lt;/clipPath&gt;
+  &lt;/defs&gt;
+
+  &lt;!-- Círculo contenedor: ultra fino, casi fantasma --&gt;
+  &lt;circle cx="50" cy="50" r="38"
+    fill="none" stroke="currentColor"
+    stroke-width="1.2" opacity="0.18"/&gt;
+
+  &lt;!-- Señal de pulso --&gt;
+  &lt;g clip-path="url(#pulse-clip)"&gt;
+    &lt;path d="M12 50 L26 50 L34 26 L44 74 L52 38 L60 50 L88 50"
+      fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round"/&gt;
+  &lt;/g&gt;
+
+  &lt;!-- Punto activo — único elemento con color fijo --&gt;
+  &lt;circle cx="60" cy="50" r="2.5" fill="#3B9EF5"/&gt;
+
+&lt;/svg&gt;
+
+&lt;!-- currentColor hereda el color del elemento padre.
+     Día:   color: #0B0F1E
+     Noche: color: #ffffff
+     Punto activo #3B9EF5 siempre fijo. --&gt;</div>
+</div>
+
+</body>
+</html>

@@ -5,10 +5,10 @@ export const MERCADOPAGO_CONFIG = {
   ACCESS_TOKEN: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || '',
   
   // URLs de webhooks
-  WEBHOOK_URL: 'https://tuweb-ai.com/api/webhooks/mercadopago',
-  SUCCESS_URL: 'https://tuweb-ai.com/dashboard/facturacion?status=success',
-  PENDING_URL: 'https://tuweb-ai.com/dashboard/facturacion?status=pending',
-  FAILURE_URL: 'https://tuweb-ai.com/dashboard/facturacion?status=failure',
+  WEBHOOK_URL: `${config.app.publicUrl}/api/webhooks/mercadopago`,
+  SUCCESS_URL: `${config.app.publicUrl}/dashboard/facturacion?status=success`,
+  PENDING_URL: `${config.app.publicUrl}/dashboard/facturacion?status=pending`,
+  FAILURE_URL: `${config.app.publicUrl}/dashboard/facturacion?status=failure`,
   
   // Configuración de la aplicación
   APP_NAME: 'Pulse by TuWebAI',
@@ -95,3 +95,4 @@ export const toCents = (amount: number) => {
 export const fromCents = (amount: number) => {
   return amount / 100;
 }; 
+import config from '@/config/environment';

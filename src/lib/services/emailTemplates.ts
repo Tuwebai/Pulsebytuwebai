@@ -74,14 +74,14 @@ export const EMAIL_TEMPLATES = {
                 </div>
                 
                 <div style="text-align: center; margin-top: 30px;">
-                    <a href="https://tuweb-ai.com/admin/support" class="action-btn">Ver en Panel de Admin</a>
+                    <a href="https://pulse.tuweb-ai.com/admin/support" class="action-btn">Ver en Panel de Admin</a>
                 </div>
             </div>
             
             <div class="footer">
                 <div class="logo">Pulse by TuWebAI</div>
                 <p>Sistema de Soporte Técnico</p>
-                <p>admin@tuweb-ai.com | +5493571416044</p>
+                <p>admin@pulse.tuweb-ai.com | +5493571416044</p>
                 <p style="font-size: 12px; opacity: 0.8;">Este es un email automático del sistema de soporte</p>
             </div>
         </div>
@@ -310,7 +310,7 @@ export const EMAIL_TEMPLATES = {
                 </div>
                 
                 <div style="text-align: center; margin-top: 30px;">
-                    <a href="https://tuweb-ai.com/support" class="action-btn">Ver en Mi Panel</a>
+                    <a href="https://pulse.tuweb-ai.com/support" class="action-btn">Ver en Mi Panel</a>
                 </div>
                 
                 <div style="background: #f3f4f6; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
@@ -422,7 +422,7 @@ export const EMAIL_TEMPLATES = {
                 </div>
                 
                 <div style="text-align: center; margin-top: 30px;">
-                    <a href="https://tuweb-ai.com/admin/support" class="action-btn">Ver Panel Completo</a>
+                    <a href="https://pulse.tuweb-ai.com/admin/support" class="action-btn">Ver Panel Completo</a>
                 </div>
             </div>
             

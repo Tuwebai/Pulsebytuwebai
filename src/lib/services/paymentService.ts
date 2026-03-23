@@ -185,7 +185,7 @@ const generateInvoice = async (paymentId: string, paymentData: any, mercadopagoD
     };
 
     // En producciÃ³n, generar PDF real
-    const invoiceUrl = `https://tuweb-ai.com/invoices/${invoiceNumber}.pdf`;
+    const invoiceUrl = `https://pulse.tuweb-ai.com/invoices/${invoiceNumber}.pdf`;
     
     const { error: invoiceError } = await supabase
       .from('payments')

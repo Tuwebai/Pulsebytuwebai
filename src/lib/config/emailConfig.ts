@@ -20,7 +20,7 @@ export const EMAIL_CONFIG = {
     SUPPORT: 'tuwebai@gmail.com',
     // Email que ENVÍA los emails (tu email configurado en EmailJS)
     FROM_EMAIL: 'tuwebai@gmail.com', // ← Este es el email que ENVÍA
-    SYSTEM: 'noreply@tuweb-ai.com'
+    SYSTEM: 'noreply@pulse.tuweb-ai.com'
   }
 };
 

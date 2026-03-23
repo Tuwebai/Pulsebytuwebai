@@ -272,7 +272,7 @@ const Facturacion = React.memo(() => {
                     Cargando historial de pagos
                   </h3>
                   <p className="text-slate-600 dark:text-slate-300 max-w-md mx-auto">
-                    Estamos sincronizando tu información de pagos desde tuweb-ai.com. 
+                    Estamos sincronizando tu informacion de pagos desde pulse.tuweb-ai.com. 
                     Esto puede tomar unos segundos.
                   </p>
                 </div>
@@ -316,7 +316,7 @@ const Facturacion = React.memo(() => {
                 </h3>
                 <p className="text-slate-600 dark:text-slate-300 mb-6 max-w-md mx-auto leading-relaxed">
                   Tu historial de pagos aparecerá aquí una vez que realices tu primera transacción. 
-                  Todos los pagos se sincronizan automáticamente desde tuweb-ai.com.
+                  Todos los pagos se sincronizan automaticamente desde pulse.tuweb-ai.com.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button

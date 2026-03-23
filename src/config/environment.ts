@@ -50,7 +50,10 @@ export const config = {
     name: 'Pulse by TuWebAI',
     version: '1.0.0',
     environment: isDevelopment ? 'development' : 'production',
-    baseUrl: import.meta.env.BASE_URL || '/'
+    baseUrl: import.meta.env.BASE_URL || '/',
+    publicUrl: import.meta.env.VITE_PUBLIC_URL || (isDevelopment ? window.location.origin : 'https://pulse.tuweb-ai.com'),
+    supportUrl: `${import.meta.env.VITE_PUBLIC_URL || (isDevelopment ? window.location.origin : 'https://pulse.tuweb-ai.com')}/soporte`,
+    adminSupportUrl: `${import.meta.env.VITE_PUBLIC_URL || (isDevelopment ? window.location.origin : 'https://pulse.tuweb-ai.com')}/admin/support`
   },
 
   // Configuración de features

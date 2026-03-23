@@ -22,7 +22,7 @@ class OAuthService {
     const credentials = getGitHubOAuthCredentials();
     return {
       clientId: credentials.clientId,
-      redirectUri: 'http://localhost:8083/auth/github/callback', // URL fija para desarrollo
+      redirectUri: credentials.redirectUri,
       scope: ['user:email', 'read:user', 'repo', 'read:org'],
     };
   }
