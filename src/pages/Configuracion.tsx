@@ -1,9 +1,8 @@
 import { useApp } from '@/contexts/AppContext';
 import type { AppContextType } from '@/contexts/AppContext';
 import React, { useEffect, useState } from 'react';
-import { Bell, Save } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { motion } from '@/components/OptimizedMotion';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { NotificationSettingsSection } from '@/features/notifications/components/NotificationSettingsSection';
@@ -107,8 +106,8 @@ const Configuracion = React.memo(() => {
   const handleSavePerformanceSettings = () =>
     runSettingsSave({
       request: updateUserSettings(performanceSettings),
-      successDescription: 'Los cambios de rendimiento se aplicaron correctamente.',
-      errorDescription: 'No se pudieron guardar los cambios de rendimiento.',
+      successDescription: 'Los cambios de experiencia se aplicaron correctamente.',
+      errorDescription: 'No se pudieron guardar los cambios de experiencia.',
     });
 
   const handleSaveSecuritySettings = () =>
@@ -124,16 +123,6 @@ const Configuracion = React.memo(() => {
       successTitle: 'Configuracion del sistema guardada',
       successDescription: 'Los cambios del sistema se guardaron correctamente.',
       errorDescription: 'No se pudieron guardar los cambios del sistema.',
-    });
-
-  const handleSaveAllSettings = () =>
-    runSettingsSave({
-      request: updateUserSettings({
-        ...performanceSettings,
-        ...securitySettings,
-      }),
-      successDescription: 'Todas las configuraciones se guardaron correctamente.',
-      errorDescription: 'No se pudieron guardar todas las configuraciones.',
     });
 
   if (!user) {
@@ -174,10 +163,13 @@ const Configuracion = React.memo(() => {
               <SettingsSectionCard
                 icon={<Bell className="h-5 w-5" />}
                 title="Notificaciones"
-                description="Elegí que novedades queres recibir de Pulse y del seguimiento de tu proyecto."
+                description="Elegí que novedades querés recibir de Pulse y del seguimiento de tu proyecto."
                 tone="signal"
               >
                 <NotificationSettingsSection />
+                <p className="border-t border-[var(--border-subtle)] pt-5 text-[12px] text-[var(--text-secondary)]">
+                  Estos cambios se guardan al instante para que no tengas que confirmarlos manualmente.
+                </p>
               </SettingsSectionCard>
             </TabsContent>
 
@@ -197,17 +189,6 @@ const Configuracion = React.memo(() => {
               />
             ) : null}
 
-            <div className="flex justify-center pt-2">
-              <Button
-                onClick={handleSaveAllSettings}
-                disabled={loading}
-                size="lg"
-                className="bg-[var(--signal)] px-8 text-white hover:bg-[var(--signal-dim)] shadow-[0_14px_34px_var(--signal-glow)]"
-              >
-                <Save className="h-5 w-5" />
-                Guardar ajustes
-              </Button>
-            </div>
           </Tabs>
         </motion.div>
       </div>
