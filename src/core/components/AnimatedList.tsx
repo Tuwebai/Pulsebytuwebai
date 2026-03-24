@@ -1,16 +1,23 @@
-import { Children, cloneElement, isValidElement, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import {
+  Children,
+  cloneElement,
+  isValidElement,
+  useEffect,
+  useState,
+  type CSSProperties,
+  type ComponentPropsWithoutRef,
+  type ReactNode,
+} from 'react';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 
-export interface AnimatedListProps {
+export interface AnimatedListProps extends ComponentPropsWithoutRef<'div'> {
   children: ReactNode;
   staggerMs?: number;
-  className?: string;
   disabled?: boolean;
 }
 
-interface AnimatedRevealProps {
+interface AnimatedRevealProps extends ComponentPropsWithoutRef<'div'> {
   children: ReactNode;
-  className?: string;
   disabled?: boolean;
   offsetY?: number;
   durationMs?: number;
@@ -32,7 +39,9 @@ export function AnimatedReveal({
   className,
   disabled = false,
   offsetY = 12,
-  durationMs = 300
+  durationMs = 300,
+  style: externalStyle,
+  ...rest
 }: AnimatedRevealProps) {
   const shouldReduceMotion = useShouldReduceMotion(disabled);
   const [isVisible, setIsVisible] = useState(shouldReduceMotion);
@@ -61,18 +70,16 @@ export function AnimatedReveal({
         transition: `opacity ${durationMs}ms cubic-bezier(0.25, 0.1, 0.25, 1), transform ${durationMs}ms cubic-bezier(0.25, 0.1, 0.25, 1)`
       };
 
-  return (
-    <div className={className} style={style}>
-      {children}
-    </div>
-  );
+  return <div className={className} style={{ ...(externalStyle ?? {}), ...(style ?? {}) }} {...rest}>{children}</div>;
 }
 
 export default function AnimatedList({
   children,
   staggerMs = 60,
   className,
-  disabled = false
+  disabled = false,
+  style: externalStyle,
+  ...rest
 }: AnimatedListProps) {
   const shouldReduceMotion = useShouldReduceMotion(disabled);
   const [isVisible, setIsVisible] = useState(shouldReduceMotion);
@@ -94,11 +101,11 @@ export default function AnimatedList({
   }, [shouldReduceMotion]);
 
   if (shouldReduceMotion) {
-    return <div className={className}>{children}</div>;
+    return <div className={className} style={externalStyle} {...rest}>{children}</div>;
   }
 
   return (
-    <div className={className}>
+    <div className={className} style={externalStyle} {...rest}>
       {Children.map(children, (child, index) => {
         const style: CSSProperties = {
           opacity: isVisible ? 1 : 0,

@@ -15,52 +15,90 @@ interface ProductTourOverlayProps {
   stepCount: number;
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
 function getTooltipStyle(rect: DOMRect | null, placement: ProductTourPlacement) {
+  const viewportPadding = 20;
+  const gap = 18;
+  const panelWidth = Math.min(360, window.innerWidth - viewportPadding * 2);
+  const panelHeight = 208;
+
   if (!rect || placement === 'center') {
     return {
+      width: `${panelWidth}px`,
       top: '50%',
       left: '50%',
       transform: 'translate(-50%, -50%)',
     };
   }
 
-  const gap = 18;
-  const viewportPadding = 20;
-  const maxWidth = Math.min(360, window.innerWidth - viewportPadding * 2);
-  const centeredLeft = Math.min(
-    Math.max(rect.left + rect.width / 2 - maxWidth / 2, viewportPadding),
-    window.innerWidth - maxWidth - viewportPadding,
+  const centeredLeft = clamp(
+    rect.left + rect.width / 2 - panelWidth / 2,
+    viewportPadding,
+    window.innerWidth - panelWidth - viewportPadding,
   );
 
-  if (placement === 'top') {
-    return {
-      top: `${Math.max(rect.top - gap, viewportPadding)}px`,
-      left: `${centeredLeft}px`,
-      transform: 'translateY(-100%)',
-      width: `${maxWidth}px`,
-    };
-  }
+  const centeredTop = clamp(
+    rect.top + rect.height / 2 - panelHeight / 2,
+    viewportPadding,
+    window.innerHeight - panelHeight - viewportPadding,
+  );
 
-  if (placement === 'left') {
-    return {
-      top: `${Math.min(Math.max(rect.top, viewportPadding), window.innerHeight - 220)}px`,
-      left: `${Math.max(rect.left - maxWidth - gap, viewportPadding)}px`,
-      width: `${maxWidth}px`,
-    };
-  }
+  const canPlaceBottom = rect.bottom + gap + panelHeight <= window.innerHeight - viewportPadding;
+  const canPlaceTop = rect.top - gap - panelHeight >= viewportPadding;
+  const canPlaceRight = rect.right + gap + panelWidth <= window.innerWidth - viewportPadding;
+  const canPlaceLeft = rect.left - gap - panelWidth >= viewportPadding;
 
-  if (placement === 'right') {
-    return {
-      top: `${Math.min(Math.max(rect.top, viewportPadding), window.innerHeight - 220)}px`,
-      left: `${Math.min(rect.right + gap, window.innerWidth - maxWidth - viewportPadding)}px`,
-      width: `${maxWidth}px`,
-    };
+  const placements: ProductTourPlacement[] = [
+    placement,
+    'bottom',
+    'top',
+    'right',
+    'left',
+    'center',
+  ].filter((candidate, index, array) => array.indexOf(candidate) === index);
+
+  for (const candidate of placements) {
+    if (candidate === 'bottom' && canPlaceBottom) {
+      return {
+        top: `${rect.bottom + gap}px`,
+        left: `${centeredLeft}px`,
+        width: `${panelWidth}px`,
+      };
+    }
+
+    if (candidate === 'top' && canPlaceTop) {
+      return {
+        top: `${rect.top - gap - panelHeight}px`,
+        left: `${centeredLeft}px`,
+        width: `${panelWidth}px`,
+      };
+    }
+
+    if (candidate === 'right' && canPlaceRight) {
+      return {
+        top: `${centeredTop}px`,
+        left: `${rect.right + gap}px`,
+        width: `${panelWidth}px`,
+      };
+    }
+
+    if (candidate === 'left' && canPlaceLeft) {
+      return {
+        top: `${centeredTop}px`,
+        left: `${rect.left - gap - panelWidth}px`,
+        width: `${panelWidth}px`,
+      };
+    }
   }
 
   return {
-    top: `${Math.min(rect.bottom + gap, Math.max(window.innerHeight - 220, viewportPadding))}px`,
-    left: `${centeredLeft}px`,
-    width: `${maxWidth}px`,
+    width: `${panelWidth}px`,
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
   };
 }
 
@@ -123,6 +161,14 @@ export function ProductTourOverlay({
     () => getTooltipStyle(rect, currentStep?.placement ?? 'center'),
     [currentStep?.placement, rect],
   );
+  const spotlightRect = rect
+    ? {
+        top: Math.max(rect.top - 10, 8),
+        left: Math.max(rect.left - 10, 8),
+        width: rect.width + 20,
+        height: rect.height + 20,
+      }
+    : null;
 
   if (!open || !currentStep) {
     return null;
@@ -130,18 +176,49 @@ export function ProductTourOverlay({
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[70]">
-      <div className="absolute inset-0 bg-[rgba(4,10,20,0.68)] backdrop-blur-[2px]" />
+      {spotlightRect ? (
+        <>
+          <div
+            className="absolute bg-[rgba(4,10,20,0.78)]"
+            style={{ top: 0, left: 0, width: '100%', height: spotlightRect.top }}
+          />
+          <div
+            className="absolute bg-[rgba(4,10,20,0.78)]"
+            style={{ top: spotlightRect.top, left: 0, width: spotlightRect.left, height: spotlightRect.height }}
+          />
+          <div
+            className="absolute bg-[rgba(4,10,20,0.78)]"
+            style={{
+              top: spotlightRect.top,
+              left: spotlightRect.left + spotlightRect.width,
+              width: Math.max(window.innerWidth - spotlightRect.left - spotlightRect.width, 0),
+              height: spotlightRect.height,
+            }}
+          />
+          <div
+            className="absolute bg-[rgba(4,10,20,0.78)]"
+            style={{
+              top: spotlightRect.top + spotlightRect.height,
+              left: 0,
+              width: '100%',
+              height: Math.max(window.innerHeight - spotlightRect.top - spotlightRect.height, 0),
+            }}
+          />
+        </>
+      ) : (
+        <div className="absolute inset-0 bg-[rgba(4,10,20,0.78)]" />
+      )}
 
-      {rect ? (
+      {spotlightRect ? (
         <motion.div
           animate={{ opacity: 1, scale: 1 }}
-          className="absolute rounded-[24px] border border-[rgba(132,204,255,0.45)] shadow-[0_0_0_9999px_rgba(4,10,20,0.68)]"
+          className="absolute rounded-[28px] border border-[rgba(96,165,250,0.88)] bg-[rgba(11,18,34,0.14)] shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_0_0_8px_rgba(59,130,246,0.18),0_18px_40px_rgba(8,14,30,0.55)]"
           initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.98 }}
           style={{
-            top: rect.top - 8,
-            left: rect.left - 8,
-            width: rect.width + 16,
-            height: rect.height + 16,
+            top: spotlightRect.top,
+            left: spotlightRect.left,
+            width: spotlightRect.width,
+            height: spotlightRect.height,
           }}
           transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.18 }}
         />
