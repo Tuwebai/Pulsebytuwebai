@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   completeProductTour,
   dismissProductTour,
+  PRODUCT_TOUR_OPEN_EVENT,
   PRODUCT_TOUR_STEPS,
   readProductTourState,
   shouldAutoOpenProductTour,
@@ -50,6 +51,19 @@ export function useProductTour({ userId }: UseProductTourOptions) {
 
     navigate(currentStep.route);
   }, [currentStep, isOpen, location.pathname, navigate]);
+
+  useEffect(() => {
+    const handleManualOpen = () => {
+      setStepIndex(0);
+      setIsOpen(true);
+    };
+
+    window.addEventListener(PRODUCT_TOUR_OPEN_EVENT, handleManualOpen);
+
+    return () => {
+      window.removeEventListener(PRODUCT_TOUR_OPEN_EVENT, handleManualOpen);
+    };
+  }, []);
 
   const close = () => {
     setIsOpen(false);

@@ -25,8 +25,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     goNext,
     goPrevious,
     isOpen,
-    isDismissed,
-    isCompleted,
   } = useProductTour({ userId: user?.id });
 
   useEffect(() => {
@@ -76,17 +74,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
       <BottomNav />
 
-      {!isDismissed && !isCompleted ? (
-        <ProductTourOverlay
-          currentStep={currentStep}
-          currentStepNumber={currentStepNumber}
-          onDismiss={dismiss}
-          onNext={goNext}
-          onPrevious={goPrevious}
-          open={isOpen}
-          stepCount={PRODUCT_TOUR_STEPS.length}
-        />
-      ) : null}
+      <ProductTourOverlay
+        currentStep={currentStep}
+        currentStepNumber={currentStepNumber}
+        onDismiss={dismiss}
+        onNext={goNext}
+        onPrevious={goPrevious}
+        open={isOpen}
+        stepCount={PRODUCT_TOUR_STEPS.length}
+      />
     </div>
   );
 }

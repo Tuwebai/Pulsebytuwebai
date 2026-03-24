@@ -1,5 +1,7 @@
 import type { ProductTourPersistenceState, ProductTourStep } from '@/features/product-tour/types/productTour.types';
 
+export const PRODUCT_TOUR_OPEN_EVENT = 'pulse:product-tour:open';
+
 const DEFAULT_STATE: ProductTourPersistenceState = {
   completedAt: null,
   dismissedAt: null,
