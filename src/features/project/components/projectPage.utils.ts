@@ -2,12 +2,48 @@ import type { BadgeProps } from '@/core/components/Badge';
 import type { ProjectsPagePhase, ProjectsPageProject } from './projectPage.types';
 
 const COMPLETED_TASK_STATUSES = new Set(['completed', 'done', 'terminado', 'aprobada']);
+const CLIENT_TASK_DONE_STATUSES = new Set(['completed', 'done', 'terminado', 'aprobada']);
+
+function getPhaseTasks(phase: ProjectsPagePhase) {
+  return phase.tasks ?? phase.tareas ?? [];
+}
+
+function isClientResponsible(task: {
+  forClient?: boolean;
+  cliente?: boolean;
+  responsable?: string;
+}) {
+  if (task.forClient === true || task.cliente === true) {
+    return true;
+  }
+
+  const responsible = task.responsable?.trim().toLowerCase() ?? '';
+
+  if (!responsible) {
+    return false;
+  }
+
+  if (responsible.includes('tuwebai') || responsible.includes('equipo') || responsible.includes('admin')) {
+    return false;
+  }
+
+  return (
+    responsible.includes('cliente') ||
+    responsible.includes('client') ||
+    responsible.includes('usuario') ||
+    responsible.includes('owner')
+  );
+}
 
 export function getProjectPhases(project: ProjectsPageProject): ProjectsPagePhase[] {
   return project.fases ?? [];
 }
 
 export function getProjectProgress(project: ProjectsPageProject): number {
+  if (typeof project.completion_percentage === 'number') {
+    return project.completion_percentage;
+  }
+
   if (typeof project.progress === 'number') {
     return project.progress;
   }
@@ -28,12 +64,23 @@ export function getProjectTaskStats(project: ProjectsPageProject) {
   let completed = 0;
 
   phases.forEach((phase) => {
-    const tasks = phase.tasks ?? [];
+    const tasks = getPhaseTasks(phase);
     total += tasks.length;
     completed += tasks.filter((task) => COMPLETED_TASK_STATUSES.has(task.status?.toLowerCase() ?? '')).length;
   });
 
   return { completed, total };
+}
+
+export function getProjectClientPendingTasks(project: ProjectsPageProject) {
+  const phaseTasks = getProjectPhases(project).flatMap((phase) => getPhaseTasks(phase));
+  const rootTasks = Array.isArray(project.tareas) ? project.tareas : [];
+  const allTasks = [...phaseTasks, ...rootTasks];
+
+  return allTasks.filter((task) => {
+    const status = task.status?.toLowerCase() ?? '';
+    return isClientResponsible(task) && !CLIENT_TASK_DONE_STATUSES.has(status);
+  });
 }
 
 export function getProjectStateLabel(project: ProjectsPageProject): string {

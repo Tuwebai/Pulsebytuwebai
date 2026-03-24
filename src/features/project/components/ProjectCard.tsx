@@ -4,10 +4,10 @@ import Badge from '@/core/components/Badge';
 import { formatDateSafe } from '@/utils/formatDateSafe';
 import type { ProjectsPageProject } from './projectPage.types';
 import {
+  getProjectClientPendingTasks,
   getProjectProgress,
   getProjectStateLabel,
   getProjectStateVariant,
-  getProjectTaskStats
 } from './projectPage.utils';
 
 interface ProjectCardProps {
@@ -17,7 +17,6 @@ interface ProjectCardProps {
   onViewProject?: (project: ProjectsPageProject) => void;
   onNavigateToEdit?: (projectId: string) => void;
   onDeleteProject?: (projectId: string) => void;
-  onNavigateToCollaboration?: (projectId: string) => void;
 }
 
 function SummaryItem({
@@ -42,10 +41,9 @@ export default function ProjectCard({
   onViewProject,
   onNavigateToEdit,
   onDeleteProject,
-  onNavigateToCollaboration
 }: ProjectCardProps) {
   const progress = getProjectProgress(project);
-  const taskStats = getProjectTaskStats(project);
+  const clientPendingTasks = getProjectClientPendingTasks(project).length;
   const stateLabel = getProjectStateLabel(project);
   const stateVariant = getProjectStateVariant(project);
   const totalPhases = project.fases?.length ?? 0;
@@ -83,9 +81,9 @@ export default function ProjectCard({
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <SummaryItem label="Tareas completadas" value={taskStats.completed} />
-        <SummaryItem label="Tareas totales" value={taskStats.total} />
+        <SummaryItem label="Progreso" value={`${progress}%`} />
         <SummaryItem label="Fases" value={totalPhases} />
+        <SummaryItem label="Tu parte" value={clientPendingTasks > 0 ? clientPendingTasks : 'Al dia'} />
       </div>
 
       <div className="mt-5 space-y-2 text-[13px] text-[var(--text-secondary)]">
@@ -112,7 +110,7 @@ export default function ProjectCard({
         {stateVariant !== 'success' ? (
           <Button
             className="h-10 rounded-[10px] border border-[var(--border-default)] bg-transparent px-4 text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
-            onClick={() => onNavigateToCollaboration?.(project.id)}
+            onClick={() => onViewProject?.(project)}
             type="button"
             variant="outline"
           >

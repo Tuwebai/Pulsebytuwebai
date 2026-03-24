@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, FolderOpen } from 'lucide-react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
@@ -10,11 +10,7 @@ import { useApp } from '@/contexts/AppContext';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
 import { userService } from '@/lib/supabaseService';
-import {
-  ProjectCard,
-  ProjectFilters,
-  ProjectStatsRow
-} from '@/features/project/components';
+import { ProjectCard, ProjectStatsRow } from '@/features/project/components';
 import type { ProjectsPageProject } from '@/features/project/components/projectPage.types';
 
 const ProjectsPage = React.memo(() => {
@@ -24,7 +20,6 @@ const ProjectsPage = React.memo(() => {
   const location = useLocation();
   const { userId } = useParams<{ userId?: string }>();
 
-  const [filteredProjects, setFilteredProjects] = useState<ProjectsPageProject[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<ProjectsPageProject | null>(null);
@@ -50,10 +45,6 @@ const ProjectsPage = React.memo(() => {
 
     return projects.filter((project) => project.created_by === user.id);
   }, [isDashboardProjectRoute, projects, user, userId]);
-
-  useEffect(() => {
-    setFilteredProjects(visibleProjects);
-  }, [visibleProjects]);
 
   useEffect(() => {
     const loadTargetUserInfo = async () => {
@@ -110,16 +101,16 @@ const ProjectsPage = React.memo(() => {
             creatorId,
             {
               full_name: creator.full_name || creator.email || 'Usuario',
-              email: creator.email || 'sin-email@example.com'
-            }
+              email: creator.email || 'sin-email@example.com',
+            },
           ] as const;
         } catch {
           return [
             creatorId,
             {
               full_name: 'Usuario no disponible',
-              email: 'sin-email@example.com'
-            }
+              email: 'sin-email@example.com',
+            },
           ] as const;
         }
       })
@@ -162,8 +153,8 @@ const ProjectsPage = React.memo(() => {
       if (user.role !== 'admin' && project.created_by !== user.id) {
         toast({
           title: 'Sin permisos',
-          description: 'Solo el dueño o un admin puede borrar este proyecto.',
-          variant: 'destructive'
+          description: 'Solo el dueno o un admin puede borrar este proyecto.',
+          variant: 'destructive',
         });
         return;
       }
@@ -188,7 +179,7 @@ const ProjectsPage = React.memo(() => {
 
       toast({
         title: 'Proyecto eliminado',
-        description: 'El proyecto se eliminó correctamente.'
+        description: 'El proyecto se elimino correctamente.',
       });
 
       await refreshData();
@@ -196,7 +187,7 @@ const ProjectsPage = React.memo(() => {
       toast({
         title: 'Error',
         description: 'No se pudo eliminar el proyecto.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setShowDeleteConfirm(false);
@@ -231,7 +222,7 @@ const ProjectsPage = React.memo(() => {
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
             {userId
               ? 'Seguimiento del proyecto asignado a este cliente'
-              : 'Seguí el estado, el progreso y las tareas de tu entrega.'}
+              : 'Segui el estado y el progreso de tu entrega.'}
           </p>
         </div>
 
@@ -248,24 +239,24 @@ const ProjectsPage = React.memo(() => {
         ) : null}
       </section>
 
-      <ProjectStatsRow loading={loading} projects={filteredProjects} />
+      <ProjectStatsRow loading={loading} projects={visibleProjects} />
 
-      <ProjectFilters onFilteredProjects={setFilteredProjects} onRefresh={refreshData} projects={visibleProjects} />
-
-      {filteredProjects.length === 0 ? (
-        <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] px-6 py-10 text-center">
-          <h2 className="text-lg font-medium text-[var(--text-primary)]">Todavía no hay proyectos para mostrar</h2>
+      {visibleProjects.length === 0 ? (
+        <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] px-6 py-12 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--bg-elevated)]">
+            <FolderOpen className="h-8 w-8 text-[var(--text-tertiary)]" strokeWidth={1.5} />
+          </div>
+          <h2 className="mt-5 text-lg font-medium text-[var(--text-primary)]">Todavia no hay proyecto visible</h2>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
-            Tu equipo de TuWebAI te va a ir mostrando el avance acá a medida que el proyecto esté listo.
+            Tu proyecto aparece aca cuando el equipo lo configura.
           </p>
         </section>
       ) : (
         <section className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
-          {filteredProjects.map((project) => (
+          {visibleProjects.map((project) => (
             <ProjectCard
               key={project.id}
               onDeleteProject={handleDeleteProject}
-              onNavigateToCollaboration={() => navigate('/dashboard/proyecto')}
               onNavigateToEdit={(projectId) => navigate(`/proyectos/${projectId}`)}
               onViewProject={handleViewProject}
               project={project}
@@ -293,12 +284,12 @@ const ProjectsPage = React.memo(() => {
       <ConfirmationDialog
         cancelText="Cancelar"
         confirmText="Eliminar"
-        description={`¿Estás seguro de que querés eliminar el proyecto "${projects.find((project) => project.id === projectToDelete)?.name || 'este proyecto'}"? Esta acción no se puede deshacer.`}
+        description={`Estas seguro de que queres eliminar el proyecto "${projects.find((project) => project.id === projectToDelete)?.name || 'este proyecto'}"? Esta accion no se puede deshacer.`}
         isOpen={showDeleteConfirm}
         loading={false}
         onClose={cancelDeleteProject}
         onConfirm={confirmDeleteProject}
-        title="Confirmar eliminación"
+        title="Confirmar eliminacion"
         variant="destructive"
       />
     </div>

@@ -13,6 +13,9 @@ export interface Project {
   is_active: boolean;
   domain?: string | null;
   ga4_property_id?: string | null;
+  progress?: number | null;
+  completion_percentage?: number | null;
+  tareas?: Array<Record<string, unknown>>;
   type?: 'Web' | 'App' | 'Landing' | 'Ecommerce' | string;
   funcionalidades?: string[];
   fases?: Array<{
