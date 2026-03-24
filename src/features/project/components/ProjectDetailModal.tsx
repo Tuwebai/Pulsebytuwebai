@@ -30,6 +30,13 @@ export default function ProjectDetailModal({ project, onClose }: ProjectDetailMo
   const contactUrl = buildWhatsAppContactUrl(
     `Hola equipo de TuWebAI, necesito ayuda con mi proyecto "${project.name}".`
   );
+  const handleOpenContact = () => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.open(contactUrl, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)] p-4">
@@ -89,15 +96,14 @@ export default function ProjectDetailModal({ project, onClose }: ProjectDetailMo
 
           <div className="flex justify-start">
             <Button
-              asChild
               className="h-10 rounded-[10px] border border-[var(--border-default)] bg-transparent px-4 text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
+              onClick={handleOpenContact}
+              type="button"
               variant="outline"
             >
-              <a href={contactUrl} rel="noreferrer" target="_blank">
-                <MessageCircle className="h-4 w-4" strokeWidth={1.5} />
-                Hablar con el equipo
-                <ExternalLink className="h-4 w-4" strokeWidth={1.5} />
-              </a>
+              <MessageCircle className="h-4 w-4" strokeWidth={1.5} />
+              Hablar con el equipo
+              <ExternalLink className="h-4 w-4" strokeWidth={1.5} />
             </Button>
           </div>
         </div>
