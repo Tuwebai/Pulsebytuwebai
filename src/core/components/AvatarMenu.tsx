@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import type { User } from '@/contexts/appContext.types';
 import { useProfile } from '@/features/profile/hooks/useProfile';
-import { PRODUCT_TOUR_OPEN_EVENT } from '@/features/product-tour/services/productTour.service';
+import { DEFAULT_PRODUCT_TOUR_SCOPE, PRODUCT_TOUR_OPEN_EVENT } from '@/features/product-tour/services/productTour.service';
 
 interface AvatarMenuProps {
   onOpenNotifications: () => void;
@@ -81,7 +81,7 @@ export default function AvatarMenu({ onOpenNotifications, onLogout, user }: Avat
           className="cursor-pointer rounded-[10px] px-3 py-2 text-[13px] text-[var(--text-primary)] transition-colors duration-150 ease-out focus:bg-[var(--bg-subtle)] focus:text-[var(--text-primary)]"
           onSelect={() => {
             navigate('/dashboard');
-            window.dispatchEvent(new Event(PRODUCT_TOUR_OPEN_EVENT));
+            window.dispatchEvent(new CustomEvent(PRODUCT_TOUR_OPEN_EVENT, { detail: DEFAULT_PRODUCT_TOUR_SCOPE }));
           }}
         >
           <Bell className="mr-2 h-4 w-4 text-[var(--signal)]" strokeWidth={1.5} />

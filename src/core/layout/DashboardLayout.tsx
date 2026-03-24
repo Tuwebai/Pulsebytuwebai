@@ -4,7 +4,6 @@ import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPrefere
 import { useApp } from '@/contexts/AppContext';
 import { ProductTourOverlay } from '@/features/product-tour/components/ProductTourOverlay';
 import { useProductTour } from '@/features/product-tour/hooks/useProductTour';
-import { PRODUCT_TOUR_STEPS } from '@/features/product-tour/services/productTour.service';
 import { useLocation } from 'react-router-dom';
 import BottomNav from './BottomNav';
 import Header from './Header';
@@ -25,6 +24,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     goNext,
     goPrevious,
     isOpen,
+    stepCount,
   } = useProductTour({ userId: user?.id });
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         onNext={goNext}
         onPrevious={goPrevious}
         open={isOpen}
-        stepCount={PRODUCT_TOUR_STEPS.length}
+        stepCount={stepCount}
       />
     </div>
   );

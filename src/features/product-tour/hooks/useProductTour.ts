@@ -1,13 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   completeProductTour,
+  DEFAULT_PRODUCT_TOUR_SCOPE,
   dismissProductTour,
+  getProductTourScopeFromPath,
+  getProductTourSteps,
   PRODUCT_TOUR_OPEN_EVENT,
-  PRODUCT_TOUR_STEPS,
   readProductTourState,
   shouldAutoOpenProductTour,
 } from '@/features/product-tour/services/productTour.service';
+import type { ProductTourScope } from '@/features/product-tour/types/productTour.types';
 
 interface UseProductTourOptions {
   userId?: string | null;
@@ -17,32 +20,36 @@ export function useProductTour({ userId }: UseProductTourOptions) {
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [scope, setScope] = useState<ProductTourScope>(DEFAULT_PRODUCT_TOUR_SCOPE);
   const [stepIndex, setStepIndex] = useState(0);
-  const [hasAutoOpened, setHasAutoOpened] = useState(false);
-  const [persistence, setPersistence] = useState(() => readProductTourState(userId));
-
-  const currentStep = PRODUCT_TOUR_STEPS[stepIndex];
-  const nextStep = PRODUCT_TOUR_STEPS[stepIndex + 1] ?? null;
-  const previousStep = PRODUCT_TOUR_STEPS[stepIndex - 1] ?? null;
-
-  useEffect(() => {
-    setPersistence(readProductTourState(userId));
-  }, [userId]);
+  const [autoOpenedScopes, setAutoOpenedScopes] = useState<Partial<Record<ProductTourScope, boolean>>>({});
+  const steps = useMemo(() => getProductTourSteps(scope), [scope]);
+  const currentStep = steps[stepIndex] ?? null;
+  const nextStep = steps[stepIndex + 1] ?? null;
+  const previousStep = steps[stepIndex - 1] ?? null;
+  const [persistence, setPersistence] = useState(() => readProductTourState(userId, scope));
 
   useEffect(() => {
-    if (!userId || hasAutoOpened || location.pathname !== '/dashboard') {
+    setPersistence(readProductTourState(userId, scope));
+  }, [scope, userId]);
+
+  useEffect(() => {
+    const routeScope = getProductTourScopeFromPath(location.pathname);
+
+    if (!routeScope || !userId || autoOpenedScopes[routeScope]) {
       return;
     }
 
-    if (!shouldAutoOpenProductTour(userId)) {
-      setHasAutoOpened(true);
+    if (!shouldAutoOpenProductTour(userId, routeScope)) {
+      setAutoOpenedScopes((previous) => ({ ...previous, [routeScope]: true }));
       return;
     }
 
-    setIsOpen(true);
+    setScope(routeScope);
     setStepIndex(0);
-    setHasAutoOpened(true);
-  }, [hasAutoOpened, location.pathname, userId]);
+    setIsOpen(true);
+    setAutoOpenedScopes((previous) => ({ ...previous, [routeScope]: true }));
+  }, [autoOpenedScopes, location.pathname, userId]);
 
   useEffect(() => {
     if (!isOpen || !currentStep || currentStep.route === location.pathname) {
@@ -53,9 +60,18 @@ export function useProductTour({ userId }: UseProductTourOptions) {
   }, [currentStep, isOpen, location.pathname, navigate]);
 
   useEffect(() => {
-    const handleManualOpen = () => {
+    const handleManualOpen = (event: Event) => {
+      const requestedScope = (event as CustomEvent<ProductTourScope | undefined>).detail ?? DEFAULT_PRODUCT_TOUR_SCOPE;
+      const requestedSteps = getProductTourSteps(requestedScope);
+
+      if (!requestedSteps.length) {
+        return;
+      }
+
+      setScope(requestedScope);
       setStepIndex(0);
       setIsOpen(true);
+      navigate(requestedSteps[0].route);
     };
 
     window.addEventListener(PRODUCT_TOUR_OPEN_EVENT, handleManualOpen);
@@ -63,7 +79,7 @@ export function useProductTour({ userId }: UseProductTourOptions) {
     return () => {
       window.removeEventListener(PRODUCT_TOUR_OPEN_EVENT, handleManualOpen);
     };
-  }, []);
+  }, [navigate]);
 
   const close = () => {
     setIsOpen(false);
@@ -71,8 +87,8 @@ export function useProductTour({ userId }: UseProductTourOptions) {
 
   const dismiss = () => {
     if (userId) {
-      dismissProductTour(userId);
-      setPersistence(readProductTourState(userId));
+      dismissProductTour(userId, scope);
+      setPersistence(readProductTourState(userId, scope));
     }
 
     close();
@@ -80,8 +96,8 @@ export function useProductTour({ userId }: UseProductTourOptions) {
 
   const complete = () => {
     if (userId) {
-      completeProductTour(userId);
-      setPersistence(readProductTourState(userId));
+      completeProductTour(userId, scope);
+      setPersistence(readProductTourState(userId, scope));
     }
 
     close();
@@ -93,7 +109,7 @@ export function useProductTour({ userId }: UseProductTourOptions) {
       return;
     }
 
-    setStepIndex((value) => Math.min(value + 1, PRODUCT_TOUR_STEPS.length - 1));
+    setStepIndex((value) => Math.min(value + 1, steps.length - 1));
   };
 
   const goPrevious = () => {
@@ -113,11 +129,12 @@ export function useProductTour({ userId }: UseProductTourOptions) {
     isCompleted: Boolean(persistence.completedAt),
     isDismissed: Boolean(persistence.dismissedAt),
     isOpen,
-    open: () => {
-      setIsOpen(true);
+    open: (nextScope: ProductTourScope = DEFAULT_PRODUCT_TOUR_SCOPE) => {
+      setScope(nextScope);
       setStepIndex(0);
+      setIsOpen(true);
     },
     previousStep,
-    stepCount: PRODUCT_TOUR_STEPS.length,
+    stepCount: steps.length,
   };
 }
