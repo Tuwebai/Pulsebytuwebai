@@ -7,6 +7,8 @@ export type { MetricCardProps } from './MetricCard';
 export { default as FadeIn } from './FadeIn';
 export { default as PulseEmptyState } from './PulseEmptyState';
 export type { PulseEmptyStateProps } from './PulseEmptyState';
+export { default as PulseFeedbackState } from './PulseFeedbackState';
+export type { PulseFeedbackStateProps } from './PulseFeedbackState';
 export { default as Badge } from './Badge';
 export type { BadgeProps } from './Badge';
 export { default as AvatarMenu } from './AvatarMenu';

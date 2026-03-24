@@ -1,6 +1,6 @@
-import { LoaderCircle, Shield } from 'lucide-react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useApp } from '@/contexts/AppContext';
+import { PulseFeedbackState } from '@/core/components';
 import { ProfileAvatarCard } from '@/features/profile/components/ProfileAvatarCard';
 import { ProfileTabsNav } from '@/features/profile/components/ProfileTabsNav';
 import { PersonalDataForm } from '@/features/profile/components/PersonalDataForm';
@@ -22,32 +22,26 @@ export default function ProfilePage() {
 
   if (isLoading || !user) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-[880px] items-center justify-center px-4 py-10">
-        <div className="flex items-center gap-3 rounded-[var(--radius-xl)] border border-[var(--border-default)] bg-[var(--bg-surface)] px-5 py-4 text-[var(--text-secondary)]">
-          <LoaderCircle className="h-4 w-4 animate-spin" />
-          Cargando tu perfil...
-        </div>
-      </div>
+      <PulseFeedbackState
+        className="min-h-[60vh] max-w-[880px] px-4 py-10"
+        description="Estamos preparando tus datos de cuenta y negocio dentro de Pulse."
+        surfaceClassName="max-w-[560px]"
+        title="Cargando tu perfil"
+        variant="loading"
+      />
     );
   }
 
   if (error || !profile) {
     return (
-      <div className="mx-auto max-w-[880px] px-4 py-6">
-        <section className="rounded-[var(--radius-xl)] border border-[var(--border-default)] bg-[var(--bg-surface)] p-6">
-          <div className="flex items-center gap-3">
-            <div className="rounded-full bg-[var(--warning-dim)] p-2 text-[var(--warning)]">
-              <Shield className="h-4 w-4" />
-            </div>
-            <div>
-              <h1 className="text-[18px] font-medium text-[var(--text-primary)]">No pudimos cargar tu perfil</h1>
-              <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
-                Proba recargando la pagina o volve a intentarlo en unos segundos.
-              </p>
-            </div>
-          </div>
-        </section>
-      </div>
+      <PulseFeedbackState
+        className="max-w-[880px] px-4 py-6"
+        description="Proba recargando la pagina o volve a intentarlo en unos segundos."
+        primaryAction={{ label: 'Recargar pagina', onClick: () => window.location.reload() }}
+        surfaceClassName="max-w-[560px]"
+        title="No pudimos cargar tu perfil"
+        variant="error"
+      />
     );
   }
 

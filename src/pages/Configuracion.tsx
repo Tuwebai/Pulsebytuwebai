@@ -3,6 +3,7 @@ import type { AppContextType } from '@/contexts/AppContext';
 import React, { useEffect } from 'react';
 import { motion } from '@/components/OptimizedMotion';
 import { Tabs } from '@/components/ui/tabs';
+import { PulseFeedbackState } from '@/core/components';
 import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 import {
   GeneralSettingsTab,
@@ -40,12 +41,13 @@ const Configuracion = React.memo(() => {
 
   if (!user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)]">
-        <div className="text-center">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-[var(--signal)]" />
-          <p className="mt-4 text-[14px] text-[var(--text-secondary)]">Cargando configuracion...</p>
-        </div>
-      </div>
+      <PulseFeedbackState
+        className="min-h-screen bg-[var(--bg-base)] px-5"
+        description="Estamos cargando tus preferencias y el estado actual de tu cuenta."
+        surfaceClassName="max-w-[560px]"
+        title="Cargando configuracion"
+        variant="loading"
+      />
     );
   }
 

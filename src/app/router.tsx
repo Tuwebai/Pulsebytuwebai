@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-d
 import DashboardLayout from '@/components/DashboardLayout';
 import { PulseLoaderScreen } from '@/components/PulseLoaderScreen';
 import TouchGestureProvider from '@/components/TouchGestureProvider';
+import RouteLoadErrorState from '@/core/components/RouteLoadErrorState';
 import { useApp } from '@/contexts/AppContext';
 import { renderAuthRoutes } from '@/features/auth/routes/AuthRoutes';
 import ProtectedRoute from '@/features/auth/components/ProtectedRoute';
@@ -16,28 +17,12 @@ type LazyComponentModule = {
   default: ComponentType;
 };
 
-const LazyLoadErrorFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)] px-6">
-    <div className="text-center">
-      <div className="mb-4 text-6xl text-[var(--danger)]">!</div>
-      <h2 className="mb-2 text-2xl font-bold text-[var(--text-primary)]">Error de carga</h2>
-      <p className="mb-4 text-[var(--text-secondary)]">No se pudo cargar el componente</p>
-      <button
-        className="rounded bg-[var(--danger)] px-4 py-2 text-white hover:opacity-90"
-        onClick={() => window.location.reload()}
-      >
-        Recargar pagina
-      </button>
-    </div>
-  </div>
-);
-
 const createLazyComponent = (importFn: () => Promise<LazyComponentModule>) =>
   lazy(() =>
     importFn().catch((error): Promise<LazyComponentModule> => {
       console.error('Error loading component:', error);
       return Promise.resolve({
-        default: LazyLoadErrorFallback
+        default: RouteLoadErrorState
       });
     })
   );
