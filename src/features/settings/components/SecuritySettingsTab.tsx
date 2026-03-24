@@ -1,14 +1,15 @@
 import { Lock } from 'lucide-react';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { TabsContent } from '@/components/ui/tabs';
 import type { Dispatch, SetStateAction } from 'react';
 import { SettingsSectionCard } from './SettingsSectionCard';
+import { SettingsSaveActions } from './SettingsSaveActions';
 import type { SecuritySettings } from './settings.types';
 
 interface SecuritySettingsTabProps {
+  dirty: boolean;
   loading: boolean;
   settings: SecuritySettings;
   setSettings: Dispatch<SetStateAction<SecuritySettings>>;
@@ -22,6 +23,7 @@ const labelClassName = 'text-[13px] font-medium text-[var(--text-primary)]';
 const hintClassName = 'text-[12px] text-[var(--text-secondary)]';
 
 export function SecuritySettingsTab({
+  dirty,
   loading,
   settings,
   setSettings,
@@ -86,16 +88,7 @@ export function SecuritySettingsTab({
           ))}
         </div>
 
-        <div className="flex justify-end border-t border-[var(--border-subtle)] pt-5">
-          <Button
-            onClick={onSave}
-            disabled={loading}
-            className="bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)] shadow-[0_12px_30px_var(--signal-glow)]"
-          >
-            <Lock className="h-4 w-4" />
-            Guardar cambios
-          </Button>
-        </div>
+        <SettingsSaveActions dirty={dirty} loading={loading} onSave={onSave} />
       </SettingsSectionCard>
     </TabsContent>
   );

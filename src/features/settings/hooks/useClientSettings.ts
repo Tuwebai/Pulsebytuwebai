@@ -13,6 +13,16 @@ import {
 export function useClientSettings() {
   const { user } = useApp() as AppContextType;
   const [loading, setLoading] = useState(false);
+  const [performanceBaseline, setPerformanceBaseline] = useState<PerformanceSettings>({
+    animations_enabled: true,
+    low_bandwidth_mode: false,
+  });
+  const [securityBaseline, setSecurityBaseline] = useState<SecuritySettings>({
+    two_factor_auth: false,
+    session_timeout: 30,
+    login_notifications: true,
+    device_management: true,
+  });
   const [performanceSettings, setPerformanceSettings] = useState<PerformanceSettings>({
     animations_enabled: true,
     low_bandwidth_mode: false,
@@ -29,8 +39,13 @@ export function useClientSettings() {
       return;
     }
 
-    setPerformanceSettings(getInitialPerformanceSettings(user));
-    setSecuritySettings(getInitialSecuritySettings(user));
+    const nextPerformance = getInitialPerformanceSettings(user);
+    const nextSecurity = getInitialSecuritySettings(user);
+
+    setPerformanceBaseline(nextPerformance);
+    setSecurityBaseline(nextSecurity);
+    setPerformanceSettings(nextPerformance);
+    setSecuritySettings(nextSecurity);
   }, [user]);
 
   const runSettingsSave = useCallback(
@@ -75,6 +90,7 @@ export function useClientSettings() {
       successDescription: 'Los cambios de experiencia se aplicaron correctamente.',
       errorDescription: 'No se pudieron guardar los cambios de experiencia.',
     });
+    setPerformanceBaseline(performanceSettings);
   }, [performanceSettings, runSettingsSave, user]);
 
   const handleSaveSecuritySettings = useCallback(async () => {
@@ -87,11 +103,24 @@ export function useClientSettings() {
       successDescription: 'Los cambios de seguridad se aplicaron correctamente.',
       errorDescription: 'No se pudieron guardar los cambios de seguridad.',
     });
+    setSecurityBaseline(securitySettings);
   }, [runSettingsSave, securitySettings, user]);
+
+  const performanceDirty =
+    performanceSettings.animations_enabled !== performanceBaseline.animations_enabled ||
+    performanceSettings.low_bandwidth_mode !== performanceBaseline.low_bandwidth_mode;
+
+  const securityDirty =
+    securitySettings.two_factor_auth !== securityBaseline.two_factor_auth ||
+    securitySettings.session_timeout !== securityBaseline.session_timeout ||
+    securitySettings.login_notifications !== securityBaseline.login_notifications ||
+    securitySettings.device_management !== securityBaseline.device_management;
 
   return {
     loading,
+    performanceDirty,
     performanceSettings,
+    securityDirty,
     securitySettings,
     setPerformanceSettings,
     setSecuritySettings,

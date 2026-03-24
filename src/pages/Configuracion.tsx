@@ -24,7 +24,9 @@ const Configuracion = React.memo(() => {
   );
   const {
     loading,
+    performanceDirty,
     performanceSettings,
+    securityDirty,
     securitySettings,
     setPerformanceSettings,
     setSecuritySettings,
@@ -67,6 +69,7 @@ const Configuracion = React.memo(() => {
             <GeneralSettingsTab user={user} projectsCount={getUserProjects().length} />
 
             <PerformanceSettingsTab
+              dirty={performanceDirty}
               loading={loading}
               settings={performanceSettings}
               setSettings={setPerformanceSettings}
@@ -88,6 +91,7 @@ const Configuracion = React.memo(() => {
             </TabsContent>
 
             <SecuritySettingsTab
+              dirty={securityDirty}
               loading={loading}
               settings={securitySettings}
               setSettings={setSecuritySettings}
