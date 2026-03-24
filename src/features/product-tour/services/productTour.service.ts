@@ -180,6 +180,69 @@ export const PRODUCT_TOUR_STEPS: ProductTourStep[] = [
     description: 'Esta parte concentra el control de sesion y las decisiones de proteccion disponibles hoy.',
     placement: 'top',
   },
+  {
+    id: 'project-header',
+    scope: 'project',
+    route: '/dashboard/proyecto',
+    target: 'project-header',
+    title: 'Aca seguis tu entrega',
+    description: 'Este resumen te ubica rapido en que etapa esta tu proyecto y que deberias mirar ahora.',
+    placement: 'bottom',
+  },
+  {
+    id: 'project-stats',
+    scope: 'project',
+    route: '/dashboard/proyecto',
+    target: 'project-stats',
+    title: 'El estado general aparece resumido',
+    description: 'Estas metricas te muestran cuantos proyectos tenes visibles y como viene el avance general.',
+    placement: 'bottom',
+  },
+  {
+    id: 'project-list',
+    scope: 'project',
+    route: '/dashboard/proyecto',
+    target: 'project-list',
+    title: 'Cada proyecto vive en su propia tarjeta',
+    description: 'Desde aca podes abrir detalles, revisar el estado y seguir lo que falta sin perderte.',
+    placement: 'top',
+  },
+  {
+    id: 'support-header',
+    scope: 'support',
+    route: '/dashboard/soporte',
+    target: 'support-header',
+    title: 'Soporte concentra tu conversacion con TuWebAI',
+    description: 'Este modulo te deja seguir consultas, respuestas y nuevos pedidos en un solo lugar.',
+    placement: 'bottom',
+  },
+  {
+    id: 'support-summary',
+    scope: 'support',
+    route: '/dashboard/soporte',
+    target: 'support-summary',
+    title: 'Aca ves el estado de tus tickets',
+    description: 'El resumen te muestra rapido que esta abierto, en progreso o ya cerrado.',
+    placement: 'bottom',
+  },
+  {
+    id: 'support-form',
+    scope: 'support',
+    route: '/dashboard/soporte',
+    target: 'support-form',
+    title: 'Desde este bloque creas una consulta nueva',
+    description: 'Cuando necesites ayuda, aca escribis el tema y Pulse lo envia al equipo.',
+    placement: 'top',
+  },
+  {
+    id: 'support-tickets',
+    scope: 'support',
+    route: '/dashboard/soporte',
+    target: 'support-tickets',
+    title: 'Tus tickets quedan listados aca',
+    description: 'Este panel te permite revisar historial, responder y retomar conversaciones activas.',
+    placement: 'top',
+  },
 ];
 
 function getStorageKey(userId: string, scope: ProductTourScope) {
@@ -197,6 +260,14 @@ export function getProductTourScopeFromPath(pathname: string): ProductTourScope 
 
   if (pathname === '/dashboard/configuracion') {
     return 'settings';
+  }
+
+  if (pathname === '/dashboard/proyecto') {
+    return 'project';
+  }
+
+  if (pathname === '/dashboard/soporte') {
+    return 'support';
   }
 
   return null;

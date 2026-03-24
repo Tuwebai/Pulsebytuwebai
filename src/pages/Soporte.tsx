@@ -205,7 +205,7 @@ export default function Soporte() {
   return (
     <>
       <div className="space-y-6">
-        <section className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <section className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between" data-tour="support-header">
           <div>
             <h1 className="text-[22px] font-semibold text-[var(--text-primary)]">Soporte</h1>
             <p className="mt-1 text-sm text-[var(--text-secondary)]">
@@ -214,21 +214,29 @@ export default function Soporte() {
           </div>
         </section>
 
-        <SupportSummaryRow closedCount={closedTickets} openCount={openTickets} progressCount={progressTickets} />
-
-        <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
-          <SupportContactPanel projectsCount={getUserProjects().length} />
-          <SupportTicketForm formData={formData} onChange={setFormData} onSubmit={handleSubmitTicket} />
+        <div data-tour="support-summary">
+          <SupportSummaryRow closedCount={closedTickets} openCount={openTickets} progressCount={progressTickets} />
         </div>
 
-        <SupportTicketsPanel
-          error={error}
-          loading={loading}
-          tickets={tickets}
-          userEmail={user.email}
-          onReply={setRespondingTicketId}
-          onRetry={handleRetryLoad}
-        />
+        <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+          <div data-tour="support-contact">
+            <SupportContactPanel projectsCount={getUserProjects().length} />
+          </div>
+          <div data-tour="support-form">
+            <SupportTicketForm formData={formData} onChange={setFormData} onSubmit={handleSubmitTicket} />
+          </div>
+        </div>
+
+        <div data-tour="support-tickets">
+          <SupportTicketsPanel
+            error={error}
+            loading={loading}
+            tickets={tickets}
+            userEmail={user.email}
+            onReply={setRespondingTicketId}
+            onRetry={handleRetryLoad}
+          />
+        </div>
       </div>
 
       <SupportResponseModal

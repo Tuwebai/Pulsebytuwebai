@@ -214,7 +214,7 @@ const ProjectsPage = React.memo(() => {
 
   return (
     <div className="space-y-6">
-      <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between" data-tour="project-header">
         <div>
           <h1 className="text-[22px] font-medium text-[var(--text-primary)]">
             {userId ? `Proyecto de ${targetUserName || 'cliente'}` : 'Mi Proyecto'}
@@ -239,10 +239,12 @@ const ProjectsPage = React.memo(() => {
         ) : null}
       </section>
 
-      <ProjectStatsRow loading={loading} projects={visibleProjects} />
+      <div data-tour="project-stats">
+        <ProjectStatsRow loading={loading} projects={visibleProjects} />
+      </div>
 
       {visibleProjects.length === 0 ? (
-        <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] px-6 py-12 text-center">
+        <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] px-6 py-12 text-center" data-tour="project-list">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--bg-elevated)]">
             <FolderOpen className="h-8 w-8 text-[var(--text-tertiary)]" strokeWidth={1.5} />
           </div>
@@ -252,7 +254,7 @@ const ProjectsPage = React.memo(() => {
           </p>
         </section>
       ) : (
-        <section className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+        <section className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3" data-tour="project-list">
           {visibleProjects.map((project) => (
             <ProjectCard
               key={project.id}
