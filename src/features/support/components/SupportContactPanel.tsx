@@ -52,19 +52,19 @@ export default function SupportContactPanel({ projectsCount }: SupportContactPan
           color="#3B9EF5"
           icon={<Mail className="h-4 w-4 text-[var(--signal)]" strokeWidth={1.5} />}
           title="Email"
-          value="tuwebai@gmail.com"
+          value="soporte@tuweb-ai.com"
         />
         <ContactRow
           color="#22C55E"
           icon={<Phone className="h-4 w-4 text-[var(--success)]" strokeWidth={1.5} />}
           title="Telefono"
-          value="+54 9 3571 416044"
+          value="+54 9 3571 417960"
         />
         <ContactRow
           color="#F59E0B"
           icon={<Clock3 className="h-4 w-4 text-[var(--warning)]" strokeWidth={1.5} />}
           title="Horario de atencion"
-          value="Lunes a viernes de 9:00 a 18:00"
+          value="Lunes a viernes de 9:00 a 20:00"
         />
       </div>
     </section>
