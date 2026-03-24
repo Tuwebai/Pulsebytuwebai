@@ -105,7 +105,7 @@ export default function MetricCard({
           : undefined
       }
     >
-      <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+      <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">
         {label}
       </p>
 
@@ -139,7 +139,7 @@ export default function MetricCard({
         </div>
       </div>
 
-      <div className="mt-4 min-h-[16px] text-[11px] text-[var(--text-tertiary)]">
+      <div className="mt-4 min-h-[20px] text-[12px] leading-5 text-[var(--text-secondary)]">
         {loading ? '\u00A0' : <FadeIn>{displayPeriod}</FadeIn>}
       </div>
     </article>

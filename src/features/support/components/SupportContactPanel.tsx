@@ -43,7 +43,7 @@ export default function SupportContactPanel({ projectsCount }: SupportContactPan
           <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">
             Estamos disponibles para ayudarte con dudas de tu web, pagos o seguimiento del proyecto.
           </p>
-          <p className="mt-2 text-[12px] text-[var(--text-tertiary)]">Proyectos asociados: {projectsCount}</p>
+          <p className="mt-2 text-[13px] leading-5 text-[var(--text-secondary)]">Proyectos asociados: {projectsCount}</p>
         </div>
       </div>
 

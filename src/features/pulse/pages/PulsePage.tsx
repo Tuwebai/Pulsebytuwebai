@@ -26,7 +26,7 @@ export default function PulsePage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-[22px] font-medium text-[var(--text-primary)]">Tu web este mes</h1>
-          <p className="text-[13px] text-[var(--text-tertiary)]">
+          <p className="text-[14px] leading-5 text-[var(--text-secondary)]">
             {data ? `${data.dateRange.from} → ${data.dateRange.to}` : 'sin datos todavia'}
           </p>
         </div>
@@ -101,7 +101,7 @@ export default function PulsePage() {
       </AnimatedList>
 
       <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
-        <p className="text-[12px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Visitas por dia</p>
+        <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">Visitas por dia</p>
         <div className="mt-4">
           <PulseChart data={data?.chartData ?? []} height={180} loading={loading} />
         </div>
@@ -116,7 +116,7 @@ export default function PulsePage() {
           <div className="overflow-hidden">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[var(--border-subtle)] text-left text-[10px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+                <tr className="border-b border-[var(--border-subtle)] text-left text-[12px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
                   <th className="px-5 py-3 font-medium">Pagina</th>
                   <th className="px-5 py-3 font-medium">Visitas</th>
                   <th className="px-5 py-3 font-medium">% del total</th>
@@ -176,7 +176,7 @@ export default function PulsePage() {
         <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
           <div>
             <h2 className="text-sm font-medium text-[var(--text-primary)]">Resumen del periodo</h2>
-            <p className="mt-1 text-[12px] text-[var(--text-tertiary)]">Lectura rapida de tus metricas</p>
+            <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">Lectura rapida de tus metricas</p>
           </div>
 
           <div className="mt-5 space-y-3">

@@ -194,7 +194,7 @@ const Facturacion = React.memo(() => {
               <div className="grid gap-4 md:grid-cols-2">
                 <DetailItem label="ID" value={selectedPago.id} />
                 <div>
-                  <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Estado</p>
+                  <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">Estado</p>
                   <div className="mt-2">
                     <Badge variant={getPaymentStatusVariant(selectedPago.status)}>
                       {getPaymentStatusLabel(selectedPago.status)}
@@ -291,7 +291,7 @@ function DetailItem({
 }) {
   return (
     <div>
-      <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">{label}</p>
+      <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">{label}</p>
       <p className={`mt-2 text-sm text-[var(--text-primary)] ${monospace ? 'font-data' : ''}`}>{value}</p>
     </div>
   );
