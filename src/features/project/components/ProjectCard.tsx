@@ -28,7 +28,7 @@ function SummaryItem({
 }) {
   return (
     <div className="rounded-[14px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-3 py-3">
-      <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">{label}</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">{label}</p>
       <p className="mt-2 font-data text-[18px] font-light text-[var(--text-primary)]">{value}</p>
     </div>
   );
@@ -52,7 +52,7 @@ export default function ProjectCard({
     <article className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 transition-[border-color] duration-150 hover:border-[var(--border-strong)]">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+          <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">
             {project.type ?? 'Proyecto web'}
           </p>
           <h2 className="mt-2 truncate text-[18px] font-medium text-[var(--text-primary)]">{project.name}</h2>
@@ -68,7 +68,7 @@ export default function ProjectCard({
       </p>
 
       <div className="mt-5">
-        <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+        <div className="flex items-center justify-between text-[12px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
           <span>Progreso</span>
           <span className="font-data text-[var(--text-primary)]">{progress}%</span>
         </div>
@@ -88,11 +88,11 @@ export default function ProjectCard({
 
       <div className="mt-5 space-y-2 text-[13px] text-[var(--text-secondary)]">
         <div className="flex items-center gap-2">
-          <CalendarDays className="h-4 w-4 text-[var(--text-tertiary)]" strokeWidth={1.5} />
+          <CalendarDays className="h-4 w-4 text-[var(--text-secondary)]" strokeWidth={1.5} />
           <span>Última actualización: {formatDateSafe(project.updated_at)}</span>
         </div>
         {showAdminActions && projectCreator ? (
-          <p className="truncate text-[var(--text-tertiary)]">
+          <p className="truncate text-[13px] text-[var(--text-secondary)]">
             Cliente: {projectCreator.full_name || projectCreator.email}
           </p>
         ) : null}

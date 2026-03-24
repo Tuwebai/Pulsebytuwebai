@@ -61,13 +61,13 @@ function SummaryCard({
     <article className="relative flex min-h-[152px] flex-col rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
       <AccentIcon tone={tone}>{icon}</AccentIcon>
 
-      <p className="pr-16 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">{label}</p>
+      <p className="pr-16 text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">{label}</p>
 
       <div className="mt-5 flex min-h-[54px] flex-1 items-start pr-16">
         {loading ? <div className="h-10 w-28 rounded bg-[var(--bg-elevated)]" /> : value}
       </div>
 
-      <div className="mt-4 min-h-[28px] text-[11px] text-[var(--text-tertiary)]">
+      <div className="mt-4 min-h-[28px] text-[12px] leading-5 text-[var(--text-secondary)]">
         {loading ? <div className="h-4 w-32 rounded bg-[var(--bg-elevated)]" /> : footer}
       </div>
     </article>
