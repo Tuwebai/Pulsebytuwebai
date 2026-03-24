@@ -12,16 +12,13 @@ import {
   AdminSettingsTab,
   GeneralSettingsTab,
   PerformanceSettingsTab,
-  PrivacySettingsTab,
   SecuritySettingsTab,
   SettingsPageHeader,
   SettingsSectionCard,
   SettingsTabsNav,
 } from '@/features/settings/components';
 import type {
-  GeneralSettings,
   PerformanceSettings,
-  PrivacySettings,
   SecuritySettings,
   SystemSettings,
 } from '@/features/settings/components';
@@ -31,36 +28,14 @@ const Configuracion = React.memo(() => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useSessionStorageState(`pulse:configuracion:${user?.id ?? 'anon'}:active-tab`, 'general');
 
-  const [generalSettings, setGeneralSettings] = useState<GeneralSettings>({
-    language: 'es',
-    timezone: 'America/Argentina/Buenos_Aires',
-    date_format: 'DD/MM/YYYY',
-    time_format: '24h',
-  });
-
-  const [privacySettings, setPrivacySettings] = useState<PrivacySettings>({
-    profile_visibility: 'public',
-    show_email: false,
-    show_phone: false,
-    allow_analytics: true,
-    allow_cookies: true,
-    two_factor_auth: false,
-  });
-
   const [performanceSettings, setPerformanceSettings] = useState<PerformanceSettings>({
-    auto_save: true,
-    auto_save_interval: 30,
-    cache_enabled: true,
-    image_quality: 'high',
     animations_enabled: true,
     low_bandwidth_mode: false,
   });
 
   const [securitySettings, setSecuritySettings] = useState<SecuritySettings>({
+    two_factor_auth: false,
     session_timeout: 30,
-    max_login_attempts: 5,
-    require_password_change: false,
-    password_expiry_days: 90,
     login_notifications: true,
     device_management: true,
   });
@@ -81,40 +56,24 @@ const Configuracion = React.memo(() => {
       return;
     }
 
-    setGeneralSettings({
-      language: user.language || 'es',
-      timezone: user.timezone || 'America/Argentina/Buenos_Aires',
-      date_format: user.date_format || 'DD/MM/YYYY',
-      time_format: user.time_format || '24h',
-    });
-
-    setPrivacySettings({
-      profile_visibility: user.profile_visibility || 'public',
-      show_email: user.show_email || false,
-      show_phone: user.show_phone || false,
-      allow_analytics: user.allow_analytics !== false,
-      allow_cookies: user.allow_cookies !== false,
-      two_factor_auth: user.two_factor_auth || false,
-    });
-
     setPerformanceSettings({
-      auto_save: user.auto_save !== false,
-      auto_save_interval: user.auto_save_interval || 30,
-      cache_enabled: user.cache_enabled !== false,
-      image_quality: user.image_quality || 'high',
       animations_enabled: user.animations_enabled !== false,
       low_bandwidth_mode: user.low_bandwidth_mode || false,
     });
 
     setSecuritySettings({
+      two_factor_auth: user.two_factor_auth || false,
       session_timeout: user.session_timeout || 30,
-      max_login_attempts: user.max_login_attempts || 5,
-      require_password_change: user.require_password_change || false,
-      password_expiry_days: user.password_expiry_days || 90,
       login_notifications: user.login_notifications !== false,
       device_management: user.device_management !== false,
     });
   }, [user]);
+
+  useEffect(() => {
+    if (activeTab === 'privacidad') {
+      setActiveTab('seguridad');
+    }
+  }, [activeTab, setActiveTab]);
 
   const runSettingsSave = async ({
     request,
@@ -145,20 +104,6 @@ const Configuracion = React.memo(() => {
     }
   };
 
-  const handleSaveGeneralSettings = () =>
-    runSettingsSave({
-      request: updateUserSettings(generalSettings),
-      successDescription: 'Los cambios se aplicaron correctamente.',
-      errorDescription: 'No se pudieron guardar los cambios.',
-    });
-
-  const handleSavePrivacySettings = () =>
-    runSettingsSave({
-      request: updateUserSettings(privacySettings),
-      successDescription: 'Los cambios de privacidad se aplicaron correctamente.',
-      errorDescription: 'No se pudieron guardar los cambios de privacidad.',
-    });
-
   const handleSavePerformanceSettings = () =>
     runSettingsSave({
       request: updateUserSettings(performanceSettings),
@@ -184,8 +129,6 @@ const Configuracion = React.memo(() => {
   const handleSaveAllSettings = () =>
     runSettingsSave({
       request: updateUserSettings({
-        ...generalSettings,
-        ...privacySettings,
         ...performanceSettings,
         ...securitySettings,
       }),
@@ -198,7 +141,7 @@ const Configuracion = React.memo(() => {
       <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)]">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-[var(--signal)]" />
-          <p className="mt-4 text-[14px] text-[var(--text-secondary)]">Cargando configuracion...</p>
+          <p className="mt-4 text-[14px] text-[var(--text-secondary)]">Cargando configuración...</p>
         </div>
       </div>
     );
@@ -216,17 +159,8 @@ const Configuracion = React.memo(() => {
             <SettingsTabsNav isAdmin={user?.role === 'admin'} />
 
             <GeneralSettingsTab
-              loading={loading}
-              settings={generalSettings}
-              setSettings={setGeneralSettings}
-              onSave={handleSaveGeneralSettings}
-            />
-
-            <PrivacySettingsTab
-              loading={loading}
-              settings={privacySettings}
-              setSettings={setPrivacySettings}
-              onSave={handleSavePrivacySettings}
+              user={user}
+              projectsCount={getUserProjects().length}
             />
 
             <PerformanceSettingsTab
@@ -240,7 +174,7 @@ const Configuracion = React.memo(() => {
               <SettingsSectionCard
                 icon={<Bell className="h-5 w-5" />}
                 title="Notificaciones"
-                description="Elegi que novedades queres recibir de Pulse y del seguimiento de tu proyecto."
+                description="Elegí que novedades queres recibir de Pulse y del seguimiento de tu proyecto."
                 tone="signal"
               >
                 <NotificationSettingsSection />
@@ -271,7 +205,7 @@ const Configuracion = React.memo(() => {
                 className="bg-[var(--signal)] px-8 text-white hover:bg-[var(--signal-dim)] shadow-[0_14px_34px_var(--signal-glow)]"
               >
                 <Save className="h-5 w-5" />
-                Guardar toda la configuracion
+                Guardar ajustes
               </Button>
             </div>
           </Tabs>
