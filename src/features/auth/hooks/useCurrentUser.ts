@@ -11,6 +11,12 @@ interface UserUpdatePayload {
   full_name?: string | null;
   avatar_url?: string;
   role?: User['role'];
+  animations_enabled?: boolean | null;
+  low_bandwidth_mode?: boolean | null;
+  two_factor_auth?: boolean | null;
+  session_timeout?: number | null;
+  login_notifications?: boolean | null;
+  device_management?: boolean | null;
   onboarding_completed?: boolean | null;
   onboarding_completed_at?: string | null;
   website?: string | null;
@@ -186,6 +192,12 @@ export function useCurrentUser({
               ...prev,
               full_name: updatedUserData.full_name ?? prev.full_name,
               role: updatedUserData.role ?? prev.role,
+              animations_enabled: updatedUserData.animations_enabled ?? prev.animations_enabled,
+              low_bandwidth_mode: updatedUserData.low_bandwidth_mode ?? prev.low_bandwidth_mode,
+              two_factor_auth: updatedUserData.two_factor_auth ?? prev.two_factor_auth,
+              session_timeout: updatedUserData.session_timeout ?? prev.session_timeout,
+              login_notifications: updatedUserData.login_notifications ?? prev.login_notifications,
+              device_management: updatedUserData.device_management ?? prev.device_management,
               onboarding_completed: updatedUserData.onboarding_completed ?? prev.onboarding_completed,
               onboarding_completed_at: updatedUserData.onboarding_completed_at ?? prev.onboarding_completed_at,
               website: updatedUserData.website ?? prev.website,

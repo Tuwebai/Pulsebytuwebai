@@ -1,10 +1,9 @@
 import { useApp } from '@/contexts/AppContext';
 import type { AppContextType } from '@/contexts/AppContext';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Bell } from 'lucide-react';
 import { motion } from '@/components/OptimizedMotion';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
-import { toast } from '@/hooks/use-toast';
 import { NotificationSettingsSection } from '@/features/notifications/components/NotificationSettingsSection';
 import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 import {
@@ -15,94 +14,29 @@ import {
   SettingsSectionCard,
   SettingsTabsNav,
 } from '@/features/settings/components';
-import type { PerformanceSettings, SecuritySettings } from '@/features/settings/components';
+import { useClientSettings } from '@/features/settings/hooks/useClientSettings';
 
 const Configuracion = React.memo(() => {
-  const { user, updateUserSettings, getUserProjects } = useApp() as AppContextType;
-  const [loading, setLoading] = useState(false);
+  const { user, getUserProjects } = useApp() as AppContextType;
   const [activeTab, setActiveTab] = useSessionStorageState(
     `pulse:configuracion:${user?.id ?? 'anon'}:active-tab`,
     'general',
   );
-
-  const [performanceSettings, setPerformanceSettings] = useState<PerformanceSettings>({
-    animations_enabled: true,
-    low_bandwidth_mode: false,
-  });
-
-  const [securitySettings, setSecuritySettings] = useState<SecuritySettings>({
-    two_factor_auth: false,
-    session_timeout: 30,
-    login_notifications: true,
-    device_management: true,
-  });
-
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-
-    setPerformanceSettings({
-      animations_enabled: user.animations_enabled !== false,
-      low_bandwidth_mode: user.low_bandwidth_mode || false,
-    });
-
-    setSecuritySettings({
-      two_factor_auth: user.two_factor_auth || false,
-      session_timeout: user.session_timeout || 30,
-      login_notifications: user.login_notifications !== false,
-      device_management: user.device_management !== false,
-    });
-  }, [user]);
+  const {
+    loading,
+    performanceSettings,
+    securitySettings,
+    setPerformanceSettings,
+    setSecuritySettings,
+    handleSavePerformanceSettings,
+    handleSaveSecuritySettings,
+  } = useClientSettings();
 
   useEffect(() => {
     if (activeTab === 'privacidad' || activeTab === 'admin') {
       setActiveTab('seguridad');
     }
   }, [activeTab, setActiveTab]);
-
-  const runSettingsSave = async ({
-    request,
-    successDescription,
-    errorDescription,
-    successTitle = 'Configuracion guardada',
-  }: {
-    request: Promise<unknown>;
-    successDescription: string;
-    errorDescription: string;
-    successTitle?: string;
-  }) => {
-    setLoading(true);
-    try {
-      await request;
-      toast({
-        title: successTitle,
-        description: successDescription,
-      });
-    } catch {
-      toast({
-        title: 'Error',
-        description: errorDescription,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSavePerformanceSettings = () =>
-    runSettingsSave({
-      request: updateUserSettings(performanceSettings),
-      successDescription: 'Los cambios de experiencia se aplicaron correctamente.',
-      errorDescription: 'No se pudieron guardar los cambios de experiencia.',
-    });
-
-  const handleSaveSecuritySettings = () =>
-    runSettingsSave({
-      request: updateUserSettings(securitySettings),
-      successDescription: 'Los cambios de seguridad se aplicaron correctamente.',
-      errorDescription: 'No se pudieron guardar los cambios de seguridad.',
-    });
 
   if (!user) {
     return (
