@@ -17,6 +17,9 @@ interface UserUpdatePayload {
   session_timeout?: number | null;
   login_notifications?: boolean | null;
   device_management?: boolean | null;
+  notif_new_consultation?: boolean | null;
+  notif_monthly_summary?: boolean | null;
+  notif_project_update?: boolean | null;
   onboarding_completed?: boolean | null;
   onboarding_completed_at?: string | null;
   website?: string | null;
@@ -198,6 +201,9 @@ export function useCurrentUser({
               session_timeout: updatedUserData.session_timeout ?? prev.session_timeout,
               login_notifications: updatedUserData.login_notifications ?? prev.login_notifications,
               device_management: updatedUserData.device_management ?? prev.device_management,
+              notif_new_consultation: updatedUserData.notif_new_consultation ?? prev.notif_new_consultation,
+              notif_monthly_summary: updatedUserData.notif_monthly_summary ?? prev.notif_monthly_summary,
+              notif_project_update: updatedUserData.notif_project_update ?? prev.notif_project_update,
               onboarding_completed: updatedUserData.onboarding_completed ?? prev.onboarding_completed,
               onboarding_completed_at: updatedUserData.onboarding_completed_at ?? prev.onboarding_completed_at,
               website: updatedUserData.website ?? prev.website,

@@ -59,7 +59,7 @@ export function useClientSettings() {
       successDescription: string;
       errorDescription: string;
       successTitle?: string;
-    }) => {
+    }): Promise<boolean> => {
       setLoading(true);
       try {
         await request;
@@ -67,12 +67,14 @@ export function useClientSettings() {
           title: successTitle,
           description: successDescription,
         });
+        return true;
       } catch {
         toast({
           title: 'Error',
           description: errorDescription,
           variant: 'destructive',
         });
+        return false;
       } finally {
         setLoading(false);
       }
@@ -85,12 +87,14 @@ export function useClientSettings() {
       return;
     }
 
-    await runSettingsSave({
+    const saved = await runSettingsSave({
       request: savePerformanceSettings(user.id, performanceSettings),
       successDescription: 'Los cambios de experiencia se aplicaron correctamente.',
       errorDescription: 'No se pudieron guardar los cambios de experiencia.',
     });
-    setPerformanceBaseline(performanceSettings);
+    if (saved) {
+      setPerformanceBaseline(performanceSettings);
+    }
   }, [performanceSettings, runSettingsSave, user]);
 
   const handleSaveSecuritySettings = useCallback(async () => {
@@ -98,12 +102,14 @@ export function useClientSettings() {
       return;
     }
 
-    await runSettingsSave({
+    const saved = await runSettingsSave({
       request: saveSecuritySettings(user.id, securitySettings),
       successDescription: 'Los cambios de seguridad se aplicaron correctamente.',
       errorDescription: 'No se pudieron guardar los cambios de seguridad.',
     });
-    setSecurityBaseline(securitySettings);
+    if (saved) {
+      setSecurityBaseline(securitySettings);
+    }
   }, [runSettingsSave, securitySettings, user]);
 
   const performanceDirty =

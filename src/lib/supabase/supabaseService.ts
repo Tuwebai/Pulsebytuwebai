@@ -219,13 +219,13 @@ export class SupabaseService {
       }
 
       // Intentar obtener el usuario con manejo de errores específicos
-      const { data, error } = await supabase
-        .from('users')
-        .select(
-          'id, email, full_name, role, created_at, updated_at, avatar_url, onboarding_completed, onboarding_completed_at, website, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by, pulse_access_disabled_at'
-        )
-        .eq('id', id)
-        .maybeSingle(); // Usar maybeSingle en lugar de single para evitar errores
+        const { data, error } = await supabase
+          .from('users')
+          .select(
+            'id, email, full_name, role, created_at, updated_at, avatar_url, onboarding_completed, onboarding_completed_at, website, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by, pulse_access_disabled_at, animations_enabled, low_bandwidth_mode, two_factor_auth, session_timeout, login_notifications, device_management, notif_new_consultation, notif_monthly_summary, notif_project_update'
+          )
+          .eq('id', id)
+          .maybeSingle(); // Usar maybeSingle en lugar de single para evitar errores
 
       if (error) {
         // Solo manejar errores de conexión, no loggear errores de red
