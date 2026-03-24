@@ -265,7 +265,7 @@ const ProjectsPage = React.memo(() => {
             <ProjectCard
               key={project.id}
               onDeleteProject={handleDeleteProject}
-              onNavigateToCollaboration={(projectId) => navigate(`/proyectos/${projectId}/colaboracion-cliente`)}
+              onNavigateToCollaboration={() => navigate('/dashboard/proyecto')}
               onNavigateToEdit={(projectId) => navigate(`/proyectos/${projectId}`)}
               onViewProject={handleViewProject}
               project={project}

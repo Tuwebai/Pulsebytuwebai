@@ -71,7 +71,7 @@ const ProjectCollaborationModal: React.FC<ProjectCollaborationModalProps> = ({
   const handleOpenCollaboration = () => {
     if (selectedProject) {
       // Navegar al proyecto específico y abrir la sección de colaboración del cliente
-      navigate(`/proyectos/${selectedProject.id}/colaboracion-cliente`);
+      navigate('/dashboard/proyecto');
       onClose();
     }
   };

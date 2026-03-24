@@ -209,7 +209,7 @@ export default function ClientNotificationBell({ className = '' }: ClientNotific
         
         // Si es un mensaje, abrir el chat del proyecto
         if (notification.title.toLowerCase().includes('mensaje')) {
-          window.open(`/proyectos/${projectId}/colaboracion-cliente`, '_blank');
+          window.open('/dashboard/proyecto', '_blank');
         } else {
           // Para otras notificaciones de proyecto, ir al dashboard
           window.open('/dashboard', '_blank');

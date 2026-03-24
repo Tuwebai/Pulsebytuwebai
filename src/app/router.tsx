@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import type { ComponentType } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import DashboardLayout from '@/components/DashboardLayout';
 import TouchGestureProvider from '@/components/TouchGestureProvider';
 import { useApp } from '@/contexts/AppContext';
@@ -54,7 +54,6 @@ const WebsyAI = createLazyComponent(() => import('@/pages/WebsyAI'));
 const ProjectsPage = createLazyComponent(() => import('@/pages/ProjectsPage'));
 const ProyectosNuevo = createLazyComponent(() => import('@/pages/ProyectosNuevo'));
 const CollaborationPage = createLazyComponent(() => import('@/pages/CollaborationPage'));
-const ClientCollaborationPage = createLazyComponent(() => import('@/pages/ClientCollaborationPage'));
 const AdminCollaborationPage = createLazyComponent(() => import('@/pages/AdminCollaborationPage'));
 const PhasesAndTasksPage = createLazyComponent(() => import('@/pages/PhasesAndTasksPage'));
 const AdminPhasesAndTasksPage = createLazyComponent(() => import('@/pages/AdminPhasesAndTasksPage'));
@@ -390,9 +389,7 @@ function AppRoutes() {
         path="/proyectos/:projectId/colaboracion-cliente"
         element={
           <ProtectedRoute>
-            <DashboardLayout>
-              <ClientCollaborationPage />
-            </DashboardLayout>
+            <Navigate replace to="/dashboard/proyecto" />
           </ProtectedRoute>
         }
       />
