@@ -50,6 +50,9 @@ export interface User {
   pulse_access_granted_at?: string | null;
   pulse_access_granted_by?: string | null;
   pulse_access_disabled_at?: string | null;
+  business_name?: string | null;
+  business_industry?: string | null;
+  profile_completed?: boolean;
   notif_new_consultation?: boolean;
   notif_monthly_summary?: boolean;
   notif_project_update?: boolean;

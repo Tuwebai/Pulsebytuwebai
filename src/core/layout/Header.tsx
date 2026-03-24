@@ -4,6 +4,7 @@ import { useApp } from '@/contexts/AppContext';
 import { NotificationsPanel } from '@/features/notifications/components/NotificationsPanel';
 import { useNotifications } from '@/features/notifications/hooks/useNotifications';
 import { useNotificationsRealtime } from '@/features/notifications/hooks/useNotificationsRealtime';
+import { useProfile } from '@/features/profile/hooks/useProfile';
 import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 
 function getGreeting(date = new Date()) {
@@ -22,6 +23,7 @@ function getGreeting(date = new Date()) {
 
 export default function Header() {
   const { logout, user } = useApp();
+  const { profile } = useProfile();
   const [panelOpen, setPanelOpen] = useSessionStorageState(`pulse:header:${user?.id ?? 'anon'}:notifications-open`, false);
   const { unreadCount } = useNotifications();
   useNotificationsRealtime(user?.id || null);
@@ -44,7 +46,7 @@ export default function Header() {
 
           <div>
             <p className="text-[15px] font-normal text-[var(--text-primary)]">
-              {greeting}, {user?.full_name || 'cliente'}
+              {greeting}, {profile?.full_name || user?.full_name || 'cliente'}
             </p>
             <p className="text-[12px] text-[var(--text-tertiary)]">{dateLabel}</p>
           </div>

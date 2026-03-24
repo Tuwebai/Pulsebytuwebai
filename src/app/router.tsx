@@ -58,7 +58,7 @@ const AdminCollaborationPage = createLazyComponent(() => import('@/pages/AdminCo
 const PhasesAndTasksPage = createLazyComponent(() => import('@/pages/PhasesAndTasksPage'));
 const AdminPhasesAndTasksPage = createLazyComponent(() => import('@/pages/AdminPhasesAndTasksPage'));
 const WorkspacePage = createLazyComponent(() => import('@/pages/WorkspacePage'));
-const Perfil = createLazyComponent(() => import('@/pages/Perfil'));
+const ProfilePage = createLazyComponent(() => import('@/features/profile/pages/ProfilePage'));
 const UserProfileView = createLazyComponent(() => import('@/pages/UserProfileView'));
 const Configuracion = createLazyComponent(() => import('@/pages/Configuracion'));
 const Facturacion = createLazyComponent(() => import('@/pages/Facturacion'));
@@ -238,6 +238,18 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/dashboard/perfil"
+        element={
+          <ProtectedRoute>
+            <OnboardingGate>
+              <DashboardShell>
+                <ProfilePage />
+              </DashboardShell>
+            </OnboardingGate>
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/admin"
@@ -309,9 +321,7 @@ function AppRoutes() {
         path="/perfil"
         element={
           <ProtectedRoute>
-            <DashboardLayout key="perfil">
-              <Perfil key="perfil-content" />
-            </DashboardLayout>
+            <Navigate replace to="/dashboard/perfil" />
           </ProtectedRoute>
         }
       />

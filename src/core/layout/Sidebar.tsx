@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PulseLogo } from '@/core/components';
 import { useApp } from '@/contexts/AppContext';
+import { useProfile } from '@/features/profile/hooks/useProfile';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -27,6 +28,10 @@ function getInitials(name?: string | null, email?: string) {
 
 export default function Sidebar() {
   const { user } = useApp();
+  const { profile } = useProfile();
+  const displayName = profile?.full_name || user?.full_name || 'Cliente Pulse';
+  const displayAvatar = profile?.avatar_url || user?.avatar || user?.avatar_url;
+  const displayEmail = profile?.email || user?.email;
 
   return (
     <aside className="sticky top-0 hidden h-screen w-[240px] shrink-0 flex-col overflow-hidden border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] md:flex">
@@ -80,28 +85,23 @@ export default function Sidebar() {
       <div className="flex-1" />
 
       <div className="border-t border-[var(--border-subtle)] px-3 py-4">
-        <div className="flex items-center gap-3 rounded-xl px-2 py-2">
+        <NavLink className="flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-[var(--bg-elevated)]" to="/dashboard/perfil">
           <Avatar className="h-10 w-10 ring-0">
-            <AvatarImage alt={user?.full_name || user?.email || 'Usuario Pulse'} src={user?.avatar || user?.avatar_url} />
+            <AvatarImage alt={displayName || displayEmail || 'Usuario Pulse'} src={displayAvatar} />
             <AvatarFallback className="bg-[var(--bg-elevated)] text-[var(--text-primary)]">
-              {getInitials(user?.full_name, user?.email)}
+              {getInitials(displayName, displayEmail)}
             </AvatarFallback>
           </Avatar>
 
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] font-medium text-[var(--text-primary)]">
-              {user?.full_name || 'Cliente Pulse'}
-            </p>
-            <p className="truncate text-[11px] text-[var(--text-tertiary)]">{user?.email}</p>
+            <p className="truncate text-[13px] font-medium text-[var(--text-primary)]">{displayName}</p>
+            <p className="truncate text-[11px] text-[var(--text-tertiary)]">{displayEmail}</p>
           </div>
 
-          <NavLink
-            className="rounded-lg p-2 text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
-            to="/dashboard/configuracion"
-          >
+          <span className="rounded-lg p-2 text-[var(--text-tertiary)]">
             <Settings size={16} strokeWidth={1.5} />
-          </NavLink>
-        </div>
+          </span>
+        </NavLink>
       </div>
     </aside>
   );

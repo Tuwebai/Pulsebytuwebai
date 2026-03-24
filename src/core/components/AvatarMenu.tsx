@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import type { User } from '@/contexts/appContext.types';
+import { useProfile } from '@/features/profile/hooks/useProfile';
 
 interface AvatarMenuProps {
   onOpenNotifications: () => void;
@@ -31,6 +32,10 @@ function getInitials(name?: string | null, email?: string) {
 
 export default function AvatarMenu({ onOpenNotifications, onLogout, user }: AvatarMenuProps) {
   const navigate = useNavigate();
+  const { profile } = useProfile();
+  const displayName = profile?.full_name || user?.full_name || 'Cliente Pulse';
+  const displayEmail = profile?.email || user?.email || 'sin email';
+  const displayAvatar = profile?.avatar_url || user?.avatar || user?.avatar_url;
 
   return (
     <DropdownMenu>
@@ -41,9 +46,9 @@ export default function AvatarMenu({ onOpenNotifications, onLogout, user }: Avat
           type="button"
         >
           <Avatar className="h-9 w-9 ring-0">
-            <AvatarImage alt={user?.full_name || user?.email || 'Usuario Pulse'} src={user?.avatar || user?.avatar_url} />
+            <AvatarImage alt={displayName || displayEmail} src={displayAvatar} />
             <AvatarFallback className="bg-[var(--bg-elevated)] text-[var(--text-primary)]">
-              {getInitials(user?.full_name, user?.email)}
+              {getInitials(displayName, displayEmail)}
             </AvatarFallback>
           </Avatar>
         </button>
@@ -56,8 +61,8 @@ export default function AvatarMenu({ onOpenNotifications, onLogout, user }: Avat
       >
         <DropdownMenuLabel className="cursor-default px-3 py-3">
           <div>
-            <p className="text-[13px] font-medium text-[var(--text-primary)]">{user?.full_name || 'Cliente Pulse'}</p>
-            <p className="mt-1 text-[11px] font-normal text-[var(--text-tertiary)]">{user?.email || 'sin email'}</p>
+            <p className="text-[13px] font-medium text-[var(--text-primary)]">{displayName}</p>
+            <p className="mt-1 text-[11px] font-normal text-[var(--text-tertiary)]">{displayEmail}</p>
           </div>
         </DropdownMenuLabel>
 
@@ -65,7 +70,7 @@ export default function AvatarMenu({ onOpenNotifications, onLogout, user }: Avat
 
         <DropdownMenuItem
           className="cursor-pointer rounded-[10px] px-3 py-2 text-[13px] text-[var(--text-primary)] transition-colors duration-150 ease-out focus:bg-[var(--bg-subtle)] focus:text-[var(--text-primary)]"
-          onSelect={() => navigate('/dashboard/configuracion')}
+          onSelect={() => navigate('/dashboard/perfil')}
         >
           <Settings className="mr-2 h-4 w-4 text-[var(--text-secondary)]" strokeWidth={1.5} />
           Mi perfil
