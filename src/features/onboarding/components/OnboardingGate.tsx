@@ -13,6 +13,7 @@ export default function OnboardingGate({
 }: OnboardingGateProps) {
   const { user } = useApp();
   const location = useLocation();
+  const forcePreviewInDev = import.meta.env.DEV && location.pathname === '/onboarding' && new URLSearchParams(location.search).get('preview') === '1';
 
   if (user?.role === 'admin') {
     return <>{children}</>;
@@ -24,7 +25,7 @@ export default function OnboardingGate({
     return <Navigate replace state={{ from: location }} to="/onboarding" />;
   }
 
-  if (allowIncomplete && completed) {
+  if (allowIncomplete && completed && !forcePreviewInDev) {
     return <Navigate replace to="/dashboard" />;
   }
 

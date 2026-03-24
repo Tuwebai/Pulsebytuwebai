@@ -27,11 +27,11 @@ export default function PulsePage() {
         <div>
           <h1 className="text-[22px] font-medium text-[var(--text-primary)]">Tu web este mes</h1>
           <p className="text-[14px] leading-5 text-[var(--text-secondary)]">
-            {data ? `${data.dateRange.from} → ${data.dateRange.to}` : 'sin datos todavia'}
+            {data ? `${data.dateRange.from} → ${data.dateRange.to}` : 'sin datos todavía'}
           </p>
         </div>
 
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center" data-tour="pulse-period-selector">
           <PeriodSelector value={period} onChange={(nextPeriod) => setPeriod(nextPeriod as Period)} disabled={!projectId} />
           <button
             className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-2 text-sm text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
@@ -61,7 +61,7 @@ export default function PulsePage() {
             <div>
               <p className="font-medium leading-5 text-[var(--text-primary)]">Conecta tu dominio para ver los datos reales.</p>
               <p className="mt-1 text-[13px] leading-5 text-[color:rgba(240,244,255,0.82)]">
-                Tu equipo de TuWebAI lo configura automaticamente al entregar tu proyecto.
+                Tu equipo de TuWebAI lo configura automáticamente al entregar tu proyecto.
               </p>
             </div>
           </div>
@@ -70,6 +70,7 @@ export default function PulsePage() {
 
       <AnimatedList
         className="grid gap-3 md:grid-cols-2 xl:grid-cols-4"
+        data-tour="pulse-metrics-grid"
         disabled={loading}
         key={`${period}-${loading ? 'loading' : 'ready'}`}
         staggerMs={60}
@@ -87,37 +88,37 @@ export default function PulsePage() {
           loading={loading}
         />
         <MetricCard
-          label="Pagina mas visitada"
+          label="Página más visitada"
           value={data?.topPages[0]?.path ?? null}
           period={data?.topPages[0] ? `${data.topPages[0].visits} visitas` : undefined}
           loading={loading}
         />
         <MetricCard
-          label="Promedio por dia"
+          label="Promedio por día"
           value={averagePerDay}
-          unit="visitas/dia"
+          unit="visitas/día"
           loading={loading}
         />
       </AnimatedList>
 
-      <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
-        <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">Visitas por dia</p>
+      <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5" data-tour="pulse-chart">
+        <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">Visitas por día</p>
         <div className="mt-4">
           <PulseChart data={data?.chartData ?? []} height={180} loading={loading} />
         </div>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)]">
+        <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)]" data-tour="pulse-top-pages">
           <div className="border-b border-[var(--border-subtle)] px-5 py-4">
-            <h2 className="text-sm font-medium text-[var(--text-primary)]">Paginas mas visitadas</h2>
+            <h2 className="text-sm font-medium text-[var(--text-primary)]">Páginas más visitadas</h2>
           </div>
 
           <div className="overflow-hidden">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[var(--border-subtle)] text-left text-[12px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
-                  <th className="px-5 py-3 font-medium">Pagina</th>
+                  <th className="px-5 py-3 font-medium">Página</th>
                   <th className="px-5 py-3 font-medium">Visitas</th>
                   <th className="px-5 py-3 font-medium">% del total</th>
                 </tr>
@@ -175,8 +176,8 @@ export default function PulsePage() {
 
         <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
           <div>
-            <h2 className="text-sm font-medium text-[var(--text-primary)]">Resumen del periodo</h2>
-            <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">Lectura rapida de tus metricas</p>
+            <h2 className="text-sm font-medium text-[var(--text-primary)]">Resumen del período</h2>
+            <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">Lectura rápida de tus métricas</p>
           </div>
 
           <div className="mt-5 space-y-3">
@@ -192,7 +193,7 @@ export default function PulsePage() {
             </div>
             <div className="flex items-center gap-3">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--text-tertiary)]" />
-              <span className="text-[13px] text-[var(--text-secondary)]">Promedio de sesion</span>
+              <span className="text-[13px] text-[var(--text-secondary)]">Promedio de sesión</span>
               <span className="ml-auto font-data text-[13px] text-[var(--text-primary)]">{data?.avgSessionSec ?? 0}s</span>
             </div>
           </div>
@@ -202,7 +203,7 @@ export default function PulsePage() {
             onClick={() => navigate('/dashboard/configuracion')}
             type="button"
           >
-            Revisar configuracion →
+            Revisar configuración →
           </button>
         </div>
       </section>

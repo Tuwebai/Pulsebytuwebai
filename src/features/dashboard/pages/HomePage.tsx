@@ -61,14 +61,15 @@ export default function HomePage() {
     <div className="space-y-6">
       <AnimatedReveal
         className="rounded-[20px] border border-[var(--signal-border)] bg-[var(--bg-surface)] p-5 md:p-7"
+        data-tour="home-hero"
         disabled={loading}
         key={`${period}-${loading ? 'loading' : hasDomain && data?.hasData ? 'ready' : 'empty'}`}
       >
         {!hasProject && !loading ? (
           <div className="space-y-3">
-            <h2 className="text-2xl font-medium text-[var(--text-primary)]">Tu proyecto se esta configurando.</h2>
+            <h2 className="text-2xl font-medium text-[var(--text-primary)]">Tu proyecto se está configurando.</h2>
             <p className="max-w-2xl text-sm text-[var(--text-secondary)]">
-              Apenas tu equipo termine la configuracion inicial, vas a ver aca el rendimiento real de tu web.
+              Apenas tu equipo termine la configuración inicial, vas a ver acá el rendimiento real de tu web.
             </p>
           </div>
         ) : !hasDomain || !data?.hasData ? (
@@ -98,7 +99,7 @@ export default function HomePage() {
                   {loading
                     ? '...'
                     : data.visitsDelta !== null
-                      ? `▲ ${data.visitsDelta}% vs periodo anterior`
+                      ? `▲ ${data.visitsDelta}% vs período anterior`
                       : 'Sin comparativa disponible'}
                 </p>
               </div>
@@ -112,7 +113,7 @@ export default function HomePage() {
                   {loading
                     ? '...'
                     : data.contactsDelta !== null
-                      ? `▲ ${data.contactsDelta}% vs periodo anterior`
+                      ? `▲ ${data.contactsDelta}% vs período anterior`
                       : 'Sin comparativa disponible'}
                 </p>
               </div>
@@ -121,7 +122,7 @@ export default function HomePage() {
             <div className="space-y-3">
               <PulseChart data={data?.chartData ?? []} height={80} loading={loading || !projectId} />
               <div className="flex flex-wrap items-center justify-between gap-3 text-[12px] text-[var(--text-tertiary)]">
-                <span>Visitas por dia</span>
+                <span>Visitas por día</span>
                 <button
                   className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={!canOpenSite}
@@ -145,6 +146,7 @@ export default function HomePage() {
       <AnimatedList className="grid gap-4 md:grid-cols-3" staggerMs={80}>
         <button
           className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 text-left transition-colors hover:border-[var(--border-strong)]"
+          data-tour="home-project-card"
           onClick={() => navigate('/dashboard/proyecto')}
           type="button"
         >
@@ -164,13 +166,14 @@ export default function HomePage() {
 
         <button
           className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 text-left transition-colors hover:border-[var(--border-strong)]"
+          data-tour="home-payments-card"
           onClick={() => navigate('/dashboard/pagos')}
           type="button"
         >
           <div className="flex items-start justify-between gap-3">
             <CreditCard className="text-[var(--success)]" size={20} strokeWidth={1.5} />
             <Badge size="sm" variant="success">
-              Al dia
+              Al día
             </Badge>
           </div>
           <h3 className="mt-4 text-base font-medium text-[var(--text-primary)]">Pagos</h3>
@@ -180,6 +183,7 @@ export default function HomePage() {
 
         <button
           className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 text-left transition-colors hover:border-[var(--border-strong)]"
+          data-tour="home-support-card"
           onClick={() => navigate('/dashboard/soporte')}
           type="button"
         >
