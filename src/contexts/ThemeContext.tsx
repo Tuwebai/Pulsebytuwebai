@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useApp } from './AppContext';
 import { userPreferencesService } from '@/lib/services/userPreferencesService';
 
@@ -15,47 +15,59 @@ interface ThemeProviderProps {
   children: ReactNode;
 }
 
+function getInitialTheme(): 'light' | 'dark' {
+  if (typeof window === 'undefined') {
+    return 'dark';
+  }
+
+  const root = document.documentElement;
+
+  if (root.classList.contains('dark')) {
+    return 'dark';
+  }
+
+  if (root.classList.contains('light')) {
+    return 'light';
+  }
+
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark' || savedTheme === 'light') {
+    return savedTheme;
+  }
+
+  return 'dark';
+}
+
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setThemeState] = useState<'light' | 'dark'>('light');
+  const [theme, setThemeState] = useState<'light' | 'dark'>(getInitialTheme);
   const [loading, setLoading] = useState(true);
   const { user, isAuthenticated } = useApp();
 
-  // Cargar tema del usuario o detectar preferencia del sistema
   useEffect(() => {
     const loadUserTheme = async () => {
       try {
-        let userTheme: 'light' | 'dark' = 'light';
-        
+        let userTheme: 'light' | 'dark' = getInitialTheme();
+
         if (isAuthenticated && user) {
-          // Cargar tema del usuario desde la base de datos
           const savedTheme = await userPreferencesService.getUserTheme(user.id);
-          userTheme = savedTheme || 'light';
+          userTheme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark';
         } else {
-          // Usuario no autenticado - cargar desde localStorage o detectar sistema
-          const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-          if (savedTheme) {
-            userTheme = savedTheme;
-          } else {
-            // Detectar preferencia del sistema
-            userTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-          }
+          userTheme = getInitialTheme();
         }
-        
+
         setThemeState(userTheme);
-        
+
         if (isAuthenticated && user) {
-          // Guardar tema en la base de datos
           await userPreferencesService.saveUserTheme(user.id, userTheme);
           await userPreferencesService.saveUserPreference(user.id, 'theme', 'hasSetTheme', true);
         } else {
-          // Guardar en localStorage
           localStorage.setItem('theme', userTheme);
         }
       } catch (error) {
         console.error('Error loading user theme:', error);
-        // Fallback a modo claro
-        setThemeState('light');
+        setThemeState('dark');
       }
+
       setLoading(false);
     };
 
@@ -63,36 +75,28 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   }, [isAuthenticated, user]);
 
   useEffect(() => {
-    // Aplicar tema al documento con transición suave
     const root = document.documentElement;
-    
-    // Remover clases anteriores
+
     root.classList.remove('light', 'dark');
-    
-    // Agregar clase de transición
-    root.style.transition = 'background-color 0.3s ease, color 0.3s ease';
-    
-    // Aplicar nuevo tema
+    root.style.transition = 'background-color 0.2s ease, color 0.2s ease';
+    root.style.colorScheme = theme;
     root.classList.add(theme);
-    
-    // Guardar en localStorage como fallback
+
     localStorage.setItem('theme', theme);
-    
-    // Guardar en base de datos si el usuario está autenticado
+
     if (isAuthenticated && user && !loading) {
-      userPreferencesService.saveUserTheme(user.id, theme).catch(error => {
+      userPreferencesService.saveUserTheme(user.id, theme).catch((error) => {
         console.error('Error saving user theme:', error);
       });
     }
-    
-    // Remover transición después de aplicar el tema
-    setTimeout(() => {
+
+    window.setTimeout(() => {
       root.style.transition = '';
-    }, 300);
+    }, 200);
   }, [theme, isAuthenticated, user, loading]);
 
   const toggleTheme = () => {
-    setThemeState(prev => prev === 'light' ? 'dark' : 'light');
+    setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
   const setTheme = (newTheme: 'light' | 'dark') => {

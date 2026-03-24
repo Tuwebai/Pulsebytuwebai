@@ -5,17 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pulse by TuWebAI</title>
 
-    <!-- FORZAR MODO CLARO DESDE EL INICIO -->
+    <!-- PULSE ES DARK-FIRST DESDE EL PRIMER PAINT -->
     <script>
-      document.documentElement.style.colorScheme = 'light';
-      document.documentElement.classList.add('light');
-      document.documentElement.classList.remove('dark');
+      (function () {
+        var savedTheme = null;
 
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.style.colorScheme = 'light';
-        document.documentElement.classList.add('light');
-        document.documentElement.classList.remove('dark');
-      }
+        try {
+          savedTheme = localStorage.getItem('theme');
+        } catch (error) {
+          savedTheme = null;
+        }
+
+        var initialTheme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark';
+
+        document.documentElement.style.colorScheme = initialTheme;
+        document.documentElement.classList.remove('light', 'dark');
+        document.documentElement.classList.add(initialTheme);
+      })();
     </script>
     <meta
       name="description"
