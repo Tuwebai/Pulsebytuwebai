@@ -6,6 +6,8 @@ const toneClassMap = {
     'border-[color:var(--signal-glow)] bg-[color:color-mix(in_srgb,var(--signal)_18%,transparent)] text-[var(--signal)] shadow-[0_0_0_1px_var(--signal-glow),0_8px_24px_color-mix(in_srgb,var(--signal)_18%,transparent)]',
   success:
     'border-[color:var(--success-dim)] bg-[color:color-mix(in_srgb,var(--success)_18%,transparent)] text-[var(--success)] shadow-[0_0_0_1px_var(--success-dim),0_8px_24px_color-mix(in_srgb,var(--success)_18%,transparent)]',
+  danger:
+    'border-[color:var(--danger-dim)] bg-[color:color-mix(in_srgb,var(--danger)_18%,transparent)] text-[var(--danger)] shadow-[0_0_0_1px_var(--danger-dim),0_8px_24px_color-mix(in_srgb,var(--danger)_18%,transparent)]',
   warning:
     'border-[color:var(--warning-dim)] bg-[color:color-mix(in_srgb,var(--warning)_18%,transparent)] text-[var(--warning)] shadow-[0_0_0_1px_var(--warning-dim),0_8px_24px_color-mix(in_srgb,var(--warning)_18%,transparent)]',
   default:

@@ -1,3 +1,5 @@
+import { SUPPORT_CONTACT } from '@/config/supportContact';
+
 // Template unificado para EmailJS que funciona para todos los tipos de emails
 export const UNIFIED_EMAIL_TEMPLATE = `
 <!DOCTYPE html>
@@ -180,8 +182,8 @@ export const EMAIL_VARIABLES = {
         <h4 style="margin: 0 0 15px 0; color: #374151;">¿Necesitas ayuda urgente?</h4>
         <p style="margin: 5px 0; color: #6b7280;">
           📧 <strong>Email:</strong> {{support_email}}<br>
-          📞 <strong>Teléfono:</strong> +5493571416044<br>
-          🕒 <strong>Horarios:</strong> Lunes a Viernes 9:00 - 18:00
+          📞 <strong>Teléfono:</strong> ${SUPPORT_CONTACT.phoneE164}<br>
+          🕒 <strong>Horarios:</strong> ${SUPPORT_CONTACT.hoursEmailDisplay}
         </p>
       </div>
     `,
@@ -248,7 +250,7 @@ export const EMAIL_VARIABLES = {
         <h4 style="margin: 0 0 15px 0; color: #374151;">¿Necesitas más ayuda?</h4>
         <p style="margin: 5px 0; color: #6b7280;">
           📧 <strong>Email:</strong> {{support_email}}<br>
-          📞 <strong>Teléfono:</strong> +5493571416044
+          📞 <strong>Teléfono:</strong> ${SUPPORT_CONTACT.phoneE164}
         </p>
       </div>
     `,

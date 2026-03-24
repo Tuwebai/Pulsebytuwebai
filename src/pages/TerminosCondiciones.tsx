@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { SUPPORT_CONTACT } from '@/config/supportContact';
 import { ArrowLeft } from 'lucide-react';
 import PulseLogo from '@/core/components/PulseLogo';
 
@@ -155,8 +156,8 @@ export default function TerminosCondiciones() {
                 </p>
                 <div className="mt-3 p-4 bg-muted rounded-lg">
                   <p className="text-foreground font-medium">Pulse by TuWebAI</p>
-                  <p className="text-muted-foreground">Email: tuwebai@gmail.com</p>
-                  <p className="text-muted-foreground">Soporte: pulse.tuweb-ai.com/soporte</p>
+                  <p className="text-muted-foreground">Email: {SUPPORT_CONTACT.publicEmail}</p>
+                  <p className="text-muted-foreground">Soporte: {SUPPORT_CONTACT.supportPortalLabel}</p>
                 </div>
               </section>
             </CardContent>

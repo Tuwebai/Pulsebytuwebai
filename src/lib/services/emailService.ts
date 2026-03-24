@@ -1,3 +1,4 @@
+import { SUPPORT_CONTACT } from '@/config/supportContact';
 import { EMAIL_CONFIG, sendEmailWithEmailJS } from '../config/emailConfig';
 
 // Servicio de email para tickets de soporte
@@ -54,7 +55,7 @@ export const sendEmailWithTemplate = async (emailType: string, data: any) => {
       ticket_priority: data.ticket_priority || 'MEDIA',
       ticket_date: data.ticket_date || new Date().toLocaleString('es-ES'),
       ticket_id: data.ticket_id || 'TICKET-001',
-      support_email: EMAIL_CONFIG.EMAILS.SUPPORT,
+      support_email: SUPPORT_CONTACT.publicEmail,
       
       // Variables para respuestas
       admin_response: data.admin_response || '',
@@ -103,7 +104,7 @@ export const sendSupportTicketEmail = async (ticketData: {
   fecha: string;
 }) => {
   const data = {
-    to_email: EMAIL_CONFIG.EMAILS.SUPPORT, // admin@pulse.tuweb-ai.com RECIBE
+    to_email: EMAIL_CONFIG.EMAILS.SUPPORT, // inbox interno de soporte
     from_name: 'Cliente Pulse by TuWebAI',
     from_email: ticketData.email, // Email del cliente que ENVÃA
     reply_to: ticketData.email, // Para responder directamente al cliente
@@ -183,7 +184,7 @@ export const sendDailySummaryEmail = async (summaryData: {
   }>;
 }) => {
   const data = {
-    to_email: EMAIL_CONFIG.EMAILS.SUPPORT, // admin@pulse.tuweb-ai.com RECIBE
+    to_email: EMAIL_CONFIG.EMAILS.SUPPORT, // inbox interno de soporte
     from_name: 'Pulse by TuWebAI',
     from_email: EMAIL_CONFIG.EMAILS.FROM_EMAIL, // Tu email de EmailJS ENVÃA
     reply_to: EMAIL_CONFIG.EMAILS.SUPPORT,

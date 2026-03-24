@@ -1,4 +1,5 @@
 import type { BadgeProps } from '@/core/components/Badge';
+import { buildWhatsAppUrl } from '@/config/supportContact';
 import type { ProjectDetailPhase, ProjectDetailProject, ProjectDetailTask } from './projectDetail.types';
 
 const ACTIVE_PHASE_STATES = new Set(['en progreso', 'en revisión', 'en revision', 'bloqueada', 'pendiente']);
@@ -174,5 +175,5 @@ export function getRelativeDateLabel(value?: string | null): string | null {
 }
 
 export function buildWhatsAppContactUrl(message: string): string {
-  return `https://wa.me/543571417960?text=${encodeURIComponent(message)}`;
+  return buildWhatsAppUrl(message);
 }

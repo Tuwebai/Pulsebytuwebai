@@ -1,3 +1,5 @@
+import { SUPPORT_CONTACT } from '@/config/supportContact';
+
 // Templates de Email Premium para TuWebAI
 export const EMAIL_TEMPLATES = {
   // Template para Admin - Nuevo Ticket de Soporte
@@ -81,7 +83,7 @@ export const EMAIL_TEMPLATES = {
             <div class="footer">
                 <div class="logo">Pulse by TuWebAI</div>
                 <p>Sistema de Soporte Técnico</p>
-                <p>admin@pulse.tuweb-ai.com | +5493571416044</p>
+                <p>${SUPPORT_CONTACT.adminEmail} | ${SUPPORT_CONTACT.phoneE164}</p>
                 <p style="font-size: 12px; opacity: 0.8;">Este es un email automático del sistema de soporte</p>
             </div>
         </div>
@@ -203,8 +205,8 @@ export const EMAIL_TEMPLATES = {
                     <h4 style="margin: 0 0 15px 0; color: #374151;">¿Necesitas ayuda urgente?</h4>
                     <p style="margin: 5px 0; color: #6b7280;">
                         📧 <strong>Email:</strong> ${data.support_email}<br>
-                        📞 <strong>Teléfono:</strong> +5493571416044<br>
-                        🕒 <strong>Horarios:</strong> Lunes a Viernes 9:00 - 18:00
+                        📞 <strong>Teléfono:</strong> ${SUPPORT_CONTACT.phoneE164}<br>
+                        🕒 <strong>Horarios:</strong> ${SUPPORT_CONTACT.hoursEmailDisplay}
                     </p>
                 </div>
             </div>
@@ -317,7 +319,7 @@ export const EMAIL_TEMPLATES = {
                     <h4 style="margin: 0 0 15px 0; color: #374151;">¿Necesitas más ayuda?</h4>
                     <p style="margin: 5px 0; color: #6b7280;">
                         📧 <strong>Email:</strong> ${data.support_email}<br>
-                        📞 <strong>Teléfono:</strong> +5493571416044
+                        📞 <strong>Teléfono:</strong> ${SUPPORT_CONTACT.phoneE164}
                     </p>
                 </div>
             </div>
