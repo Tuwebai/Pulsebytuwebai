@@ -6,5 +6,5 @@ export function useReducedMotionPreference(): boolean {
   const prefersReducedMotion = usePrefersReducedMotion();
   const { user } = useApp() as AppContextType;
 
-  return prefersReducedMotion || user?.animations_enabled === false || user?.low_bandwidth_mode === true;
+  return prefersReducedMotion || user?.animations_enabled === false;
 }
