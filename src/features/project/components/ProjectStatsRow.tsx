@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Activity, CheckCircle2, FolderKanban } from 'lucide-react';
+import { AccentIcon } from '@/core/components';
 import type { ProjectsPageProject } from './projectPage.types';
 import {
   getProjectClientPendingTasks,
@@ -11,35 +12,6 @@ import {
 interface ProjectStatsRowProps {
   projects: ProjectsPageProject[];
   loading?: boolean;
-}
-
-function AccentIcon({
-  children,
-  tone,
-}: {
-  children: ReactNode;
-  tone: 'signal' | 'success' | 'warning' | 'default';
-}) {
-  const toneClassMap: Record<typeof tone, string> = {
-    signal:
-      'border-[color:var(--signal-glow)] bg-[color:color-mix(in srgb,var(--signal) 18%,transparent)] text-[var(--signal)] shadow-[0_0_0_1px_var(--signal-glow),0_8px_24px_color-mix(in_srgb,var(--signal)_18%,transparent)]',
-    success:
-      'border-[color:var(--success-dim)] bg-[color:color-mix(in srgb,var(--success) 18%,transparent)] text-[var(--success)] shadow-[0_0_0_1px_var(--success-dim),0_8px_24px_color-mix(in_srgb,var(--success)_18%,transparent)]',
-    warning:
-      'border-[color:var(--warning-dim)] bg-[color:color-mix(in srgb,var(--warning) 18%,transparent)] text-[var(--warning)] shadow-[0_0_0_1px_var(--warning-dim),0_8px_24px_color-mix(in_srgb,var(--warning)_18%,transparent)]',
-    default:
-      'border-[color:var(--border-strong)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] shadow-[0_0_0_1px_var(--border-subtle),0_8px_24px_rgba(0,0,0,0.18)]',
-  };
-
-  return (
-    <div className="pointer-events-none absolute right-5 top-5">
-      <div
-        className={`flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-sm ${toneClassMap[tone]}`}
-      >
-        {children}
-      </div>
-    </div>
-  );
 }
 
 function SummaryCard({
@@ -59,7 +31,9 @@ function SummaryCard({
 }) {
   return (
     <article className="relative flex min-h-[152px] flex-col rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
-      <AccentIcon tone={tone}>{icon}</AccentIcon>
+      <div className="pointer-events-none absolute right-5 top-5">
+        <AccentIcon tone={tone}>{icon}</AccentIcon>
+      </div>
 
       <p className="pr-16 text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">{label}</p>
 

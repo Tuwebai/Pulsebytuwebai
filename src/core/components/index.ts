@@ -10,3 +10,5 @@ export type { PulseEmptyStateProps } from './PulseEmptyState';
 export { default as Badge } from './Badge';
 export type { BadgeProps } from './Badge';
 export { default as AvatarMenu } from './AvatarMenu';
+export { default as AccentIcon } from './AccentIcon';
+export type { AccentIconProps } from './AccentIcon';
