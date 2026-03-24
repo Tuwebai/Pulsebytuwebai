@@ -6,9 +6,9 @@ export const MERCADOPAGO_CONFIG = {
   
   // URLs de webhooks
   WEBHOOK_URL: `${config.app.publicUrl}/api/webhooks/mercadopago`,
-  SUCCESS_URL: `${config.app.publicUrl}/dashboard/facturacion?status=success`,
-  PENDING_URL: `${config.app.publicUrl}/dashboard/facturacion?status=pending`,
-  FAILURE_URL: `${config.app.publicUrl}/dashboard/facturacion?status=failure`,
+  SUCCESS_URL: `${config.app.publicUrl}/dashboard/pagos?status=success`,
+  PENDING_URL: `${config.app.publicUrl}/dashboard/pagos?status=pending`,
+  FAILURE_URL: `${config.app.publicUrl}/dashboard/pagos?status=failure`,
   
   // Configuración de la aplicación
   APP_NAME: 'Pulse by TuWebAI',

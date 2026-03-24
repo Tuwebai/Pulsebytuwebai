@@ -304,9 +304,15 @@ function AppRoutes() {
         path="/facturacion"
         element={
           <ProtectedRoute>
-            <DashboardLayout key="facturacion">
-              <Facturacion key="facturacion-content" />
-            </DashboardLayout>
+            <Navigate replace to="/dashboard/pagos" />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/facturacion"
+        element={
+          <ProtectedRoute>
+            <Navigate replace to="/dashboard/pagos" />
           </ProtectedRoute>
         }
       />

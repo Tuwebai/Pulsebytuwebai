@@ -225,7 +225,7 @@ export default function ClientNotificationBell({ className = '' }: ClientNotific
 
       // Para notificaciones de pagos
       if (notification.category === 'payment') {
-        window.open('/facturacion', '_blank');
+        window.open('/dashboard/pagos', '_blank');
         return;
       }
 
