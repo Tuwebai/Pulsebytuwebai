@@ -6,12 +6,10 @@ import type { PerformanceSettings, SecuritySettings } from '@/features/settings/
 import {
   getInitialPerformanceSettings,
   getInitialSecuritySettings,
-  savePerformanceSettings,
-  saveSecuritySettings,
 } from '@/features/settings/services/settings.service';
 
 export function useClientSettings() {
-  const { user } = useApp() as AppContextType;
+  const { updateUserSettings, user } = useApp() as AppContextType;
   const [loading, setLoading] = useState(false);
   const [performanceBaseline, setPerformanceBaseline] = useState<PerformanceSettings>({
     animations_enabled: true,
@@ -82,14 +80,18 @@ export function useClientSettings() {
     }
 
     const saved = await runSettingsSave({
-      request: savePerformanceSettings(user.id, performanceSettings),
+      request: updateUserSettings(performanceSettings).then((success) => {
+        if (!success) {
+          throw new Error('settings_update_failed');
+        }
+      }),
       successDescription: 'Los cambios de experiencia se aplicaron correctamente.',
       errorDescription: 'No se pudieron guardar los cambios de experiencia.',
     });
     if (saved) {
       setPerformanceBaseline(performanceSettings);
     }
-  }, [performanceSettings, runSettingsSave, user]);
+  }, [performanceSettings, runSettingsSave, updateUserSettings, user]);
 
   const handleSaveSecuritySettings = useCallback(async () => {
     if (!user) {
@@ -97,14 +99,18 @@ export function useClientSettings() {
     }
 
     const saved = await runSettingsSave({
-      request: saveSecuritySettings(user.id, securitySettings),
+      request: updateUserSettings(securitySettings).then((success) => {
+        if (!success) {
+          throw new Error('settings_update_failed');
+        }
+      }),
       successDescription: 'Los cambios de seguridad se aplicaron correctamente.',
       errorDescription: 'No se pudieron guardar los cambios de seguridad.',
     });
     if (saved) {
       setSecurityBaseline(securitySettings);
     }
-  }, [runSettingsSave, securitySettings, user]);
+  }, [runSettingsSave, securitySettings, updateUserSettings, user]);
 
   const performanceDirty =
     performanceSettings.animations_enabled !== performanceBaseline.animations_enabled ||
