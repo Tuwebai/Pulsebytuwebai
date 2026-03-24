@@ -7,6 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { ProfileRow, ProfileUpdatePayload } from '@/data/types/profile';
+import {
+  PROFILE_INPUT_CLASSNAME,
+  PROFILE_SURFACE_CLASSNAME,
+} from '@/features/profile/constants/profile.constants';
 import { personalDataSchema } from '@/features/profile/profile.schemas';
 
 type PersonalDataFormValues = {
@@ -26,14 +30,14 @@ export function PersonalDataForm({ email, isSaving, profile, save }: PersonalDat
     resolver: zodResolver(personalDataSchema),
     defaultValues: {
       full_name: profile.full_name ?? '',
-      phone: profile.phone ?? ''
-    }
+      phone: profile.phone ?? '',
+    },
   });
 
   useEffect(() => {
     form.reset({
       full_name: profile.full_name ?? '',
-      phone: profile.phone ?? ''
+      phone: profile.phone ?? '',
     });
   }, [form, profile.full_name, profile.phone]);
 
@@ -42,46 +46,60 @@ export function PersonalDataForm({ email, isSaving, profile, save }: PersonalDat
       await save(values);
       toast({
         title: 'Datos actualizados',
-        description: 'Tus datos personales quedaron guardados.'
+        description: 'Tus datos personales quedaron guardados.',
       });
     } catch (error) {
       toast({
         title: 'No pudimos guardar tus datos',
         description: error instanceof Error ? error.message : 'Intentalo nuevamente.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     }
   };
 
   return (
-    <section className="rounded-[var(--radius-xl)] border border-[var(--border-default)] bg-[var(--bg-surface)] p-6">
+    <section className={PROFILE_SURFACE_CLASSNAME}>
       <div className="mb-5">
         <h3 className="text-[18px] font-medium text-[var(--text-primary)]">Datos personales</h3>
-        <p className="mt-1 text-[13px] text-[var(--text-secondary)]">Actualizá tu información de contacto en Pulse.</p>
+        <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
+          Actualiza tu informacion de contacto para mantener tu cuenta al dia.
+        </p>
       </div>
 
       <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="space-y-2">
-          <Label className="text-[12px] font-normal text-[var(--text-secondary)]" htmlFor="full_name">
-            Nombre completo
-          </Label>
-          <Input id="full_name" {...form.register('full_name')} />
-          <p className="text-[12px] text-[var(--danger)]">{form.formState.errors.full_name?.message}</p>
-        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label className="text-[12px] font-normal text-[var(--text-secondary)]" htmlFor="full_name">
+              Nombre completo
+            </Label>
+            <Input autoComplete="name" className={PROFILE_INPUT_CLASSNAME} id="full_name" {...form.register('full_name')} />
+            <p className="text-[12px] text-[var(--danger)]">{form.formState.errors.full_name?.message}</p>
+          </div>
 
-        <div className="space-y-2">
-          <Label className="text-[12px] font-normal text-[var(--text-secondary)]" htmlFor="phone">
-            Teléfono
-          </Label>
-          <Input id="phone" placeholder="+54 9 ..." {...form.register('phone')} />
-          <p className="text-[12px] text-[var(--danger)]">{form.formState.errors.phone?.message}</p>
+          <div className="space-y-2">
+            <Label className="text-[12px] font-normal text-[var(--text-secondary)]" htmlFor="phone">
+              Telefono
+            </Label>
+            <Input
+              autoComplete="tel"
+              className={PROFILE_INPUT_CLASSNAME}
+              id="phone"
+              inputMode="tel"
+              placeholder="+54 9 ..."
+              {...form.register('phone')}
+            />
+            <p className="text-[12px] text-[var(--danger)]">{form.formState.errors.phone?.message}</p>
+          </div>
         </div>
 
         <div className="space-y-2">
           <Label className="text-[12px] font-normal text-[var(--text-secondary)]" htmlFor="email">
             Email
           </Label>
-          <Input disabled id="email" value={email} />
+          <Input className={PROFILE_INPUT_CLASSNAME} disabled id="email" value={email} />
+          <p className="text-[12px] text-[var(--text-secondary)]">
+            Tu email de acceso no se edita desde esta pantalla.
+          </p>
         </div>
 
         {form.formState.isDirty ? (
