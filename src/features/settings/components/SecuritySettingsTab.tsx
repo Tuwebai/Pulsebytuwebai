@@ -2,6 +2,7 @@ import { Lock } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { TabsContent } from '@/components/ui/tabs';
+import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import type { Dispatch, SetStateAction } from 'react';
 import { SettingsSectionCard } from './SettingsSectionCard';
 import { SettingsSaveActions } from './SettingsSaveActions';
@@ -28,6 +29,8 @@ export function SecuritySettingsTab({
   setSettings,
   onSave,
 }: SecuritySettingsTabProps) {
+  const prefersReducedMotion = useReducedMotionPreference();
+
   return (
     <TabsContent value="seguridad" className="space-y-6">
       <SettingsSectionCard
@@ -40,6 +43,7 @@ export function SecuritySettingsTab({
           <div className={sliderClassName}>
             <Label className={labelClassName}>Tiempo de sesión: {settings.session_timeout} minutos</Label>
             <Slider
+              className={prefersReducedMotion ? 'transition-none' : undefined}
               value={[settings.session_timeout]}
               onValueChange={(value) =>
                 setSettings((current) => ({ ...current, session_timeout: value[0] ?? current.session_timeout }))

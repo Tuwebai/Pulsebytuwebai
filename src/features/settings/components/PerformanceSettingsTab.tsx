@@ -2,6 +2,7 @@ import { Monitor } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { TabsContent } from '@/components/ui/tabs';
+import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import type { Dispatch, SetStateAction } from 'react';
 import { SettingsSectionCard } from './SettingsSectionCard';
 import { SettingsSaveActions } from './SettingsSaveActions';
@@ -27,6 +28,8 @@ export function PerformanceSettingsTab({
   setSettings,
   onSave,
 }: PerformanceSettingsTabProps) {
+  const prefersReducedMotion = useReducedMotionPreference();
+
   return (
     <TabsContent value="rendimiento" className="space-y-6">
       <SettingsSectionCard
@@ -54,6 +57,7 @@ export function PerformanceSettingsTab({
                 <p className={hintClassName}>{item.description}</p>
               </div>
               <Switch
+                className={prefersReducedMotion ? 'transition-none' : undefined}
                 checked={settings[item.key as keyof PerformanceSettings] as boolean}
                 onCheckedChange={(checked) => setSettings((current) => ({ ...current, [item.key]: checked }))}
               />

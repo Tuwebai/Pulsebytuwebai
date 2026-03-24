@@ -1,5 +1,6 @@
 import { Bell, Lock, Monitor, UserCircle2 } from 'lucide-react';
 import { TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import { cn } from '@/lib/utils';
 
 const triggerClassName =
@@ -13,6 +14,8 @@ const tabs = [
 ] as const;
 
 export function SettingsTabsNav() {
+  const prefersReducedMotion = useReducedMotionPreference();
+
   return (
     <TabsList
       className={cn(
@@ -20,7 +23,11 @@ export function SettingsTabsNav() {
       )}
     >
       {tabs.map(({ value, label, icon: Icon }) => (
-        <TabsTrigger key={value} value={value} className={triggerClassName}>
+        <TabsTrigger
+          key={value}
+          value={value}
+          className={cn(triggerClassName, prefersReducedMotion && 'transition-none hover:bg-transparent')}
+        >
           <span className="flex items-center justify-center gap-2">
             <Icon className="h-4 w-4" />
             <span>{label}</span>

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AccentIcon from '@/core/components/AccentIcon';
+import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 
 interface SettingsSectionCardProps {
   icon: ReactNode;
@@ -17,8 +18,13 @@ export function SettingsSectionCard({
   tone = 'signal',
   children,
 }: SettingsSectionCardProps) {
+  const prefersReducedMotion = useReducedMotionPreference();
+
   return (
-    <Card className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-[var(--shadow-card)]">
+    <Card
+      className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-[var(--shadow-card)]"
+      hover={!prefersReducedMotion}
+    >
       <CardHeader className="space-y-4">
         <div className="flex items-start gap-4">
           <AccentIcon tone={tone}>{icon}</AccentIcon>
