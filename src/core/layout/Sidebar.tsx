@@ -34,7 +34,7 @@ export default function Sidebar() {
   const displayEmail = profile?.email || user?.email;
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-[240px] shrink-0 flex-col overflow-hidden border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] md:flex">
+    <aside className="sticky top-0 hidden h-screen w-[240px] shrink-0 flex-col overflow-hidden border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] md:flex" data-tour="shell-sidebar">
       <div className="h-0.5 w-full bg-[var(--gradient-brand)]" />
 
       <div className="px-5 py-6">
@@ -72,6 +72,7 @@ export default function Sidebar() {
                       'border-l-2 border-[var(--signal)] bg-[var(--signal-glow)] pl-[10px] text-[var(--signal)]'
                   )
                 }
+                data-tour={`shell-nav-${label.toLowerCase().replace(/\s+/g, '-')}`}
                 to={to}
               >
                 <Icon size={18} strokeWidth={1.5} />
@@ -85,7 +86,7 @@ export default function Sidebar() {
       <div className="flex-1" />
 
       <div className="border-t border-[var(--border-subtle)] px-3 py-4">
-        <NavLink className="flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-[var(--bg-elevated)]" to="/dashboard/perfil">
+        <NavLink className="flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-[var(--bg-elevated)]" data-tour="shell-profile-entry" to="/dashboard/perfil">
           <Avatar className="h-10 w-10 ring-0">
             <AvatarImage alt={displayName || displayEmail || 'Usuario Pulse'} src={displayAvatar} />
             <AvatarFallback className="bg-[var(--bg-elevated)] text-[var(--text-primary)]">

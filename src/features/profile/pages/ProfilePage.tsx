@@ -46,15 +46,16 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[880px] flex-col gap-4 px-4 py-4 md:px-6 md:py-6">
-      <header className="space-y-1">
+    <div className="mx-auto flex w-full max-w-[880px] flex-col gap-4 px-4 py-4 md:px-6 md:py-6" data-tour="profile-root">
+      <header className="space-y-1" data-tour="profile-header">
         <h1 className="text-[22px] font-medium text-[var(--text-primary)]">Mi Perfil</h1>
         <p className="text-[13px] text-[var(--text-secondary)]">
           Gestiona tu informacion personal y la identidad de tu negocio dentro de Pulse.
         </p>
       </header>
 
-      <ProfileAvatarCard
+      <div data-tour="profile-avatar-card">
+        <ProfileAvatarCard
         email={profile.email}
         fullName={profile.full_name}
         isUploading={isUploading}
@@ -74,9 +75,10 @@ export default function ProfilePage() {
             });
           }
         }}
-      />
+        />
+      </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-4" data-tour="profile-tabs">
         <ProfileTabsNav />
 
         <TabsContent value="datos" className="mt-0">

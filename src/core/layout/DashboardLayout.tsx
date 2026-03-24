@@ -1,6 +1,10 @@
 import { useEffect, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
+import { useApp } from '@/contexts/AppContext';
+import { ProductTourOverlay } from '@/features/product-tour/components/ProductTourOverlay';
+import { useProductTour } from '@/features/product-tour/hooks/useProductTour';
+import { PRODUCT_TOUR_STEPS } from '@/features/product-tour/services/productTour.service';
 import { useLocation } from 'react-router-dom';
 import BottomNav from './BottomNav';
 import Header from './Header';
@@ -12,7 +16,18 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
+  const { user } = useApp();
   const prefersReducedMotion = useReducedMotionPreference();
+  const {
+    currentStep,
+    currentStepNumber,
+    dismiss,
+    goNext,
+    goPrevious,
+    isOpen,
+    isDismissed,
+    isCompleted,
+  } = useProductTour({ userId: user?.id });
 
   useEffect(() => {
     const previousBodyOverflow = document.body.style.overflow;
@@ -60,6 +75,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       <BottomNav />
+
+      {!isDismissed && !isCompleted ? (
+        <ProductTourOverlay
+          currentStep={currentStep}
+          currentStepNumber={currentStepNumber}
+          onDismiss={dismiss}
+          onNext={goNext}
+          onPrevious={goPrevious}
+          open={isOpen}
+          stepCount={PRODUCT_TOUR_STEPS.length}
+        />
+      ) : null}
     </div>
   );
 }

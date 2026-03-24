@@ -37,7 +37,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="flex h-16 items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-base)] px-4 md:px-8">
+      <header className="flex h-16 items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-base)] px-4 md:px-8" data-tour="shell-header">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 md:hidden">
             <PulseLogo size={24} variant="night" />
@@ -56,6 +56,7 @@ export default function Header() {
           <button
             aria-label="Abrir notificaciones"
             className="relative rounded-full p-2 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
+            data-tour="shell-notifications"
             type="button"
             onClick={() => setPanelOpen(true)}
           >
@@ -67,7 +68,9 @@ export default function Header() {
             ) : null}
           </button>
 
-          <AvatarMenu onLogout={logout} onOpenNotifications={() => setPanelOpen(true)} user={user} />
+          <div data-tour="shell-avatar-menu">
+            <AvatarMenu onLogout={logout} onOpenNotifications={() => setPanelOpen(true)} user={user} />
+          </div>
         </div>
       </header>
 

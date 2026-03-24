@@ -53,7 +53,7 @@ const Configuracion = React.memo(() => {
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)]">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-5 md:p-6">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-5 md:p-6" data-tour="settings-root">
         <motion.div initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
           <SettingsPageHeader projectsCount={getUserProjects().length} />
         </motion.div>
@@ -63,7 +63,7 @@ const Configuracion = React.memo(() => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.08 }}
         >
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6" data-tour="settings-tabs">
             <SettingsTabsNav />
 
             <GeneralSettingsTab user={user} projectsCount={getUserProjects().length} />
