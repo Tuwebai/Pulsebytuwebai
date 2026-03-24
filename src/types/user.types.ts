@@ -1,4 +1,4 @@
-// Tipos de usuario para el Dashboard TuWebAI
+// Tipos de usuario para el Pulse By TuWebAI
 
 export interface User {
   id: string;
@@ -7,10 +7,10 @@ export interface User {
   role: 'admin' | 'user';
   created_at: string;
   updated_at: string;
-  
-  // Avatar del usuario - Estandarizado a avatar_url
+
+  // Avatar del usuario
   avatar_url?: string;
-  
+
   // Perfil extendido
   phone?: string;
   company?: string;
@@ -18,22 +18,9 @@ export interface User {
   bio?: string;
   location?: string;
   website?: string;
-  
-  // Configuración general
-  language?: string;
-  timezone?: string;
-  dateFormat?: string;
-  timeFormat?: string;
-  
-  // Privacidad
-  profileVisibility?: string;
-  showEmail?: boolean;
-  showPhone?: boolean;
-  allowAnalytics?: boolean;
-  allowCookies?: boolean;
+
+  // Seguridad y experiencia del cliente
   twoFactorAuth?: boolean;
-  
-  // Notificaciones
   pushNotifications?: boolean;
   emailNotifications?: boolean;
   smsNotifications?: boolean;
@@ -46,29 +33,17 @@ export interface User {
   paymentReminders?: boolean;
   supportUpdates?: boolean;
   marketingEmails?: boolean;
-  
-  // Rendimiento
-  autoSave?: boolean;
-  autoSaveInterval?: number;
-  cacheEnabled?: boolean;
-  imageQuality?: string;
   animationsEnabled?: boolean;
   lowBandwidthMode?: boolean;
-  
-  // Seguridad
   sessionTimeout?: number;
-  maxLoginAttempts?: number;
-  requirePasswordChange?: boolean;
-  passwordExpiryDays?: number;
   loginNotifications?: boolean;
   deviceManagement?: boolean;
-  
+
   // Timestamps
   lastLogin?: string;
   last_login?: string;
 }
 
-// Tipos para creación y actualización de usuarios
 export interface CreateUserData {
   email: string;
   full_name?: string;
@@ -91,11 +66,8 @@ export interface UpdateUserData {
   location?: string;
   website?: string;
   avatar_url?: string;
-  language?: string;
-  timezone?: string;
 }
 
-// Tipos para autenticación
 export interface AuthUser {
   id: string;
   email: string;
@@ -109,7 +81,6 @@ export interface AuthUser {
   };
 }
 
-// Tipos para roles y permisos
 export interface UserRole {
   id: string;
   name: string;
@@ -125,7 +96,6 @@ export interface UserPermission {
   description?: string;
 }
 
-// Tipos para sesiones
 export interface UserSession {
   id: string;
   userId: string;
@@ -139,7 +109,6 @@ export interface UserSession {
   isActive: boolean;
 }
 
-// Tipos para auditoría
 export interface UserAuditLog {
   id: string;
   userId: string;
