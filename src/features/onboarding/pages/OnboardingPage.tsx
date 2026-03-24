@@ -12,22 +12,41 @@ export default function OnboardingPage() {
   const { domain, fullName, saveDomain, complete, submitting } = usePulseOnboarding();
   const [step, setStep] = useState(1);
   const [siteUrl, setSiteUrl] = useState(domain);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const dots = useMemo(() => [1, 2, 3], []);
+  const hasDomainInput = siteUrl.trim().length > 0;
 
   const handleContinueToReady = async () => {
-    await saveDomain(siteUrl);
+    setErrorMessage(null);
+
+    try {
+      if (hasDomainInput) {
+        await saveDomain(siteUrl);
+      }
+
+      setStep(3);
+    } catch (error) {
+      console.error('Error al guardar el sitio en onboarding:', error);
+      setErrorMessage('No pudimos guardar tu sitio ahora. Podés intentarlo de nuevo o hacerlo después desde Configuración.');
+    }
+  };
+
+  const handleSkipDomain = () => {
+    setErrorMessage(null);
     setStep(3);
   };
 
   const handleFinish = async () => {
+    setErrorMessage(null);
+
     try {
       await complete();
-    } catch (error) {
-      console.error('Error al completar onboarding:', error);
-    } finally {
       await refreshData();
       navigate('/dashboard');
+    } catch (error) {
+      console.error('Error al completar onboarding:', error);
+      setErrorMessage('No pudimos terminar tu bienvenida ahora. Probá otra vez en unos segundos.');
     }
   };
 
@@ -43,6 +62,12 @@ export default function OnboardingPage() {
           ))}
         </div>
 
+        {errorMessage ? (
+          <div className="mt-6 rounded-2xl border border-[var(--danger)]/30 bg-[var(--danger)]/10 px-4 py-3 text-sm text-[var(--text-primary)]">
+            {errorMessage}
+          </div>
+        ) : null}
+
         {step === 1 ? (
           <div className="mt-10 flex flex-col items-center text-center">
             <PulseLogo animated size={76} variant="night" />
@@ -50,7 +75,7 @@ export default function OnboardingPage() {
               Bienvenido a Pulse, {fullName || 'cliente'}
             </h1>
             <p className="mt-4 max-w-lg text-[14px] text-[var(--text-secondary)]">
-              Acá vas a ver en tiempo real cómo está rindiendo tu web.
+              En pocos segundos vas a tener listo tu espacio para seguir cómo rinde tu web y tu proyecto en un solo lugar.
             </p>
             <Button
               className="mt-8 rounded-[10px] bg-[var(--signal)] px-6 text-white hover:bg-[var(--signal-dim)]"
@@ -65,7 +90,7 @@ export default function OnboardingPage() {
           <div className="mt-10 text-center">
             <h1 className="text-[24px] font-medium text-[var(--text-primary)]">¿Cuál es la URL de tu sitio?</h1>
             <p className="mt-3 text-[14px] text-[var(--text-secondary)]">
-              La usamos para conectar los datos de visitas.
+              Podés cargarla ahora para dejarla vinculada o hacerlo después desde Configuración.
             </p>
 
             <div className="mx-auto mt-8 max-w-md">
@@ -84,14 +109,14 @@ export default function OnboardingPage() {
                 disabled={submitting}
                 onClick={handleContinueToReady}
               >
-                Continuar →
+                {hasDomainInput ? 'Guardar y continuar →' : 'Continuar →'}
               </Button>
               <button
                 className="text-sm text-[var(--text-secondary)] underline underline-offset-4"
-                onClick={() => setStep(3)}
+                onClick={handleSkipDomain}
                 type="button"
               >
-                Completar después
+                Omitir por ahora
               </button>
             </div>
           </div>
@@ -120,9 +145,11 @@ export default function OnboardingPage() {
               </svg>
             </div>
 
-            <h1 className="mt-8 text-[24px] font-normal text-[var(--text-primary)]">¡Tu dashboard está listo!</h1>
+            <h1 className="mt-8 text-[24px] font-normal text-[var(--text-primary)]">Ya podés entrar a Pulse</h1>
             <p className="mt-3 max-w-md text-[14px] text-[var(--text-secondary)]">
-              En las próximas horas van a aparecer los datos de tu web.
+              {hasDomainInput
+                ? 'Tu sitio ya quedó registrado. Cuando los datos estén conectados, vas a empezar a ver movimiento acá.'
+                : 'Ya podés empezar a usar Pulse. Si después querés sumar tu sitio, lo podés hacer desde Configuración.'}
             </p>
 
             <Button
