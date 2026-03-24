@@ -30,8 +30,24 @@ const ITEMS: Array<{
   }
 ];
 
-export function NotificationSettingsSection() {
-  const { prefs, isLoading, updatePreference, isSaving } = useNotificationPreferences();
+interface NotificationSettingsSectionProps {
+  prefs?: NotificationPreferences;
+  isLoading?: boolean;
+  isSaving?: boolean;
+  updatePreference?: (nextPrefs: Partial<NotificationPreferences>) => void;
+}
+
+export function NotificationSettingsSection({
+  prefs: providedPrefs,
+  isLoading: providedIsLoading,
+  isSaving: providedIsSaving,
+  updatePreference: providedUpdatePreference,
+}: NotificationSettingsSectionProps = {}) {
+  const notificationPreferences = useNotificationPreferences();
+  const prefs = providedPrefs ?? notificationPreferences.prefs;
+  const isLoading = providedIsLoading ?? notificationPreferences.isLoading;
+  const isSaving = providedIsSaving ?? notificationPreferences.isSaving;
+  const updatePreference = providedUpdatePreference ?? notificationPreferences.updatePreference;
 
   return (
     <div className="space-y-4">

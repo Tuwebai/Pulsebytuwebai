@@ -1,17 +1,15 @@
 import { useApp } from '@/contexts/AppContext';
 import type { AppContextType } from '@/contexts/AppContext';
 import React, { useEffect } from 'react';
-import { Bell } from 'lucide-react';
 import { motion } from '@/components/OptimizedMotion';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
-import { NotificationSettingsSection } from '@/features/notifications/components/NotificationSettingsSection';
+import { Tabs } from '@/components/ui/tabs';
 import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 import {
   GeneralSettingsTab,
   PerformanceSettingsTab,
   SecuritySettingsTab,
+  SettingsNotificationsTab,
   SettingsPageHeader,
-  SettingsSectionCard,
   SettingsTabsNav,
 } from '@/features/settings/components';
 import { useClientSettings } from '@/features/settings/hooks/useClientSettings';
@@ -76,19 +74,7 @@ const Configuracion = React.memo(() => {
               onSave={handleSavePerformanceSettings}
             />
 
-            <TabsContent value="notificaciones" className="space-y-6">
-              <SettingsSectionCard
-                icon={<Bell className="h-5 w-5" />}
-                title="Notificaciones"
-                description="Elegi que novedades queres recibir de Pulse y del seguimiento de tu proyecto."
-                tone="signal"
-              >
-                <NotificationSettingsSection />
-                <p className="border-t border-[var(--border-subtle)] pt-5 text-[12px] text-[var(--text-secondary)]">
-                  Estos cambios se guardan al instante para que no tengas que confirmarlos manualmente.
-                </p>
-              </SettingsSectionCard>
-            </TabsContent>
+            <SettingsNotificationsTab />
 
             <SecuritySettingsTab
               dirty={securityDirty}
