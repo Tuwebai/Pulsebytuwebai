@@ -31,7 +31,7 @@ export function PerformanceSettingsTab({
   const prefersReducedMotion = useReducedMotionPreference();
 
   return (
-    <TabsContent value="rendimiento" className="space-y-6">
+    <TabsContent value="rendimiento" className="space-y-6" data-tour="settings-panel-rendimiento">
       <SettingsSectionCard
         icon={<Monitor className="h-5 w-5" />}
         title="Experiencia"

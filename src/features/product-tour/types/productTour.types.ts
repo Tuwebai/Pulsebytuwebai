@@ -9,6 +9,7 @@ export interface ProductTourStep {
   scope: ProductTourScope;
   route: ProductTourRoute;
   target: string;
+  tabValue?: string;
   title: string;
   description: string;
   placement?: ProductTourPlacement;

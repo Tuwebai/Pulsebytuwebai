@@ -27,6 +27,7 @@ export function ProfileTabsNav() {
             key={value}
             value={value}
             className={cn(triggerClassName, prefersReducedMotion && 'transition-none hover:bg-transparent')}
+            data-tour={`profile-tab-${value}`}
           >
             <span className="flex items-center justify-center gap-2">
               <Icon className="h-4 w-4" />

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useApp } from '@/contexts/AppContext';
 import { PulseFeedbackState } from '@/core/components';
@@ -10,6 +11,8 @@ import { DangerZone } from '@/features/profile/components/DangerZone';
 import { useAvatarUpload } from '@/features/profile/hooks/useAvatarUpload';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import { useUpdateProfile } from '@/features/profile/hooks/useUpdateProfile';
+import { PRODUCT_TOUR_STEP_CHANGE_EVENT } from '@/features/product-tour/services/productTour.service';
+import type { ProductTourStep } from '@/features/product-tour/types/productTour.types';
 import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 import { toast } from '@/hooks/use-toast';
 
@@ -19,6 +22,24 @@ export default function ProfilePage() {
   const { upload, isUploading } = useAvatarUpload();
   const { save, isSaving } = useUpdateProfile();
   const [activeTab, setActiveTab] = useSessionStorageState(`pulse:perfil:${user?.id ?? 'anon'}:active-tab`, 'datos');
+
+  useEffect(() => {
+    const handleTourStepChange = (event: Event) => {
+      const step = (event as CustomEvent<ProductTourStep | null>).detail;
+
+      if (!step || step.scope !== 'profile' || !step.tabValue) {
+        return;
+      }
+
+      setActiveTab(step.tabValue);
+    };
+
+    window.addEventListener(PRODUCT_TOUR_STEP_CHANGE_EVENT, handleTourStepChange);
+
+    return () => {
+      window.removeEventListener(PRODUCT_TOUR_STEP_CHANGE_EVENT, handleTourStepChange);
+    };
+  }, [setActiveTab]);
 
   if (isLoading || !user) {
     return (
@@ -81,19 +102,19 @@ export default function ProfilePage() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-4" data-tour="profile-tabs">
         <ProfileTabsNav />
 
-        <TabsContent value="datos" className="mt-0">
+        <TabsContent value="datos" className="mt-0" data-tour="profile-panel-datos">
           <PersonalDataForm email={profile.email} isSaving={isSaving} profile={profile} save={save} />
         </TabsContent>
 
-        <TabsContent value="negocio" className="mt-0">
+        <TabsContent value="negocio" className="mt-0" data-tour="profile-panel-negocio">
           <BusinessDataForm isSaving={isSaving} profile={profile} save={save} website={user.website} />
         </TabsContent>
 
-        <TabsContent value="seguridad" className="mt-0">
+        <TabsContent value="seguridad" className="mt-0" data-tour="profile-panel-seguridad">
           <SecuritySection />
         </TabsContent>
 
-        <TabsContent value="cuenta" className="mt-0">
+        <TabsContent value="cuenta" className="mt-0" data-tour="profile-panel-cuenta">
           <DangerZone />
         </TabsContent>
       </Tabs>

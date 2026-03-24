@@ -32,7 +32,7 @@ export function SecuritySettingsTab({
   const prefersReducedMotion = useReducedMotionPreference();
 
   return (
-    <TabsContent value="seguridad" className="space-y-6">
+    <TabsContent value="seguridad" className="space-y-6" data-tour="settings-panel-seguridad">
       <SettingsSectionCard
         icon={<Lock className="h-5 w-5" />}
         title="Seguridad"

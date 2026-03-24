@@ -8,7 +8,7 @@ export function SettingsNotificationsTab() {
   const { prefs, isLoading, isSaving, statusLabel, updatePreference } = useSettingsNotifications();
 
   return (
-    <TabsContent value="notificaciones" className="space-y-6">
+    <TabsContent value="notificaciones" className="space-y-6" data-tour="settings-panel-notificaciones">
       <SettingsSectionCard
         icon={<Bell className="h-5 w-5" />}
         title="Notificaciones"

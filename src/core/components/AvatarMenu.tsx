@@ -1,4 +1,4 @@
-import { Bell, LogOut, Settings } from 'lucide-react';
+import { Bell, Compass, LogOut, UserCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -73,7 +73,7 @@ export default function AvatarMenu({ onOpenNotifications, onLogout, user }: Avat
           className="cursor-pointer rounded-[10px] px-3 py-2 text-[13px] text-[var(--text-primary)] transition-colors duration-150 ease-out focus:bg-[var(--bg-subtle)] focus:text-[var(--text-primary)]"
           onSelect={() => navigate('/dashboard/perfil')}
         >
-          <Settings className="mr-2 h-4 w-4 text-[var(--text-secondary)]" strokeWidth={1.5} />
+          <UserCircle2 className="mr-2 h-4 w-4 text-[var(--text-secondary)]" strokeWidth={1.5} />
           Mi perfil
         </DropdownMenuItem>
 
@@ -84,7 +84,7 @@ export default function AvatarMenu({ onOpenNotifications, onLogout, user }: Avat
             window.dispatchEvent(new CustomEvent(PRODUCT_TOUR_OPEN_EVENT, { detail: DEFAULT_PRODUCT_TOUR_SCOPE }));
           }}
         >
-          <Bell className="mr-2 h-4 w-4 text-[var(--signal)]" strokeWidth={1.5} />
+          <Compass className="mr-2 h-4 w-4 text-[var(--signal)]" strokeWidth={1.5} />
           Ver recorrido de Pulse
         </DropdownMenuItem>
 

@@ -29,11 +29,11 @@ export function GeneralSettingsTab({ user, projectsCount }: GeneralSettingsTabPr
   ];
 
   return (
-    <TabsContent value="general" className="space-y-6">
+    <TabsContent value="general" className="space-y-6" data-tour="settings-panel-general">
       <SettingsSectionCard
         icon={<UserCircle2 className="h-5 w-5" />}
         title="Cuenta"
-        description="Revisa la identidad principal con la que usás Pulse y el estado general de tu acceso."
+        description="Revisá la identidad principal con la que usás Pulse y el estado general de tu acceso."
         tone="signal"
       >
         <div className="rounded-[20px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-5 py-5">

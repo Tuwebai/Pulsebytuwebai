@@ -7,6 +7,7 @@ import {
   getProductTourScopeFromPath,
   getProductTourSteps,
   PRODUCT_TOUR_OPEN_EVENT,
+  PRODUCT_TOUR_STEP_CHANGE_EVENT,
   readProductTourState,
   shouldAutoOpenProductTour,
 } from '@/features/product-tour/services/productTour.service';
@@ -58,6 +59,10 @@ export function useProductTour({ userId }: UseProductTourOptions) {
 
     navigate(currentStep.route);
   }, [currentStep, isOpen, location.pathname, navigate]);
+
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent(PRODUCT_TOUR_STEP_CHANGE_EVENT, { detail: isOpen ? currentStep : null }));
+  }, [currentStep, isOpen]);
 
   useEffect(() => {
     const handleManualOpen = (event: Event) => {
