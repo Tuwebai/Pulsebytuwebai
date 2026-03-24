@@ -1,5 +1,6 @@
 import React from 'react';
 import { Slot } from '@radix-ui/react-slot';
+import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import { cn } from '@/lib/utils';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -26,6 +27,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     children, 
     ...props 
   }, ref) => {
+    const prefersReducedMotion = useReducedMotionPreference();
     const Comp = asChild ? Slot : 'button';
     const baseStyles = "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 relative overflow-hidden";
     
@@ -55,6 +57,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           variants[variant],
           sizes[size],
           widthStyles,
+          prefersReducedMotion && "transition-none active:scale-100",
           className
         )}
         disabled={disabled || loading}
@@ -77,7 +80,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
         {/* Ripple Effect */}
         <div className="absolute inset-0 -z-10 overflow-hidden rounded-lg">
-          <div className="absolute inset-0 bg-white/20 scale-0 transition-transform duration-300 group-hover:scale-100" />
+          <div
+            className={cn(
+              "absolute inset-0 bg-white/20 scale-0 transition-transform duration-300 group-hover:scale-100",
+              prefersReducedMotion && "hidden",
+            )}
+          />
         </div>
       </Comp>
     );

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import { cn } from '@/lib/utils';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -18,6 +19,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     children, 
     ...props 
   }, ref) => {
+    const prefersReducedMotion = useReducedMotionPreference();
     const baseStyles = "rounded-xl border transition-all duration-300 relative overflow-hidden";
     
     const variants = {
@@ -35,7 +37,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       xl: "p-10"
     };
 
-    const hoverStyles = hover ? "hover:shadow-xl hover:-translate-y-1" : "";
+    const hoverStyles = hover && !prefersReducedMotion ? "hover:shadow-xl hover:-translate-y-1" : "";
     const interactiveStyles = interactive ? "cursor-pointer" : "";
 
     return (
@@ -46,13 +48,14 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           paddingStyles[padding],
           hoverStyles,
           interactiveStyles,
+          prefersReducedMotion && "transition-none",
           className
         )}
         ref={ref}
         {...props}
       >
         {/* Gradient Overlay for Hover Effect */}
-        {hover && (
+        {hover && !prefersReducedMotion && (
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none" />
         )}
         
@@ -62,7 +65,9 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         </div>
 
         {/* Subtle Border Glow */}
-        <div className="absolute inset-0 rounded-xl border border-primary/10 opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none" />
+        {!prefersReducedMotion ? (
+          <div className="absolute inset-0 rounded-xl border border-primary/10 opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none" />
+        ) : null}
       </div>
     );
   }
