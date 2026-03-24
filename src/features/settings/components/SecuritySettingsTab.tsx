@@ -1,6 +1,5 @@
 import { Lock } from 'lucide-react';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { TabsContent } from '@/components/ui/tabs';
 import type { Dispatch, SetStateAction } from 'react';
@@ -16,9 +15,9 @@ interface SecuritySettingsTabProps {
   onSave: () => Promise<void>;
 }
 
-const rowClassName =
-  'flex items-center justify-between gap-4 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-4 py-4';
 const sliderClassName = 'space-y-2 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-4 py-4';
+const noteClassName =
+  'rounded-[18px] border border-[var(--warning)] bg-[var(--warning-dim)] px-4 py-4 text-[13px] leading-6 text-[var(--text-primary)]';
 const labelClassName = 'text-[13px] font-medium text-[var(--text-primary)]';
 const hintClassName = 'text-[12px] text-[var(--text-secondary)]';
 
@@ -34,21 +33,10 @@ export function SecuritySettingsTab({
       <SettingsSectionCard
         icon={<Lock className="h-5 w-5" />}
         title="Seguridad"
-        description="Configura las protecciones de acceso que sí tienen sentido para vos como cliente de Pulse."
+        description="Controla el tiempo de sesión que querés mantener abierto en este dispositivo. Las protecciones avanzadas de acceso se administran en el login y con el equipo de TuWebAI."
         tone="danger"
       >
         <div className="space-y-4">
-          <div className={rowClassName}>
-            <div className="space-y-1">
-              <Label className={labelClassName}>Autenticación de dos factores</Label>
-              <p className={hintClassName}>Agrega una capa extra de protección al iniciar sesión.</p>
-            </div>
-            <Switch
-              checked={settings.two_factor_auth}
-              onCheckedChange={(checked) => setSettings((current) => ({ ...current, two_factor_auth: checked }))}
-            />
-          </div>
-
           <div className={sliderClassName}>
             <Label className={labelClassName}>Tiempo de sesión: {settings.session_timeout} minutos</Label>
             <Slider
@@ -60,32 +48,13 @@ export function SecuritySettingsTab({
               min={15}
               step={15}
             />
-            <p className={hintClassName}>Define cuánto tiempo puede quedar abierta tu sesión sin actividad.</p>
+            <p className={hintClassName}>Si no detectamos actividad dentro de Pulse, la sesión se cerrará automáticamente.</p>
           </div>
 
-          {[
-            {
-              key: 'login_notifications',
-              title: 'Notificaciones de login',
-              description: 'Recibe avisos cuando se detecta un nuevo ingreso a tu cuenta.',
-            },
-            {
-              key: 'device_management',
-              title: 'Gestión de dispositivos',
-              description: 'Permite revisar sesiones y dispositivos conectados a tu cuenta.',
-            },
-          ].map((item) => (
-            <div key={item.key} className={rowClassName}>
-              <div className="space-y-1">
-                <Label className={labelClassName}>{item.title}</Label>
-                <p className={hintClassName}>{item.description}</p>
-              </div>
-              <Switch
-                checked={settings[item.key as keyof SecuritySettings] as boolean}
-                onCheckedChange={(checked) => setSettings((current) => ({ ...current, [item.key]: checked }))}
-              />
-            </div>
-          ))}
+          <div className={noteClassName}>
+            Controles como 2FA, alertas de login y gestión de dispositivos no se muestran acá hasta tener enforcement real
+            en autenticación. Preferimos no prometer una protección que hoy todavía no existe de punta a punta.
+          </div>
         </div>
 
         <SettingsSaveActions dirty={dirty} loading={loading} onSave={onSave} />

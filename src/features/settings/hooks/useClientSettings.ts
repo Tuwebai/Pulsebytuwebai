@@ -18,20 +18,14 @@ export function useClientSettings() {
     low_bandwidth_mode: false,
   });
   const [securityBaseline, setSecurityBaseline] = useState<SecuritySettings>({
-    two_factor_auth: false,
     session_timeout: 30,
-    login_notifications: true,
-    device_management: true,
   });
   const [performanceSettings, setPerformanceSettings] = useState<PerformanceSettings>({
     animations_enabled: true,
     low_bandwidth_mode: false,
   });
   const [securitySettings, setSecuritySettings] = useState<SecuritySettings>({
-    two_factor_auth: false,
     session_timeout: 30,
-    login_notifications: true,
-    device_management: true,
   });
 
   useEffect(() => {
@@ -117,10 +111,7 @@ export function useClientSettings() {
     performanceSettings.low_bandwidth_mode !== performanceBaseline.low_bandwidth_mode;
 
   const securityDirty =
-    securitySettings.two_factor_auth !== securityBaseline.two_factor_auth ||
-    securitySettings.session_timeout !== securityBaseline.session_timeout ||
-    securitySettings.login_notifications !== securityBaseline.login_notifications ||
-    securitySettings.device_management !== securityBaseline.device_management;
+    securitySettings.session_timeout !== securityBaseline.session_timeout;
 
   return {
     loading,

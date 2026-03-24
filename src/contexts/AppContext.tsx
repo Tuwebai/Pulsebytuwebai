@@ -5,6 +5,7 @@ import type { AppContextType, Project, ProjectLog } from '@/contexts/appContext.
 import { defaultAppContext } from '@/contexts/appContext.default';
 import { useAppAuth } from '@/features/auth/hooks/useAppAuth';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
+import { useSessionTimeout } from '@/features/auth/hooks/useSessionTimeout';
 import { useAppProjects } from '@/features/project/hooks/useAppProjects';
 
 export type { AppContextType, Project, ProjectLog, User } from '@/contexts/appContext.types';
@@ -59,6 +60,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     signOut,
     signUpWithEmail,
     user
+  });
+
+  useSessionTimeout({
+    enabled: Boolean(isAuthenticated && user?.session_timeout),
+    onTimeout: authActions.logout,
+    timeoutMinutes: user?.session_timeout ?? 30,
   });
 
   const contextValue = useMemo(

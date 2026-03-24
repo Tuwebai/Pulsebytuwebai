@@ -96,9 +96,8 @@ export const exportUserData = (user: User, projects: Project[], format: 'csv' | 
     Configuracion: {
       Tema: getUserTheme(user),
       Sitio_Web: user.website || 'No especificado',
-      Seguridad_2FA: user.two_factor_auth ? 'Activada' : 'Desactivada',
-      Animaciones: user.animations_enabled !== false ? 'Activadas' : 'Desactivadas',
-      Modo_Bajo_Ancho_Banda: user.low_bandwidth_mode ? 'Activado' : 'Desactivado',
+        Animaciones: user.animations_enabled !== false ? 'Activadas' : 'Desactivadas',
+        Modo_Bajo_Ancho_Banda: user.low_bandwidth_mode ? 'Activado' : 'Desactivado',
       Notificaciones_Email: getUserEmailNotifications(user) ? 'Activadas' : 'Desactivadas',
       Notificaciones_Push: getUserPushNotifications(user) ? 'Activadas' : 'Desactivadas',
     },
@@ -273,16 +272,13 @@ export const exportUserSettings = (user: User, format: 'csv' | 'json' = 'csv') =
       Actualizaciones_Soporte: user.support_updates !== false ? 'Activadas' : 'Desactivadas',
       Emails_Marketing: user.marketing_emails ? 'Activados' : 'Desactivados',
     },
-    Experiencia: {
-      Animaciones: user.animations_enabled !== false ? 'Activadas' : 'Desactivadas',
-      Modo_Bajo_Ancho_Banda: user.low_bandwidth_mode ? 'Activado' : 'Desactivado',
-    },
-    Seguridad: {
-      Autenticacion_Dos_Factores: user.two_factor_auth ? 'Activada' : 'Desactivada',
-      Tiempo_Sesion: user.session_timeout || 30,
-      Notificaciones_Login: user.login_notifications !== false ? 'Activadas' : 'Desactivadas',
-      Gestion_Dispositivos: user.device_management !== false ? 'Activada' : 'Desactivada',
-    },
+      Experiencia: {
+        Animaciones: user.animations_enabled !== false ? 'Activadas' : 'Desactivadas',
+        Modo_Bajo_Ancho_Banda: user.low_bandwidth_mode ? 'Activado' : 'Desactivado',
+      },
+      Seguridad: {
+        Tiempo_Sesion: user.session_timeout || 30,
+      },
   };
 
   const filename = `configuracion_usuario_${user.email}_${new Date().toISOString().split('T')[0]}`;

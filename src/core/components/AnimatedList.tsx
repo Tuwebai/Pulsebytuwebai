@@ -1,4 +1,5 @@
 import { Children, cloneElement, isValidElement, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 
 export interface AnimatedListProps {
   children: ReactNode;
@@ -16,24 +17,12 @@ interface AnimatedRevealProps {
 }
 
 function useShouldReduceMotion(disabled = false) {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(disabled);
+  const reducedMotionPreference = useReducedMotionPreference();
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(disabled || reducedMotionPreference);
 
   useEffect(() => {
-    if (disabled || typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-      setPrefersReducedMotion(disabled);
-      return;
-    }
-
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const handleChange = () => setPrefersReducedMotion(mediaQuery.matches);
-
-    handleChange();
-    mediaQuery.addEventListener('change', handleChange);
-
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange);
-    };
-  }, [disabled]);
+    setPrefersReducedMotion(disabled || reducedMotionPreference);
+  }, [disabled, reducedMotionPreference]);
 
   return prefersReducedMotion;
 }

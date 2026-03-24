@@ -10,8 +10,5 @@ export interface PerformanceSettings {
 }
 
 export interface SecuritySettings {
-  two_factor_auth: boolean;
   session_timeout: number;
-  login_notifications: boolean;
-  device_management: boolean;
 }

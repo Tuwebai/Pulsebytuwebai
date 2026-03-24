@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { useCountUp } from '@/core/hooks/useCountUp';
+import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import { cn } from '@/lib/utils';
 import FadeIn from './FadeIn';
 import Skeleton from './Skeleton';
@@ -52,7 +52,7 @@ export default function MetricCard({
   onClick,
   className
 }: MetricCardProps) {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const prefersReducedMotion = useReducedMotionPreference();
   const isEmpty = value === null && !loading;
   const displayPeriod = isEmpty ? 'sin datos disponibles' : period;
   const clickable = typeof onClick === 'function';
@@ -62,27 +62,6 @@ export default function MetricCard({
     enabled: !prefersReducedMotion && !loading && typeof value === 'number',
   });
   const displayValue = typeof value === 'number' && !loading ? animatedValue : value;
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-      return;
-    }
-
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const syncPreference = () => {
-      setPrefersReducedMotion(mediaQuery.matches);
-    };
-
-    syncPreference();
-
-    if (typeof mediaQuery.addEventListener === 'function') {
-      mediaQuery.addEventListener('change', syncPreference);
-      return () => mediaQuery.removeEventListener('change', syncPreference);
-    }
-
-    mediaQuery.addListener(syncPreference);
-    return () => mediaQuery.removeListener(syncPreference);
-  }, []);
 
   return (
     <article

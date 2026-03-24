@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
-import { usePrefersReducedMotion } from '@/core/hooks/usePrefersReducedMotion';
+import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 
 interface FadeInProps {
   children: ReactNode;
@@ -8,7 +8,7 @@ interface FadeInProps {
 }
 
 export default function FadeIn({ children, className }: FadeInProps) {
-  const prefersReducedMotion = usePrefersReducedMotion();
+  const prefersReducedMotion = useReducedMotionPreference();
 
   if (prefersReducedMotion) {
     return <div className={className}>{children}</div>;

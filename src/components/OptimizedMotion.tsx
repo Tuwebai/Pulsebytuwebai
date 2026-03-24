@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 
 // =====================================================
 // COMPONENTES DE ANIMACIÓN OPTIMIZADOS SIN FRAMER MOTION
@@ -67,6 +68,7 @@ export const OptimizedMotion = React.memo(React.forwardRef<HTMLDivElement, Optim
   onAnimationComplete,
   ...props
 }, ref) => {
+  const prefersReducedMotion = useReducedMotionPreference();
   const [isVisible, setIsVisible] = useState(true); // SIEMPRE visible por defecto
   const [isHovered, setIsHovered] = useState(false);
   const [isTapped, setIsTapped] = useState(false);
@@ -77,11 +79,18 @@ export const OptimizedMotion = React.memo(React.forwardRef<HTMLDivElement, Optim
     delay = 0,
     ease = 'cubic-bezier(0.4, 0, 0.2, 1)'
   } = transition;
+  const effectiveDuration = prefersReducedMotion ? 0 : duration;
+  const effectiveDelay = prefersReducedMotion ? 0 : delay;
 
   // Manejar animación de entrada - SIEMPRE mostrar el componente
   useEffect(() => {
     // Por defecto, siempre mostrar el componente
     setIsVisible(true);
+
+    if (prefersReducedMotion) {
+      onAnimationComplete?.();
+      return;
+    }
     
     // Solo ocultar si explícitamente se solicita
     if (animate === 'hidden' || (typeof animate === 'object' && animate.opacity === 0)) {
@@ -89,7 +98,7 @@ export const OptimizedMotion = React.memo(React.forwardRef<HTMLDivElement, Optim
       // Ocultar después de la animación
       timeoutRef.current = setTimeout(() => {
         onAnimationComplete?.();
-      }, duration);
+      }, effectiveDuration);
     }
 
     return () => {
@@ -97,36 +106,40 @@ export const OptimizedMotion = React.memo(React.forwardRef<HTMLDivElement, Optim
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [animate, exit, duration, onAnimationComplete]);
+  }, [animate, exit, effectiveDuration, onAnimationComplete, prefersReducedMotion]);
 
   // Manejar hover
   const handleMouseEnter = useCallback(() => {
-    if (whileHover) {
+    if (!prefersReducedMotion && whileHover) {
       setIsHovered(true);
     }
-  }, [whileHover]);
+  }, [prefersReducedMotion, whileHover]);
 
   const handleMouseLeave = useCallback(() => {
-    if (whileHover) {
+    if (!prefersReducedMotion && whileHover) {
       setIsHovered(false);
     }
-  }, [whileHover]);
+  }, [prefersReducedMotion, whileHover]);
 
   // Manejar tap
   const handleMouseDown = useCallback(() => {
-    if (whileTap) {
+    if (!prefersReducedMotion && whileTap) {
       setIsTapped(true);
     }
-  }, [whileTap]);
+  }, [prefersReducedMotion, whileTap]);
 
   const handleMouseUp = useCallback(() => {
-    if (whileTap) {
+    if (!prefersReducedMotion && whileTap) {
       setTimeout(() => setIsTapped(false), 150);
     }
-  }, [whileTap]);
+  }, [prefersReducedMotion, whileTap]);
 
   // Calcular estilos de transformación
   const getTransformStyles = useCallback(() => {
+    if (prefersReducedMotion) {
+      return '';
+    }
+
     let transform = '';
     let scale = 1;
     let translateY = 0;
@@ -181,7 +194,7 @@ export const OptimizedMotion = React.memo(React.forwardRef<HTMLDivElement, Optim
     if (rotate !== 0) transform += `rotate(${rotate}deg) `;
 
     return transform.trim();
-  }, [isVisible, isHovered, isTapped, whileHover, whileTap, initial, animate]);
+  }, [prefersReducedMotion, isVisible, isHovered, isTapped, whileHover, whileTap, initial, animate]);
 
   // Calcular opacidad basada en initial, animate y visibilidad
   const getOpacity = useCallback(() => {
@@ -202,8 +215,8 @@ export const OptimizedMotion = React.memo(React.forwardRef<HTMLDivElement, Optim
 
   // SIEMPRE renderizar el componente, solo ocultar con CSS
   const animationStyles: React.CSSProperties = {
-    transition: `all ${duration}ms ${ease}`,
-    transitionDelay: `${delay}ms`,
+    transition: `all ${effectiveDuration}ms ${ease}`,
+    transitionDelay: `${effectiveDelay}ms`,
     opacity: getOpacity(),
     transform: getTransformStyles(),
     ...style,

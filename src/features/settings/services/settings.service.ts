@@ -11,10 +11,7 @@ export function getInitialPerformanceSettings(user: User): PerformanceSettings {
 
 export function getInitialSecuritySettings(user: User): SecuritySettings {
   return {
-    two_factor_auth: user.two_factor_auth || false,
     session_timeout: user.session_timeout || 30,
-    login_notifications: user.login_notifications !== false,
-    device_management: user.device_management !== false,
   };
 }
 

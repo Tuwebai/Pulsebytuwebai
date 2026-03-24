@@ -5,10 +5,7 @@ type ClientSettingsUpdates = Pick<
   User,
   | 'animations_enabled'
   | 'low_bandwidth_mode'
-  | 'two_factor_auth'
   | 'session_timeout'
-  | 'login_notifications'
-  | 'device_management'
 >;
 
 export async function updateClientSettings(userId: string, updates: Partial<ClientSettingsUpdates>): Promise<void> {
