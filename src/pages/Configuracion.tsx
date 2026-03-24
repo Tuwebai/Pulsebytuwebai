@@ -8,7 +8,6 @@ import { toast } from '@/hooks/use-toast';
 import { NotificationSettingsSection } from '@/features/notifications/components/NotificationSettingsSection';
 import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 import {
-  AdminSettingsTab,
   GeneralSettingsTab,
   PerformanceSettingsTab,
   SecuritySettingsTab,
@@ -16,16 +15,15 @@ import {
   SettingsSectionCard,
   SettingsTabsNav,
 } from '@/features/settings/components';
-import type {
-  PerformanceSettings,
-  SecuritySettings,
-  SystemSettings,
-} from '@/features/settings/components';
+import type { PerformanceSettings, SecuritySettings } from '@/features/settings/components';
 
 const Configuracion = React.memo(() => {
   const { user, updateUserSettings, getUserProjects } = useApp() as AppContextType;
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useSessionStorageState(`pulse:configuracion:${user?.id ?? 'anon'}:active-tab`, 'general');
+  const [activeTab, setActiveTab] = useSessionStorageState(
+    `pulse:configuracion:${user?.id ?? 'anon'}:active-tab`,
+    'general',
+  );
 
   const [performanceSettings, setPerformanceSettings] = useState<PerformanceSettings>({
     animations_enabled: true,
@@ -37,17 +35,6 @@ const Configuracion = React.memo(() => {
     session_timeout: 30,
     login_notifications: true,
     device_management: true,
-  });
-
-  const [systemSettings, setSystemSettings] = useState<SystemSettings>({
-    system_name: 'Pulse by TuWebAI',
-    system_timezone: 'UTC',
-    system_language: 'es',
-    maintenance_mode: false,
-    debug_mode: false,
-    log_level: 'info',
-    backup_frequency: 'daily',
-    auto_updates: true,
   });
 
   useEffect(() => {
@@ -69,7 +56,7 @@ const Configuracion = React.memo(() => {
   }, [user]);
 
   useEffect(() => {
-    if (activeTab === 'privacidad') {
+    if (activeTab === 'privacidad' || activeTab === 'admin') {
       setActiveTab('seguridad');
     }
   }, [activeTab, setActiveTab]);
@@ -117,20 +104,12 @@ const Configuracion = React.memo(() => {
       errorDescription: 'No se pudieron guardar los cambios de seguridad.',
     });
 
-  const handleSaveSystemSettings = () =>
-    runSettingsSave({
-      request: new Promise((resolve) => setTimeout(resolve, 1000)),
-      successTitle: 'Configuracion del sistema guardada',
-      successDescription: 'Los cambios del sistema se guardaron correctamente.',
-      errorDescription: 'No se pudieron guardar los cambios del sistema.',
-    });
-
   if (!user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)]">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-[var(--signal)]" />
-          <p className="mt-4 text-[14px] text-[var(--text-secondary)]">Cargando configuración...</p>
+          <p className="mt-4 text-[14px] text-[var(--text-secondary)]">Cargando configuracion...</p>
         </div>
       </div>
     );
@@ -143,14 +122,15 @@ const Configuracion = React.memo(() => {
           <SettingsPageHeader projectsCount={getUserProjects().length} />
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.08 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.08 }}
+        >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
-            <SettingsTabsNav isAdmin={user?.role === 'admin'} />
+            <SettingsTabsNav />
 
-            <GeneralSettingsTab
-              user={user}
-              projectsCount={getUserProjects().length}
-            />
+            <GeneralSettingsTab user={user} projectsCount={getUserProjects().length} />
 
             <PerformanceSettingsTab
               loading={loading}
@@ -163,7 +143,7 @@ const Configuracion = React.memo(() => {
               <SettingsSectionCard
                 icon={<Bell className="h-5 w-5" />}
                 title="Notificaciones"
-                description="Elegí que novedades querés recibir de Pulse y del seguimiento de tu proyecto."
+                description="Elegi que novedades queres recibir de Pulse y del seguimiento de tu proyecto."
                 tone="signal"
               >
                 <NotificationSettingsSection />
@@ -179,16 +159,6 @@ const Configuracion = React.memo(() => {
               setSettings={setSecuritySettings}
               onSave={handleSaveSecuritySettings}
             />
-
-            {user?.role === 'admin' ? (
-              <AdminSettingsTab
-                loading={loading}
-                settings={systemSettings}
-                setSettings={setSystemSettings}
-                onSave={handleSaveSystemSettings}
-              />
-            ) : null}
-
           </Tabs>
         </motion.div>
       </div>

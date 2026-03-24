@@ -1,11 +1,6 @@
-import { Bell, Cog, Lock, Monitor, UserCircle2 } from 'lucide-react';
+import { Bell, Lock, Monitor, UserCircle2 } from 'lucide-react';
 import { TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import type { SettingsTabValue } from './settings.types';
-
-interface SettingsTabsNavProps {
-  isAdmin: boolean;
-}
 
 const triggerClassName =
   'rounded-[14px] border border-transparent px-3 py-3 text-[13px] font-medium text-[var(--text-secondary)] transition-colors duration-150 data-[state=active]:border-[var(--signal-border)] data-[state=active]:bg-[var(--bg-elevated)] data-[state=active]:text-[var(--text-primary)] data-[state=active]:shadow-[0_0_0_1px_var(--signal-glow)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]';
@@ -15,18 +10,13 @@ const tabs = [
   { value: 'rendimiento', label: 'Experiencia', icon: Monitor },
   { value: 'notificaciones', label: 'Notificaciones', icon: Bell },
   { value: 'seguridad', label: 'Seguridad', icon: Lock },
-] satisfies Array<{
-  value: Exclude<SettingsTabValue, 'admin'>;
-  label: string;
-  icon: typeof UserCircle2;
-}>;
+] as const;
 
-export function SettingsTabsNav({ isAdmin }: SettingsTabsNavProps) {
+export function SettingsTabsNav() {
   return (
     <TabsList
       className={cn(
-        'grid h-auto w-full gap-2 rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-2',
-        isAdmin ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5' : 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-4',
+        'grid h-auto w-full grid-cols-2 gap-2 rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-2 sm:grid-cols-2 lg:grid-cols-4',
       )}
     >
       {tabs.map(({ value, label, icon: Icon }) => (
@@ -37,14 +27,6 @@ export function SettingsTabsNav({ isAdmin }: SettingsTabsNavProps) {
           </span>
         </TabsTrigger>
       ))}
-      {isAdmin ? (
-        <TabsTrigger value="admin" className={triggerClassName}>
-          <span className="flex items-center justify-center gap-2">
-            <Cog className="h-4 w-4" />
-            <span>Admin</span>
-          </span>
-        </TabsTrigger>
-      ) : null}
     </TabsList>
   );
 }

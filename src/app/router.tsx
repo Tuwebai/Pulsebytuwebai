@@ -250,6 +250,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/admin/configuracion"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <Navigate replace to={{ pathname: '/admin', hash: '#settings' }} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/admin/websy-ai"
         element={
           <ProtectedRoute requiredRole="admin">
