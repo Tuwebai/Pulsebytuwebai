@@ -12,7 +12,7 @@ export function SettingsNotificationsTab() {
       <SettingsSectionCard
         icon={<Bell className="h-5 w-5" />}
         title="Notificaciones"
-        description="Elegi que novedades queres recibir de Pulse y del seguimiento de tu proyecto."
+        description="Elegí qué novedades querés recibir de Pulse y del seguimiento de tu proyecto."
         tone="signal"
       >
         <div data-tour="settings-notifications-controls">
@@ -32,7 +32,7 @@ export function SettingsNotificationsTab() {
             ) : (
               <CheckCircle2 className="h-3.5 w-3.5 text-[var(--success)]" />
             )}
-            <span>{isSaving ? 'Guardando' : 'Guardado automatico'}</span>
+            <span>{isSaving ? 'Guardando' : 'Guardado automático'}</span>
           </div>
         </div>
       </SettingsSectionCard>

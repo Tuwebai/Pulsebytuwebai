@@ -50,7 +50,7 @@ export default function PulseChart({ data, loading = false, height = 180 }: Puls
     return (
       <FadeIn>
         <div className="flex items-center justify-center text-[12px] italic text-[var(--text-tertiary)]" style={{ height }}>
-          No hay suficientes datos para mostrar el grafico.
+          No hay suficientes datos para mostrar el gráfico.
         </div>
       </FadeIn>
     );

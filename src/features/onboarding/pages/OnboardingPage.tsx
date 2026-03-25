@@ -33,7 +33,7 @@ export default function OnboardingPage() {
       setStep(3);
     } catch (error) {
       console.error('Error al guardar el sitio en onboarding:', error);
-      setErrorMessage('No pudimos guardar tu sitio ahora. Podes intentarlo de nuevo o hacerlo despues desde Configuracion.');
+      setErrorMessage('No pudimos guardar tu sitio ahora. Podés intentarlo de nuevo o hacerlo después desde Configuración.');
     }
   };
 
@@ -50,7 +50,7 @@ export default function OnboardingPage() {
       navigate('/dashboard', { replace: true });
     } catch (error) {
       console.error('Error al completar onboarding:', error);
-      setErrorMessage('No pudimos terminar tu bienvenida ahora. Proba otra vez en unos segundos.');
+      setErrorMessage('No pudimos terminar tu bienvenida ahora. Probá otra vez en unos segundos.');
     }
   };
 
@@ -89,7 +89,7 @@ export default function OnboardingPage() {
               Bienvenido a Pulse, {fullName || 'cliente'}
             </h1>
             <p className="mt-4 max-w-lg text-[14px] text-[var(--text-secondary)]">
-              En pocos segundos vas a tener listo tu espacio para seguir como rinde tu web y tu proyecto en un solo lugar.
+              En pocos segundos vas a tener listo tu espacio para seguir cómo rinde tu web y tu proyecto en un solo lugar.
             </p>
             <Button
               className="mt-8 rounded-[10px] bg-[var(--signal)] px-6 text-white hover:bg-[var(--signal-dim)]"
@@ -102,9 +102,9 @@ export default function OnboardingPage() {
 
         {step === 2 ? (
           <div className="mt-10 text-center">
-            <h1 className="text-[24px] font-medium text-[var(--text-primary)]">Cual es la URL de tu sitio?</h1>
+            <h1 className="text-[24px] font-medium text-[var(--text-primary)]">¿Cuál es la URL de tu sitio?</h1>
             <p className="mt-3 text-[14px] text-[var(--text-secondary)]">
-              Podes cargarla ahora para dejarla vinculada o hacerlo despues desde Configuracion.
+              Podés cargarla ahora para dejarla vinculada o hacerlo después desde Configuración.
             </p>
 
             <div className="mx-auto mt-8 max-w-md">
@@ -159,11 +159,11 @@ export default function OnboardingPage() {
               </svg>
             </div>
 
-            <h1 className="mt-8 text-[24px] font-normal text-[var(--text-primary)]">Ya podes entrar a Pulse</h1>
+            <h1 className="mt-8 text-[24px] font-normal text-[var(--text-primary)]">Ya podés entrar a Pulse</h1>
             <p className="mt-3 max-w-md text-[14px] text-[var(--text-secondary)]">
               {hasDomainInput
-                ? 'Tu sitio ya quedo registrado. Cuando los datos esten conectados, vas a empezar a ver movimiento aca.'
-                : 'Ya podes empezar a usar Pulse. Si despues queres sumar tu sitio, lo podes hacer desde Configuracion.'}
+                ? 'Tu sitio ya quedó registrado. Cuando los datos estén conectados, vas a empezar a ver movimiento acá.'
+                : 'Ya podés empezar a usar Pulse. Si después querés sumar tu sitio, lo podés hacer desde Configuración.'}
             </p>
 
             <Button

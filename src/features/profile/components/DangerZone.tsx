@@ -23,12 +23,12 @@ export function DangerZone() {
       await requestDeletion();
       toast({
         title: 'Solicitud enviada',
-        description: 'El equipo te contactara para continuar con la baja.',
+        description: 'El equipo te contactará para continuar con la baja.',
       });
     } catch (error) {
       toast({
         title: 'No pudimos enviar tu solicitud',
-        description: error instanceof Error ? error.message : 'Intentalo nuevamente.',
+        description: error instanceof Error ? error.message : 'Intentá nuevamente.',
         variant: 'destructive',
       });
     }
@@ -44,7 +44,7 @@ export function DangerZone() {
           <div className="min-w-0 flex-1">
             <h3 className="text-[14px] font-medium text-[var(--danger)]">Zona de peligro</h3>
             <p className="mt-2 text-[13px] leading-5 text-[var(--text-secondary)]">
-              Enviamos tu solicitud al equipo de TuWebAI. La cuenta no se elimina de forma automatica.
+              Enviamos tu solicitud al equipo de TuWebAI. La cuenta no se elimina de forma automática.
             </p>
           </div>
         </div>
@@ -62,7 +62,7 @@ export function DangerZone() {
           </AlertDialogTrigger>
           <AlertDialogContent className="border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-primary)]">
             <AlertDialogHeader>
-              <AlertDialogTitle>Quieres solicitar la baja de tu cuenta?</AlertDialogTitle>
+              <AlertDialogTitle>¿Querés solicitar la baja de tu cuenta?</AlertDialogTitle>
               <AlertDialogDescription className="text-[var(--text-secondary)]">
                 El equipo de TuWebAI va a revisar tu solicitud y te va a contactar.
               </AlertDialogDescription>
@@ -72,7 +72,7 @@ export function DangerZone() {
                 Cancelar
               </AlertDialogCancel>
               <AlertDialogAction className="bg-[var(--danger)] text-white hover:opacity-90" onClick={() => void handleRequestDeletion()}>
-                {isRequesting ? 'Enviando...' : 'Si, solicitar baja'}
+                {isRequesting ? 'Enviando...' : 'Sí, solicitar baja'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

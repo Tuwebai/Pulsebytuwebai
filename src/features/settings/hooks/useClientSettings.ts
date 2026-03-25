@@ -45,7 +45,7 @@ export function useClientSettings() {
       request,
       successDescription,
       errorDescription,
-      successTitle = 'Configuracion guardada',
+      successTitle = 'Configuración guardada',
     }: {
       request: Promise<void>;
       successDescription: string;

@@ -15,9 +15,9 @@ export function SettingsPageHeader({ projectsCount }: SettingsPageHeaderProps) {
           </AccentIcon>
           <div className="space-y-2">
             <div>
-              <h1 className="text-[24px] font-medium text-[var(--text-primary)]">Configuracion</h1>
+              <h1 className="text-[24px] font-medium text-[var(--text-primary)]">Configuración</h1>
               <p className="mt-1 max-w-2xl text-[13px] text-[var(--text-secondary)]">
-                Ajusta idioma, privacidad, rendimiento y seguridad de tu cuenta dentro de Pulse.
+                Revisá tu cuenta, experiencia, notificaciones y seguridad dentro de Pulse.
               </p>
             </div>
             <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-1.5 text-[12px] text-[var(--text-secondary)]">

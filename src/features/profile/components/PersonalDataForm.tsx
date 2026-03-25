@@ -51,7 +51,7 @@ export function PersonalDataForm({ email, isSaving, profile, save }: PersonalDat
     } catch (error) {
       toast({
         title: 'No pudimos guardar tus datos',
-        description: error instanceof Error ? error.message : 'Intentalo nuevamente.',
+        description: error instanceof Error ? error.message : 'Intentá nuevamente.',
         variant: 'destructive',
       });
     }
@@ -62,7 +62,7 @@ export function PersonalDataForm({ email, isSaving, profile, save }: PersonalDat
       <div className="mb-5">
         <h3 className="text-[18px] font-medium text-[var(--text-primary)]">Datos personales</h3>
         <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
-          Actualiza tu informacion de contacto para mantener tu cuenta al dia.
+          Actualizá tu información de contacto para mantener tu cuenta al día.
         </p>
       </div>
 
@@ -78,7 +78,7 @@ export function PersonalDataForm({ email, isSaving, profile, save }: PersonalDat
 
           <div className="space-y-2">
             <Label className="text-[12px] font-normal text-[var(--text-secondary)]" htmlFor="phone">
-              Telefono
+              Teléfono
             </Label>
             <Input
               autoComplete="tel"

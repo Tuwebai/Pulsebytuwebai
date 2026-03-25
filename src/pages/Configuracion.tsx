@@ -65,7 +65,7 @@ const Configuracion = React.memo(() => {
         className="min-h-screen bg-[var(--bg-base)] px-5"
         description="Estamos cargando tus preferencias y el estado actual de tu cuenta."
         surfaceClassName="max-w-[560px]"
-        title="Cargando configuracion"
+        title="Cargando configuración"
         variant="loading"
       />
     );

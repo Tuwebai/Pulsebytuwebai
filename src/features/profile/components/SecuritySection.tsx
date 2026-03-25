@@ -58,14 +58,14 @@ export function SecuritySection() {
         newPassword: values.newPassword,
       });
       toast({
-        title: 'Contrasena actualizada',
-        description: 'Tu acceso quedo actualizado correctamente.',
+        title: 'Contraseña actualizada',
+        description: 'Tu acceso quedó actualizado correctamente.',
       });
       form.reset();
     } catch (error) {
       toast({
-        title: 'No pudimos actualizar la contrasena',
-        description: error instanceof Error ? error.message : 'Intentalo nuevamente.',
+        title: 'No pudimos actualizar la contraseña',
+        description: error instanceof Error ? error.message : 'Intentá nuevamente.',
         variant: 'destructive',
       });
     }
@@ -79,7 +79,7 @@ export function SecuritySection() {
     } catch (error) {
       toast({
         title: 'No pudimos cerrar tus sesiones',
-        description: error instanceof Error ? error.message : 'Intentalo nuevamente.',
+        description: error instanceof Error ? error.message : 'Intentá nuevamente.',
         variant: 'destructive',
       });
     }
@@ -90,7 +90,7 @@ export function SecuritySection() {
       <div className="mb-5">
         <h3 className="text-[18px] font-medium text-[var(--text-primary)]">Seguridad</h3>
         <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
-          Administra tu contrasena y el cierre de sesiones activas.
+          Administrá tu contraseña y el cierre de sesiones activas.
         </p>
       </div>
 
@@ -102,7 +102,7 @@ export function SecuritySection() {
         >
           <div className="space-y-2">
             <Label className="text-[12px] font-normal text-[var(--text-secondary)]" htmlFor="currentPassword">
-              Contrasena actual
+              Contraseña actual
             </Label>
             <div className="relative">
               <Input
@@ -125,7 +125,7 @@ export function SecuritySection() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label className="text-[12px] font-normal text-[var(--text-secondary)]" htmlFor="newPassword">
-                Nueva contrasena
+                Nueva contraseña
               </Label>
               <div className="relative">
                 <Input
@@ -147,7 +147,7 @@ export function SecuritySection() {
 
             <div className="space-y-2">
               <Label className="text-[12px] font-normal text-[var(--text-secondary)]" htmlFor="confirmPassword">
-                Confirmar contrasena
+                Confirmar contraseña
               </Label>
               <div className="relative">
                 <Input
@@ -170,7 +170,7 @@ export function SecuritySection() {
 
           <Button disabled={isChanging} type="submit">
             <Save className="h-4 w-4" />
-            {isChanging ? 'Actualizando...' : 'Actualizar contrasena'}
+            {isChanging ? 'Actualizando...' : 'Actualizar contraseña'}
           </Button>
         </form>
 
@@ -182,7 +182,7 @@ export function SecuritySection() {
             <div className="min-w-0 flex-1">
               <p className="text-[14px] font-medium text-[var(--text-primary)]">Sesiones</p>
               <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">
-                Si sospechas que alguien entro a tu cuenta, puedes cerrar todas las sesiones y volver a iniciar desde cero.
+                Si sospechás que alguien entró a tu cuenta, podés cerrar todas las sesiones y volver a iniciar desde cero.
               </p>
             </div>
           </div>
@@ -197,9 +197,9 @@ export function SecuritySection() {
               </AlertDialogTrigger>
               <AlertDialogContent className="border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-primary)]">
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Estas seguro?</AlertDialogTitle>
+                  <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
                   <AlertDialogDescription className="text-[var(--text-secondary)]">
-                    Vas a cerrar todas las sesiones activas y seras redirigido al login.
+                    Vas a cerrar todas las sesiones activas y serás redirigido al login.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -210,7 +210,7 @@ export function SecuritySection() {
                     className="bg-[var(--signal)] text-white hover:opacity-90"
                     onClick={() => void handleSignOutAllDevices()}
                   >
-                    {isSigningOut ? 'Cerrando...' : 'Si, cerrar sesiones'}
+                    {isSigningOut ? 'Cerrando...' : 'Sí, cerrar sesiones'}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

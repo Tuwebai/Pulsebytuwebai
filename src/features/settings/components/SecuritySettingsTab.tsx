@@ -1,11 +1,11 @@
 import { Lock } from 'lucide-react';
+import type { Dispatch, SetStateAction } from 'react';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { TabsContent } from '@/components/ui/tabs';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
-import type { Dispatch, SetStateAction } from 'react';
-import { SettingsSectionCard } from './SettingsSectionCard';
 import { SettingsSaveActions } from './SettingsSaveActions';
+import { SettingsSectionCard } from './SettingsSectionCard';
 import type { SecuritySettings } from './settings.types';
 
 interface SecuritySettingsTabProps {
@@ -36,7 +36,7 @@ export function SecuritySettingsTab({
       <SettingsSectionCard
         icon={<Lock className="h-5 w-5" />}
         title="Seguridad"
-        description="Controla el tiempo de sesión que querés mantener abierto en este dispositivo. Las protecciones avanzadas de acceso se administran en el login y con el equipo de TuWebAI."
+        description="Controlá el tiempo de sesión que querés mantener abierto en este dispositivo. Las protecciones avanzadas de acceso se administran en el login y con el equipo de TuWebAI."
         tone="danger"
       >
         <div className="space-y-4" data-tour="settings-security-controls">

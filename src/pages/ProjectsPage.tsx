@@ -179,7 +179,7 @@ const ProjectsPage = React.memo(() => {
 
       toast({
         title: 'Proyecto eliminado',
-        description: 'El proyecto se elimino correctamente.',
+        description: 'El proyecto se eliminó correctamente.',
       });
 
       await refreshData();
@@ -222,7 +222,7 @@ const ProjectsPage = React.memo(() => {
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
             {userId
               ? 'Seguimiento del proyecto asignado a este cliente'
-              : 'Segui el estado y el progreso de tu entrega.'}
+              : 'Seguí el estado y el progreso de tu entrega.'}
           </p>
         </div>
 
@@ -248,9 +248,9 @@ const ProjectsPage = React.memo(() => {
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--bg-elevated)]">
             <FolderOpen className="h-8 w-8 text-[var(--text-tertiary)]" strokeWidth={1.5} />
           </div>
-          <h2 className="mt-5 text-lg font-medium text-[var(--text-primary)]">Todavia no hay proyecto visible</h2>
+          <h2 className="mt-5 text-lg font-medium text-[var(--text-primary)]">Todavía no hay proyecto visible</h2>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
-            Tu proyecto aparece aca cuando el equipo lo configura.
+            Tu proyecto aparece acá cuando el equipo lo configura.
           </p>
         </section>
       ) : (
@@ -286,12 +286,12 @@ const ProjectsPage = React.memo(() => {
       <ConfirmationDialog
         cancelText="Cancelar"
         confirmText="Eliminar"
-        description={`Estas seguro de que queres eliminar el proyecto "${projects.find((project) => project.id === projectToDelete)?.name || 'este proyecto'}"? Esta accion no se puede deshacer.`}
+        description={`¿Estás seguro de que querés eliminar el proyecto "${projects.find((project) => project.id === projectToDelete)?.name || 'este proyecto'}"? Esta acción no se puede deshacer.`}
         isOpen={showDeleteConfirm}
         loading={false}
         onClose={cancelDeleteProject}
         onConfirm={confirmDeleteProject}
-        title="Confirmar eliminacion"
+        title="Confirmar eliminación"
         variant="destructive"
       />
     </div>

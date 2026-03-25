@@ -56,7 +56,7 @@ export function BusinessDataForm({ isSaving, profile, save, website }: BusinessD
     } catch (error) {
       toast({
         title: 'No pudimos guardar tu negocio',
-        description: error instanceof Error ? error.message : 'Intentalo nuevamente.',
+        description: error instanceof Error ? error.message : 'Intentá nuevamente.',
         variant: 'destructive',
       });
     }

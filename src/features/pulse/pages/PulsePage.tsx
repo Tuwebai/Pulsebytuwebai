@@ -50,7 +50,7 @@ export default function PulsePage() {
 
       {!hasProject && !loading ? (
         <div className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-6 text-sm text-[var(--text-secondary)]">
-          Tu proyecto esta siendo configurado. Volve pronto.
+          Tu proyecto está siendo configurado. Volvé pronto.
         </div>
       ) : null}
 
@@ -59,7 +59,7 @@ export default function PulsePage() {
           <div className="flex items-start gap-3">
             <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--warning)]" />
             <div>
-              <p className="font-medium leading-5 text-[var(--text-primary)]">Conecta tu dominio para ver los datos reales.</p>
+              <p className="font-medium leading-5 text-[var(--text-primary)]">Conectá tu dominio para ver los datos reales.</p>
               <p className="mt-1 text-[13px] leading-5 text-[color:rgba(240,244,255,0.82)]">
                 Tu equipo de TuWebAI lo configura automáticamente al entregar tu proyecto.
               </p>

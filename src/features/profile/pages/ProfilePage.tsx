@@ -57,8 +57,8 @@ export default function ProfilePage() {
     return (
       <PulseFeedbackState
         className="max-w-[880px] px-4 py-6"
-        description="Proba recargando la pagina o volve a intentarlo en unos segundos."
-        primaryAction={{ label: 'Recargar pagina', onClick: () => window.location.reload() }}
+        description="Probá recargando la página o volvé a intentarlo en unos segundos."
+        primaryAction={{ label: 'Recargar página', onClick: () => window.location.reload() }}
         surfaceClassName="max-w-[560px]"
         title="No pudimos cargar tu perfil"
         variant="error"
@@ -71,7 +71,7 @@ export default function ProfilePage() {
       <header className="space-y-1" data-tour="profile-header">
         <h1 className="text-[22px] font-medium text-[var(--text-primary)]">Mi Perfil</h1>
         <p className="text-[13px] text-[var(--text-secondary)]">
-          Gestiona tu informacion personal y la identidad de tu negocio dentro de Pulse.
+          Gestioná tu información personal y la identidad de tu negocio dentro de Pulse.
         </p>
       </header>
 
@@ -91,7 +91,7 @@ export default function ProfilePage() {
           } catch (uploadError) {
             toast({
               title: 'No pudimos subir tu avatar',
-              description: uploadError instanceof Error ? uploadError.message : 'Intentalo nuevamente.',
+              description: uploadError instanceof Error ? uploadError.message : 'Intentá nuevamente.',
               variant: 'destructive',
             });
           }
