@@ -33,7 +33,7 @@ const Facturacion = React.memo(() => {
       setLoading(false);
     }, 5000);
 
-    const unsubscribe = getUserPayments(user.email, (payments) => {
+    const unsubscribe = getUserPayments(user.id, user.email, (payments) => {
       try {
         setPagos(payments || []);
         setError(null);
@@ -100,7 +100,7 @@ const Facturacion = React.memo(() => {
       setError('Tiempo de espera agotado. Verifica tu conexión e inténtalo de nuevo.');
     }, 5000);
 
-    const unsubscribe = getUserPayments(user.email, (payments) => {
+    const unsubscribe = getUserPayments(user.id, user.email, (payments) => {
       try {
         setPagos(payments || []);
         setError(null);

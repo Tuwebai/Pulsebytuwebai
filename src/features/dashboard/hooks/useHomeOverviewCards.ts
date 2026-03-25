@@ -94,7 +94,7 @@ export function useHomeOverviewCards(user: User | null, primaryProject: Project 
 
     setSecondaryLoading(true);
 
-    const unsubscribe = getUserPayments(user.email, (payments) => {
+    const unsubscribe = getUserPayments(user.id, user.email, (payments) => {
       const normalizedPayments = payments
         .map((payment) => normalizePayment(payment as unknown as Record<string, unknown>))
         .sort((a, b) => {
@@ -111,7 +111,7 @@ export function useHomeOverviewCards(user: User | null, primaryProject: Project 
     return () => {
       unsubscribe();
     };
-  }, [user?.email]);
+  }, [user?.email, user?.id]);
 
   useEffect(() => {
     if (!user?.id) {
