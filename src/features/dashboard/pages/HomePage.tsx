@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Badge, PulseEmptyState, Skeleton } from '@/core/components';
 import AnimatedList, { AnimatedReveal } from '@/core/components/AnimatedList';
 import { useApp } from '@/contexts/AppContext';
+import { useHomeOverviewCards } from '@/features/dashboard/hooks/useHomeOverviewCards';
 import { useUserProject } from '@/features/project/hooks/useUserProject';
 import PulseChart from '@/features/pulse/components/PulseChart';
 import { usePulseMetrics } from '@/features/pulse/hooks/usePulseMetrics';
 import { usePulsePeriod } from '@/features/pulse/hooks/usePulsePeriod';
 import { usePulseRealtime } from '@/features/pulse/hooks/usePulseRealtime';
+import { formatCurrency } from '@/lib/mercadopago';
 
 function getProjectStatusVariant(status?: string | null): 'signal' | 'success' | 'default' {
   if (!status) {
@@ -41,14 +43,48 @@ function getProjectStatusLabel(status?: string | null): string {
   return 'Mantenimiento';
 }
 
+function getPaymentBadgeVariant(status?: string | null): 'signal' | 'success' | 'default' {
+  if (!status) {
+    return 'default';
+  }
+
+  if (status === 'approved' || status === 'paid' || status === 'completed') {
+    return 'success';
+  }
+
+  if (status === 'pending' || status === 'in_process') {
+    return 'signal';
+  }
+
+  return 'default';
+}
+
+function getPaymentBadgeLabel(status?: string | null): string {
+  if (!status) {
+    return 'Sin pagos';
+  }
+
+  if (status === 'approved' || status === 'paid' || status === 'completed') {
+    return 'Aprobado';
+  }
+
+  if (status === 'pending' || status === 'in_process') {
+    return 'Pendiente';
+  }
+
+  return 'Registrado';
+}
+
 export default function HomePage() {
   const navigate = useNavigate();
-  const { authReady, getUserProjects, isAuthenticated } = useApp();
+  const { authReady, getUserProjects, isAuthenticated, user } = useApp();
   const projects = getUserProjects();
-  const primaryProject = projects[0];
+  const primaryProject = projects[0] ?? null;
   const { period } = usePulsePeriod();
   const { projectId, domain, loading: projectLoading, projectsReady } = useUserProject();
   const { data, isLoading } = usePulseMetrics(projectId, period);
+  const { latestPayment, openTickets, paymentsCount, remainingTasks, secondaryLoading, ticketsCount } =
+    useHomeOverviewCards(user, primaryProject);
 
   usePulseRealtime(projectId);
 
@@ -57,6 +93,21 @@ export default function HomePage() {
   const hasProject = Boolean(projectId);
   const hasDomain = Boolean(domain);
   const canOpenSite = Boolean(domain);
+  const projectProgress = Math.max(0, Math.min(primaryProject?.completion_percentage ?? primaryProject?.progress ?? 0, 100));
+  const projectSummary = !hasProject
+    ? 'Tu proyecto va a aparecer aca cuando quede asignado en Pulse.'
+    : remainingTasks === null
+      ? 'Todavia no hay tareas visibles para mostrarte en este modulo.'
+      : remainingTasks === 0
+        ? 'No hay tareas pendientes por ahora.'
+        : `${remainingTasks} ${remainingTasks === 1 ? 'tarea pendiente' : 'tareas pendientes'}`;
+  const paymentSummary = latestPayment
+    ? `${latestPayment.description ?? 'Pago registrado'} · ${formatCurrency(latestPayment.amount ?? 0, latestPayment.currency ?? 'ARS')}`
+    : 'Todavia no registramos pagos en tu cuenta.';
+  const supportSummary =
+    ticketsCount > 0
+      ? `${openTickets} ${openTickets === 1 ? 'ticket abierto' : 'tickets abiertos'} para revisar con el equipo.`
+      : 'Cuando necesites ayuda, vas a poder escribirnos desde aca.';
 
   return (
     <div className="space-y-6">
@@ -68,9 +119,9 @@ export default function HomePage() {
       >
         {!hasProject && !loading ? (
           <div className="space-y-3">
-            <h2 className="text-2xl font-medium text-[var(--text-primary)]">Tu proyecto se está configurando.</h2>
+            <h2 className="text-2xl font-medium text-[var(--text-primary)]">Tu proyecto se esta configurando.</h2>
             <p className="max-w-2xl text-sm text-[var(--text-secondary)]">
-              Apenas tu equipo termine la configuración inicial, vas a ver acá el rendimiento real de tu web.
+              Apenas tu equipo termine la configuracion inicial, vas a ver aca el rendimiento real de tu web.
             </p>
           </div>
         ) : !hasDomain || !data?.hasData ? (
@@ -86,7 +137,7 @@ export default function HomePage() {
                 className="self-start rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs text-[var(--text-tertiary)]"
                 type="button"
               >
-                Este mes ▼
+                Este mes
               </button>
             </div>
 
@@ -97,11 +148,7 @@ export default function HomePage() {
                 </div>
                 <p className="text-[13px] text-[var(--text-secondary)]">visitas</p>
                 <p className="text-[13px] font-medium text-[var(--success)]">
-                  {loading
-                    ? '...'
-                    : data.visitsDelta !== null
-                      ? `▲ ${data.visitsDelta}% vs período anterior`
-                      : 'Sin comparativa disponible'}
+                  {loading ? '...' : data.visitsDelta !== null ? `+${data.visitsDelta}% vs periodo anterior` : 'Sin comparativa disponible'}
                 </p>
               </div>
 
@@ -111,11 +158,7 @@ export default function HomePage() {
                 </div>
                 <p className="text-[13px] text-[var(--text-secondary)]">consultas recibidas</p>
                 <p className="text-[13px] font-medium text-[var(--success)]">
-                  {loading
-                    ? '...'
-                    : data.contactsDelta !== null
-                      ? `▲ ${data.contactsDelta}% vs período anterior`
-                      : 'Sin comparativa disponible'}
+                  {loading ? '...' : data.contactsDelta !== null ? `+${data.contactsDelta}% vs periodo anterior` : 'Sin comparativa disponible'}
                 </p>
               </div>
             </div>
@@ -123,7 +166,7 @@ export default function HomePage() {
             <div className="space-y-3">
               <PulseChart data={data?.chartData ?? []} height={80} loading={loading || !projectId} />
               <div className="flex flex-wrap items-center justify-between gap-3 text-[12px] text-[var(--text-tertiary)]">
-                <span>Visitas por día</span>
+                <span>Visitas por dia</span>
                 <button
                   className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={!canOpenSite}
@@ -136,7 +179,7 @@ export default function HomePage() {
                   }}
                   type="button"
                 >
-                  Ver mi sitio ↗
+                  Ver mi sitio
                 </button>
               </div>
             </div>
@@ -153,15 +196,15 @@ export default function HomePage() {
         >
           <div className="flex items-start justify-between gap-3">
             <FolderOpen className="text-[var(--signal)]" size={20} strokeWidth={1.5} />
-            <Badge variant={getProjectStatusVariant(primaryProject?.status)} size="sm">
-              {getProjectStatusLabel(primaryProject?.status)}
+            <Badge variant={hasProject ? getProjectStatusVariant(primaryProject?.status) : 'default'} size="sm">
+              {hasProject ? getProjectStatusLabel(primaryProject?.status) : 'Sin proyecto'}
             </Badge>
           </div>
           <h3 className="mt-4 text-base font-medium text-[var(--text-primary)]">Mi Proyecto</h3>
           <div className="mt-4 h-2 rounded-full bg-[var(--bg-subtle)]">
-            <div className="h-2 w-[85%] rounded-full bg-[var(--signal)]" />
+            <div className="h-2 rounded-full bg-[var(--signal)]" style={{ width: `${projectProgress}%` }} />
           </div>
-          <p className="mt-3 text-sm text-[var(--text-secondary)]">Quedan 2 tareas para la entrega</p>
+          <p className="mt-3 text-sm text-[var(--text-secondary)]">{projectSummary}</p>
           <p className="mt-4 text-sm text-[var(--signal)]">Ver proyecto →</p>
         </button>
 
@@ -173,13 +216,13 @@ export default function HomePage() {
         >
           <div className="flex items-start justify-between gap-3">
             <CreditCard className="text-[var(--success)]" size={20} strokeWidth={1.5} />
-            <Badge size="sm" variant="success">
-              Al día
+            <Badge size="sm" variant={getPaymentBadgeVariant(latestPayment?.status)}>
+              {secondaryLoading ? 'Cargando' : getPaymentBadgeLabel(latestPayment?.status)}
             </Badge>
           </div>
           <h3 className="mt-4 text-base font-medium text-[var(--text-primary)]">Pagos</h3>
-          <p className="mt-3 text-sm text-[var(--text-secondary)]">Web Comercial · $780.000 ARS</p>
-          <p className="mt-4 text-sm text-[var(--success)]">Ver historial →</p>
+          <p className="mt-3 text-sm text-[var(--text-secondary)]">{secondaryLoading ? 'Cargando pagos...' : paymentSummary}</p>
+          <p className="mt-4 text-sm text-[var(--success)]">{paymentsCount > 0 ? 'Ver pagos →' : 'Ir a pagos →'}</p>
         </button>
 
         <button
@@ -191,11 +234,11 @@ export default function HomePage() {
           <div className="flex items-start justify-between gap-3">
             <LifeBuoy className="text-[var(--text-secondary)]" size={20} strokeWidth={1.5} />
             <Badge size="sm" variant="default">
-              0 tickets abiertos
+              {secondaryLoading ? 'Cargando' : `${openTickets} ${openTickets === 1 ? 'ticket abierto' : 'tickets abiertos'}`}
             </Badge>
           </div>
           <h3 className="mt-4 text-base font-medium text-[var(--text-primary)]">Soporte</h3>
-          <p className="mt-3 text-sm text-[var(--text-secondary)]">Tu equipo de TuWebAI sigue disponible.</p>
+          <p className="mt-3 text-sm text-[var(--text-secondary)]">{secondaryLoading ? 'Cargando soporte...' : supportSummary}</p>
           <p className="mt-4 text-sm text-[var(--signal)]">Abrir ticket →</p>
         </button>
       </AnimatedList>
