@@ -4,6 +4,12 @@ import { useApp } from '@/contexts/AppContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { toast } from '@/hooks/use-toast';
+import { AdminUserDomainReviewDialog } from '@/features/admin/components/AdminUserDomainReviewDialog';
+import {
+  DEFAULT_ADMIN_SECTION,
+  getAdminSectionFromHash,
+  type AdminSectionId,
+} from '@/features/admin/constants/adminSections';
 import { enablePulseAccess } from '@/features/admin/services/pulseAccessAdminService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -71,7 +77,7 @@ const Admin = React.memo(() => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const [activeSection, setActiveSection] = useState('dashboard');
+  const [activeSection, setActiveSection] = useState<AdminSectionId>(DEFAULT_ADMIN_SECTION);
   const [recentMessages, setRecentMessages] = useState<any[]>([]);
   const [systemMetrics, setSystemMetrics] = useState<any>({});
   const [userBehavior, setUserBehavior] = useState<any[]>([]);
@@ -293,8 +299,7 @@ const Admin = React.memo(() => {
     }
 
     const handleHashChange = () => {
-      const hash = window.location.hash.slice(1);
-      setActiveSection(hash || 'dashboard');
+      setActiveSection(getAdminSectionFromHash(window.location.hash));
     };
 
     handleHashChange();
@@ -314,8 +319,7 @@ const Admin = React.memo(() => {
     if (!user || user.role !== 'admin') return;
 
     const handleHashChange = () => {
-      const hash = window.location.hash.slice(1);
-      setActiveSection(hash || 'dashboard');
+      setActiveSection(getAdminSectionFromHash(window.location.hash));
     };
 
     // Establecer la sección inicial
@@ -1250,6 +1254,29 @@ const Admin = React.memo(() => {
                                       <UserCheck size={14} className="mr-1" />
                                       {enablingPulseUserId === usuario.id ? 'Habilitando...' : 'Permitir acceso a Pulse'}
                                     </Button>
+                                  ) : null}
+                                  {usuario.role !== 'admin' ? (
+                                    <AdminUserDomainReviewDialog
+                                      user={usuario}
+                                      onUpdated={(result) => {
+                                        setUsuarios(prev =>
+                                          prev.map(currentUser =>
+                                            currentUser.id === usuario.id
+                                              ? {
+                                                  ...currentUser,
+                                                  website: result.website,
+                                                  website_status: result.website_status,
+                                                  website_submitted_at: result.website_submitted_at,
+                                                  website_reviewed_at: result.website_reviewed_at,
+                                                  website_reviewed_by: result.website_reviewed_by,
+                                                  website_review_notes: result.website_review_notes,
+                                                  updated_at: new Date().toISOString()
+                                                }
+                                              : currentUser
+                                          )
+                                        );
+                                      }}
+                                    />
                                   ) : null}
                                   <Button 
                                     variant="outline" 
