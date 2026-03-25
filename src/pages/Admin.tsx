@@ -10,6 +10,7 @@ import {
   getAdminSectionFromHash,
   type AdminSectionId,
 } from '@/features/admin/constants/adminSections';
+import { getAdminDashboardData } from '@/features/admin/services/adminDashboardService';
 import { enablePulseAccess } from '@/features/admin/services/pulseAccessAdminService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -78,9 +79,6 @@ const Admin = React.memo(() => {
   const location = useLocation();
   
   const [activeSection, setActiveSection] = useState<AdminSectionId>(DEFAULT_ADMIN_SECTION);
-  const [recentMessages, setRecentMessages] = useState<any[]>([]);
-  const [systemMetrics, setSystemMetrics] = useState<any>({});
-  const [userBehavior, setUserBehavior] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [proyectos, setProyectos] = useState<any[]>([]);
@@ -115,164 +113,24 @@ const Admin = React.memo(() => {
   } = useGoogleCalendar(user);
 
   // Cargar datos desde Supabase
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      
-      // Cargar usuarios con información adicional
-      const { data: usersData, error: usersError } = await supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (usersError) {
-        console.error('❌ Error cargando usuarios:', usersError);
-        throw usersError;
-      }
-      
-      setUsuarios(usersData || []);
 
-      // Cargar proyectos con información detallada
-      const { data: projectsData, error: projectsError } = await supabase
-        .from('projects')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (projectsError) {
-        console.error('❌ Error cargando proyectos:', projectsError);
-        throw projectsError;
-      }
-      setProyectos(projectsData || []);
+      const dashboardData = await getAdminDashboardData();
 
-      // Cargar tickets
-      const { data: ticketsData, error: ticketsError } = await supabase
-        .from('tickets')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (ticketsError) {
-        console.error('❌ Error cargando tickets:', ticketsError);
-        throw ticketsError;
-      }
-      
-      // Cargar información de usuarios para los tickets
-      const userIds = [...new Set((ticketsData || []).map(ticket => ticket.user_id).filter(Boolean))];
-      let usersMap = new Map();
-      
-      if (userIds.length > 0) {
-        const { data: usersData } = await supabase
-          .from('users')
-          .select('id, full_name, email, role')
-          .in('id', userIds);
-        
-        if (usersData) {
-          usersMap = new Map(usersData.map(user => [user.id, user]));
-        }
-      }
-
-      // Transformar tickets para el componente TicketAnalysis
-      const transformedTickets = (ticketsData || []).map(ticket => {
-        const user = usersMap.get(ticket.user_id);
-        return {
-          id: ticket.id,
-          title: ticket.title || 'Sin título',
-          description: ticket.description || 'Sin descripción',
-          priority: ticket.priority || 5,
-          urgency: ticket.urgency || 'low',
-          status: ticket.status || 'open',
-          createdAt: ticket.created_at,
-          customer: user ? {
-            name: user.full_name || 'Usuario desconocido',
-            email: user.email || '',
-            tier: user.role || 'cliente'
-          } : {
-            name: 'Usuario desconocido',
-            email: '',
-            tier: 'cliente'
-          },
-          category: ticket.category || 'general',
-          tags: ticket.tags || [],
-          user_id: ticket.user_id
-        };
-      });
-      
-      setTickets(transformedTickets);
-
-      // Cargar pagos con información financiera
-      const { data: paymentsData, error: paymentsError } = await supabase
-        .from('payments')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (paymentsError) {
-        console.error('❌ Error cargando pagos:', paymentsError);
-        throw paymentsError;
-      }
-      setPagos(paymentsData || []);
-
-      // Cargar datos para inteligencia contextual
-      await loadIntelligenceData();
-
+      setUsuarios(dashboardData.users);
+      setProyectos(dashboardData.projects);
+      setTickets(dashboardData.tickets);
+      setPagos(dashboardData.payments);
     } catch (error) {
-        console.error('Error fatal cargando datos del admin:', error);
+      console.error('Error fatal cargando datos del admin:', error);
       toast({ title: 'Error', description: 'No se pudieron cargar los datos.', variant: 'destructive' });
     } finally {
       setLoading(false);
       setLastUpdate(new Date());
     }
-  };
-
-  // Cargar datos para inteligencia contextual
-  const loadIntelligenceData = async () => {
-    try {
-      // Cargar mensajes recientes de chat (usando tickets como ejemplo)
-      const { data: messagesData } = await supabase
-        .from('tickets')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(20);
-      
-      // Transformar tickets a formato de mensajes para el análisis
-      const transformedMessages = (messagesData || []).map(ticket => ({
-        id: ticket.id,
-        content: ticket.description || ticket.title || 'Sin contenido',
-        context: `Ticket: ${ticket.title}`,
-        created_at: ticket.created_at,
-        isAI: false
-      }));
-      
-      setRecentMessages(transformedMessages);
-
-      // Cargar métricas del sistema
-      const systemMetricsData = {
-        totalUsers: usuarios.length,
-        activeProjects: proyectos.filter(p => p.status === 'en_progress').length,
-        completedProjects: proyectos.filter(p => p.status === 'completed').length,
-        openTickets: tickets.filter(t => t.status === 'open').length,
-        resolvedTickets: tickets.filter(t => t.status === 'resolved').length,
-        totalRevenue: pagos.reduce((sum, p) => sum + (p.amount || 0), 0),
-        averageResponseTime: 2.5, // horas
-        customerSatisfaction: 4.2 // de 5
-      };
-      
-      setSystemMetrics(systemMetricsData);
-
-      // Cargar comportamiento de usuarios (simulado)
-      const userBehaviorData = usuarios.map(user => ({
-        userId: user.id,
-        loginCount: Math.floor(Math.random() * 50) + 1,
-        lastActivity: user.last_sign_in_at,
-        projectCount: proyectos.filter(p => p.user_id === user.id).length,
-        ticketCount: tickets.filter(t => t.user_id === user.id).length,
-        avgSessionDuration: Math.floor(Math.random() * 30) + 5 // minutos
-      }));
-      
-      setUserBehavior(userBehaviorData);
-
-    } catch (error) {
-      console.error('Error cargando datos de inteligencia:', error);
-    }
-  };
+  }, []);
 
   // Función para actualizar datos en tiempo real
   const refreshData = async () => {
@@ -314,26 +172,7 @@ const Admin = React.memo(() => {
     };
   }, [user, navigate, initialDataLoaded, location.pathname]);
 
-  // useEffect adicional para manejar cambios de hash después del montaje
-  useEffect(() => {
-    if (!user || user.role !== 'admin') return;
-
-    const handleHashChange = () => {
-      setActiveSection(getAdminSectionFromHash(window.location.hash));
-    };
-
-    // Establecer la sección inicial
-    handleHashChange();
-
-    // Agregar listener para cambios de hash
-    window.addEventListener('hashchange', handleHashChange);
-
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-    };
-  }, [user]);
-
-  // MÉTRICAS AVANZADAS
+  // MÃ‰TRICAS AVANZADAS
   const usuariosActivos = usuarios.length;
   const usuariosNuevos = usuarios.filter(u => {
     const userDate = new Date(u.created_at);
@@ -1698,3 +1537,4 @@ const Admin = React.memo(() => {
 Admin.displayName = 'Admin';
 
 export default Admin;
+
