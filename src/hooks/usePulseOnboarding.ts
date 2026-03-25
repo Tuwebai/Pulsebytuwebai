@@ -14,7 +14,7 @@ interface PulseOnboardingState {
 }
 
 export function usePulseOnboarding(): PulseOnboardingState {
-  const { user, refreshData } = useApp();
+  const { user, refreshData, updateUserSettings } = useApp();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [domain, setDomain] = useState('');
@@ -55,6 +55,7 @@ export function usePulseOnboarding(): PulseOnboardingState {
         const result = await onboardingService.saveDomain(user.id, value);
         if (result.saved) {
           setDomain(result.normalizedDomain);
+          await updateUserSettings({ website: result.normalizedDomain });
           await refreshData();
         }
         return result;
@@ -62,7 +63,7 @@ export function usePulseOnboarding(): PulseOnboardingState {
         setSubmitting(false);
       }
     },
-    [refreshData, user?.id]
+    [refreshData, updateUserSettings, user?.id]
   );
 
   const complete = useCallback(async () => {
@@ -73,13 +74,18 @@ export function usePulseOnboarding(): PulseOnboardingState {
     setSubmitting(true);
 
     try {
+      const completedAt = new Date().toISOString();
       await onboardingService.complete(user.id);
       setCompleted(true);
+      await updateUserSettings({
+        onboarding_completed: true,
+        onboarding_completed_at: completedAt,
+      });
       await refreshData();
     } finally {
       setSubmitting(false);
     }
-  }, [refreshData, user?.id]);
+  }, [refreshData, updateUserSettings, user?.id]);
 
   return {
     loading,

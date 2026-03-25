@@ -1,15 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PulseLogo } from '@/core/components';
-import { useApp } from '@/contexts/AppContext';
 import { usePulseOnboarding } from '@/hooks/usePulseOnboarding';
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
-  const { refreshData } = useApp();
-  const { domain, fullName, saveDomain, complete, submitting } = usePulseOnboarding();
+  const { complete, domain, fullName, loading, saveDomain, submitting } = usePulseOnboarding();
   const [step, setStep] = useState(1);
   const [siteUrl, setSiteUrl] = useState(domain);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -17,18 +15,25 @@ export default function OnboardingPage() {
   const dots = useMemo(() => [1, 2, 3], []);
   const hasDomainInput = siteUrl.trim().length > 0;
 
+  useEffect(() => {
+    if (!siteUrl.trim() && domain) {
+      setSiteUrl(domain);
+    }
+  }, [domain, siteUrl]);
+
   const handleContinueToReady = async () => {
+    if (!hasDomainInput) {
+      return;
+    }
+
     setErrorMessage(null);
 
     try {
-      if (hasDomainInput) {
-        await saveDomain(siteUrl);
-      }
-
+      await saveDomain(siteUrl);
       setStep(3);
     } catch (error) {
       console.error('Error al guardar el sitio en onboarding:', error);
-      setErrorMessage('No pudimos guardar tu sitio ahora. Podés intentarlo de nuevo o hacerlo después desde Configuración.');
+      setErrorMessage('No pudimos guardar tu sitio ahora. Podes intentarlo de nuevo o hacerlo despues desde Configuracion.');
     }
   };
 
@@ -42,13 +47,22 @@ export default function OnboardingPage() {
 
     try {
       await complete();
-      await refreshData();
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } catch (error) {
       console.error('Error al completar onboarding:', error);
-      setErrorMessage('No pudimos terminar tu bienvenida ahora. Probá otra vez en unos segundos.');
+      setErrorMessage('No pudimos terminar tu bienvenida ahora. Proba otra vez en unos segundos.');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)] px-4 py-10">
+        <div className="w-full max-w-2xl rounded-[28px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-8 text-center shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+          <p className="text-[14px] text-[var(--text-secondary)]">Estamos preparando tu bienvenida en Pulse.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)] px-4 py-10">
@@ -75,22 +89,22 @@ export default function OnboardingPage() {
               Bienvenido a Pulse, {fullName || 'cliente'}
             </h1>
             <p className="mt-4 max-w-lg text-[14px] text-[var(--text-secondary)]">
-              En pocos segundos vas a tener listo tu espacio para seguir cómo rinde tu web y tu proyecto en un solo lugar.
+              En pocos segundos vas a tener listo tu espacio para seguir como rinde tu web y tu proyecto en un solo lugar.
             </p>
             <Button
               className="mt-8 rounded-[10px] bg-[var(--signal)] px-6 text-white hover:bg-[var(--signal-dim)]"
               onClick={() => setStep(2)}
             >
-              Empezar →
+              Empezar {'->'}
             </Button>
           </div>
         ) : null}
 
         {step === 2 ? (
           <div className="mt-10 text-center">
-            <h1 className="text-[24px] font-medium text-[var(--text-primary)]">¿Cuál es la URL de tu sitio?</h1>
+            <h1 className="text-[24px] font-medium text-[var(--text-primary)]">Cual es la URL de tu sitio?</h1>
             <p className="mt-3 text-[14px] text-[var(--text-secondary)]">
-              Podés cargarla ahora para dejarla vinculada o hacerlo después desde Configuración.
+              Podes cargarla ahora para dejarla vinculada o hacerlo despues desde Configuracion.
             </p>
 
             <div className="mx-auto mt-8 max-w-md">
@@ -106,10 +120,10 @@ export default function OnboardingPage() {
             <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button
                 className="rounded-[10px] bg-[var(--signal)] px-6 text-white hover:bg-[var(--signal-dim)]"
-                disabled={submitting}
+                disabled={submitting || !hasDomainInput}
                 onClick={handleContinueToReady}
               >
-                {hasDomainInput ? 'Guardar y continuar →' : 'Continuar →'}
+                Guardar y continuar {'->'}
               </Button>
               <button
                 className="text-sm text-[var(--text-secondary)] underline underline-offset-4"
@@ -145,11 +159,11 @@ export default function OnboardingPage() {
               </svg>
             </div>
 
-            <h1 className="mt-8 text-[24px] font-normal text-[var(--text-primary)]">Ya podés entrar a Pulse</h1>
+            <h1 className="mt-8 text-[24px] font-normal text-[var(--text-primary)]">Ya podes entrar a Pulse</h1>
             <p className="mt-3 max-w-md text-[14px] text-[var(--text-secondary)]">
               {hasDomainInput
-                ? 'Tu sitio ya quedó registrado. Cuando los datos estén conectados, vas a empezar a ver movimiento acá.'
-                : 'Ya podés empezar a usar Pulse. Si después querés sumar tu sitio, lo podés hacer desde Configuración.'}
+                ? 'Tu sitio ya quedo registrado. Cuando los datos esten conectados, vas a empezar a ver movimiento aca.'
+                : 'Ya podes empezar a usar Pulse. Si despues queres sumar tu sitio, lo podes hacer desde Configuracion.'}
             </p>
 
             <Button
@@ -157,7 +171,7 @@ export default function OnboardingPage() {
               disabled={submitting}
               onClick={handleFinish}
             >
-              Ver mi dashboard →
+              Ver mi dashboard {'->'}
             </Button>
           </div>
         ) : null}
