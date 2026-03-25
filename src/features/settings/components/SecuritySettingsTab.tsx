@@ -39,7 +39,7 @@ export function SecuritySettingsTab({
         description="Controla el tiempo de sesión que querés mantener abierto en este dispositivo. Las protecciones avanzadas de acceso se administran en el login y con el equipo de TuWebAI."
         tone="danger"
       >
-        <div className="space-y-4">
+        <div className="space-y-4" data-tour="settings-security-controls">
           <div className={sliderClassName}>
             <Label className={labelClassName}>Tiempo de sesión: {settings.session_timeout} minutos</Label>
             <Slider

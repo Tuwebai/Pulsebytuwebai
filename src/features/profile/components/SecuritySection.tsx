@@ -86,7 +86,7 @@ export function SecuritySection() {
   };
 
   return (
-    <section className={PROFILE_SURFACE_CLASSNAME}>
+    <section className={PROFILE_SURFACE_CLASSNAME} data-tour="profile-security-root">
       <div className="mb-5">
         <h3 className="text-[18px] font-medium text-[var(--text-primary)]">Seguridad</h3>
         <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
@@ -97,6 +97,7 @@ export function SecuritySection() {
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.9fr)]">
         <form
           className="space-y-4 rounded-[18px] border border-[var(--border-default)] bg-[var(--bg-elevated)] p-4"
+          data-tour="profile-security-password"
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <div className="space-y-2">
@@ -173,7 +174,7 @@ export function SecuritySection() {
           </Button>
         </form>
 
-        <div className="rounded-[18px] border border-[var(--border-default)] bg-[var(--bg-elevated)] p-4">
+        <div className="rounded-[18px] border border-[var(--border-default)] bg-[var(--bg-elevated)] p-4" data-tour="profile-security-sessions">
           <div className="flex items-start gap-3">
             <div className="rounded-full bg-[var(--warning-dim)] p-2 text-[var(--warning)]">
               <AlertTriangle className="h-4 w-4" />

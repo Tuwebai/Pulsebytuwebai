@@ -38,7 +38,7 @@ export function PerformanceSettingsTab({
         description="Ajusta solo preferencias visuales y de uso que realmente impactan tu experiencia dentro de Pulse."
         tone="signal"
       >
-        <div className="space-y-4">
+        <div className="space-y-4" data-tour="settings-performance-controls">
           {[
             {
               key: 'animations_enabled',

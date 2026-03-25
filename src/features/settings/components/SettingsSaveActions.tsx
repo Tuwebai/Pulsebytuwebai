@@ -11,9 +11,13 @@ interface SettingsSaveActionsProps {
 
 export function SettingsSaveActions({ dirty, loading, onSave }: SettingsSaveActionsProps) {
   const prefersReducedMotion = useReducedMotionPreference();
+  const stateKey = dirty ? 'pending' : 'idle';
 
   return (
-    <div className="flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-5 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      className="flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-5 sm:flex-row sm:items-center sm:justify-between"
+      data-tour={`settings-save-actions-${stateKey}`}
+    >
       <p className="text-[12px] text-[var(--text-secondary)]">
         {dirty
           ? 'Tenes cambios pendientes en esta seccion.'

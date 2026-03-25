@@ -63,7 +63,7 @@ export function BusinessDataForm({ isSaving, profile, save, website }: BusinessD
   };
 
   return (
-    <section className={PROFILE_SURFACE_CLASSNAME}>
+    <section className={PROFILE_SURFACE_CLASSNAME} data-tour="profile-form-negocio">
       <div className="mb-5">
         <h3 className="text-[18px] font-medium text-[var(--text-primary)]">Mi negocio</h3>
         <p className="mt-1 text-[13px] text-[var(--text-secondary)]">

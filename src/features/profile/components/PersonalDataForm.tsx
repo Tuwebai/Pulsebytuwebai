@@ -58,7 +58,7 @@ export function PersonalDataForm({ email, isSaving, profile, save }: PersonalDat
   };
 
   return (
-    <section className={PROFILE_SURFACE_CLASSNAME}>
+    <section className={PROFILE_SURFACE_CLASSNAME} data-tour="profile-form-datos">
       <div className="mb-5">
         <h3 className="text-[18px] font-medium text-[var(--text-primary)]">Datos personales</h3>
         <p className="mt-1 text-[13px] text-[var(--text-secondary)]">

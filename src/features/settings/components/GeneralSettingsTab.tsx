@@ -36,7 +36,7 @@ export function GeneralSettingsTab({ user, projectsCount }: GeneralSettingsTabPr
         description="Revisá la identidad principal con la que usás Pulse y el estado general de tu acceso."
         tone="signal"
       >
-        <div className="rounded-[20px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-5 py-5">
+        <div className="rounded-[20px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-5 py-5" data-tour="settings-general-overview">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="min-w-0 space-y-2">
               <div className="flex items-center gap-3">

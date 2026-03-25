@@ -35,7 +35,7 @@ export function DangerZone() {
   };
 
   return (
-    <section className={`${PROFILE_SURFACE_CLASSNAME} border-[rgba(255,92,122,0.3)]`}>
+    <section className={`${PROFILE_SURFACE_CLASSNAME} border-[rgba(255,92,122,0.3)]`} data-tour="profile-danger-zone">
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.25fr)_auto] lg:items-center">
         <div className="flex items-start gap-3">
           <div className="rounded-full bg-[var(--danger-dim)] p-2 text-[var(--danger)]">

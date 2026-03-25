@@ -15,12 +15,14 @@ export function SettingsNotificationsTab() {
         description="Elegi que novedades queres recibir de Pulse y del seguimiento de tu proyecto."
         tone="signal"
       >
-        <NotificationSettingsSection
-          prefs={prefs}
-          isLoading={isLoading}
-          isSaving={isSaving}
-          updatePreference={updatePreference}
-        />
+        <div data-tour="settings-notifications-controls">
+          <NotificationSettingsSection
+            prefs={prefs}
+            isLoading={isLoading}
+            isSaving={isSaving}
+            updatePreference={updatePreference}
+          />
+        </div>
 
         <div className="flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[12px] text-[var(--text-secondary)]">{statusLabel}</p>
