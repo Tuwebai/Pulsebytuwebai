@@ -15,6 +15,42 @@ export interface AvatarResult {
 // =====================================================
 
 export class RealAvatarService {
+  getAuthMetadataAvatar(user: { user_metadata?: Record<string, unknown> } | null | undefined): string | null {
+    if (!user?.user_metadata) {
+      return null;
+    }
+
+    const avatarUrl =
+      user.user_metadata.avatar_url ||
+      user.user_metadata.picture ||
+      user.user_metadata.photoURL ||
+      user.user_metadata.image;
+
+    if (typeof avatarUrl !== 'string' || !avatarUrl.trim()) {
+      return null;
+    }
+
+    return this.isRealAvatarUrl(avatarUrl) ? avatarUrl : null;
+  }
+
+  isPulseStorageAvatar(url: string | null | undefined): boolean {
+    if (!url) {
+      return false;
+    }
+
+    return (
+      url.includes('/storage/v1/object/public/avatars/') ||
+      url.includes('/storage/v1/object/public/project-files/avatars/')
+    );
+  }
+
+  shouldKeepStoredAvatar(url: string | null | undefined): boolean {
+    if (!url) {
+      return false;
+    }
+
+    return this.isPulseStorageAvatar(url) || this.isRealAvatarUrl(url);
+  }
   
   // =====================================================
   // OBTENER AVATAR REAL DEL CORREO REGISTRADO
@@ -25,7 +61,7 @@ export class RealAvatarService {
       
       // 1. Intentar obtener avatar guardado en la base de datos
       const savedAvatar = await this.getSavedAvatar(email);
-      if (savedAvatar && this.isRealAvatarUrl(savedAvatar)) {
+      if (savedAvatar && this.shouldKeepStoredAvatar(savedAvatar)) {
         return {
           url: savedAvatar,
           provider: 'Database',
@@ -106,19 +142,10 @@ export class RealAvatarService {
         return null;
       }
 
-      // Obtener avatar de user_metadata (funciona con Google, GitHub, email/password)
-      const avatarUrl = user.user_metadata?.avatar_url || 
-                       user.user_metadata?.picture || 
-                       user.user_metadata?.photoURL ||
-                       user.user_metadata?.image;
+      const avatarUrl = this.getAuthMetadataAvatar(user);
 
       if (avatarUrl) {
-        
-        if (this.isRealAvatarUrl(avatarUrl)) {
-          return avatarUrl;
-        } else {
-          return null;
-        }
+        return avatarUrl;
       } else {
         return null;
       }
@@ -128,7 +155,7 @@ export class RealAvatarService {
     }
   }
 
-  private isRealAvatarUrl(url: string): boolean {
+  isRealAvatarUrl(url: string): boolean {
     
     // Verificar si la URL es de un avatar real (no generado)
     const realProviders = [

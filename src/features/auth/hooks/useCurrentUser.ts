@@ -6,6 +6,7 @@ import { toast as toastGlobal } from '@/hooks/use-toast';
 import { userPreferencesService } from '@/lib/services/userPreferencesService';
 import { clearCache, getCachedData, setCachedData } from '@/contexts/appContext.cache';
 import type { User } from '@/contexts/appContext.types';
+import { realAvatarService } from '@/lib/config/avatarProviders';
 
 interface UserUpdatePayload {
   full_name?: string | null;
@@ -102,26 +103,44 @@ export function useCurrentUser({
         if (userData && supabaseUser.email) {
           try {
             const updatedUserData = await userService.getUserById(supabaseUser.id);
+            const authAvatar = realAvatarService.getAuthMetadataAvatar(supabaseUser);
+            const storedAvatar = updatedUserData?.avatar_url ?? userData.avatar_url ?? null;
 
-            if (updatedUserData) {
-              if (updatedUserData.avatar_url) {
-                userData.avatar = updatedUserData.avatar_url;
-              }
+            const shouldUseAuthAvatar =
+              Boolean(authAvatar) &&
+              (!storedAvatar ||
+                !realAvatarService.shouldKeepStoredAvatar(storedAvatar) ||
+                (!realAvatarService.isPulseStorageAvatar(storedAvatar) && storedAvatar !== authAvatar));
 
-              if (!updatedUserData.avatar_url && supabaseUser.email) {
-                const { realAvatarService } = await import('@/lib/config/avatarProviders');
-                await realAvatarService.syncUserAvatar(supabaseUser.email);
-
-                const finalUserData = await userService.getUserById(supabaseUser.id);
-                if (finalUserData) {
-                  userData = finalUserData;
-                  if (finalUserData.avatar_url) {
-                    userData.avatar = finalUserData.avatar_url;
-                  }
-                  setCachedData(cacheKey, userData, 10 * 60 * 1000);
-                }
-              }
+            if (shouldUseAuthAvatar && authAvatar) {
+              await userService.updateUser(supabaseUser.id, {
+                avatar_url: authAvatar,
+                updated_at: new Date().toISOString(),
+              });
             }
+
+            const finalUserData =
+              shouldUseAuthAvatar
+                ? await userService.getUserById(supabaseUser.id)
+                : updatedUserData;
+
+            if (finalUserData) {
+              userData = finalUserData;
+            }
+
+            const resolvedAvatar =
+              finalUserData?.avatar_url ??
+              updatedUserData?.avatar_url ??
+              userData.avatar_url ??
+              authAvatar ??
+              undefined;
+
+            if (resolvedAvatar) {
+              userData.avatar_url = resolvedAvatar;
+              userData.avatar = resolvedAvatar;
+            }
+
+            setCachedData(cacheKey, userData, 10 * 60 * 1000);
           } catch {
             // Error sincronizando avatar
           }
