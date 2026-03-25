@@ -2,6 +2,7 @@ import { ExternalLink, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { FadeIn, MetricCard, Skeleton } from '@/core/components';
 import AnimatedList from '@/core/components/AnimatedList';
+import { useApp } from '@/contexts/AppContext';
 import type { Period } from '@/data/types/pulse';
 import { useUserProject } from '@/features/project/hooks/useUserProject';
 import PulseChart from '../components/PulseChart';
@@ -12,11 +13,13 @@ import { getDaysInRange } from '../services/pulse.service';
 
 export default function PulsePage() {
   const navigate = useNavigate();
+  const { authReady, isAuthenticated } = useApp();
   const { period, setPeriod } = usePulsePeriod();
-  const { projectId, domain, ga4PropertyId, loading: projectLoading } = useUserProject();
+  const { projectId, domain, ga4PropertyId, loading: projectLoading, projectsReady } = useUserProject();
   const { data, isLoading } = usePulseMetrics(projectId, period);
 
-  const loading = projectLoading || isLoading;
+  const projectHydrating = isAuthenticated && authReady && !projectsReady;
+  const loading = projectHydrating || projectLoading || isLoading;
   const hasProject = Boolean(projectId);
   const hasGa4 = Boolean(ga4PropertyId);
   const averagePerDay = data ? Math.round(data.visits / getDaysInRange(period)) : null;

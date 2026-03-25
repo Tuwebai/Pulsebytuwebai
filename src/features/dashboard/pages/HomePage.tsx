@@ -43,16 +43,17 @@ function getProjectStatusLabel(status?: string | null): string {
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { getUserProjects } = useApp();
+  const { authReady, getUserProjects, isAuthenticated } = useApp();
   const projects = getUserProjects();
   const primaryProject = projects[0];
   const { period } = usePulsePeriod();
-  const { projectId, domain, loading: projectLoading } = useUserProject();
+  const { projectId, domain, loading: projectLoading, projectsReady } = useUserProject();
   const { data, isLoading } = usePulseMetrics(projectId, period);
 
   usePulseRealtime(projectId);
 
-  const loading = projectLoading || isLoading;
+  const projectHydrating = isAuthenticated && authReady && !projectsReady;
+  const loading = projectHydrating || projectLoading || isLoading;
   const hasProject = Boolean(projectId);
   const hasDomain = Boolean(domain);
   const canOpenSite = Boolean(domain);

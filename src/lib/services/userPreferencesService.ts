@@ -180,6 +180,17 @@ const parseStoredPreferenceValue = (value: string): JsonValue => {
   }
 };
 
+const isPreferencesAuthError = (error: unknown): boolean => {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+
+  const code = 'code' in error ? String(error.code ?? '') : '';
+  const message = 'message' in error ? String(error.message ?? '') : '';
+
+  return code === '42501' || message.includes('401') || message.toLowerCase().includes('unauthorized');
+};
+
 export class UserPreferencesService {
   // Obtener preferencias del usuario
   async getUserPreferences(userId: string, preferenceType?: string): Promise<UserPreferences[]> {
@@ -195,7 +206,13 @@ export class UserPreferencesService {
 
       const { data, error } = await query.order('updated_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        if (isPreferencesAuthError(error)) {
+          return [];
+        }
+
+        throw error;
+      }
       return data || [];
     } catch (error) {
       handleSupabaseError(error, 'Obtener preferencias del usuario');
@@ -230,7 +247,10 @@ export class UserPreferencesService {
         .single();
 
       if (error) {
-        console.warn('Error al guardar preferencia, usando fallback:', error);
+        if (isPreferencesAuthError(error)) {
+          return null;
+        }
+
         // Fallback: intentar actualizar primero, luego insertar
         try {
           const { data: existing } = await supabase
@@ -239,7 +259,7 @@ export class UserPreferencesService {
             .eq('user_id', userId)
             .eq('preference_type', preferenceType)
             .eq('preference_key', preferenceKey)
-            .single();
+            .maybeSingle();
 
           if (existing) {
             const { data: updateData, error: updateError } = await supabase
@@ -249,7 +269,13 @@ export class UserPreferencesService {
               .select()
               .single();
             
-            if (updateError) throw updateError;
+            if (updateError) {
+              if (isPreferencesAuthError(updateError)) {
+                return null;
+              }
+
+              throw updateError;
+            }
             return updateData;
           } else {
             const { data: insertData, error: insertError } = await supabase
@@ -258,11 +284,19 @@ export class UserPreferencesService {
               .select()
               .single();
             
-            if (insertError) throw insertError;
+            if (insertError) {
+              if (isPreferencesAuthError(insertError)) {
+                return null;
+              }
+
+              throw insertError;
+            }
             return insertData;
           }
         } catch (fallbackError) {
-          console.warn('Fallback tambiÃ©n fallÃ³, continuando sin guardar preferencia:', fallbackError);
+          if (!isPreferencesAuthError(fallbackError)) {
+            console.warn('Fallback tambiÃ©n fallÃ³, continuando sin guardar preferencia:', fallbackError);
+          }
           return null;
         }
       }
@@ -288,7 +322,13 @@ export class UserPreferencesService {
         .eq('preference_type', preferenceType)
         .eq('preference_key', preferenceKey);
 
-      if (error) throw error;
+      if (error) {
+        if (isPreferencesAuthError(error)) {
+          return false;
+        }
+
+        throw error;
+      }
       return true;
     } catch (error) {
       handleSupabaseError(error, 'Eliminar preferencia del usuario');

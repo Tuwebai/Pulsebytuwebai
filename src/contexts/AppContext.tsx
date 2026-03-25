@@ -14,6 +14,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [projectsReady, setProjectsReady] = useState(false);
   const [logs, setLogs] = useState<ProjectLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +49,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setLoading,
     setLogs,
     setProjects,
+    setProjectsReady,
     user
   });
 
@@ -72,6 +74,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     () => ({
       user,
       projects,
+      projectsReady,
       isAuthenticated,
       authReady,
       logs,
@@ -99,6 +102,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       loading,
       logs,
       projects,
+      projectsReady,
       projectsState,
       updateUserSettings,
       user

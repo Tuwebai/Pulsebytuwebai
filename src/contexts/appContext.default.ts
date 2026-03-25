@@ -3,6 +3,7 @@ import type { AppContextType } from '@/contexts/appContext.types';
 export const defaultAppContext: AppContextType = {
   user: null,
   projects: [],
+  projectsReady: false,
   isAuthenticated: false,
   authReady: false,
   logs: [],

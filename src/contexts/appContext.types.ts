@@ -95,6 +95,7 @@ export interface ProjectLog {
 export interface AppContextType {
   user: User | null;
   projects: Project[];
+  projectsReady: boolean;
   isAuthenticated: boolean;
   authReady: boolean;
   logs: ProjectLog[];

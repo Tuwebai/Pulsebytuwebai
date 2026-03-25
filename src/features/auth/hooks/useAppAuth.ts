@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 import { toast as toastGlobal } from '@/hooks/use-toast';
 import { clearCache } from '@/contexts/appContext.cache';
 import type { User } from '@/contexts/appContext.types';
-import { userPreferencesService } from '@/lib/services/userPreferencesService';
 
 interface UseAppAuthParams {
   setError: (value: string | null) => void;
@@ -22,8 +21,7 @@ export function useAppAuth({
   signInWithGithub,
   signInWithGoogle,
   signOut,
-  signUpWithEmail,
-  user
+  signUpWithEmail
 }: UseAppAuthParams) {
   const login = useCallback(
     async (email: string, password: string): Promise<boolean> => {
@@ -35,14 +33,14 @@ export function useAppAuth({
 
         if (result) {
           toastGlobal({
-            title: '¡Bienvenido!',
-            description: 'Has iniciado sesión correctamente.'
+            title: 'Â¡Bienvenido!',
+            description: 'Has iniciado sesiÃ³n correctamente.'
           });
         }
 
         return result;
       } catch {
-        setError('Error al iniciar sesión');
+        setError('Error al iniciar sesiÃ³n');
         return false;
       } finally {
         setLoading(false);
@@ -75,7 +73,7 @@ export function useAppAuth({
       setError(null);
       return await signInWithGoogle();
     } catch {
-      setError('Error al iniciar sesión con Google');
+      setError('Error al iniciar sesiÃ³n con Google');
       return false;
     } finally {
       setLoading(false);
@@ -88,7 +86,7 @@ export function useAppAuth({
       setError(null);
       return await signInWithGithub();
     } catch {
-      setError('Error al iniciar sesión con GitHub');
+      setError('Error al iniciar sesiÃ³n con GitHub');
       return false;
     } finally {
       setLoading(false);
@@ -100,16 +98,12 @@ export function useAppAuth({
       setLoading(true);
       await signOut();
       clearCache();
-
-      if (user) {
-        await userPreferencesService.deleteUserPreference(user.id, 'welcome_back', 'tuwebai_welcome_back');
-      }
     } catch {
-      setError('Error al cerrar sesión');
+      setError('Error al cerrar sesiÃ³n');
     } finally {
       setLoading(false);
     }
-  }, [setError, setLoading, signOut, user]);
+  }, [setError, setLoading, signOut]);
 
   return {
     login,

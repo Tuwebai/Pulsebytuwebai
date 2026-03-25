@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Session, User as SupabaseUser } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/supabase';
 import { userService } from '@/lib/supabase/supabaseService';
@@ -55,6 +55,17 @@ export function useCurrentUser({
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authReady, setAuthReady] = useState(false);
+  const authSnapshotRef = useRef<{ accessToken: string | null; userId: string | null }>({
+    accessToken: null,
+    userId: null
+  });
+
+  useEffect(() => {
+    authSnapshotRef.current = {
+      accessToken: session?.access_token ?? null,
+      userId: supabaseUser?.id ?? null
+    };
+  }, [session?.access_token, supabaseUser?.id]);
 
   const clearError = useCallback(() => {
     setError(null);
@@ -65,6 +76,11 @@ export function useCurrentUser({
     if (authLoading) return;
 
     if (supabaseUser && session) {
+      const requestAccessToken = session.access_token ?? null;
+      const requestUserId = supabaseUser.id;
+      const isStaleAuthFlow = () =>
+        authSnapshotRef.current.accessToken !== requestAccessToken || authSnapshotRef.current.userId !== requestUserId;
+
       try {
         setLoading(true);
 
@@ -150,11 +166,11 @@ export function useCurrentUser({
         setIsAuthenticated(true);
         setError(null);
 
-        if (userData && userData.id) {
+        if (userData && userData.id && !isStaleAuthFlow()) {
           await userPreferencesService.migrateLocalStorageToDB(userData.id);
         }
 
-        if (userData && userData.id) {
+        if (userData && userData.id && !isStaleAuthFlow()) {
           const welcomeBack = await userPreferencesService.getUserPreferences(userData.id, 'welcome_back');
           if (welcomeBack.length === 0) {
             toastGlobal({
@@ -177,14 +193,10 @@ export function useCurrentUser({
       setLogs([]);
       clearCache();
 
-      if (user && user.id) {
-        await userPreferencesService.deleteUserPreference(user.id, 'welcome_back', 'tuwebai_welcome_back');
-      }
-
       setAuthReady(true);
       setLoading(false);
     }
-  }, [authLoading, session, setError, setLoading, supabaseUser, setProjects, setLogs, user]);
+  }, [authLoading, session, setError, setLoading, supabaseUser, setProjects, setLogs]);
 
   useEffect(() => {
     void syncUser();
@@ -247,7 +259,7 @@ export function useCurrentUser({
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      void channel.unsubscribe().catch(() => undefined);
     };
   }, [user]);
 

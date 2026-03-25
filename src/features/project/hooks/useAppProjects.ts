@@ -13,16 +13,27 @@ interface UseAppProjectsParams {
   setLoading: (value: boolean) => void;
   setLogs: Dispatch<SetStateAction<ProjectLog[]>>;
   setProjects: Dispatch<SetStateAction<Project[]>>;
+  setProjectsReady: Dispatch<SetStateAction<boolean>>;
   user: User | null;
   projects: Project[];
 }
 
-export function useAppProjects({ logs, projects, setError, setLoading, setLogs, setProjects, user }: UseAppProjectsParams) {
+export function useAppProjects({
+  logs,
+  projects,
+  setError,
+  setLoading,
+  setLogs,
+  setProjects,
+  setProjectsReady,
+  user
+}: UseAppProjectsParams) {
   const refreshData = useCallback(async () => {
     if (!user) return;
 
     try {
       setLoading(true);
+      setProjectsReady(false);
 
       let projectData: Project[] = [];
 
@@ -37,9 +48,10 @@ export function useAppProjects({ logs, projects, setError, setLoading, setLogs, 
     } catch {
       setError('Error al recargar los datos');
     } finally {
+      setProjectsReady(true);
       setLoading(false);
     }
-  }, [setError, setLoading, setProjects, user]);
+  }, [setError, setLoading, setProjects, setProjectsReady, user]);
 
   const getUserProjects = useCallback(() => {
     if (!user) return [];
@@ -53,6 +65,7 @@ export function useAppProjects({ logs, projects, setError, setLoading, setLogs, 
 
   const setupProjects = useCallback(async () => {
     if (!user) {
+      setProjectsReady(false);
       setProjects([]);
       setLogs([]);
       return;
@@ -60,6 +73,7 @@ export function useAppProjects({ logs, projects, setError, setLoading, setLogs, 
 
     try {
       setLoading(true);
+      setProjectsReady(false);
 
       let projectData: Project[] = [];
 
@@ -77,9 +91,10 @@ export function useAppProjects({ logs, projects, setError, setLoading, setLogs, 
       setProjects([]);
       setLogs([]);
     } finally {
+      setProjectsReady(true);
       setLoading(false);
     }
-  }, [setError, setLoading, setLogs, setProjects, user]);
+  }, [setError, setLoading, setLogs, setProjects, setProjectsReady, user]);
 
   useEffect(() => {
     if (user) {
