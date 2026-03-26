@@ -1,0 +1,107 @@
+import type { ComponentType, LazyExoticComponent, ReactNode } from 'react';
+import { Navigate, Route } from 'react-router-dom';
+import DashboardLayout from '@/components/DashboardLayout';
+import ProtectedRoute from '@/features/auth/components/ProtectedRoute';
+
+type LazyPage = LazyExoticComponent<ComponentType>;
+
+interface AdminRoutesComponents {
+  Admin: LazyPage;
+  AdminGitHubProfile: LazyPage;
+  AdvancedAnalytics: LazyPage;
+  AdvancedUserManagement: LazyPage;
+  EnvironmentVariables: LazyPage;
+  ProjectsPage: LazyPage;
+  UserProfileView: LazyPage;
+}
+
+export function renderAdminRoutes({
+  Admin,
+  AdminGitHubProfile,
+  AdvancedAnalytics,
+  AdvancedUserManagement,
+  EnvironmentVariables,
+  ProjectsPage,
+  UserProfileView,
+}: AdminRoutesComponents): ReactNode {
+  return (
+    <>
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <DashboardLayout>
+              <Admin />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/configuracion"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <Navigate replace to={{ pathname: '/admin', hash: '#settings' }} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/proyectos/:userId"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <DashboardLayout key="proyectos-user">
+              <ProjectsPage key="proyectos-user-content" />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/perfil/:userId"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <DashboardLayout key="user-profile">
+              <UserProfileView key="user-profile-content" />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile/:userId/github"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminGitHubProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/environment"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <DashboardLayout>
+              <EnvironmentVariables />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <DashboardLayout>
+              <AdvancedAnalytics />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user-management"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <DashboardLayout>
+              <AdvancedUserManagement />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+    </>
+  );
+}

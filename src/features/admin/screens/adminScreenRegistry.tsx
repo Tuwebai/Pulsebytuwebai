@@ -5,13 +5,13 @@ import type { User } from '@/contexts/appContext.types';
 import { AdminPaymentsSection } from '@/features/admin/billing/components/AdminPaymentsSection';
 import type { AdminSectionId } from '@/features/admin/constants/adminSections';
 import { AdminOverviewScreen } from '@/features/admin/overview/components/AdminOverviewScreen';
+import { AdminNotificationsInboxScreen } from '@/features/admin/notifications/pages/AdminNotificationsInboxScreen';
 import { AdminSettingsScreen } from '@/features/admin/settings/components/AdminSettingsScreen';
 import { AdminUsersScreen } from '@/features/admin/users/components/AdminUsersScreen';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 import ProjectApprovalManager from '@/components/ProjectApprovalManager';
 import AdvancedTicketManager from '@/components/AdvancedTicketManager';
 import { ProjectsManagement } from '@/components/admin/ProjectsManagement';
-import AdminNotifications from '@/pages/AdminNotifications';
 
 interface AdminDomainUpdateResult {
   website?: string | null;
@@ -115,7 +115,7 @@ export function createAdminScreenRegistry(
         onUpdatePaymentStatus={context.onUpdatePaymentStatus}
       />
     ),
-    notifications: <AdminNotifications />,
+    notifications: <AdminNotificationsInboxScreen />,
     settings: <AdminSettingsScreen onSaveReference={context.onSaveSettingsReference} />,
   };
 }

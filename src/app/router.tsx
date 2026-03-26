@@ -5,6 +5,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { PulseLoaderScreen } from '@/components/PulseLoaderScreen';
 import TouchGestureProvider from '@/components/TouchGestureProvider';
 import RouteLoadErrorState from '@/core/components/RouteLoadErrorState';
+import { renderAdminRoutes } from '@/app/adminRoutes';
 import { useApp } from '@/contexts/AppContext';
 import { renderAuthRoutes } from '@/features/auth/routes/AuthRoutes';
 import ProtectedRoute from '@/features/auth/components/ProtectedRoute';
@@ -185,24 +186,15 @@ function AppRoutes() {
         }
       />
 
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <DashboardLayout>
-              <Admin />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/configuracion"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <Navigate replace to={{ pathname: '/admin', hash: '#settings' }} />
-          </ProtectedRoute>
-        }
-      />
+      {renderAdminRoutes({
+        Admin,
+        AdminGitHubProfile,
+        AdvancedAnalytics,
+        AdvancedUserManagement,
+        EnvironmentVariables,
+        ProjectsPage,
+        UserProfileView
+      })}
       <Route
         path="/proyectos"
         element={
@@ -224,30 +216,10 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/proyectos/:userId"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <DashboardLayout key="proyectos-user">
-              <ProjectsPage key="proyectos-user-content" />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
         path="/perfil"
         element={
           <ProtectedRoute>
             <Navigate replace to="/dashboard/perfil" />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/perfil/:userId"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <DashboardLayout key="user-profile">
-              <UserProfileView key="user-profile-content" />
-            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -258,14 +230,6 @@ function AppRoutes() {
             <DashboardLayout key="github-dashboard">
               <GitHubDashboard />
             </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/profile/:userId/github"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <AdminGitHubProfile />
           </ProtectedRoute>
         }
       />
@@ -354,41 +318,11 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/environment"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <DashboardLayout>
-              <EnvironmentVariables />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/analytics"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <DashboardLayout>
-              <AdvancedAnalytics />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
         path="/dashboard-custom"
         element={
           <ProtectedRoute>
             <DashboardLayout>
               <CustomizableDashboard />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/user-management"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <DashboardLayout>
-              <AdvancedUserManagement />
             </DashboardLayout>
           </ProtectedRoute>
         }

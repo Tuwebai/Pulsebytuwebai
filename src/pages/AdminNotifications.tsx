@@ -1,3 +1,5 @@
+// DEPRECATED: reemplazado por AdminNotificationsInboxScreen
+// Ver DECISION_LOG.md - 2026-03-26
 import React, { useState, useEffect } from 'react';
 import { motion } from '@/components/OptimizedMotion';
 import { useTheme } from '@/contexts/ThemeContext';
