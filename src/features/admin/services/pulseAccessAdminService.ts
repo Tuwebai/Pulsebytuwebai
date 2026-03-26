@@ -33,7 +33,7 @@ export async function enablePulseAccess(userId: string): Promise<EnablePulseAcce
   } = await supabase.auth.getSession();
 
   if (!session?.access_token) {
-    throw new Error('Tu sesion de administrador no esta disponible para habilitar Pulse.');
+    throw new Error('Tu sesión de administrador no está disponible para habilitar Pulse.');
   }
 
   const { data, error } = await supabase.functions.invoke('enable-pulse-access', {
@@ -50,7 +50,7 @@ export async function enablePulseAccess(userId: string): Promise<EnablePulseAcce
       const payload = await error.context.json().catch(() => null) as { error?: string } | null;
 
       if (error.context.status === 401) {
-        throw new Error('Tu sesion no tiene permisos para habilitar acceso a Pulse.');
+        throw new Error('Tu sesión no tiene permisos para habilitar acceso a Pulse.');
       }
 
       if (error.context.status === 403) {
@@ -62,7 +62,7 @@ export async function enablePulseAccess(userId: string): Promise<EnablePulseAcce
       }
 
       if (error.context.status === 409 && payload?.error === 'ACCESS_DISABLED') {
-        throw new Error('El usuario tiene el acceso a Pulse revocado. Reactivarlo requiere una accion separada.');
+        throw new Error('El usuario tiene el acceso a Pulse revocado. Reactivarlo requiere una acción separada.');
       }
 
       throw new Error('No pudimos habilitar el acceso a Pulse desde el backend.');
@@ -73,7 +73,7 @@ export async function enablePulseAccess(userId: string): Promise<EnablePulseAcce
     }
 
     if (error instanceof FunctionsFetchError) {
-      throw new Error('No pudimos conectarnos con la funcion que habilita acceso a Pulse.');
+      throw new Error('No pudimos conectarnos con la función que habilita acceso a Pulse.');
     }
 
     throw new Error('No pudimos habilitar el acceso a Pulse.');

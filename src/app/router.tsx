@@ -36,20 +36,17 @@ const TerminosCondiciones = createLazyComponent(() => import('@/pages/TerminosCo
 const HomePage = createLazyComponent(() => import('@/features/dashboard/pages/HomePage'));
 const PulsePage = createLazyComponent(() => import('@/features/pulse/pages/PulsePage'));
 const Admin = createLazyComponent(() => import('@/pages/Admin'));
-const WebsyAI = createLazyComponent(() => import('@/pages/WebsyAI'));
 const ProjectsPage = createLazyComponent(() => import('@/pages/ProjectsPage'));
 const ProyectosNuevo = createLazyComponent(() => import('@/pages/ProyectosNuevo'));
 const CollaborationPage = createLazyComponent(() => import('@/pages/CollaborationPage'));
 const AdminCollaborationPage = createLazyComponent(() => import('@/pages/AdminCollaborationPage'));
 const PhasesAndTasksPage = createLazyComponent(() => import('@/pages/PhasesAndTasksPage'));
-const AdminPhasesAndTasksPage = createLazyComponent(() => import('@/pages/AdminPhasesAndTasksPage'));
 const WorkspacePage = createLazyComponent(() => import('@/pages/WorkspacePage'));
 const ProfilePage = createLazyComponent(() => import('@/features/profile/pages/ProfilePage'));
 const UserProfileView = createLazyComponent(() => import('@/pages/UserProfileView'));
 const Configuracion = createLazyComponent(() => import('@/pages/Configuracion'));
 const Facturacion = createLazyComponent(() => import('@/pages/Facturacion'));
 const Soporte = createLazyComponent(() => import('@/pages/Soporte'));
-const Team = createLazyComponent(() => import('@/pages/Team'));
 const NotFound = createLazyComponent(() => import('@/pages/NotFound'));
 const AdvancedAnalytics = createLazyComponent(() => import('@/components/AdvancedAnalytics'));
 const CustomizableDashboard = createLazyComponent(() => import('@/components/CustomizableDashboard'));
@@ -207,24 +204,6 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/admin/websy-ai"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <WebsyAI />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/fases-tareas"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <DashboardLayout>
-              <AdminPhasesAndTasksPage />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
         path="/proyectos"
         element={
           <ProtectedRoute>
@@ -370,16 +349,6 @@ function AppRoutes() {
           <ProtectedRoute>
             <DashboardLayout>
               <WorkspacePage />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/team"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <DashboardLayout>
-              <Team />
             </DashboardLayout>
           </ProtectedRoute>
         }
