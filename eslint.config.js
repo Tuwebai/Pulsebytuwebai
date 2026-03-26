@@ -8,6 +8,7 @@ export default tseslint.config(
   {
     ignores: [
       "dist",
+      "proyecto-template/**",
       "skills/**",
       "src/components/**",
       "src/pages/**",

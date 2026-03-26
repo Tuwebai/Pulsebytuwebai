@@ -98,11 +98,15 @@ jspm_packages/
 # Temporary files
 *.tmp
 *.temp
-*.md
+
+# Project documentation and governance are intentionally versioned in this repo.
+proyecto-template/*
+skills/*
 !README.md
-AGENTS.md
-docs/
-skills/
-scripts/
-SQL/
+docs/*
+docsproyecto/*
+*.md
+scripts/*
 *.sql
+SQL/*
+planes/*
