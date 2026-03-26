@@ -3,11 +3,31 @@ import { PulseLogo } from './PulseLogo';
 
 export interface PulseEmptyStateProps {
   onConnect?: () => void;
+  website?: string | null;
+  websiteStatus?: 'missing' | 'pending_review' | 'approved' | 'rejected' | null;
 }
 
 const WHATSAPP_SUPPORT_URL = 'https://wa.me/5491130187377?text=Necesito%20ayuda%20con%20Pulse';
 
-export default function PulseEmptyState({ onConnect }: PulseEmptyStateProps) {
+export default function PulseEmptyState({ onConnect, website, websiteStatus }: PulseEmptyStateProps) {
+  const isPendingReview = websiteStatus === 'pending_review' && Boolean(website);
+  const isApprovedWithoutData = websiteStatus === 'approved' && Boolean(website);
+
+  const title = isPendingReview
+    ? 'Tu URL ya esta en revision'
+    : isApprovedWithoutData
+      ? 'Estamos terminando de conectar tu web'
+      : 'Los datos de tu web aparecen aca';
+
+  const description = isPendingReview
+    ? 'Tu equipo de TuWebAI ya recibio la URL y la esta revisando antes de conectar los datos reales.'
+    : isApprovedWithoutData
+      ? 'Tu dominio ya quedo aprobado. Apenas termine la conexion de datos, vas a empezar a ver movimiento aca.'
+      : 'Conecta tu dominio para ver cuantas personas te estan visitando cada dia.';
+
+  const buttonLabel = isPendingReview || isApprovedWithoutData ? 'Revisar configuracion ->' : 'Conectar mi web ->';
+  const helpLabel = isPendingReview || isApprovedWithoutData ? 'Quieres avisarnos algo? Escribinos' : 'Necesitas ayuda? Escribinos';
+
   return (
     <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 px-6 py-10 text-center">
       <div
@@ -18,10 +38,8 @@ export default function PulseEmptyState({ onConnect }: PulseEmptyStateProps) {
       </div>
 
       <div className="space-y-2">
-        <h2 className="text-2xl font-medium text-[var(--text-primary)]">Los datos de tu web aparecen acá</h2>
-        <p className="max-w-xl text-sm text-[var(--text-secondary)]">
-          Conectá tu dominio para ver cuántas personas te están visitando cada día.
-        </p>
+        <h2 className="text-2xl font-medium text-[var(--text-primary)]">{title}</h2>
+        <p className="max-w-xl text-sm text-[var(--text-secondary)]">{description}</p>
       </div>
 
       <div className="flex flex-col items-center gap-3 sm:flex-row">
@@ -29,7 +47,7 @@ export default function PulseEmptyState({ onConnect }: PulseEmptyStateProps) {
           className="rounded-[10px] bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]"
           onClick={onConnect}
         >
-          Conectar mi web →
+          {buttonLabel}
         </Button>
 
         <a
@@ -38,7 +56,7 @@ export default function PulseEmptyState({ onConnect }: PulseEmptyStateProps) {
           rel="noreferrer"
           target="_blank"
         >
-          ¿Necesitás ayuda? Escribinos
+          {helpLabel}
         </a>
       </div>
     </div>

@@ -62,6 +62,11 @@ export interface User {
   bio?: string;
   location?: string;
   website?: string;
+  website_status?: 'missing' | 'pending_review' | 'approved' | 'rejected';
+  website_submitted_at?: string | null;
+  website_reviewed_at?: string | null;
+  website_reviewed_by?: string | null;
+  website_review_notes?: string | null;
   two_factor_auth?: boolean;
   push_notifications?: boolean;
   email_notifications?: boolean;

@@ -7,7 +7,7 @@ import { usePulseOnboarding } from '@/hooks/usePulseOnboarding';
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
-  const { complete, domain, fullName, loading, saveDomain, submitting } = usePulseOnboarding();
+  const { complete, domain, fullName, loading, saveDomain, submitting, websiteStatus } = usePulseOnboarding();
   const [step, setStep] = useState(1);
   const [siteUrl, setSiteUrl] = useState(domain);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -33,7 +33,11 @@ export default function OnboardingPage() {
       setStep(3);
     } catch (error) {
       console.error('Error al guardar el sitio en onboarding:', error);
-      setErrorMessage('No pudimos guardar tu sitio ahora. Podés intentarlo de nuevo o hacerlo después desde Configuración.');
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'No pudimos guardar tu sitio ahora. Puedes intentarlo de nuevo o hacerlo despues desde Configuracion.'
+      );
     }
   };
 
@@ -50,7 +54,7 @@ export default function OnboardingPage() {
       navigate('/dashboard', { replace: true });
     } catch (error) {
       console.error('Error al completar onboarding:', error);
-      setErrorMessage('No pudimos terminar tu bienvenida ahora. Probá otra vez en unos segundos.');
+      setErrorMessage('No pudimos terminar tu bienvenida ahora. Proba otra vez en unos segundos.');
     }
   };
 
@@ -89,7 +93,7 @@ export default function OnboardingPage() {
               Bienvenido a Pulse, {fullName || 'cliente'}
             </h1>
             <p className="mt-4 max-w-lg text-[14px] text-[var(--text-secondary)]">
-              En pocos segundos vas a tener listo tu espacio para seguir cómo rinde tu web y tu proyecto en un solo lugar.
+              En pocos segundos vas a tener listo tu espacio para seguir como rinde tu web y tu proyecto en un solo lugar.
             </p>
             <Button
               className="mt-8 rounded-[10px] bg-[var(--signal)] px-6 text-white hover:bg-[var(--signal-dim)]"
@@ -102,9 +106,9 @@ export default function OnboardingPage() {
 
         {step === 2 ? (
           <div className="mt-10 text-center">
-            <h1 className="text-[24px] font-medium text-[var(--text-primary)]">¿Cuál es la URL de tu sitio?</h1>
+            <h1 className="text-[24px] font-medium text-[var(--text-primary)]">Cual es la URL de tu sitio?</h1>
             <p className="mt-3 text-[14px] text-[var(--text-secondary)]">
-              Podés cargarla ahora para dejarla vinculada o hacerlo después desde Configuración.
+              La validamos automaticamente y el equipo de TuWebAI la confirma antes de conectar tus datos reales.
             </p>
 
             <div className="mx-auto mt-8 max-w-md">
@@ -116,6 +120,10 @@ export default function OnboardingPage() {
                 value={siteUrl}
               />
             </div>
+
+            <p className="mx-auto mt-3 max-w-md text-[12px] text-[var(--text-tertiary)]">
+              Puedes escribir solo el dominio. Ejemplo: tuempresa.com o tienda.tuempresa.com
+            </p>
 
             <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button
@@ -159,11 +167,13 @@ export default function OnboardingPage() {
               </svg>
             </div>
 
-            <h1 className="mt-8 text-[24px] font-normal text-[var(--text-primary)]">Ya podés entrar a Pulse</h1>
+            <h1 className="mt-8 text-[24px] font-normal text-[var(--text-primary)]">Ya puedes entrar a Pulse</h1>
             <p className="mt-3 max-w-md text-[14px] text-[var(--text-secondary)]">
               {hasDomainInput
-                ? 'Tu sitio ya quedó registrado. Cuando los datos estén conectados, vas a empezar a ver movimiento acá.'
-                : 'Ya podés empezar a usar Pulse. Si después querés sumar tu sitio, lo podés hacer desde Configuración.'}
+                ? websiteStatus === 'pending_review'
+                  ? 'Tu URL quedo enviada para revision. Cuando el equipo la confirme y conecte los datos, vas a empezar a ver movimiento aca.'
+                  : 'Tu sitio ya quedo registrado. Cuando los datos esten conectados, vas a empezar a ver movimiento aca.'
+                : 'Ya puedes empezar a usar Pulse. Si despues quieres sumar tu sitio, lo puedes hacer desde Configuracion.'}
             </p>
 
             <Button

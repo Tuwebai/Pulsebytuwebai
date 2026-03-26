@@ -8,6 +8,7 @@ interface PulseOnboardingState {
   domain: string;
   fullName: string;
   completed: boolean;
+  websiteStatus: 'missing' | 'pending_review' | 'approved' | 'rejected';
   refresh: () => Promise<void>;
   saveDomain: (domain: string) => Promise<{ saved: boolean; normalizedDomain: string }>;
   complete: () => Promise<void>;
@@ -20,6 +21,7 @@ export function usePulseOnboarding(): PulseOnboardingState {
   const [domain, setDomain] = useState('');
   const [fullName, setFullName] = useState('');
   const [completed, setCompleted] = useState(Boolean(user?.onboarding_completed));
+  const [websiteStatus, setWebsiteStatus] = useState<'missing' | 'pending_review' | 'approved' | 'rejected'>('missing');
 
   const refresh = useCallback(async () => {
     if (!user?.id) {
@@ -34,6 +36,7 @@ export function usePulseOnboarding(): PulseOnboardingState {
       setDomain(state.domain);
       setFullName(state.user?.full_name || user.full_name || '');
       setCompleted(Boolean(state.user?.onboarding_completed));
+      setWebsiteStatus(state.user?.website_status ?? (state.domain ? 'pending_review' : 'missing'));
     } finally {
       setLoading(false);
     }
@@ -55,7 +58,15 @@ export function usePulseOnboarding(): PulseOnboardingState {
         const result = await onboardingService.saveDomain(user.id, value);
         if (result.saved) {
           setDomain(result.normalizedDomain);
-          await updateUserSettings({ website: result.normalizedDomain });
+          setWebsiteStatus('pending_review');
+          await updateUserSettings({
+            website: result.normalizedDomain,
+            website_status: 'pending_review',
+            website_submitted_at: new Date().toISOString(),
+            website_reviewed_at: null,
+            website_reviewed_by: null,
+            website_review_notes: null,
+          });
           await refreshData();
         }
         return result;
@@ -93,6 +104,7 @@ export function usePulseOnboarding(): PulseOnboardingState {
     domain,
     fullName,
     completed,
+    websiteStatus,
     refresh,
     saveDomain,
     complete

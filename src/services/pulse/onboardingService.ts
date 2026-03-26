@@ -1,17 +1,5 @@
 import { onboardingApi } from '@/api/pulse/onboardingApi';
-
-function normalizeDomain(input: string): string {
-  const trimmed = input.trim();
-
-  if (!trimmed) {
-    return '';
-  }
-
-  return trimmed
-    .replace(/^https?:\/\//i, '')
-    .replace(/^www\./i, '')
-    .replace(/\/+$/, '');
-}
+import { validateBusinessDomain } from '@/lib/utils/domain';
 
 export const onboardingService = {
   async getState(userId: string) {
@@ -28,20 +16,17 @@ export const onboardingService = {
   },
 
   async saveDomain(userId: string, domain: string) {
-    const normalizedDomain = normalizeDomain(domain);
+    const validation = validateBusinessDomain(domain);
 
-    if (!normalizedDomain) {
-      return {
-        saved: false,
-        normalizedDomain: ''
-      };
+    if (!validation.isValid) {
+      throw new Error(validation.errorMessage || 'La URL ingresada no es valida.');
     }
 
-    await onboardingApi.saveDomain(userId, normalizedDomain);
+    await onboardingApi.saveDomainSubmission(userId, validation.normalizedDomain);
 
     return {
       saved: true,
-      normalizedDomain
+      normalizedDomain: validation.normalizedDomain
     };
   },
 

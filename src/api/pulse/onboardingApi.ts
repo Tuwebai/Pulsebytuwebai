@@ -6,6 +6,11 @@ export interface PulseOnboardingSnapshot {
   onboarding_completed: boolean | null;
   onboarding_completed_at: string | null;
   website: string | null;
+  website_status: 'missing' | 'pending_review' | 'approved' | 'rejected' | null;
+  website_submitted_at: string | null;
+  website_reviewed_at: string | null;
+  website_reviewed_by: string | null;
+  website_review_notes: string | null;
 }
 
 export interface UserProjectDomainRecord {
@@ -18,7 +23,9 @@ export const onboardingApi = {
   async getUserSnapshot(userId: string): Promise<PulseOnboardingSnapshot | null> {
     const { data, error } = await supabase
       .from('users')
-      .select('id, full_name, onboarding_completed, onboarding_completed_at, website')
+      .select(
+        'id, full_name, onboarding_completed, onboarding_completed_at, website, website_status, website_submitted_at, website_reviewed_at, website_reviewed_by, website_review_notes'
+      )
       .eq('id', userId)
       .maybeSingle();
 
@@ -45,20 +52,18 @@ export const onboardingApi = {
     return data;
   },
 
-  async saveDomain(userId: string, domain: string): Promise<void> {
-    const latestProject = await this.getLatestProject(userId);
-
-    if (latestProject?.id) {
-      const { error } = await supabase.from('projects').update({ domain }).eq('id', latestProject.id);
-
-      if (error) {
-        throw error;
-      }
-
-      return;
-    }
-
-    const { error } = await supabase.from('users').update({ website: domain }).eq('id', userId);
+  async saveDomainSubmission(userId: string, domain: string): Promise<void> {
+    const { error } = await supabase
+      .from('users')
+      .update({
+        website: domain,
+        website_status: 'pending_review',
+        website_submitted_at: new Date().toISOString(),
+        website_reviewed_at: null,
+        website_reviewed_by: null,
+        website_review_notes: null,
+      })
+      .eq('id', userId);
 
     if (error) {
       throw error;

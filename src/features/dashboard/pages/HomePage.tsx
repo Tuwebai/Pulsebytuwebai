@@ -125,7 +125,11 @@ export default function HomePage() {
             </p>
           </div>
         ) : !hasDomain || !data?.hasData ? (
-          <PulseEmptyState onConnect={() => navigate('/dashboard/configuracion')} />
+          <PulseEmptyState
+            onConnect={() => navigate('/dashboard/configuracion')}
+            website={user?.website ?? null}
+            websiteStatus={user?.website_status ?? null}
+          />
         ) : (
           <div className="space-y-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">

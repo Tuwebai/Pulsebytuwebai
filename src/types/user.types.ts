@@ -18,6 +18,11 @@ export interface User {
   bio?: string;
   location?: string;
   website?: string;
+  website_status?: 'missing' | 'pending_review' | 'approved' | 'rejected';
+  website_submitted_at?: string | null;
+  website_reviewed_at?: string | null;
+  website_reviewed_by?: string | null;
+  website_review_notes?: string | null;
 
   // Seguridad y experiencia del cliente
   twoFactorAuth?: boolean;
@@ -54,6 +59,8 @@ export interface CreateUserData {
   bio?: string;
   location?: string;
   website?: string;
+  website_status?: 'missing' | 'pending_review' | 'approved' | 'rejected';
+  website_review_notes?: string | null;
 }
 
 export interface UpdateUserData {
@@ -65,6 +72,11 @@ export interface UpdateUserData {
   bio?: string;
   location?: string;
   website?: string;
+  website_status?: 'missing' | 'pending_review' | 'approved' | 'rejected';
+  website_submitted_at?: string | null;
+  website_reviewed_at?: string | null;
+  website_reviewed_by?: string | null;
+  website_review_notes?: string | null;
   avatar_url?: string;
 }
 

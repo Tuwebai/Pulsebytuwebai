@@ -7,6 +7,7 @@ import { userPreferencesService } from '@/lib/services/userPreferencesService';
 import { clearCache, getCachedData, setCachedData } from '@/contexts/appContext.cache';
 import type { User } from '@/contexts/appContext.types';
 import { realAvatarService } from '@/lib/config/avatarProviders';
+import { onboardingApi } from '@/api/pulse/onboardingApi';
 
 interface UserUpdatePayload {
   full_name?: string | null;
@@ -24,6 +25,11 @@ interface UserUpdatePayload {
   onboarding_completed?: boolean | null;
   onboarding_completed_at?: string | null;
   website?: string | null;
+  website_status?: User['website_status'];
+  website_submitted_at?: string | null;
+  website_reviewed_at?: string | null;
+  website_reviewed_by?: string | null;
+  website_review_notes?: string | null;
   pulse_access_status?: User['pulse_access_status'];
   pulse_access_granted_at?: string | null;
   pulse_access_granted_by?: string | null;
@@ -119,6 +125,7 @@ export function useCurrentUser({
         if (userData && supabaseUser.email) {
           try {
             const updatedUserData = await userService.getUserById(supabaseUser.id);
+            const onboardingSnapshot = await onboardingApi.getUserSnapshot(supabaseUser.id);
             const authAvatar = realAvatarService.getAuthMetadataAvatar(supabaseUser);
             const storedAvatar = updatedUserData?.avatar_url ?? userData.avatar_url ?? null;
 
@@ -142,6 +149,18 @@ export function useCurrentUser({
 
             if (finalUserData) {
               userData = finalUserData;
+            }
+
+            if (onboardingSnapshot) {
+              userData = {
+                ...userData,
+                website: onboardingSnapshot.website ?? userData.website,
+                website_status: onboardingSnapshot.website_status ?? userData.website_status,
+                website_submitted_at: onboardingSnapshot.website_submitted_at ?? userData.website_submitted_at,
+                website_reviewed_at: onboardingSnapshot.website_reviewed_at ?? userData.website_reviewed_at,
+                website_reviewed_by: onboardingSnapshot.website_reviewed_by ?? userData.website_reviewed_by,
+                website_review_notes: onboardingSnapshot.website_review_notes ?? userData.website_review_notes,
+              };
             }
 
             const resolvedAvatar =
@@ -238,6 +257,11 @@ export function useCurrentUser({
               onboarding_completed: updatedUserData.onboarding_completed ?? prev.onboarding_completed,
               onboarding_completed_at: updatedUserData.onboarding_completed_at ?? prev.onboarding_completed_at,
               website: updatedUserData.website ?? prev.website,
+              website_status: updatedUserData.website_status ?? prev.website_status,
+              website_submitted_at: updatedUserData.website_submitted_at ?? prev.website_submitted_at,
+              website_reviewed_at: updatedUserData.website_reviewed_at ?? prev.website_reviewed_at,
+              website_reviewed_by: updatedUserData.website_reviewed_by ?? prev.website_reviewed_by,
+              website_review_notes: updatedUserData.website_review_notes ?? prev.website_review_notes,
               pulse_access_status: updatedUserData.pulse_access_status ?? prev.pulse_access_status,
               pulse_access_granted_at: updatedUserData.pulse_access_granted_at ?? prev.pulse_access_granted_at,
               pulse_access_granted_by: updatedUserData.pulse_access_granted_by ?? prev.pulse_access_granted_by,

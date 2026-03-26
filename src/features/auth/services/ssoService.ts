@@ -56,7 +56,7 @@ async function getSsoBridge(token: string): Promise<SsoBridgeResponse> {
       if (payload.error === 'USER_NOT_FOUND' || payload.error === 'AUTH_NOT_FOUND' || payload.error === 'ACCESS_PENDING') {
         throw new SsoAccessError(
           'access_pending',
-          'Tu acceso a Pulse todavia no fue habilitado por un administrador.'
+          'Tu acceso a Pulse todavía no fue habilitado por un administrador.'
         );
       }
 
@@ -88,7 +88,7 @@ export async function signInWithSsoToken(token: string): Promise<string> {
   });
 
   if (error) {
-    throw new SsoAccessError('session_bridge_failed', 'No pudimos abrir tu sesion en Pulse.');
+    throw new SsoAccessError('session_bridge_failed', 'No pudimos abrir tu sesión en Pulse.');
   }
 
   return bridge.redirect_path;

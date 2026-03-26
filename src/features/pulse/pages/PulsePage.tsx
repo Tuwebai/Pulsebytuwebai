@@ -13,7 +13,7 @@ import { getDaysInRange } from '../services/pulse.service';
 
 export default function PulsePage() {
   const navigate = useNavigate();
-  const { authReady, isAuthenticated } = useApp();
+  const { authReady, isAuthenticated, user } = useApp();
   const { period, setPeriod } = usePulsePeriod();
   const { projectId, domain, ga4PropertyId, loading: projectLoading, projectsReady } = useUserProject();
   const { data, isLoading } = usePulseMetrics(projectId, period);
@@ -23,6 +23,8 @@ export default function PulsePage() {
   const hasProject = Boolean(projectId);
   const hasGa4 = Boolean(ga4PropertyId);
   const averagePerDay = data ? Math.round(data.visits / getDaysInRange(period)) : null;
+  const websitePendingReview = user?.website_status === 'pending_review' && Boolean(user.website);
+  const websiteApprovedWithoutData = user?.website_status === 'approved' && Boolean(user.website);
 
   return (
     <div className="space-y-6">
@@ -30,7 +32,7 @@ export default function PulsePage() {
         <div>
           <h1 className="text-[22px] font-medium text-[var(--text-primary)]">Tu web este mes</h1>
           <p className="text-[14px] leading-5 text-[var(--text-secondary)]">
-            {data ? `${data.dateRange.from} → ${data.dateRange.to}` : 'sin datos todavía'}
+            {data ? `${data.dateRange.from} -> ${data.dateRange.to}` : 'sin datos todavia'}
           </p>
         </div>
 
@@ -53,7 +55,7 @@ export default function PulsePage() {
 
       {!hasProject && !loading ? (
         <div className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-6 text-sm text-[var(--text-secondary)]">
-          Tu proyecto está siendo configurado. Volvé pronto.
+          Tu proyecto esta siendo configurado. Vuelve pronto.
         </div>
       ) : null}
 
@@ -62,9 +64,19 @@ export default function PulsePage() {
           <div className="flex items-start gap-3">
             <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--warning)]" />
             <div>
-              <p className="font-medium leading-5 text-[var(--text-primary)]">Conectá tu dominio para ver los datos reales.</p>
+              <p className="font-medium leading-5 text-[var(--text-primary)]">
+                {websitePendingReview
+                  ? 'Tu URL esta en revision antes de conectar los datos reales.'
+                  : websiteApprovedWithoutData
+                    ? 'Tu dominio ya esta aprobado y estamos conectando los datos.'
+                    : 'Conecta tu dominio para ver los datos reales.'}
+              </p>
               <p className="mt-1 text-[13px] leading-5 text-[color:rgba(240,244,255,0.82)]">
-                Tu equipo de TuWebAI lo configura automáticamente al entregar tu proyecto.
+                {websitePendingReview
+                  ? 'Cuando el equipo lo confirme, Pulse va a empezar a mostrar tu informacion real.'
+                  : websiteApprovedWithoutData
+                    ? 'Este estado se completa solo cuando termina la integracion del proyecto.'
+                    : 'Tu equipo de TuWebAI lo configura automaticamente al entregar tu proyecto.'}
               </p>
             </div>
           </div>
@@ -91,21 +103,16 @@ export default function PulsePage() {
           loading={loading}
         />
         <MetricCard
-          label="Página más visitada"
+          label="Pagina mas visitada"
           value={data?.topPages[0]?.path ?? null}
           period={data?.topPages[0] ? `${data.topPages[0].visits} visitas` : undefined}
           loading={loading}
         />
-        <MetricCard
-          label="Promedio por día"
-          value={averagePerDay}
-          unit="visitas/día"
-          loading={loading}
-        />
+        <MetricCard label="Promedio por dia" value={averagePerDay} unit="visitas/dia" loading={loading} />
       </AnimatedList>
 
       <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5" data-tour="pulse-chart">
-        <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">Visitas por día</p>
+        <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">Visitas por dia</p>
         <div className="mt-4">
           <PulseChart data={data?.chartData ?? []} height={180} loading={loading} />
         </div>
@@ -114,14 +121,14 @@ export default function PulsePage() {
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)]" data-tour="pulse-top-pages">
           <div className="border-b border-[var(--border-subtle)] px-5 py-4">
-            <h2 className="text-sm font-medium text-[var(--text-primary)]">Páginas más visitadas</h2>
+            <h2 className="text-sm font-medium text-[var(--text-primary)]">Paginas mas visitadas</h2>
           </div>
 
           <div className="overflow-hidden">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[var(--border-subtle)] text-left text-[12px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
-                  <th className="px-5 py-3 font-medium">Página</th>
+                  <th className="px-5 py-3 font-medium">Pagina</th>
                   <th className="px-5 py-3 font-medium">Visitas</th>
                   <th className="px-5 py-3 font-medium">% del total</th>
                 </tr>
@@ -162,7 +169,7 @@ export default function PulsePage() {
                             <Globe className="h-8 w-8 text-[var(--text-tertiary)]" strokeWidth={1.5} />
                           </div>
                           <p className="mt-4 text-[14px] font-medium text-[var(--text-primary)]">
-                            Las páginas aparecen cuando tu web tenga visitas
+                            Las paginas aparecen cuando tu web tenga visitas
                           </p>
                           <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
                             Este estado se completa solo a medida que llegan datos reales.
@@ -179,8 +186,8 @@ export default function PulsePage() {
 
         <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
           <div>
-            <h2 className="text-sm font-medium text-[var(--text-primary)]">Resumen del período</h2>
-            <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">Lectura rápida de tus métricas</p>
+            <h2 className="text-sm font-medium text-[var(--text-primary)]">Resumen del periodo</h2>
+            <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">Lectura rapida de tus metricas</p>
           </div>
 
           <div className="mt-5 space-y-3">
@@ -196,7 +203,7 @@ export default function PulsePage() {
             </div>
             <div className="flex items-center gap-3">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--text-tertiary)]" />
-              <span className="text-[13px] text-[var(--text-secondary)]">Promedio de sesión</span>
+              <span className="text-[13px] text-[var(--text-secondary)]">Promedio de sesion</span>
               <span className="ml-auto font-data text-[13px] text-[var(--text-primary)]">{data?.avgSessionSec ?? 0}s</span>
             </div>
           </div>
@@ -206,7 +213,7 @@ export default function PulsePage() {
             onClick={() => navigate('/dashboard/configuracion')}
             type="button"
           >
-            Revisar configuración →
+            Revisar configuracion {'->'}
           </button>
         </div>
       </section>
