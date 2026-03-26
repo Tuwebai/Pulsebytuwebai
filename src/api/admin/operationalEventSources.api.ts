@@ -128,13 +128,19 @@ export async function createManagedOperationalEvent(
 ): Promise<void> {
   const { error } = await supabase
     .from('operational_events')
-    .insert({
-      ...payload,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      resolved_at: payload.resolved_at ?? null,
-      snoozed_until: payload.snoozed_until ?? null,
-    });
+    .upsert(
+      {
+        ...payload,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        resolved_at: payload.resolved_at ?? null,
+        snoozed_until: payload.snoozed_until ?? null,
+      },
+      {
+        onConflict: 'event_key',
+        ignoreDuplicates: true,
+      },
+    );
 
   if (error) throw error;
 }
