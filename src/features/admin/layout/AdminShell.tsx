@@ -2,10 +2,15 @@ import type { ReactNode } from 'react';
 
 import { RefreshCw, Shield } from 'lucide-react';
 
-import NotificationBell from '@/components/admin/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { AvatarMenu } from '@/core/components';
+import { NotificationsBellTrigger } from '@/core/notifications/components/NotificationsBellTrigger';
+import { NotificationsPanel } from '@/core/notifications/components/NotificationsPanel';
+import { useNotifications } from '@/core/notifications/hooks/useNotifications';
+import { useNotificationsPanelState } from '@/core/notifications/hooks/useNotificationsPanelState';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useApp } from '@/contexts/AppContext';
 import { AdminSectionNav } from '@/features/admin/components/AdminSectionNav';
 import { getAdminSectionLabel, type AdminSectionId } from '@/features/admin/constants/adminSections';
 
@@ -24,10 +29,19 @@ export function AdminShell({
   onSectionChange,
   children,
 }: AdminShellProps) {
+  const { logout, user } = useApp();
+  const sectionLabel = getAdminSectionLabel(activeSection);
+  const { unreadCount } = useNotifications();
+  const { panelOpen, openPanel, closePanel } = useNotificationsPanelState(
+    `pulse:admin:${user?.id ?? 'anon'}:notifications-open`,
+    user?.id ?? null
+  );
+
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-all duration-300">
-      <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-3 py-3 sm:px-4 sm:py-4 lg:px-8 lg:py-6">
-        <div className="rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm backdrop-blur">
+    <>
+      <div className="min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-all duration-300">
+        <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-3 py-3 sm:px-4 sm:py-4 lg:px-8 lg:py-6">
+          <div className="rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm backdrop-blur">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
@@ -36,39 +50,36 @@ export function AdminShell({
                   Pulse Admin
                 </Badge>
                 <Badge variant="secondary">
-                  {getAdminSectionLabel(activeSection)}
+                  {sectionLabel}
                 </Badge>
               </div>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-foreground">Centro operativo de Pulse</h1>
-                <p className="text-sm text-muted-foreground">
-                  El shell principal muestra solo operaciones de Pulse; el tooling interno legacy queda fuera de esta navegacion.
-                </p>
-              </div>
               <p className="text-xs text-muted-foreground">
-                Ultima actualizacion: {lastUpdate.toLocaleString()}
+                Última actualización operativa: {lastUpdate.toLocaleString()}
               </p>
             </div>
 
             <div className="flex items-center gap-2 self-start">
+              <ThemeToggle size="sm" variant="outline" />
               <Button type="button" variant="outline" onClick={onRefresh}>
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Actualizar
               </Button>
-              <NotificationBell />
-              <ThemeToggle />
+              <NotificationsBellTrigger onClick={openPanel} unreadCount={unreadCount} />
+              <AvatarMenu onLogout={logout} onOpenNotifications={openPanel} user={user} />
             </div>
           </div>
 
           <div className="mt-4 border-t border-border/60 pt-4">
             <AdminSectionNav activeSection={activeSection} onSectionChange={onSectionChange} />
           </div>
-        </div>
+          </div>
 
-        <div className="min-h-[calc(100vh-240px)] space-y-3 sm:space-y-4 lg:space-y-6">
-          {children}
+          <div className="min-h-[calc(100vh-240px)] space-y-3 sm:space-y-4 lg:space-y-6">
+            {children}
+          </div>
         </div>
       </div>
-    </div>
+      <NotificationsPanel open={panelOpen} onClose={closePanel} />
+    </>
   );
 }

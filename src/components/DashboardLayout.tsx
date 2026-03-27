@@ -105,12 +105,6 @@ export default function DashboardLayout({ children, dashboardProps }: DashboardL
   const isAdminPage = location.pathname === '/admin';
   const isClientDashboardPage = location.pathname === '/dashboard';
 
-  const handleRefreshData = () => {
-    if (isAdminPage) {
-      window.location.reload();
-    }
-  };
-
   return (
     <>
       <SkipLink targetId="main-content" />
@@ -148,28 +142,30 @@ export default function DashboardLayout({ children, dashboardProps }: DashboardL
         ) : null}
 
         <div className="flex-1 flex flex-col overflow-hidden w-full">
-          <Topbar
-            onMenuClick={() => setIsMobileMenuOpen(true)}
-            showMobileMenu={true}
-            onRefreshData={isAdminPage ? handleRefreshData : undefined}
-            lastUpdate={isAdminPage || isClientDashboardPage ? new Date() : undefined}
-            isAdmin={isAdminPage}
-            isClientDashboard={isClientDashboardPage}
-            clientDashboardStats={
-              isClientDashboardPage && dashboardProps?.stats ? dashboardProps.stats : undefined
-            }
-            onClientRefresh={
-              isClientDashboardPage && dashboardProps?.onRefresh
-                ? dashboardProps.onRefresh
-                : undefined
-            }
-            onClientSearch={
-              isClientDashboardPage && dashboardProps?.onSearch ? dashboardProps.onSearch : undefined
-            }
-            clientSearchTerm={
-              isClientDashboardPage && dashboardProps?.searchTerm ? dashboardProps.searchTerm : ''
-            }
-          />
+          {!isAdminPage ? (
+            <Topbar
+              onMenuClick={() => setIsMobileMenuOpen(true)}
+              showMobileMenu={true}
+              onRefreshData={undefined}
+              lastUpdate={isClientDashboardPage ? new Date() : undefined}
+              isAdmin={false}
+              isClientDashboard={isClientDashboardPage}
+              clientDashboardStats={
+                isClientDashboardPage && dashboardProps?.stats ? dashboardProps.stats : undefined
+              }
+              onClientRefresh={
+                isClientDashboardPage && dashboardProps?.onRefresh
+                  ? dashboardProps.onRefresh
+                  : undefined
+              }
+              onClientSearch={
+                isClientDashboardPage && dashboardProps?.onSearch ? dashboardProps.onSearch : undefined
+              }
+              clientSearchTerm={
+                isClientDashboardPage && dashboardProps?.searchTerm ? dashboardProps.searchTerm : ''
+              }
+            />
+          ) : null}
           <main id="main-content" className="flex-1 overflow-y-auto w-full">
             {children}
           </main>
