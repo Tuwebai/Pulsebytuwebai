@@ -14,7 +14,7 @@ import { toast } from '@/hooks/use-toast';
 
 export interface AdminDomainUser {
   id: string;
-  email: string;
+  email: string | null;
   website?: string | null;
   website_status?: WebsiteReviewStatus | null;
   website_review_notes?: string | null;
@@ -22,6 +22,7 @@ export interface AdminDomainUser {
 
 interface AdminUserDomainReviewDialogProps {
   user: AdminDomainUser;
+  triggerLabel?: string;
   onUpdated: (result: AdminWebsiteReviewResult) => void;
 }
 
@@ -46,7 +47,11 @@ function getStatusVariant(status?: WebsiteReviewStatus | null): 'default' | 'sec
   return 'secondary';
 }
 
-export function AdminUserDomainReviewDialog({ user, onUpdated }: AdminUserDomainReviewDialogProps) {
+export function AdminUserDomainReviewDialog({
+  user,
+  triggerLabel = 'Gestionar URL',
+  onUpdated,
+}: AdminUserDomainReviewDialogProps) {
   const [open, setOpen] = useState(false);
   const [domain, setDomain] = useState(user.website ?? '');
   const [notes, setNotes] = useState(user.website_review_notes ?? '');
@@ -106,7 +111,7 @@ export function AdminUserDomainReviewDialog({ user, onUpdated }: AdminUserDomain
         className="bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 dark:bg-slate-900/30 dark:border-slate-700 dark:text-slate-200"
       >
         <Globe size={14} className="mr-1" />
-        Gestionar URL
+        {triggerLabel}
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -117,7 +122,7 @@ export function AdminUserDomainReviewDialog({ user, onUpdated }: AdminUserDomain
               <Badge variant={getStatusVariant(user.website_status)}>{statusLabel}</Badge>
             </div>
             <DialogDescription className="text-[var(--text-secondary)]">
-              Cliente: {user.email}
+              Cliente: {user.email ?? 'Sin email'}
             </DialogDescription>
           </DialogHeader>
 

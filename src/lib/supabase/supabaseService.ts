@@ -13,6 +13,11 @@ export interface User {
   onboarding_completed?: boolean;
   onboarding_completed_at?: string | null;
   website?: string | null;
+  website_status?: 'missing' | 'pending_review' | 'approved' | 'rejected' | null;
+  website_submitted_at?: string | null;
+  website_reviewed_at?: string | null;
+  website_reviewed_by?: string | null;
+  website_review_notes?: string | null;
   pulse_access_status?: 'pending' | 'invited' | 'active' | 'disabled';
   pulse_access_granted_at?: string | null;
   pulse_access_granted_by?: string | null;
@@ -222,7 +227,7 @@ export class SupabaseService {
         const { data, error } = await supabase
           .from('users')
           .select(
-            'id, email, full_name, role, created_at, updated_at, avatar_url, onboarding_completed, onboarding_completed_at, website, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by, pulse_access_disabled_at, animations_enabled, low_bandwidth_mode, two_factor_auth, session_timeout, login_notifications, device_management, notif_new_consultation, notif_monthly_summary, notif_project_update'
+            'id, email, full_name, role, created_at, updated_at, avatar_url, onboarding_completed, onboarding_completed_at, website, website_status, website_submitted_at, website_reviewed_at, website_reviewed_by, website_review_notes, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by, pulse_access_disabled_at, animations_enabled, low_bandwidth_mode, two_factor_auth, session_timeout, login_notifications, device_management, notif_new_consultation, notif_monthly_summary, notif_project_update'
           )
           .eq('id', id)
           .maybeSingle(); // Usar maybeSingle en lugar de single para evitar errores

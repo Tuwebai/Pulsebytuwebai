@@ -2,6 +2,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useEffect } from 'react';
 import { deleteCachedData, getCachedData, setCachedData } from '@/contexts/appContext.cache';
 import type { Project, ProjectLog, User } from '@/contexts/appContext.types';
+import { supabase } from '@/lib/supabase';
 import { projectService } from '@/lib/services/projectService';
 
 type ProjectPhase = NonNullable<Project['fases']>[number];
@@ -101,6 +102,48 @@ export function useAppProjects({
       void setupProjects();
     }
   }, [setupProjects, user]);
+
+  useEffect(() => {
+    if (!user || user.role === 'admin') {
+      return;
+    }
+
+    const channel = supabase
+      .channel(`projects-user-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'projects',
+          filter: `created_by=eq.${user.id}`,
+        },
+        (payload) => {
+          if (payload.eventType === 'DELETE') {
+            const deletedProject = payload.old as Pick<Project, 'id'>;
+            setProjects((currentProjects) => currentProjects.filter((project) => project.id !== deletedProject.id));
+            return;
+          }
+
+          const nextProject = payload.new as Project;
+
+          setProjects((currentProjects) => {
+            const currentIndex = currentProjects.findIndex((project) => project.id === nextProject.id);
+
+            if (currentIndex === -1) {
+              return [nextProject, ...currentProjects];
+            }
+
+            return currentProjects.map((project) => (project.id === nextProject.id ? { ...project, ...nextProject } : project));
+          });
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [setProjects, user]);
 
   const createProject = useCallback(
     async (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt' | 'ownerEmail'>) => {

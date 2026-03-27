@@ -25,6 +25,57 @@ interface AdminUserCardProps {
   onDomainUpdated: (userId: string, update: AdminUserCardWebsiteUpdate) => void;
 }
 
+function getWebsiteStatusLabel(status?: string | null, website?: string | null) {
+  if (!website) {
+    return 'Sin URL';
+  }
+
+  switch (status) {
+    case 'approved':
+      return 'URL aprobada';
+    case 'pending_review':
+      return 'URL en revision';
+    case 'rejected':
+      return 'URL rechazada';
+    default:
+      return 'URL cargada';
+  }
+}
+
+function getWebsiteStatusBadgeClass(status?: string | null, website?: string | null) {
+  if (!website) {
+    return 'border-border/60 bg-[var(--bg-elevated)] text-muted-foreground';
+  }
+
+  switch (status) {
+    case 'approved':
+      return 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300';
+    case 'pending_review':
+      return 'border-amber-500/30 bg-amber-500/10 text-amber-300';
+    case 'rejected':
+      return 'border-red-500/25 bg-red-500/10 text-red-300';
+    default:
+      return 'border-border/60 bg-[var(--bg-elevated)] text-foreground';
+  }
+}
+
+function getWebsiteActionLabel(status?: string | null, website?: string | null) {
+  if (!website) {
+    return 'Configurar URL';
+  }
+
+  switch (status) {
+    case 'approved':
+      return 'Editar URL';
+    case 'pending_review':
+      return 'Revisar URL';
+    case 'rejected':
+      return 'Corregir URL';
+    default:
+      return 'Gestionar URL';
+  }
+}
+
 export function AdminUserCard({
   user,
   enablingPulseUserId,
@@ -37,6 +88,8 @@ export function AdminUserCard({
   const role = user.role || 'cliente';
   const userInitial = user.full_name?.charAt(0) || user.email?.charAt(0) || 'U';
   const isAdmin = role === 'admin';
+  const websiteStatusLabel = getWebsiteStatusLabel(user.website_status, user.website);
+  const websiteActionLabel = getWebsiteActionLabel(user.website_status, user.website);
 
   return (
     <div className="rounded-2xl border border-border/60 bg-background/30 p-4 shadow-sm transition-colors duration-150 hover:border-border hover:bg-background/50 sm:p-5">
@@ -97,8 +150,22 @@ export function AdminUserCard({
               >
                 {isAdmin ? 'Administrador' : 'Cliente'}
               </Badge>
+              {!isAdmin ? (
+                <Badge
+                  variant="outline"
+                  className={getWebsiteStatusBadgeClass(user.website_status, user.website)}
+                >
+                  {websiteStatusLabel}
+                </Badge>
+              ) : null}
               <span className="text-xs text-muted-foreground">ID {user.id.slice(0, 8)}</span>
             </div>
+
+            {!isAdmin ? (
+              <p className="max-w-[520px] truncate text-sm text-muted-foreground">
+                {user.website ? user.website : 'Todavia no cargamos una URL para este cliente.'}
+              </p>
+            ) : null}
           </div>
         </div>
 
@@ -139,6 +206,7 @@ export function AdminUserCard({
             {!isAdmin ? (
               <AdminUserDomainReviewDialog
                 user={user}
+                triggerLabel={websiteActionLabel}
                 onUpdated={(result) => {
                   onDomainUpdated(user.id, result);
                 }}
