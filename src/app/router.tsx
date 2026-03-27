@@ -32,6 +32,7 @@ const Index = createLazyComponent(() => import('@/pages/Index'));
 const Login = createLazyComponent(() => import('@/pages/Login'));
 const Onboarding = createLazyComponent(() => import('@/pages/Onboarding'));
 const Register = createLazyComponent(() => import('@/pages/Register'));
+const PulseAccessPendingPage = createLazyComponent(() => import('@/features/auth/pages/PulseAccessPendingPage'));
 const PoliticaPrivacidad = createLazyComponent(() => import('@/pages/PoliticaPrivacidad'));
 const TerminosCondiciones = createLazyComponent(() => import('@/pages/TerminosCondiciones'));
 const HomePage = createLazyComponent(() => import('@/features/dashboard/pages/HomePage'));
@@ -97,6 +98,7 @@ function AppRoutes() {
         InvitationPage,
         Login,
         Onboarding,
+        PulseAccessPendingPage,
         Register,
         SSOPage
       })}

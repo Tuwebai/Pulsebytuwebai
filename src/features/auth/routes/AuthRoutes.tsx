@@ -9,6 +9,7 @@ interface AuthRoutesProps {
   InvitationPage: ComponentType;
   Login: ComponentType;
   Onboarding: ComponentType;
+  PulseAccessPendingPage: ComponentType;
   Register: ComponentType;
   SSOPage: ComponentType;
 }
@@ -19,6 +20,7 @@ export function renderAuthRoutes({
   InvitationPage,
   Login,
   Onboarding,
+  PulseAccessPendingPage,
   Register,
   SSOPage
 }: AuthRoutesProps): ReactNode {
@@ -36,6 +38,14 @@ export function renderAuthRoutes({
         }
       />
       <Route path="/register" element={<Register />} />
+      <Route
+        path="/pulse-access"
+        element={
+          <ProtectedRoute allowWithoutPulseAccess>
+            <PulseAccessPendingPage />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/invite" element={<InvitationPage />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/auth/github/callback" element={<GitHubCallback />} />
