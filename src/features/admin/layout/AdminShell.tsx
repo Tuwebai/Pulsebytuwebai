@@ -42,9 +42,9 @@ export function AdminShell({
       <div className="min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-all duration-300">
         <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-3 py-3 sm:px-4 sm:py-4 lg:px-8 lg:py-6">
           <div className="rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm backdrop-blur">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex flex-col gap-4">
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="outline" className="border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300">
                   <Shield className="mr-1 h-3.5 w-3.5" />
                   Pulse Admin
@@ -58,14 +58,23 @@ export function AdminShell({
               </p>
             </div>
 
-            <div className="flex items-center gap-2 self-start">
-              <ThemeToggle size="sm" variant="outline" />
-              <Button type="button" variant="outline" onClick={onRefresh}>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <Button type="button" variant="outline" onClick={onRefresh} className="w-full sm:w-auto">
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Actualizar
               </Button>
-              <NotificationsBellTrigger onClick={openPanel} unreadCount={unreadCount} />
-              <AvatarMenu onLogout={logout} onOpenNotifications={openPanel} user={user} />
+
+              <div className="flex items-center justify-end gap-2 rounded-full border border-border/60 bg-[var(--bg-elevated)]/70 p-1">
+                <ThemeToggle size="sm" variant="ghost" className="shrink-0" />
+                <NotificationsBellTrigger
+                  className="h-9 w-9 shrink-0 border border-border/60 bg-background/70 p-0"
+                  onClick={openPanel}
+                  unreadCount={unreadCount}
+                />
+                <div className="shrink-0">
+                  <AvatarMenu onLogout={logout} onOpenNotifications={openPanel} user={user} />
+                </div>
+              </div>
             </div>
           </div>
 
