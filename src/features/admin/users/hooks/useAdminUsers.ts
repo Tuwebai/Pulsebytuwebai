@@ -155,7 +155,10 @@ export function useAdminUsers() {
     try {
       setEnablingPulseUserId(targetUserId);
 
-      const result = await enablePulseAccess(targetUserId);
+      const result = await enablePulseAccess(
+        targetUserId,
+        mode === 'resend' ? 'resend' : 'enable',
+      );
 
       setUsers((prev) =>
         prev.map((currentUser) =>
@@ -172,11 +175,16 @@ export function useAdminUsers() {
       );
 
       if (mode === 'resend') {
+        const resendDescription =
+          result.delivery_type === 'invite'
+            ? 'Se envió una nueva invitación Pulse con branding TuWebAI.'
+            : result.delivery_type === 'magiclink'
+              ? 'Se envió un nuevo enlace de acceso directo a Pulse.'
+              : 'El acceso Pulse del cliente sigue vigente. Si todavía no llegó el correo, falta alinear el backend de reenvío.';
+
         toast({
-          title: result.invited ? 'Acceso reenviado' : 'Acceso Pulse vigente',
-          description: result.invited
-            ? 'Se envio una nueva invitacion de acceso a Pulse para este cliente.'
-            : 'El acceso sigue habilitado. El reenvio de correo todavia no esta disponible desde este panel.',
+          title: 'Acceso reenviado',
+          description: resendDescription,
         });
       } else if (mode === 'manage') {
         toast({
@@ -184,7 +192,7 @@ export function useAdminUsers() {
           description:
             result.pulse_access_status === 'active'
               ? 'El cliente ya tiene acceso activo a Pulse.'
-              : 'El cliente ya tiene una invitacion vigente para entrar a Pulse.',
+              : 'El cliente ya tiene una invitación vigente para entrar a Pulse.',
         });
       } else {
         toast({
@@ -192,7 +200,7 @@ export function useAdminUsers() {
           description:
             result.pulse_access_status === 'active'
               ? 'El cliente ya tiene acceso activo a Pulse.'
-              : 'El cliente ya puede entrar a Pulse. Si todavia no completa onboarding, va a onboarding.',
+              : 'El cliente ya puede entrar a Pulse. Si todavía no completa onboarding, va a onboarding.',
         });
       }
     } catch (error) {

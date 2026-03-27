@@ -1,8 +1,8 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import {
   corsHeaders,
+  deliverPulseAccess,
   ensureAuthenticatedAdmin,
-  ensureAuthUserExists,
   type EnablePulseAccessBody,
   type EnablePulseAccessResponse,
   type TargetUserRow,
@@ -30,7 +30,7 @@ async function findTargetUser(
   if (typeof body.userId === 'string' && body.userId.trim()) {
     const { data, error } = await adminClient
       .from('users')
-      .select('id, email, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by')
+      .select('id, email, full_name, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by')
       .eq('id', body.userId.trim())
       .maybeSingle();
 
@@ -44,7 +44,7 @@ async function findTargetUser(
   const normalizedEmail = normalizeEmail(body.email ?? '');
   const { data, error } = await adminClient
     .from('users')
-    .select('id, email, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by')
+    .select('id, email, full_name, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by')
     .eq('email', normalizedEmail)
     .maybeSingle();
 
@@ -65,13 +65,14 @@ async function createInvitedUser(
     .from('users')
     .insert({
       email: normalizeEmail(email),
+      full_name: null,
       role: 'user',
       pulse_access_status: 'invited',
       pulse_access_granted_at: timestamp,
       pulse_access_granted_by: adminUserId,
       updated_at: timestamp
     })
-    .select('id, email, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by')
+    .select('id, email, full_name, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by')
     .single();
 
   if (error) {
@@ -97,7 +98,7 @@ async function promotePendingUser(
       updated_at: timestamp
     })
     .eq('id', userId)
-    .select('id, email, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by')
+    .select('id, email, full_name, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by')
     .single();
 
   if (error) {
@@ -107,9 +108,18 @@ async function promotePendingUser(
   return data as TargetUserRow;
 }
 
-function toResponse(user: TargetUserRow, invited: boolean): EnablePulseAccessResponse {
+function toResponse(
+  user: TargetUserRow,
+  delivery: {
+    invited: boolean;
+    email_sent: boolean;
+    delivery_type: 'invite' | 'magiclink' | 'none';
+  }
+): EnablePulseAccessResponse {
   return {
-    invited,
+    invited: delivery.invited,
+    email_sent: delivery.email_sent,
+    delivery_type: delivery.delivery_type,
     user_id: user.id,
     email: normalizeEmail(user.email),
     pulse_access_status: user.pulse_access_status === 'active' ? 'active' : 'invited',
@@ -165,8 +175,8 @@ serve(async (req) => {
       user = await promotePendingUser(adminClient, user.id, authUserId);
     }
 
-    const invited = await ensureAuthUserExists(adminClient, user.email);
-    return jsonResponse(200, toResponse(user, invited));
+    const delivery = await deliverPulseAccess(adminClient, user);
+    return jsonResponse(200, toResponse(user, delivery));
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
 

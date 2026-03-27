@@ -3,6 +3,8 @@ import { supabase } from '@/lib/supabase/supabase';
 
 export interface EnablePulseAccessResponse {
   invited: boolean;
+  email_sent: boolean;
+  delivery_type: 'invite' | 'magiclink' | 'none';
   user_id: string;
   email: string;
   pulse_access_status: 'invited' | 'active';
@@ -10,7 +12,16 @@ export interface EnablePulseAccessResponse {
   pulse_access_granted_by: string | null;
 }
 
-function isEnablePulseAccessResponse(value: unknown): value is EnablePulseAccessResponse {
+interface LegacyEnablePulseAccessResponse {
+  invited: boolean;
+  user_id: string;
+  email: string;
+  pulse_access_status: 'invited' | 'active';
+  pulse_access_granted_at: string | null;
+  pulse_access_granted_by: string | null;
+}
+
+function isLegacyEnablePulseAccessResponse(value: unknown): value is LegacyEnablePulseAccessResponse {
   if (!value || typeof value !== 'object') {
     return false;
   }
@@ -27,7 +38,47 @@ function isEnablePulseAccessResponse(value: unknown): value is EnablePulseAccess
   );
 }
 
-export async function invokeEnablePulseAccess(userId: string): Promise<EnablePulseAccessResponse> {
+function isEnablePulseAccessResponse(value: unknown): value is EnablePulseAccessResponse {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const payload = value as Record<string, unknown>;
+
+  return (
+    typeof payload.invited === 'boolean' &&
+    typeof payload.email_sent === 'boolean' &&
+    (payload.delivery_type === 'invite' ||
+      payload.delivery_type === 'magiclink' ||
+      payload.delivery_type === 'none') &&
+    typeof payload.user_id === 'string' &&
+    typeof payload.email === 'string' &&
+    (payload.pulse_access_status === 'invited' || payload.pulse_access_status === 'active') &&
+    (typeof payload.pulse_access_granted_at === 'string' || payload.pulse_access_granted_at === null) &&
+    (typeof payload.pulse_access_granted_by === 'string' || payload.pulse_access_granted_by === null)
+  );
+}
+
+function normalizeEnablePulseAccessResponse(data: unknown): EnablePulseAccessResponse | null {
+  if (isEnablePulseAccessResponse(data)) {
+    return data;
+  }
+
+  if (isLegacyEnablePulseAccessResponse(data)) {
+    return {
+      ...data,
+      email_sent: false,
+      delivery_type: 'none',
+    };
+  }
+
+  return null;
+}
+
+export async function invokeEnablePulseAccess(
+  userId: string,
+  action: 'enable' | 'resend' = 'enable',
+): Promise<EnablePulseAccessResponse> {
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -42,6 +93,7 @@ export async function invokeEnablePulseAccess(userId: string): Promise<EnablePul
     },
     body: {
       userId,
+      action,
     },
   });
 
@@ -65,7 +117,11 @@ export async function invokeEnablePulseAccess(userId: string): Promise<EnablePul
         throw new Error('El usuario tiene el acceso a Pulse revocado. Reactivarlo requiere una acción separada.');
       }
 
-      throw new Error('No pudimos habilitar el acceso a Pulse desde el backend.');
+      throw new Error(
+        action === 'resend'
+          ? 'No pudimos reenviar el acceso a Pulse desde el backend.'
+          : 'No pudimos habilitar el acceso a Pulse desde el backend.',
+      );
     }
 
     if (error instanceof FunctionsRelayError) {
@@ -73,15 +129,25 @@ export async function invokeEnablePulseAccess(userId: string): Promise<EnablePul
     }
 
     if (error instanceof FunctionsFetchError) {
-      throw new Error('No pudimos conectarnos con la función que habilita acceso a Pulse.');
+      throw new Error(
+        action === 'resend'
+          ? 'No pudimos conectarnos con la función que reenvía acceso a Pulse.'
+          : 'No pudimos conectarnos con la función que habilita acceso a Pulse.',
+      );
     }
 
-    throw new Error('No pudimos habilitar el acceso a Pulse.');
+    throw new Error(
+      action === 'resend'
+        ? 'No pudimos reenviar el acceso a Pulse.'
+        : 'No pudimos habilitar el acceso a Pulse.',
+    );
   }
 
-  if (!isEnablePulseAccessResponse(data)) {
+  const normalizedResponse = normalizeEnablePulseAccessResponse(data);
+
+  if (!normalizedResponse) {
     throw new Error('La respuesta para habilitar Pulse vino incompleta.');
   }
 
-  return data;
+  return normalizedResponse;
 }

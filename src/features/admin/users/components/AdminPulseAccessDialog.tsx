@@ -134,7 +134,7 @@ export function AdminPulseAccessDialog({
             {hasAccess ? (
               <p>
                 Si necesitás volver a notificar al cliente, usá <strong className="text-[var(--text-primary)]">Reenviar acceso</strong>.
-                Cuando el backend no puede reenviar correo, el panel te lo informa sin mentir el estado.
+                Pulse va a enviar un nuevo correo operativo con acceso actualizado y branding TuWebAI.
               </p>
             ) : (
               <p>

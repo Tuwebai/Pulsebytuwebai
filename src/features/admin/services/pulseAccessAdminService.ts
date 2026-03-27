@@ -5,6 +5,9 @@ import {
 
 export type { EnablePulseAccessResponse };
 
-export async function enablePulseAccess(userId: string): Promise<EnablePulseAccessResponse> {
-  return invokeEnablePulseAccess(userId);
+export async function enablePulseAccess(
+  userId: string,
+  action: 'enable' | 'resend' = 'enable',
+): Promise<EnablePulseAccessResponse> {
+  return invokeEnablePulseAccess(userId, action);
 }

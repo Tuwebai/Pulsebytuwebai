@@ -2,6 +2,7 @@
 /// <reference lib="deno.window" />
 // @ts-expect-error - Deno import for Supabase
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { generatePulseAccessEmailHtml, generatePulseAccessEmailSubject } from './template.ts';
 
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,10 +11,12 @@ export const corsHeaders = {
 } as const;
 
 export type PulseAccessStatus = 'pending' | 'invited' | 'active' | 'disabled';
+export type PulseAccessAction = 'enable' | 'resend';
 
 export interface EnablePulseAccessBody {
   userId?: string;
   email?: string;
+  action?: PulseAccessAction;
 }
 
 export interface AdminUserRow {
@@ -24,6 +27,7 @@ export interface AdminUserRow {
 export interface TargetUserRow {
   id: string;
   email: string;
+  full_name: string | null;
   pulse_access_status: PulseAccessStatus;
   pulse_access_granted_at: string | null;
   pulse_access_granted_by: string | null;
@@ -31,6 +35,8 @@ export interface TargetUserRow {
 
 export interface EnablePulseAccessResponse {
   invited: boolean;
+  email_sent: boolean;
+  delivery_type: 'invite' | 'magiclink' | 'none';
   user_id: string;
   email: string;
   pulse_access_status: Extract<PulseAccessStatus, 'invited' | 'active'>;
@@ -58,6 +64,10 @@ export function isValidEmail(value: string): boolean {
 
 export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
+}
+
+function getPulseAccessRedirectUrl() {
+  return Deno.env.get('PULSE_ACCESS_REDIRECT_URL') || 'https://pulse.tuweb-ai.com/';
 }
 
 export function createSupabaseAdminClient() {
@@ -182,4 +192,99 @@ export async function ensureAuthUserExists(
   }
 
   return true;
+}
+
+async function sendPulseAccessEmail(params: {
+  to: string;
+  name: string;
+  accessUrl: string;
+  mode: 'invite' | 'magiclink';
+}) {
+  const resendApiKey = Deno.env.get('RESEND_API_KEY');
+  const from = Deno.env.get('SMTP_FROM') || 'pulse@tuweb-ai.com';
+  const replyTo = Deno.env.get('EMAIL_REPLY_TO') || 'hola@tuweb-ai.com';
+
+  if (!resendApiKey) {
+    throw new Error('MISSING_RESEND_API_KEY');
+  }
+
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${resendApiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from,
+      to: params.to,
+      reply_to: replyTo,
+      subject: generatePulseAccessEmailSubject(params),
+      html: generatePulseAccessEmailHtml(params)
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`RESEND_ERROR_${response.status}`);
+  }
+}
+
+export async function deliverPulseAccess(
+  adminClient: ReturnType<typeof createSupabaseAdminClient>,
+  user: Pick<TargetUserRow, 'email' | 'full_name'>
+) {
+  const normalizedEmail = normalizeEmail(user.email);
+  const redirectTo = getPulseAccessRedirectUrl();
+  const existingUser = await findAuthUserByEmail(adminClient, normalizedEmail);
+
+  if (existingUser?.email) {
+    const linkResult = await adminClient.auth.admin.generateLink({
+      type: 'magiclink',
+      email: normalizedEmail,
+      options: {
+        redirectTo
+      }
+    });
+
+    if (linkResult.error || !linkResult.data.properties?.action_link) {
+      throw linkResult.error || new Error('MAGICLINK_GENERATION_FAILED');
+    }
+
+    await sendPulseAccessEmail({
+      to: normalizedEmail,
+      name: user.full_name || 'cliente',
+      accessUrl: linkResult.data.properties.action_link,
+      mode: 'magiclink'
+    });
+
+    return {
+      invited: false,
+      email_sent: true,
+      delivery_type: 'magiclink' as const
+    };
+  }
+
+  const inviteResult = await adminClient.auth.admin.generateLink({
+    type: 'invite',
+    email: normalizedEmail,
+    options: {
+      redirectTo
+    }
+  });
+
+  if (inviteResult.error || !inviteResult.data.properties?.action_link) {
+    throw inviteResult.error || new Error('INVITE_GENERATION_FAILED');
+  }
+
+  await sendPulseAccessEmail({
+    to: normalizedEmail,
+    name: user.full_name || 'cliente',
+    accessUrl: inviteResult.data.properties.action_link,
+    mode: 'invite'
+  });
+
+  return {
+    invited: true,
+    email_sent: true,
+    delivery_type: 'invite' as const
+  };
 }
