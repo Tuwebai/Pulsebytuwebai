@@ -1,11 +1,10 @@
-import { Bell } from 'lucide-react';
 import { AvatarMenu, PulseLogo } from '@/core/components';
+import { NotificationsBellTrigger } from '@/core/notifications/components/NotificationsBellTrigger';
 import { useApp } from '@/contexts/AppContext';
 import { NotificationsPanel } from '@/core/notifications/components/NotificationsPanel';
 import { useNotifications } from '@/core/notifications/hooks/useNotifications';
-import { useNotificationsRealtime } from '@/core/notifications/hooks/useNotificationsRealtime';
+import { useNotificationsPanelState } from '@/core/notifications/hooks/useNotificationsPanelState';
 import { useProfile } from '@/features/profile/hooks/useProfile';
-import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 
 function getGreeting(date = new Date()) {
   const hours = date.getHours();
@@ -24,9 +23,11 @@ function getGreeting(date = new Date()) {
 export default function Header() {
   const { logout, user } = useApp();
   const { profile } = useProfile();
-  const [panelOpen, setPanelOpen] = useSessionStorageState(`pulse:header:${user?.id ?? 'anon'}:notifications-open`, false);
   const { unreadCount } = useNotifications();
-  useNotificationsRealtime(user?.id || null);
+  const { panelOpen, openPanel, closePanel } = useNotificationsPanelState(
+    `pulse:header:${user?.id ?? 'anon'}:notifications-open`,
+    user?.id ?? null
+  );
   const greeting = getGreeting();
   const dateLabel = new Intl.DateTimeFormat('es-AR', {
     weekday: 'long',
@@ -53,28 +54,15 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            aria-label="Abrir notificaciones"
-            className="relative rounded-full p-2 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
-            data-tour="shell-notifications"
-            type="button"
-            onClick={() => setPanelOpen(true)}
-          >
-            <Bell size={20} strokeWidth={1.5} />
-            {unreadCount > 0 ? (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--danger)] px-1 text-[10px] font-medium text-white">
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </span>
-            ) : null}
-          </button>
+          <NotificationsBellTrigger dataTour="shell-notifications" onClick={openPanel} unreadCount={unreadCount} />
 
           <div data-tour="shell-avatar-menu">
-            <AvatarMenu onLogout={logout} onOpenNotifications={() => setPanelOpen(true)} user={user} />
+            <AvatarMenu onLogout={logout} onOpenNotifications={openPanel} user={user} />
           </div>
         </div>
       </header>
 
-      <NotificationsPanel open={panelOpen} onClose={() => setPanelOpen(false)} />
+      <NotificationsPanel open={panelOpen} onClose={closePanel} />
     </>
   );
 }

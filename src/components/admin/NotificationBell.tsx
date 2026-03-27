@@ -1,9 +1,8 @@
 import { useApp } from '@/contexts/AppContext';
-import { Bell } from 'lucide-react';
+import { NotificationsBellTrigger } from '@/core/notifications/components/NotificationsBellTrigger';
 import { NotificationsPanel } from '@/core/notifications/components/NotificationsPanel';
 import { useNotifications } from '@/core/notifications/hooks/useNotifications';
-import { useNotificationsRealtime } from '@/core/notifications/hooks/useNotificationsRealtime';
-import { useSessionStorageState } from '@/hooks/useSessionStorageState';
+import { useNotificationsPanelState } from '@/core/notifications/hooks/useNotificationsPanelState';
 
 interface NotificationBellProps {
   className?: string;
@@ -11,31 +10,17 @@ interface NotificationBellProps {
 
 export default function NotificationBell({ className = '' }: NotificationBellProps) {
   const { user } = useApp();
-  const [panelOpen, setPanelOpen] = useSessionStorageState(
+  const { panelOpen, openPanel, closePanel } = useNotificationsPanelState(
     `pulse:topbar:${user?.id ?? 'anon'}:notifications-open`,
-    false
+    user?.id ?? null
   );
   const { unreadCount } = useNotifications();
 
-  useNotificationsRealtime(user?.id ?? null);
-
   return (
     <>
-      <button
-        aria-label="Abrir notificaciones"
-        className={`relative rounded-full p-2 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] ${className}`.trim()}
-        type="button"
-        onClick={() => setPanelOpen(true)}
-      >
-        <Bell className="h-5 w-5" strokeWidth={1.5} />
-        {unreadCount > 0 ? (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--danger)] px-1 text-[10px] font-medium text-white">
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
-        ) : null}
-      </button>
+      <NotificationsBellTrigger className={className} onClick={openPanel} unreadCount={unreadCount} />
 
-      <NotificationsPanel open={panelOpen} onClose={() => setPanelOpen(false)} />
+      <NotificationsPanel open={panelOpen} onClose={closePanel} />
     </>
   );
 }
