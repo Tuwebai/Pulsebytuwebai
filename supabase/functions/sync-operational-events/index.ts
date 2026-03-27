@@ -5,8 +5,13 @@ import {
   buildEventKey,
   buildLatestProjectMap,
   corsHeaders,
+  createRequestAuditId,
   ensureAuthenticatedAdmin,
   jsonResponse,
+  logSyncOperationalEventsError,
+  readSyncOperationalEventsRequest,
+  SyncOperationalEventsError,
+  type AuthenticatedAdminContext,
   type ManagedEventInput,
   type ManagedEventRecord,
 } from './shared.ts';
@@ -26,7 +31,7 @@ const MANAGED_EVENT_TYPES = [
   'onboarding_incomplete',
 ];
 
-async function applyEvents(adminClient: Awaited<ReturnType<typeof ensureAuthenticatedAdmin>>, desiredEvents: ManagedEventInput[], existingEvents: ManagedEventRecord[]) {
+async function applyEvents(adminClient: AuthenticatedAdminContext['adminClient'], desiredEvents: ManagedEventInput[], existingEvents: ManagedEventRecord[]) {
   const existingByKey = new Map(existingEvents.map((event) => [buildEventKey(event), event]));
   const desiredByKey = new Map(desiredEvents.map((event) => [buildEventKey(event), event]));
   let created = 0;
@@ -78,17 +83,23 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: corsHeaders });
   if (req.method !== 'POST') return jsonResponse(405, { error: 'Method Not Allowed' });
 
+  const requestId = createRequestAuditId();
   const authorization = req.headers.get('Authorization');
-  if (!authorization) return jsonResponse(401, { error: 'Unauthorized' });
+  if (!authorization) {
+    return jsonResponse(401, { error: 'Tu sesion no tiene permisos para sincronizar eventos.', request_id: requestId });
+  }
 
+  let adminUserId: string | null = null;
   try {
-    const adminClient = await ensureAuthenticatedAdmin(authorization);
+    await readSyncOperationalEventsRequest(req);
+    const adminContext = await ensureAuthenticatedAdmin(authorization);
+    adminUserId = adminContext.adminUserId;
     const [users, projects, tickets, payments, existingEventsResult] = await Promise.all([
-      adminClient.from('users').select('id, role, onboarding_completed, website, website_status').eq('role', 'user'),
-      adminClient.from('projects').select('id, created_by, name, approval_status, domain, ga4_property_id, created_at').order('created_at', { ascending: false }),
-      adminClient.from('tickets').select('id, user_id, status, priority, asunto, created_at').order('created_at', { ascending: false }),
-      adminClient.from('payments').select('id, user_id, status, mercadopago_status, description, created_at').order('created_at', { ascending: false }),
-      adminClient.from('operational_events').select('id, client_id, type, status, owner_id, source_type, source_id, snoozed_until, updated_at, created_at').in('type', MANAGED_EVENT_TYPES),
+      adminContext.adminClient.from('users').select('id, role, onboarding_completed, website, website_status').eq('role', 'user'),
+      adminContext.adminClient.from('projects').select('id, created_by, name, approval_status, domain, ga4_property_id, created_at').order('created_at', { ascending: false }),
+      adminContext.adminClient.from('tickets').select('id, user_id, status, priority, asunto, created_at').order('created_at', { ascending: false }),
+      adminContext.adminClient.from('payments').select('id, user_id, status, mercadopago_status, description, created_at').order('created_at', { ascending: false }),
+      adminContext.adminClient.from('operational_events').select('id, client_id, type, status, owner_id, source_type, source_id, snoozed_until, updated_at, created_at').in('type', MANAGED_EVENT_TYPES),
     ]);
 
     if (users.error) throw users.error;
@@ -107,13 +118,18 @@ serve(async (req) => {
       ...createPaymentEvents(payments.data ?? [], existingByKey),
     ];
 
-    const summary = await applyEvents(adminClient, desiredEvents, existingEvents);
-    return jsonResponse(200, { ok: true, ...summary, desired: desiredEvents.length });
+    const summary = await applyEvents(adminContext.adminClient, desiredEvents, existingEvents);
+    return jsonResponse(200, { ok: true, request_id: requestId, ...summary, desired: desiredEvents.length });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    if (message === 'UNAUTHORIZED') return jsonResponse(401, { error: message });
-    if (message === 'FORBIDDEN') return jsonResponse(403, { error: message });
-    console.error('Error en sync-operational-events:', message);
-    return jsonResponse(500, { error: 'Unable to sync operational events' });
+    if (error instanceof SyncOperationalEventsError) {
+      logSyncOperationalEventsError({ requestId, adminUserId, error });
+      return jsonResponse(error.status, { error: error.publicMessage, request_id: requestId });
+    }
+
+    logSyncOperationalEventsError({ requestId, adminUserId, error });
+    return jsonResponse(500, {
+      error: 'No pudimos completar la sincronizacion operativa.',
+      request_id: requestId,
+    });
   }
 });

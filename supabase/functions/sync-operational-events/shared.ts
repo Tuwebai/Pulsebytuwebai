@@ -9,6 +9,16 @@ export const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 } as const;
 
+export class SyncOperationalEventsError extends Error {
+  constructor(
+    public readonly status: number,
+    public readonly publicMessage: string,
+    public readonly code: string,
+  ) {
+    super(code);
+  }
+}
+
 export type EventType =
   | 'payment_pending'
   | 'payment_rejected'
@@ -86,6 +96,15 @@ export interface ManagedEventInput {
   resolved_at?: string | null;
 }
 
+export interface AuthenticatedAdminContext {
+  adminClient: ReturnType<typeof createSupabaseAdminClient>;
+  adminUserId: string;
+}
+
+export interface SyncOperationalEventsRequest {
+  trigger: 'manual_admin_sync';
+}
+
 export function jsonResponse(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
     status,
@@ -93,31 +112,75 @@ export function jsonResponse(status: number, body: Record<string, unknown>) {
   });
 }
 
+function getRequiredEnv(name: string) {
+  const value = Deno.env.get(name);
+  if (!value) {
+    throw new SyncOperationalEventsError(500, 'No pudimos preparar la sincronizacion operativa.', 'ENV_MISSING');
+  }
+  return value;
+}
+
 export function createSupabaseAdminClient() {
-  return createClient(Deno.env.get('SUPABASE_URL') || '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '', {
+  return createClient(getRequiredEnv('SUPABASE_URL'), getRequiredEnv('SUPABASE_SERVICE_ROLE_KEY'), {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }
 
 function createSupabaseUserClient(authorization: string) {
-  return createClient(Deno.env.get('SUPABASE_URL') || '', Deno.env.get('SUPABASE_ANON_KEY') || '', {
+  return createClient(getRequiredEnv('SUPABASE_URL'), getRequiredEnv('SUPABASE_ANON_KEY'), {
     auth: { autoRefreshToken: false, persistSession: false },
     global: { headers: { Authorization: authorization } },
   });
 }
 
-export async function ensureAuthenticatedAdmin(authorization: string) {
+export function createRequestAuditId() {
+  return crypto.randomUUID();
+}
+
+export async function readSyncOperationalEventsRequest(req: Request): Promise<SyncOperationalEventsRequest> {
+  const contentLength = req.headers.get('content-length');
+  if (!req.body || contentLength === '0') {
+    return { trigger: 'manual_admin_sync' };
+  }
+
+  const contentType = req.headers.get('content-type') ?? '';
+  if (contentType && !contentType.toLowerCase().includes('application/json')) {
+    throw new SyncOperationalEventsError(415, 'La solicitud de sincronizacion no es valida.', 'UNSUPPORTED_CONTENT_TYPE');
+  }
+
+  let rawBody: unknown;
+
+  try {
+    rawBody = await req.json();
+  } catch {
+    throw new SyncOperationalEventsError(400, 'La solicitud de sincronizacion no es valida.', 'INVALID_JSON');
+  }
+
+  if (!rawBody || typeof rawBody !== 'object' || Array.isArray(rawBody)) {
+    throw new SyncOperationalEventsError(400, 'La solicitud de sincronizacion no es valida.', 'INVALID_PAYLOAD');
+  }
+
+  const trigger = 'trigger' in rawBody ? (rawBody as { trigger?: unknown }).trigger : undefined;
+
+  if (typeof trigger !== 'undefined' && trigger !== 'manual_admin_sync') {
+    throw new SyncOperationalEventsError(400, 'La solicitud de sincronizacion no es valida.', 'INVALID_TRIGGER');
+  }
+
+  return { trigger: 'manual_admin_sync' };
+}
+
+export async function ensureAuthenticatedAdmin(authorization: string): Promise<AuthenticatedAdminContext> {
   const userClient = createSupabaseUserClient(authorization);
   const adminClient = createSupabaseAdminClient();
   const { data: { user }, error } = await userClient.auth.getUser();
 
   if (error || !user?.id) {
-    throw new Error('UNAUTHORIZED');
+    throw new SyncOperationalEventsError(401, 'Tu sesion no tiene permisos para sincronizar eventos.', 'UNAUTHORIZED');
   }
 
   const { data: isAdmin, error: adminRpcError } = await userClient.rpc('is_admin');
   if (!adminRpcError && isAdmin === true) {
-    return adminClient;
+    return { adminClient, adminUserId: user.id };
   }
 
   const { data: adminUser, error: adminUserError } = await adminClient
@@ -128,10 +191,23 @@ export async function ensureAuthenticatedAdmin(authorization: string) {
 
   if (adminUserError) throw adminUserError;
   if ((adminUser as { role: string | null } | null)?.role !== 'admin') {
-    throw new Error('FORBIDDEN');
+    throw new SyncOperationalEventsError(403, 'Solo un administrador puede sincronizar eventos operativos.', 'FORBIDDEN');
   }
 
-  return adminClient;
+  return { adminClient, adminUserId: user.id };
+}
+
+export function logSyncOperationalEventsError(params: {
+  requestId: string;
+  adminUserId: string | null;
+  error: unknown;
+}) {
+  const message = params.error instanceof Error ? params.error.message : 'Unknown error';
+  console.error('[sync-operational-events]', {
+    request_id: params.requestId,
+    admin_user_id: params.adminUserId,
+    error_message: message,
+  });
 }
 
 export function buildEventKey(event: Pick<ManagedEventInput, 'client_id' | 'type' | 'source_type' | 'source_id'>) {
