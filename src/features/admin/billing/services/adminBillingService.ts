@@ -1,19 +1,12 @@
+import { updateAdminPaymentRecordStatus } from '@/api/admin/adminBilling.api';
 import { notificationService } from '@/lib/notificationService';
-import { supabase } from '@/lib/supabase';
 
 export async function updateAdminPaymentStatus(
   paymentId: string,
   newStatus: string,
   actorUserId: string,
 ) {
-  const { error } = await supabase
-    .from('payments')
-    .update({ status: newStatus })
-    .eq('id', paymentId);
-
-  if (error) {
-    throw error;
-  }
+  await updateAdminPaymentRecordStatus(paymentId, newStatus);
 
   await notificationService.createNotification({
     title: 'Estado de Pago Actualizado',
