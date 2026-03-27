@@ -1,8 +1,8 @@
 import { useApp } from '@/contexts/AppContext';
 import { Bell } from 'lucide-react';
-import { NotificationsPanel } from '@/features/notifications/components/NotificationsPanel';
-import { useNotifications } from '@/features/notifications/hooks/useNotifications';
-import { useNotificationsRealtime } from '@/features/notifications/hooks/useNotificationsRealtime';
+import { NotificationsPanel } from '@/core/notifications/components/NotificationsPanel';
+import { useNotifications } from '@/core/notifications/hooks/useNotifications';
+import { useNotificationsRealtime } from '@/core/notifications/hooks/useNotificationsRealtime';
 import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 
 interface NotificationBellProps {

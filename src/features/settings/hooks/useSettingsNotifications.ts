@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useNotificationPreferences } from '@/features/notifications/hooks/useNotificationPreferences';
+import { useNotificationPreferences } from '@/core/notifications/hooks/useNotificationPreferences';
 
 export function useSettingsNotifications() {
   const { prefs, isLoading, isSaving, updatePreference } = useNotificationPreferences();
