@@ -14,6 +14,8 @@ interface NotificationBellProps {
   className?: string;
 }
 
+const isDocumentVisible = () => typeof document === 'undefined' || document.visibilityState === 'visible';
+
 export default function NotificationBell({ className = '' }: NotificationBellProps) {
   const { theme } = useTheme();
   const { user } = useApp();
@@ -103,13 +105,28 @@ export default function NotificationBell({ className = '' }: NotificationBellPro
       return undefined;
     }
 
-    loadUnreadNotifications();
+    if (isDocumentVisible()) {
+      void loadUnreadNotifications();
+    }
+
+    const handleVisibilityChange = () => {
+      if (isDocumentVisible()) {
+        void loadUnreadNotifications(true);
+      }
+    };
 
     const interval = setInterval(() => {
-      loadUnreadNotifications(true);
+      if (isDocumentVisible()) {
+        void loadUnreadNotifications(true);
+      }
     }, 30000);
 
-    return () => clearInterval(interval);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [user?.id]); // Solo ejecutar cuando user.id cambie realmente
 
   // Manejar clic en notificación

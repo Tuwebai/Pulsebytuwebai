@@ -215,7 +215,9 @@ export const OptimizedMotion = React.memo(React.forwardRef<HTMLDivElement, Optim
 
   // SIEMPRE renderizar el componente, solo ocultar con CSS
   const animationStyles: React.CSSProperties = {
-    transition: `all ${effectiveDuration}ms ${ease}`,
+    transitionProperty: 'opacity, transform',
+    transitionDuration: `${effectiveDuration}ms`,
+    transitionTimingFunction: ease,
     transitionDelay: `${effectiveDelay}ms`,
     opacity: getOpacity(),
     transform: getTransformStyles(),

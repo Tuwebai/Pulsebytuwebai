@@ -67,6 +67,12 @@ class NotificationService {
 
       return filteredData;
     } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+
+      if (message.includes('The provided callback is no longer runnable.')) {
+        return [];
+      }
+
       // Solo manejar errores de conexiÃ³n, no loggear errores de red
       if (error?.message?.includes('Failed to fetch') || error?.message?.includes('ERR_CONNECTION_CLOSED')) {
         // Error de conexiÃ³n - no loggear, solo retornar array vacÃ­o
