@@ -205,14 +205,17 @@ export function useAdminUsers() {
       }
     } catch (error) {
       console.error('Error enabling Pulse access:', error);
-      toast({
-        title: 'Error',
-        description:
-          mode === 'resend'
+      const message =
+        error instanceof Error
+          ? error.message
+          : mode === 'resend'
             ? 'No se pudo reenviar el acceso a Pulse.'
             : mode === 'manage'
               ? 'No se pudo revisar el acceso a Pulse.'
-              : 'No se pudo habilitar el acceso a Pulse.',
+              : 'No se pudo habilitar el acceso a Pulse.';
+      toast({
+        title: 'Error',
+        description: message,
         variant: 'destructive',
       });
     } finally {

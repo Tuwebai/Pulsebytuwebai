@@ -188,6 +188,14 @@ serve(async (req) => {
       return jsonResponse(403, { error: message });
     }
 
+    if (message.includes('Error sending magic link email')) {
+      return jsonResponse(502, { error: 'MAGIC_LINK_EMAIL_FAILED' });
+    }
+
+    if (message.includes('Error sending invite email')) {
+      return jsonResponse(502, { error: 'INVITE_EMAIL_FAILED' });
+    }
+
     console.error('Error en enable-pulse-access:', message);
     return jsonResponse(500, { error: 'Unable to enable Pulse access' });
   }

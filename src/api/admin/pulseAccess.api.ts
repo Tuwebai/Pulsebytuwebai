@@ -117,6 +117,18 @@ export async function invokeEnablePulseAccess(
         throw new Error('El usuario tiene el acceso a Pulse revocado. Reactivarlo requiere una acción separada.');
       }
 
+      if (error.context.status === 502 && payload?.error === 'MAGIC_LINK_EMAIL_FAILED') {
+        throw new Error(
+          'Supabase Auth no pudo enviar el enlace de acceso. Revisá SMTP y el template de Magic Link en Authentication > Email.',
+        );
+      }
+
+      if (error.context.status === 502 && payload?.error === 'INVITE_EMAIL_FAILED') {
+        throw new Error(
+          'Supabase Auth no pudo enviar la invitación inicial. Revisá SMTP y el template de Invite user en Authentication > Email.',
+        );
+      }
+
       throw new Error(
         action === 'resend'
           ? 'No pudimos reenviar el acceso a Pulse desde el backend.'
