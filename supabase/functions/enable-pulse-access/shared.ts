@@ -2,7 +2,6 @@
 /// <reference lib="deno.window" />
 // @ts-expect-error - Deno import for Supabase
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { generatePulseAccessEmailHtml, generatePulseAccessEmailSubject } from './template.ts';
 
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -99,6 +98,18 @@ export function createSupabaseUserClient(authHeader: string) {
   });
 }
 
+export function createSupabasePublicClient() {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+  const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
+
+  return createClient(supabaseUrl, anonKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+}
+
 export async function ensureAuthenticatedAdmin(authorization: string) {
   const userClient = createSupabaseUserClient(authorization);
   const adminClient = createSupabaseAdminClient();
@@ -174,64 +185,6 @@ export async function findAuthUserByEmail(
   return null;
 }
 
-export async function ensureAuthUserExists(
-  adminClient: ReturnType<typeof createSupabaseAdminClient>,
-  email: string
-) {
-  const normalizedEmail = normalizeEmail(email);
-  const existingUser = await findAuthUserByEmail(adminClient, normalizedEmail);
-
-  if (existingUser?.email) {
-    return false;
-  }
-
-  const inviteResult = await adminClient.auth.admin.inviteUserByEmail(normalizedEmail);
-
-  if (inviteResult.error) {
-    throw inviteResult.error;
-  }
-
-  return true;
-}
-
-async function sendPulseAccessEmail(params: {
-  to: string;
-  name: string;
-  accessUrl: string;
-  mode: 'invite' | 'magiclink';
-}) {
-  const resendApiKey = Deno.env.get('RESEND_API_KEY');
-  const from = Deno.env.get('SMTP_FROM') || 'pulse@tuweb-ai.com';
-  const replyTo = Deno.env.get('EMAIL_REPLY_TO') || 'hola@tuweb-ai.com';
-
-  if (!resendApiKey) {
-    throw new Error('MISSING_RESEND_API_KEY');
-  }
-
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      from,
-      to: params.to,
-      reply_to: replyTo,
-      subject: generatePulseAccessEmailSubject(params),
-      html: generatePulseAccessEmailHtml(params)
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error(`RESEND_ERROR_${response.status}`);
-  }
-}
-
-function hasPulseEmailInfrastructure() {
-  return Boolean(Deno.env.get('RESEND_API_KEY'));
-}
-
 export async function deliverPulseAccess(
   adminClient: ReturnType<typeof createSupabaseAdminClient>,
   user: Pick<TargetUserRow, 'email' | 'full_name'>
@@ -240,47 +193,19 @@ export async function deliverPulseAccess(
   const redirectTo = getPulseAccessRedirectUrl();
   const existingUser = await findAuthUserByEmail(adminClient, normalizedEmail);
 
-  if (!hasPulseEmailInfrastructure()) {
-    if (existingUser?.email) {
-      return {
-        invited: false,
-        email_sent: false,
-        delivery_type: 'none' as const
-      };
-    }
-
-    const inviteResult = await adminClient.auth.admin.inviteUserByEmail(normalizedEmail);
-
-    if (inviteResult.error) {
-      throw inviteResult.error;
-    }
-
-    return {
-      invited: true,
-      email_sent: true,
-      delivery_type: 'invite' as const
-    };
-  }
-
   if (existingUser?.email) {
-    const linkResult = await adminClient.auth.admin.generateLink({
-      type: 'magiclink',
+    const publicClient = createSupabasePublicClient();
+    const signInResult = await publicClient.auth.signInWithOtp({
       email: normalizedEmail,
       options: {
-        redirectTo
+        shouldCreateUser: false,
+        emailRedirectTo: redirectTo
       }
     });
 
-    if (linkResult.error || !linkResult.data.properties?.action_link) {
-      throw linkResult.error || new Error('MAGICLINK_GENERATION_FAILED');
+    if (signInResult.error) {
+      throw signInResult.error;
     }
-
-    await sendPulseAccessEmail({
-      to: normalizedEmail,
-      name: user.full_name || 'cliente',
-      accessUrl: linkResult.data.properties.action_link,
-      mode: 'magiclink'
-    });
 
     return {
       invited: false,
@@ -289,24 +214,13 @@ export async function deliverPulseAccess(
     };
   }
 
-  const inviteResult = await adminClient.auth.admin.generateLink({
-    type: 'invite',
-    email: normalizedEmail,
-    options: {
-      redirectTo
-    }
+  const inviteResult = await adminClient.auth.admin.inviteUserByEmail(normalizedEmail, {
+    redirectTo
   });
 
-  if (inviteResult.error || !inviteResult.data.properties?.action_link) {
-    throw inviteResult.error || new Error('INVITE_GENERATION_FAILED');
+  if (inviteResult.error) {
+    throw inviteResult.error;
   }
-
-  await sendPulseAccessEmail({
-    to: normalizedEmail,
-    name: user.full_name || 'cliente',
-    accessUrl: inviteResult.data.properties.action_link,
-    mode: 'invite'
-  });
 
   return {
     invited: true,

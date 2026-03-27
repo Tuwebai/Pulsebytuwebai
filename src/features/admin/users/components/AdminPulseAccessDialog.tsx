@@ -132,7 +132,7 @@ export function AdminPulseAccessDialog({
             {hasAccess ? (
               <p>
                 Si necesitás volver a notificar al cliente, usá <strong className="text-[var(--text-primary)]">Reenviar acceso</strong>.
-                Cuando la capa de correo operativa esté disponible, Pulse envía el correo con branding TuWebAI; si no, el panel te informa el estado real sin mentir.
+                Pulse reenvía el acceso a través de Supabase Auth y el SMTP configurado para el proyecto, sin depender del frontend.
               </p>
             ) : (
               <p>

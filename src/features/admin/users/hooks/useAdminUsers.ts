@@ -180,7 +180,7 @@ export function useAdminUsers() {
             ? 'Se envió una nueva invitación Pulse con branding TuWebAI.'
             : result.delivery_type === 'magiclink'
               ? 'Se envió un nuevo enlace de acceso directo a Pulse.'
-              : 'El acceso Pulse del cliente sigue vigente. Si todavía no llegó el correo, falta alinear el backend de reenvío.';
+              : 'El acceso Pulse del cliente sigue vigente. Si todavía no llegó el correo, revisá la configuración SMTP de Supabase Auth.';
 
         toast({
           title: 'Acceso reenviado',
