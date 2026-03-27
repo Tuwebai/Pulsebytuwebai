@@ -1,6 +1,6 @@
 import { ExternalLink, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { FadeIn, MetricCard, Skeleton } from '@/core/components';
+import { FadeIn, MetricCard, PulseEmptyState, Skeleton } from '@/core/components';
 import AnimatedList from '@/core/components/AnimatedList';
 import { useApp } from '@/contexts/AppContext';
 import type { Period } from '@/data/types/pulse';
@@ -54,8 +54,13 @@ export default function PulsePage() {
       </section>
 
       {!hasProject && !loading ? (
-        <div className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-6 text-sm text-[var(--text-secondary)]">
-          Tu proyecto esta siendo configurado. Vuelve pronto.
+        <div className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)]">
+          <PulseEmptyState
+            hasProject={false}
+            onConnect={() => navigate('/dashboard/configuracion')}
+            website={user?.website ?? null}
+            websiteStatus={user?.website_status ?? null}
+          />
         </div>
       ) : null}
 

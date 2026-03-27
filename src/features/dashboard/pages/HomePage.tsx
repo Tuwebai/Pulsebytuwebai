@@ -118,12 +118,12 @@ export default function HomePage() {
         key={`${period}-${loading ? 'loading' : hasDomain && data?.hasData ? 'ready' : 'empty'}`}
       >
         {!hasProject && !loading ? (
-          <div className="space-y-3">
-            <h2 className="text-2xl font-medium text-[var(--text-primary)]">Tu proyecto se esta configurando.</h2>
-            <p className="max-w-2xl text-sm text-[var(--text-secondary)]">
-              Apenas tu equipo termine la configuracion inicial, vas a ver aca el rendimiento real de tu web.
-            </p>
-          </div>
+          <PulseEmptyState
+            hasProject={false}
+            onConnect={() => navigate('/dashboard/configuracion')}
+            website={user?.website ?? null}
+            websiteStatus={user?.website_status ?? null}
+          />
         ) : !hasDomain || !data?.hasData ? (
           <PulseEmptyState
             onConnect={() => navigate('/dashboard/configuracion')}

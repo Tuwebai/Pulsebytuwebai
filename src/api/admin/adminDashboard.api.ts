@@ -5,6 +5,18 @@ export interface AdminUserRecord {
   email: string | null;
   full_name: string | null;
   role: string | null;
+  avatar_url?: string | null;
+  website?: string | null;
+  website_status?: 'missing' | 'pending_review' | 'approved' | 'rejected' | null;
+  website_submitted_at?: string | null;
+  website_reviewed_at?: string | null;
+  website_reviewed_by?: string | null;
+  website_review_notes?: string | null;
+  pulse_access_status?: 'pending' | 'invited' | 'active' | 'disabled' | null;
+  pulse_access_granted_at?: string | null;
+  pulse_access_granted_by?: string | null;
+  pulse_access_disabled_at?: string | null;
+  updated_at?: string | null;
   created_at: string;
   [key: string]: unknown;
 }
