@@ -178,16 +178,6 @@ export function AdminPulseAccessDialog({
 
             <section className="space-y-4">
               <div className="rounded-[var(--radius-xl)] border border-[var(--border-default)] bg-[var(--bg-elevated)] p-4">
-                <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-                  Canal operativo
-                </p>
-                <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">Supabase Auth + SMTP del proyecto</p>
-                <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-                  El acceso se emite desde backend y el correo sale con la configuracion activa del proyecto.
-                </p>
-              </div>
-
-              <div className="rounded-[var(--radius-xl)] border border-[var(--border-default)] bg-[var(--bg-elevated)] p-4">
                 <div className="flex items-start gap-3">
                   <Mail className="mt-0.5 h-4 w-4 text-signal" />
                   <div className="min-w-0">
