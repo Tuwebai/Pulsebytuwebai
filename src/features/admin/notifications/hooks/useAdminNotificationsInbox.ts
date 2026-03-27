@@ -10,11 +10,19 @@ import {
   snoozeInboxEvent,
   type EventFilters,
 } from '@/features/admin/notifications/services/adminNotifications.service';
-import { syncOperationalEvents } from '@/features/admin/notifications/services/adminOperationalEventSyncAction.service';
+import {
+  syncOperationalEvents,
+  type OperationalEventSyncSummary,
+} from '@/features/admin/notifications/services/adminOperationalEventSyncAction.service';
+import { toast } from '@/hooks/use-toast';
 
 const DEFAULT_FILTERS: EventFilters = {
   status: ['open', 'in_progress'],
 };
+
+function buildSyncDescription(summary: OperationalEventSyncSummary) {
+  return `Creados ${summary.created} · actualizados ${summary.updated} · cerrados ${summary.deleted} · vigentes ${summary.desired}`;
+}
 
 export function useAdminNotificationsInbox() {
   const queryClient = useQueryClient();
@@ -71,7 +79,20 @@ export function useAdminNotificationsInbox() {
 
   const syncSources = useMutation({
     mutationFn: syncOperationalEvents,
-    onSuccess: invalidate,
+    onSuccess: async (summary) => {
+      await invalidate();
+      toast({
+        title: 'Inbox operativa actualizada',
+        description: buildSyncDescription(summary),
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'No pudimos actualizar la inbox operativa',
+        description: error instanceof Error ? error.message : 'Reintentá en unos segundos.',
+        variant: 'destructive',
+      });
+    },
   });
 
   return {

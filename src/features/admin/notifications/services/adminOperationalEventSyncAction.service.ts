@@ -1,7 +1,29 @@
 import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/supabase';
 
-export async function syncOperationalEvents(): Promise<void> {
+export interface OperationalEventSyncSummary {
+  ok: boolean;
+  created: number;
+  updated: number;
+  deleted: number;
+  desired: number;
+}
+
+function isValidSyncSummary(data: unknown): data is OperationalEventSyncSummary {
+  if (!data || typeof data !== 'object') return false;
+
+  const candidate = data as Record<string, unknown>;
+
+  return (
+    typeof candidate.ok === 'boolean'
+    && typeof candidate.created === 'number'
+    && typeof candidate.updated === 'number'
+    && typeof candidate.deleted === 'number'
+    && typeof candidate.desired === 'number'
+  );
+}
+
+export async function syncOperationalEvents(): Promise<OperationalEventSyncSummary> {
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -10,7 +32,7 @@ export async function syncOperationalEvents(): Promise<void> {
     throw new Error('Tu sesión de administrador no está disponible para actualizar eventos.');
   }
 
-  const { error } = await supabase.functions.invoke('sync-operational-events', {
+  const { data, error } = await supabase.functions.invoke('sync-operational-events', {
     headers: {
       Authorization: `Bearer ${session.access_token}`,
     },
@@ -39,4 +61,10 @@ export async function syncOperationalEvents(): Promise<void> {
   if (error) {
     throw new Error('No pudimos sincronizar los eventos operativos.');
   }
+
+  if (!isValidSyncSummary(data)) {
+    throw new Error('El backend devolvio una respuesta invalida al actualizar eventos.');
+  }
+
+  return data;
 }
