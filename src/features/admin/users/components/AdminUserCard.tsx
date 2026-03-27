@@ -1,9 +1,10 @@
+import { Edit, Shield, Trash2, UserCheck } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AdminUserDomainReviewDialog } from '@/features/admin/components/AdminUserDomainReviewDialog';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
-import { Edit, Trash2, UserCheck } from 'lucide-react';
 
 interface AdminUserCardWebsiteUpdate {
   website?: string | null;
@@ -35,14 +36,15 @@ export function AdminUserCard({
 }: AdminUserCardProps) {
   const role = user.role || 'cliente';
   const userInitial = user.full_name?.charAt(0) || user.email?.charAt(0) || 'U';
+  const isAdmin = role === 'admin';
 
   return (
-    <div className="group rounded-2xl border border-border/50 bg-gradient-to-r from-slate-50 to-white p-6 transition-all duration-300 hover:border-border/50 hover:from-slate-100 hover:to-slate-50 hover:shadow-lg dark:border-slate-600/50 dark:from-slate-700 dark:to-slate-600 dark:hover:border-slate-500/50 dark:hover:from-slate-600 dark:hover:to-slate-500">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="relative">
+    <div className="rounded-2xl border border-border/60 bg-background/30 p-4 shadow-sm transition-colors duration-150 hover:border-border hover:bg-background/50 sm:p-5">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+          <div className="relative shrink-0">
             {user.avatar_url ? (
-              <div className="h-14 w-14 overflow-hidden rounded-2xl shadow-lg transition-transform duration-300 group-hover:scale-110">
+              <div className="h-12 w-12 overflow-hidden rounded-2xl border border-white/10 bg-[var(--bg-elevated)] sm:h-14 sm:w-14">
                 <img
                   src={user.avatar_url}
                   alt={`Avatar de ${user.full_name || user.email}`}
@@ -57,47 +59,57 @@ export function AdminUserCard({
                   }}
                 />
                 <div
-                  className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 text-lg font-bold text-white"
+                  className="hidden h-full w-full items-center justify-center bg-signal/15 text-base font-semibold text-signal"
                   style={{ display: 'none' }}
                 >
                   {userInitial}
                 </div>
               </div>
             ) : (
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-lg font-bold text-white shadow-lg transition-transform duration-300 group-hover:scale-110">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-signal/15 text-base font-semibold text-signal sm:h-14 sm:w-14">
                 {userInitial}
               </div>
             )}
 
-            {role === 'admin' ? (
-              <div className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg">
-                <span className="text-xs font-bold text-white">A</span>
+            {isAdmin ? (
+              <div className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-slate-950">
+                <Shield className="h-3.5 w-3.5" />
               </div>
             ) : null}
           </div>
 
-          <div>
-            <div className="text-lg font-bold text-card-foreground transition-colors duration-300 group-hover:text-slate-900 dark:text-slate-100 dark:group-hover:text-slate-50">
-              {user.full_name || 'Sin nombre'}
+          <div className="min-w-0 space-y-2">
+            <div className="space-y-1">
+              <p className="truncate text-base font-semibold text-foreground sm:text-lg">
+                {user.full_name || 'Sin nombre'}
+              </p>
+              <p className="truncate text-sm text-muted-foreground">{user.email}</p>
             </div>
-            <div className="text-sm text-slate-500 transition-colors duration-300 group-hover:text-slate-600 dark:text-slate-400 dark:group-hover:text-slate-300">
-              {user.email}
-              <div className="mt-2 flex items-center space-x-2">
-                <Badge variant={role === 'admin' ? 'default' : 'secondary'} className="px-3 py-1 text-xs font-medium">
-                  {role === 'admin' ? 'Administrador' : 'Cliente'}
-                </Badge>
-                <span className="text-xs text-slate-400 dark:text-slate-500">ID: {user.id.slice(0, 8)}...</span>
-              </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge
+                variant="outline"
+                className={
+                  isAdmin
+                    ? 'border-amber-500/30 bg-amber-500/10 text-amber-300'
+                    : 'border-border/60 bg-[var(--bg-elevated)] text-foreground'
+                }
+              >
+                {isAdmin ? 'Administrador' : 'Cliente'}
+              </Badge>
+              <span className="text-xs text-muted-foreground">ID {user.id.slice(0, 8)}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-3">
-            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Rol:</span>
+        <div className="flex w-full flex-col gap-3 lg:w-auto lg:min-w-[360px]">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+              Rol operativo
+            </span>
             <Select value={role} onValueChange={(value) => onRoleChange(user.id, value)}>
-              <SelectTrigger className="w-32 border-border bg-white font-medium text-card-foreground transition-colors duration-200 hover:border-border dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:border-slate-500">
-                <SelectValue>{role === 'admin' ? 'Admin' : 'Cliente'}</SelectValue>
+              <SelectTrigger className="w-full border-border/60 bg-[var(--bg-elevated)] text-foreground sm:w-[180px]">
+                <SelectValue>{isAdmin ? 'Admin' : 'Cliente'}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="admin" className="text-card-foreground">
@@ -110,21 +122,21 @@ export function AdminUserCard({
             </Select>
           </div>
 
-          <div className="flex items-center space-x-2">
-            {role !== 'admin' ? (
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            {!isAdmin ? (
               <Button
                 variant="outline"
                 size="sm"
                 disabled={enablingPulseUserId === user.id}
                 onClick={() => onEnablePulseAccess(user.id)}
-                className="h-9 border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-3 py-2 text-emerald-700 transition-all duration-200 hover:from-emerald-100 hover:to-teal-100 hover:text-emerald-800 dark:border-emerald-700 dark:from-emerald-900/30 dark:to-teal-900/30 dark:text-emerald-400 dark:hover:from-emerald-800/40 dark:hover:to-teal-800/40 dark:hover:text-emerald-300"
+                className="justify-center border-emerald-500/25 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/15"
               >
-                <UserCheck size={14} className="mr-1" />
-                {enablingPulseUserId === user.id ? 'Habilitando...' : 'Permitir acceso a Pulse'}
+                <UserCheck size={14} className="mr-2" />
+                {enablingPulseUserId === user.id ? 'Habilitando acceso...' : 'Habilitar acceso Pulse'}
               </Button>
             ) : null}
 
-            {role !== 'admin' ? (
+            {!isAdmin ? (
               <AdminUserDomainReviewDialog
                 user={user}
                 onUpdated={(result) => {
@@ -137,18 +149,18 @@ export function AdminUserCard({
               variant="outline"
               size="sm"
               onClick={() => onEdit(user)}
-              className="h-9 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-2 text-blue-700 transition-all duration-200 hover:from-blue-100 hover:to-indigo-100 hover:text-blue-800 dark:border-blue-700 dark:from-blue-900/30 dark:to-indigo-900/30 dark:text-blue-400 dark:hover:from-blue-800/40 dark:hover:to-indigo-800/40 dark:hover:text-blue-300"
+              className="justify-center border-border/60 bg-[var(--bg-elevated)] text-foreground hover:border-signal/40"
             >
-              <Edit size={14} className="mr-1" />
+              <Edit size={14} className="mr-2" />
               Editar
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={() => onDelete(user)}
-              className="h-9 border-red-200 bg-gradient-to-r from-red-50 to-pink-50 px-3 py-2 text-red-700 transition-all duration-200 hover:from-red-100 hover:to-pink-100 hover:text-red-800 dark:border-red-700 dark:from-red-900/30 dark:to-pink-900/30 dark:text-red-400 dark:hover:from-red-800/40 dark:hover:to-pink-800/40 dark:hover:text-red-300"
+              className="justify-center border-red-500/25 bg-red-500/10 text-red-300 hover:bg-red-500/15"
             >
-              <Trash2 size={14} className="mr-1" />
+              <Trash2 size={14} className="mr-2" />
               Eliminar
             </Button>
           </div>
