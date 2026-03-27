@@ -10,7 +10,6 @@ import {
   snoozeInboxEvent,
   type EventFilters,
 } from '@/features/admin/notifications/services/adminNotifications.service';
-import { syncOperationalEventsFromSources } from '@/features/admin/notifications/services/adminOperationalEventSync.service';
 
 const DEFAULT_FILTERS: EventFilters = {
   status: ['open', 'in_progress'],
@@ -69,11 +68,6 @@ export function useAdminNotificationsInbox() {
     onSuccess: invalidate,
   });
 
-  const syncSources = useMutation({
-    mutationFn: syncOperationalEventsFromSources,
-    onSuccess: invalidate,
-  });
-
   return {
     events: events ?? [],
     counts,
@@ -82,12 +76,10 @@ export function useAdminNotificationsInbox() {
     adminsLoading,
     filters,
     setFilters,
-    syncSources: syncSources.mutate,
     assign: assign.mutate,
     markInProgress: markInProgress.mutate,
     snooze: snooze.mutate,
     resolve: resolve.mutate,
-    isSyncingSources: syncSources.isPending,
     isAssigning: assign.isPending,
     isMarkingInProgress: markInProgress.isPending,
     isSnoozing: snooze.isPending,

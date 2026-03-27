@@ -73,7 +73,6 @@ export function AdminNotificationsInboxScreen() {
   const navigate = useNavigate();
   const { user } = useApp();
   useInboxRealtime();
-  const [syncTriggered, setSyncTriggered] = useState(false);
   const [activeCounter, setActiveCounter] = useState<CounterFilterId>('all');
   const [activeSegment, setActiveSegment] = useState<InboxSegmentId>('all');
   const [search, setSearch] = useState('');
@@ -86,12 +85,10 @@ export function AdminNotificationsInboxScreen() {
     isLoading,
     adminsLoading,
     setFilters,
-    syncSources,
     assign,
     markInProgress,
     snooze,
     resolve,
-    isSyncingSources,
     isAssigning,
     isMarkingInProgress,
     isSnoozing,
@@ -101,12 +98,6 @@ export function AdminNotificationsInboxScreen() {
   useEffect(() => {
     setFilters(buildFilters(activeCounter, activeSegment, deferredSearch));
   }, [activeCounter, activeSegment, deferredSearch, setFilters]);
-
-  useEffect(() => {
-    if (syncTriggered) return;
-    syncSources();
-    setSyncTriggered(true);
-  }, [syncSources, syncTriggered]);
 
   useEffect(() => {
     if (!events.length) {
@@ -127,7 +118,7 @@ export function AdminNotificationsInboxScreen() {
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,55%)_minmax(0,45%)]">
         <div className="space-y-3">
-          {isLoading || isSyncingSources
+          {isLoading
             ? Array.from({ length: 5 }).map((_, index) => (
                 <div key={`skeleton-${index}`} className="rounded-2xl border border-border/70 bg-card/60 p-4">
                   <Skeleton className="h-4 w-1/2" />
