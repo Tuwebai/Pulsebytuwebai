@@ -45,7 +45,7 @@ export function AdminOverviewScreen({
   onSectionChange,
 }: AdminOverviewScreenProps) {
   return (
-    <>
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5">
       <AdminOverviewStats
         usuariosActivos={usuariosActivos}
         usuariosNuevos={usuariosNuevos}
@@ -59,7 +59,7 @@ export function AdminOverviewScreen({
         ingresosEsteMes={ingresosEsteMes}
       />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] xl:gap-4">
         <AdminOperationalStatus
           isCalendarAuthenticated={isCalendarAuthenticated}
           calendarLoading={calendarLoading}
@@ -83,6 +83,6 @@ export function AdminOverviewScreen({
           onSectionChange={onSectionChange}
         />
       </div>
-    </>
+    </div>
   );
 }

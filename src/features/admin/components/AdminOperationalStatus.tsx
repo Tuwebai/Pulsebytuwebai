@@ -32,69 +32,83 @@ export function AdminOperationalStatus({
   ingresosTotales,
   ingresosEsteMes,
 }: AdminOperationalStatusProps) {
+  const statusRows = [
+    { icon: Users, label: 'Clientes con acceso', value: usuariosActivos, toneClassName: 'bg-signal/15 text-signal' },
+    { icon: Users, label: 'Altas del mes', value: `+${usuariosNuevos}`, toneClassName: 'bg-emerald-500/15 text-emerald-400' },
+    { icon: FolderOpen, label: 'Proyectos en seguimiento', value: proyectosEnCurso, toneClassName: 'bg-emerald-500/15 text-emerald-400' },
+    { icon: CheckCircle, label: 'Entrega completada', value: `${tasaCompletacionProyectos}%`, toneClassName: 'bg-sky-500/15 text-sky-300' },
+    { icon: Ticket, label: 'Tickets abiertos', value: ticketsAbiertos, toneClassName: 'bg-amber-500/15 text-amber-300' },
+    { icon: Eye, label: 'Casos urgentes', value: ticketsUrgentes, toneClassName: 'bg-red-500/15 text-red-300' },
+    { icon: DollarSign, label: 'Cobranza acumulada', value: `$${ingresosTotales.toLocaleString()}`, toneClassName: 'bg-violet-500/15 text-violet-300' },
+    { icon: Calendar, label: 'Cobranza del mes', value: `$${ingresosEsteMes.toLocaleString()}`, toneClassName: 'bg-signal/15 text-signal' },
+  ] as const;
+
   return (
-    <>
-      <div className="mb-6">
-        <div className="rounded-xl border border-border/50 bg-card p-4 shadow-lg transition-all duration-300 hover:shadow-xl dark:border-slate-700/20 dark:bg-slate-800/50 sm:rounded-2xl sm:p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div
-                className={`flex h-10 w-10 items-center justify-center rounded-xl shadow-lg transition-transform duration-300 sm:h-12 sm:w-12 ${
-                  isCalendarAuthenticated
-                    ? 'bg-gradient-to-br from-green-500 to-green-600 text-white'
-                    : calendarLoading
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
-                      : 'bg-gradient-to-br from-gray-400 to-gray-500 text-white'
-                }`}
-              >
-                <Calendar size={20} className="sm:h-6 sm:w-6" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-card-foreground">Agenda operativa</h3>
-                <p className="text-sm text-muted-foreground">{calendarUserLabel}</p>
-              </div>
+    <div className="space-y-3 sm:space-y-4">
+      <section className="rounded-2xl border border-border/60 bg-[var(--bg-surface)] p-4 shadow-sm sm:p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div
+              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${
+                isCalendarAuthenticated
+                  ? 'bg-emerald-500/15 text-emerald-400'
+                  : calendarLoading
+                    ? 'bg-signal/15 text-signal'
+                    : 'bg-muted text-muted-foreground'
+              }`}
+            >
+              <Calendar className="h-5 w-5" />
             </div>
-            <div className="flex items-center space-x-2">
-              {isCalendarAuthenticated ? (
-                <Badge variant="default" className="bg-green-500 text-white">
-                  Activa
-                </Badge>
-              ) : calendarLoading ? (
-                <Badge variant="outline" className="border-blue-500 text-blue-500">
-                  <div className="mr-2 h-3 w-3 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-                  Conectando...
-                </Badge>
-              ) : (
-                <Button variant="outline" size="sm" onClick={onAuthenticateCalendar} className="text-xs">
-                  Conectar agenda
-                </Button>
-              )}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground">Agenda operativa</h3>
+              <p className="text-xs text-muted-foreground">{calendarUserLabel}</p>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
-        <div className="rounded-2xl border border-border/50 bg-card p-8 shadow-lg transition-all duration-300 hover:shadow-xl dark:border-slate-700/20 dark:bg-slate-800/50">
-          <div className="mb-2 flex items-center space-x-3 text-2xl font-bold text-card-foreground">
-            <BarChart3 size={24} className="text-blue-600" />
-            <span>Estado operativo Pulse</span>
-          </div>
-          <p className="mb-8 text-base text-muted-foreground">Lectura rápida de clientes, soporte, proyectos y cobranza.</p>
-
-          <div className="space-y-4">
-            <OperationalRow icon={Users} label="Clientes con acceso:" value={usuariosActivos} colorClass="bg-blue-500 dark:bg-blue-600" />
-            <OperationalRow icon={Users} label="Altas del mes:" value={`+${usuariosNuevos}`} colorClass="bg-emerald-500 dark:bg-emerald-600" />
-            <OperationalRow icon={FolderOpen} label="Proyectos en seguimiento:" value={proyectosEnCurso} colorClass="bg-emerald-500 dark:bg-emerald-600" />
-            <OperationalRow icon={CheckCircle} label="Entrega completada:" value={`${tasaCompletacionProyectos}%`} colorClass="bg-green-500 dark:bg-green-600" />
-            <OperationalRow icon={Ticket} label="Tickets abiertos:" value={ticketsAbiertos} colorClass="bg-amber-500 dark:bg-amber-600" />
-            <OperationalRow icon={Eye} label="Casos urgentes:" value={ticketsUrgentes} colorClass="bg-red-500 dark:bg-red-600" />
-            <OperationalRow icon={DollarSign} label="Cobranza acumulada:" value={`$${ingresosTotales.toLocaleString()}`} colorClass="bg-violet-500 dark:bg-violet-600" />
-            <OperationalRow icon={Calendar} label="Cobranza del mes:" value={`$${ingresosEsteMes.toLocaleString()}`} colorClass="bg-blue-500 dark:bg-blue-600" />
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {isCalendarAuthenticated ? (
+              <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
+                Activa
+              </Badge>
+            ) : calendarLoading ? (
+              <Badge variant="outline" className="border-signal/40 bg-signal/10 text-signal">
+                <div className="mr-2 h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Conectando
+              </Badge>
+            ) : (
+              <Button variant="outline" size="sm" onClick={onAuthenticateCalendar}>
+                Conectar agenda
+              </Button>
+            )}
           </div>
         </div>
-      </div>
-    </>
+      </section>
+
+      <section className="rounded-2xl border border-border/60 bg-[var(--bg-surface)] p-4 shadow-sm sm:p-5">
+        <div className="mb-4 flex items-start gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-signal/15 text-signal">
+            <BarChart3 className="h-5 w-5" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-lg font-semibold leading-tight text-foreground">Estado operativo Pulse</h3>
+            <p className="text-sm text-muted-foreground">
+              Lectura rápida de clientes, soporte, proyectos y cobranza.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          {statusRows.map((row) => (
+            <OperationalRow
+              key={row.label}
+              icon={row.icon}
+              label={row.label}
+              value={row.value}
+              toneClassName={row.toneClassName}
+            />
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -102,17 +116,19 @@ interface OperationalRowProps {
   icon: typeof Users;
   label: string;
   value: number | string;
-  colorClass: string;
+  toneClassName: string;
 }
 
-function OperationalRow({ icon: Icon, label, value, colorClass }: OperationalRowProps) {
+function OperationalRow({ icon: Icon, label, value, toneClassName }: OperationalRowProps) {
   return (
-    <div className="group flex items-center justify-between rounded-lg border-b border-border px-4 py-4 transition-all duration-200 hover:bg-muted/50 last:border-b-0">
-      <span className="flex items-center space-x-3 font-medium text-muted-foreground">
-        <Icon size={16} className="text-current" />
-        <span>{label}</span>
+    <div className="flex items-center justify-between gap-3 rounded-2xl border border-border/50 bg-background/30 px-3 py-3">
+      <span className="flex min-w-0 items-center gap-3 text-sm text-muted-foreground">
+        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${toneClassName}`}>
+          <Icon className="h-4 w-4" />
+        </span>
+        <span className="truncate">{label}</span>
       </span>
-      <Badge className={`rounded-2xl px-5 py-3 text-base font-bold text-white shadow-lg transition-all duration-200 group-hover:scale-105 ${colorClass}`}>
+      <Badge className="shrink-0 rounded-full border border-border/50 bg-[var(--bg-elevated)] px-3 py-1.5 text-sm font-semibold text-foreground shadow-none">
         {value}
       </Badge>
     </div>
