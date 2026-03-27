@@ -1,42 +1,17 @@
-import type {
-  ManagedOperationalEventRecord,
-  ManagedOperationalEventUpsertInput,
-  OperationalSourcePaymentRecord,
-  OperationalSourceTicketRecord,
-} from '@/api/admin/operationalEventSources.api';
-import {
-  buildEventKey,
-  getPersistedStatus,
-  normalizePriority,
-  normalizeStatus,
-} from './adminOperationalEventSync.utils';
+import type { ManagedEventInput, ManagedEventRecord, PaymentRow, TicketRow } from './shared.ts';
+import { buildEventKey, getPersistedStatus, normalizePriority, normalizeStatus } from './shared.ts';
 
-export function createTicketEvents(
-  tickets: OperationalSourceTicketRecord[],
-  existingByKey: Map<string, ManagedOperationalEventRecord>,
-): ManagedOperationalEventUpsertInput[] {
+export function createTicketEvents(tickets: TicketRow[], existingByKey: Map<string, ManagedEventRecord>): ManagedEventInput[] {
   const now = Date.now();
-
   return tickets.flatMap((ticket) => {
     if (!ticket.user_id) return [];
-
+    const events: ManagedEventInput[] = [];
     const normalizedStatus = normalizeStatus(ticket.status);
     const normalizedPriority = normalizePriority(ticket.priority);
-    const ageHours = (now - new Date(ticket.created_at).getTime()) / (1000 * 60 * 60);
-    const events: ManagedOperationalEventUpsertInput[] = [];
+    const ageHours = (now - new Date(ticket.created_at).getTime()) / 36e5;
 
-    if (
-      ['open', 'new', 'in_progress'].includes(normalizedStatus)
-      && ['high', 'critical', 'urgent', 'alta'].includes(normalizedPriority)
-    ) {
-      const key = buildEventKey({
-        client_id: ticket.user_id,
-        type: 'ticket_critical',
-        source_type: 'ticket',
-        source_id: ticket.id,
-      });
-      const existingEvent = existingByKey.get(key);
-
+    if (['open', 'new', 'in_progress'].includes(normalizedStatus) && ['high', 'critical', 'urgent', 'alta'].includes(normalizedPriority)) {
+      const existingEvent = existingByKey.get(buildEventKey({ client_id: ticket.user_id, type: 'ticket_critical', source_type: 'ticket', source_id: ticket.id }));
       events.push({
         client_id: ticket.user_id,
         type: 'ticket_critical',
@@ -54,14 +29,7 @@ export function createTicketEvents(
     }
 
     if (['open', 'new', 'in_progress'].includes(normalizedStatus) && ageHours >= 48) {
-      const key = buildEventKey({
-        client_id: ticket.user_id,
-        type: 'ticket_sla_breach',
-        source_type: 'ticket',
-        source_id: ticket.id,
-      });
-      const existingEvent = existingByKey.get(key);
-
+      const existingEvent = existingByKey.get(buildEventKey({ client_id: ticket.user_id, type: 'ticket_sla_breach', source_type: 'ticket', source_id: ticket.id }));
       events.push({
         client_id: ticket.user_id,
         type: 'ticket_sla_breach',
@@ -82,28 +50,16 @@ export function createTicketEvents(
   });
 }
 
-export function createPaymentEvents(
-  payments: OperationalSourcePaymentRecord[],
-  existingByKey: Map<string, ManagedOperationalEventRecord>,
-): ManagedOperationalEventUpsertInput[] {
+export function createPaymentEvents(payments: PaymentRow[], existingByKey: Map<string, ManagedEventRecord>): ManagedEventInput[] {
   const now = Date.now();
-
   return payments.flatMap((payment) => {
     if (!payment.user_id) return [];
-
+    const events: ManagedEventInput[] = [];
     const normalizedStatus = normalizeStatus(payment.status || payment.mercadopago_status);
-    const ageHours = (now - new Date(payment.created_at).getTime()) / (1000 * 60 * 60);
-    const events: ManagedOperationalEventUpsertInput[] = [];
+    const ageHours = (now - new Date(payment.created_at).getTime()) / 36e5;
 
     if (['rejected', 'failed', 'cancelled'].includes(normalizedStatus)) {
-      const key = buildEventKey({
-        client_id: payment.user_id,
-        type: 'payment_rejected',
-        source_type: 'payment',
-        source_id: payment.id,
-      });
-      const existingEvent = existingByKey.get(key);
-
+      const existingEvent = existingByKey.get(buildEventKey({ client_id: payment.user_id, type: 'payment_rejected', source_type: 'payment', source_id: payment.id }));
       events.push({
         client_id: payment.user_id,
         type: 'payment_rejected',
@@ -119,14 +75,7 @@ export function createPaymentEvents(
         snoozed_until: existingEvent?.snoozed_until ?? null,
       });
     } else if (normalizedStatus === 'pending' && ageHours >= 48) {
-      const key = buildEventKey({
-        client_id: payment.user_id,
-        type: 'payment_overdue',
-        source_type: 'payment',
-        source_id: payment.id,
-      });
-      const existingEvent = existingByKey.get(key);
-
+      const existingEvent = existingByKey.get(buildEventKey({ client_id: payment.user_id, type: 'payment_overdue', source_type: 'payment', source_id: payment.id }));
       events.push({
         client_id: payment.user_id,
         type: 'payment_overdue',
@@ -142,14 +91,7 @@ export function createPaymentEvents(
         snoozed_until: existingEvent?.snoozed_until ?? null,
       });
     } else if (normalizedStatus === 'pending') {
-      const key = buildEventKey({
-        client_id: payment.user_id,
-        type: 'payment_pending',
-        source_type: 'payment',
-        source_id: payment.id,
-      });
-      const existingEvent = existingByKey.get(key);
-
+      const existingEvent = existingByKey.get(buildEventKey({ client_id: payment.user_id, type: 'payment_pending', source_type: 'payment', source_id: payment.id }));
       events.push({
         client_id: payment.user_id,
         type: 'payment_pending',

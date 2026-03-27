@@ -1,30 +1,18 @@
-import type {
-  ManagedOperationalEventRecord,
-  ManagedOperationalEventUpsertInput,
-  OperationalSourceProjectRecord,
-  OperationalSourceUserRecord,
-} from '@/api/admin/operationalEventSources.api';
-import { buildEventKey, getPersistedStatus } from './adminOperationalEventSync.utils';
+import type { ManagedEventInput, ManagedEventRecord, ProjectRow, UserRow } from './shared.ts';
+import { buildEventKey, getPersistedStatus } from './shared.ts';
 
 export function createUserEvents(
-  users: OperationalSourceUserRecord[],
-  latestProjectByUser: Map<string, OperationalSourceProjectRecord>,
-  existingByKey: Map<string, ManagedOperationalEventRecord>,
-): ManagedOperationalEventUpsertInput[] {
-  const events: ManagedOperationalEventUpsertInput[] = [];
+  users: UserRow[],
+  latestProjectByUser: Map<string, ProjectRow>,
+  existingByKey: Map<string, ManagedEventRecord>,
+): ManagedEventInput[] {
+  const events: ManagedEventInput[] = [];
 
   users.forEach((user) => {
     const latestProject = latestProjectByUser.get(user.id);
 
     if (!user.onboarding_completed) {
-      const key = buildEventKey({
-        client_id: user.id,
-        type: 'onboarding_incomplete',
-        source_type: 'onboarding',
-        source_id: null,
-      });
-      const existingEvent = existingByKey.get(key);
-
+      const existingEvent = existingByKey.get(buildEventKey({ client_id: user.id, type: 'onboarding_incomplete', source_type: 'onboarding', source_id: null }));
       events.push({
         client_id: user.id,
         type: 'onboarding_incomplete',
@@ -42,14 +30,7 @@ export function createUserEvents(
     }
 
     if (user.website_status === 'approved' && user.website && !latestProject) {
-      const key = buildEventKey({
-        client_id: user.id,
-        type: 'client_no_pulse_data',
-        source_type: 'system',
-        source_id: null,
-      });
-      const existingEvent = existingByKey.get(key);
-
+      const existingEvent = existingByKey.get(buildEventKey({ client_id: user.id, type: 'client_no_pulse_data', source_type: 'system', source_id: null }));
       events.push({
         client_id: user.id,
         type: 'client_no_pulse_data',
@@ -66,19 +47,10 @@ export function createUserEvents(
       });
     }
 
-    if (!latestProject || !latestProject.id) {
-      return;
-    }
+    if (!latestProject?.id) return;
 
     if (user.website_status === 'approved' && !latestProject.domain) {
-      const key = buildEventKey({
-        client_id: user.id,
-        type: 'domain_not_connected',
-        source_type: 'domain',
-        source_id: latestProject.id,
-      });
-      const existingEvent = existingByKey.get(key);
-
+      const existingEvent = existingByKey.get(buildEventKey({ client_id: user.id, type: 'domain_not_connected', source_type: 'domain', source_id: latestProject.id }));
       events.push({
         client_id: user.id,
         type: 'domain_not_connected',
@@ -96,14 +68,7 @@ export function createUserEvents(
     }
 
     if (user.website_status === 'approved' && latestProject.domain && !latestProject.ga4_property_id) {
-      const key = buildEventKey({
-        client_id: user.id,
-        type: 'ga4_not_connected',
-        source_type: 'project',
-        source_id: latestProject.id,
-      });
-      const existingEvent = existingByKey.get(key);
-
+      const existingEvent = existingByKey.get(buildEventKey({ client_id: user.id, type: 'ga4_not_connected', source_type: 'project', source_id: latestProject.id }));
       events.push({
         client_id: user.id,
         type: 'ga4_not_connected',
@@ -124,21 +89,11 @@ export function createUserEvents(
   return events;
 }
 
-export function createProjectApprovalEvents(
-  projects: OperationalSourceProjectRecord[],
-  existingByKey: Map<string, ManagedOperationalEventRecord>,
-): ManagedOperationalEventUpsertInput[] {
+export function createProjectApprovalEvents(projects: ProjectRow[], existingByKey: Map<string, ManagedEventRecord>): ManagedEventInput[] {
   return projects
     .filter((project) => project.created_by && project.approval_status === 'pending')
     .map((project) => {
-      const key = buildEventKey({
-        client_id: project.created_by as string,
-        type: 'project_approval_pending',
-        source_type: 'project',
-        source_id: project.id,
-      });
-      const existingEvent = existingByKey.get(key);
-
+      const existingEvent = existingByKey.get(buildEventKey({ client_id: project.created_by as string, type: 'project_approval_pending', source_type: 'project', source_id: project.id }));
       return {
         client_id: project.created_by as string,
         type: 'project_approval_pending',
