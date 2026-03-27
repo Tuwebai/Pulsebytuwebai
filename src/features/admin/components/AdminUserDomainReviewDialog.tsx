@@ -82,7 +82,9 @@ export function AdminUserDomainReviewDialog({
               : 'URL guardada para revision',
         description:
           action === 'approve'
-            ? 'El dominio ya quedo listo para usarse en el proyecto del cliente.'
+            ? result.project_created
+              ? 'La URL quedo aprobada y tambien creamos el proyecto operativo del cliente en Pulse.'
+              : 'El dominio ya quedo listo para usarse en el proyecto del cliente.'
             : action === 'reject'
               ? 'La URL quedo marcada como rechazada para este cliente.'
               : 'La URL quedo pendiente para revision del equipo.',

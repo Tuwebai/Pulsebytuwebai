@@ -21,9 +21,12 @@ export interface AdminWebsiteReviewResult {
   website_review_notes: string | null;
   project_id: string | null;
   project_domain: string | null;
+  project_created: boolean;
 }
 
 interface CurrentUserRecord {
+  email: string | null;
+  full_name: string | null;
   website: string | null;
   website_status: WebsiteReviewStatus | null;
   website_submitted_at: string | null;
@@ -37,6 +40,11 @@ interface LatestProjectRecord {
 function normalizeOptionalNotes(notes?: string | null): string | null {
   const trimmed = notes?.trim() ?? '';
   return trimmed.length > 0 ? trimmed : null;
+}
+
+function buildOperationalProjectName(user: Pick<CurrentUserRecord, 'full_name' | 'email'>) {
+  const identity = user.full_name?.trim() || user.email?.split('@')[0]?.trim() || 'Cliente';
+  return `Web de ${identity}`;
 }
 
 export async function reviewUserWebsite(payload: AdminWebsiteReviewPayload): Promise<AdminWebsiteReviewResult> {
@@ -60,7 +68,7 @@ export async function reviewUserWebsite(payload: AdminWebsiteReviewPayload): Pro
 
   const { data: currentUser, error: currentUserError } = await supabase
     .from('users')
-    .select('website, website_status, website_submitted_at')
+    .select('email, full_name, website, website_status, website_submitted_at')
     .eq('id', payload.userId)
     .maybeSingle();
 
@@ -123,6 +131,7 @@ export async function reviewUserWebsite(payload: AdminWebsiteReviewPayload): Pro
   }
 
   latestProject = (projectData as LatestProjectRecord | null) ?? null;
+  let projectCreated = false;
 
   if (payload.action === 'approve' && normalizedDomain && latestProject?.id) {
     const { error: projectUpdateError } = await supabase
@@ -143,6 +152,34 @@ export async function reviewUserWebsite(payload: AdminWebsiteReviewPayload): Pro
     };
   }
 
+  if (payload.action === 'approve' && normalizedDomain && !latestProject?.id) {
+    const typedUser = currentUser as CurrentUserRecord;
+    const { data: createdProject, error: createProjectError } = await supabase
+      .from('projects')
+      .insert({
+        name: buildOperationalProjectName(typedUser),
+        description: 'Proyecto operativo creado automaticamente al aprobar la URL del cliente.',
+        technologies: [],
+        status: 'development',
+        created_by: payload.userId,
+        is_active: true,
+        approval_status: 'approved',
+        approved_by: authUser.id,
+        approved_at: timestamp,
+        domain: normalizedDomain,
+        updated_at: timestamp,
+      })
+      .select('id, domain')
+      .single();
+
+    if (createProjectError) {
+      throw new Error('No pudimos crear el proyecto asociado al cliente al aprobar la URL.');
+    }
+
+    latestProject = createdProject as LatestProjectRecord;
+    projectCreated = true;
+  }
+
   return {
     user_id: payload.userId,
     website: website ?? null,
@@ -153,5 +190,6 @@ export async function reviewUserWebsite(payload: AdminWebsiteReviewPayload): Pro
     website_review_notes: userUpdate.website_review_notes,
     project_id: latestProject?.id ?? null,
     project_domain: latestProject?.domain ?? null,
+    project_created: projectCreated,
   };
 }
