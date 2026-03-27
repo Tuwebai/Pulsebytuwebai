@@ -37,10 +37,20 @@ export function renderAdminRoutes({
         }
       />
       <Route
+        path="/admin/:sectionId"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <DashboardLayout>
+              <Admin />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/admin/configuracion"
         element={
           <ProtectedRoute requiredRole="admin">
-            <Navigate replace to={{ pathname: '/admin', hash: '#settings' }} />
+            <Navigate replace to="/admin/settings" />
           </ProtectedRoute>
         }
       />

@@ -30,14 +30,14 @@ export function isAdminSectionId(value: string): value is AdminSectionId {
   return (ADMIN_SECTION_IDS as readonly string[]).includes(value);
 }
 
-export function getAdminSectionFromHash(hash: string): AdminSectionId {
-  const normalizedHash = hash.replace(/^#/, '').trim();
+export function getAdminSectionFromRouteSegment(segment?: string | null): AdminSectionId {
+  const normalizedSegment = (segment ?? '').trim();
 
-  if (!normalizedHash) {
+  if (!normalizedSegment) {
     return DEFAULT_ADMIN_SECTION;
   }
 
-  return isAdminSectionId(normalizedHash) ? normalizedHash : DEFAULT_ADMIN_SECTION;
+  return isAdminSectionId(normalizedSegment) ? normalizedSegment : DEFAULT_ADMIN_SECTION;
 }
 
 export function getAdminSectionLabel(sectionId: AdminSectionId): string {

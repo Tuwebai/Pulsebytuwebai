@@ -52,14 +52,14 @@ function getPrimaryActionLabel(event: OperationalEvent) {
 function openPrimaryAction(navigate: ReturnType<typeof useNavigate>, event: OperationalEvent) {
   switch (event.source_type) {
     case 'payment':
-      navigate('/admin#pagos');
+      navigate('/admin/pagos');
       return;
     case 'ticket':
-      navigate('/admin#tickets');
+      navigate('/admin/tickets');
       return;
     case 'project':
     case 'domain':
-      navigate('/admin#proyectos');
+      navigate('/admin/proyectos');
       return;
     case 'onboarding':
       navigate(`/perfil/${event.client_id}`);

@@ -517,7 +517,7 @@ class NotificationService {
       type,
       category: 'ticket',
       is_urgent: isUrgent,
-      action_url: `/admin#tickets`
+      action_url: `/admin/tickets`
     });
   }
 

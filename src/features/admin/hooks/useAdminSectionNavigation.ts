@@ -1,41 +1,28 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   DEFAULT_ADMIN_SECTION,
-  getAdminSectionFromHash,
+  getAdminSectionFromRouteSegment,
   isOperationalAdminSectionId,
   type AdminSectionId,
 } from '@/features/admin/constants/adminSections';
 
 export function useAdminSectionNavigation() {
-  const [activeSection, setActiveSection] = useState<AdminSectionId>(DEFAULT_ADMIN_SECTION);
+  const navigate = useNavigate();
+  const { sectionId } = useParams<{ sectionId?: string }>();
+  const activeSection = getAdminSectionFromRouteSegment(sectionId);
 
   useEffect(() => {
-    const syncSectionFromHash = () => {
-      const nextSection = getAdminSectionFromHash(window.location.hash);
-      setActiveSection(
-        isOperationalAdminSectionId(nextSection) ? nextSection : DEFAULT_ADMIN_SECTION,
-      );
-    };
-
-    syncSectionFromHash();
-    window.addEventListener('hashchange', syncSectionFromHash);
-
-    return () => {
-      window.removeEventListener('hashchange', syncSectionFromHash);
-    };
-  }, []);
+    if (sectionId && !isOperationalAdminSectionId(activeSection)) {
+      navigate('/admin', { replace: true });
+    }
+  }, [activeSection, navigate, sectionId]);
 
   const navigateToSection = useCallback((sectionId: AdminSectionId) => {
-    const nextHash = `#${sectionId}`;
-
-    if (window.location.hash !== nextHash) {
-      window.location.hash = nextHash;
-      return;
-    }
-
-    setActiveSection(sectionId);
-  }, []);
+    const nextPath = sectionId === DEFAULT_ADMIN_SECTION ? '/admin' : `/admin/${sectionId}`;
+    navigate(nextPath);
+  }, [navigate]);
 
   return {
     activeSection,
