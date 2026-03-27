@@ -111,6 +111,7 @@ export function useCurrentUser({
               email: supabaseUser.email || '',
               full_name: user_metadata?.full_name || user_metadata?.name || email?.split('@')[0] || '',
               role: 'user',
+              pulse_access_status: 'pending',
               avatar_url: avatar,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()

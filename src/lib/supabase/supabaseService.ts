@@ -666,24 +666,31 @@ export const userService = {
   },
 
   async upsertUser(userData: User): Promise<void> {
-    try {
-      // Intentar actualizar primero
-      await SupabaseService.updateUser(userData.id, userData);
-    } catch (error) {
-      // Si no existe, crear nuevo directamente con Supabase
-      const { id, ...createData } = userData;
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert([createData]);
+    const payload = {
+      ...userData,
+      role: userData.role ?? 'user',
+      pulse_access_status: userData.role === 'admin' ? userData.pulse_access_status : (userData.pulse_access_status ?? 'pending'),
+      updated_at: userData.updated_at ?? new Date().toISOString(),
+    };
 
-      if (insertError) throw insertError;
-    }
+    const { error } = await supabase
+      .from('users')
+      .upsert(payload, { onConflict: 'id' });
+
+    if (error) throw error;
   },
 
   async createUser(userData: Omit<User, 'id'>): Promise<User> {
+    const payload = {
+      ...userData,
+      role: userData.role ?? 'user',
+      pulse_access_status: userData.role === 'admin' ? userData.pulse_access_status : (userData.pulse_access_status ?? 'pending'),
+      updated_at: userData.updated_at ?? new Date().toISOString(),
+    };
+
     const { data, error } = await supabase
       .from('users')
-      .insert([userData])
+      .insert([payload])
       .select()
       .single();
 
