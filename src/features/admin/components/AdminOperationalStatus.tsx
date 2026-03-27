@@ -49,44 +49,6 @@ export function AdminOperationalStatus({
   return (
     <div className="space-y-3 sm:space-y-4">
       <section className="rounded-2xl border border-border/60 bg-[var(--bg-surface)] p-4 shadow-sm sm:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-3">
-            <div
-              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${
-                isCalendarAuthenticated
-                  ? 'bg-emerald-500/15 text-emerald-400'
-                  : calendarLoading
-                    ? 'bg-signal/15 text-signal'
-                    : 'bg-muted text-muted-foreground'
-              }`}
-            >
-              <Calendar className="h-5 w-5" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-sm font-semibold text-foreground">Agenda operativa</h3>
-              <p className="text-xs text-muted-foreground">{calendarUserLabel}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            {isCalendarAuthenticated ? (
-              <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
-                Activa
-              </Badge>
-            ) : calendarLoading ? (
-              <Badge variant="outline" className="border-signal/40 bg-signal/10 text-signal">
-                <div className="mr-2 h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                Conectando
-              </Badge>
-            ) : (
-              <Button variant="outline" size="sm" onClick={onAuthenticateCalendar}>
-                Conectar agenda
-              </Button>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-border/60 bg-[var(--bg-surface)] p-4 shadow-sm sm:p-5">
         <div className="mb-4 flex items-start gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-signal/15 text-signal">
             <BarChart3 className="h-5 w-5" />
@@ -110,6 +72,44 @@ export function AdminOperationalStatus({
               onClick={() => onSectionChange(row.sectionId)}
             />
           ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-border/60 bg-[var(--bg-surface)] p-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
+                isCalendarAuthenticated
+                  ? 'bg-emerald-500/15 text-emerald-400'
+                  : calendarLoading
+                    ? 'bg-signal/15 text-signal'
+                    : 'bg-muted text-muted-foreground'
+              }`}
+            >
+              <Calendar className="h-4 w-4" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground">Agenda operativa</h3>
+              <p className="text-xs text-muted-foreground">{calendarUserLabel}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {isCalendarAuthenticated ? (
+              <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
+                Activa
+              </Badge>
+            ) : calendarLoading ? (
+              <Badge variant="outline" className="border-signal/40 bg-signal/10 text-signal">
+                <div className="mr-2 h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Conectando
+              </Badge>
+            ) : (
+              <Button variant="outline" size="sm" onClick={onAuthenticateCalendar} className="w-full sm:w-auto">
+                Conectar agenda
+              </Button>
+            )}
+          </div>
         </div>
       </section>
     </div>
