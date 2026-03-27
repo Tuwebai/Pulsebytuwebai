@@ -129,10 +129,11 @@ export function AdminUserCard({
   const pulseAccessLabel = getPulseAccessLabel(user.pulse_access_status);
   const pulseAccessEnabled = user.pulse_access_status === 'invited' || user.pulse_access_status === 'active';
   const pulseAccessBusy = enablingPulseUserId === user.id;
+  const websiteSummary = user.website ? user.website : 'Sin dominio operativo cargado';
 
   return (
-    <div className="rounded-2xl border border-border/60 bg-background/30 p-4 shadow-sm transition-colors duration-150 hover:border-border hover:bg-background/50 sm:p-5">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="rounded-[var(--radius-xl)] border border-border/60 bg-[var(--bg-elevated)] p-4 shadow-sm transition-colors duration-150 hover:border-border hover:bg-[var(--bg-elevated)]/90 sm:p-5">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 items-start gap-3 sm:gap-4">
           <div className="relative shrink-0">
             {user.avatar_url ? (
@@ -170,7 +171,7 @@ export function AdminUserCard({
             ) : null}
           </div>
 
-          <div className="min-w-0 space-y-2">
+          <div className="min-w-0 space-y-3">
             <div className="space-y-1">
               <p className="truncate text-base font-semibold text-foreground sm:text-lg">
                 {user.full_name || 'Sin nombre'}
@@ -205,24 +206,36 @@ export function AdminUserCard({
                   {pulseAccessLabel}
                 </Badge>
               ) : null}
-              <span className="text-xs text-muted-foreground">ID {user.id.slice(0, 8)}</span>
             </div>
 
-            {!isAdmin ? (
-              <p className="max-w-[520px] truncate text-sm text-muted-foreground">
-                {user.website ? user.website : 'Todavia no cargamos una URL para este cliente.'}
-              </p>
-            ) : null}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                  {isAdmin ? 'Perfil interno' : 'Dominio Pulse'}
+                </p>
+                <p className="max-w-[520px] truncate text-[var(--text-primary)]">
+                  {isAdmin ? 'Usuario de operacion interna' : websiteSummary}
+                </p>
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                  Identificador
+                </p>
+                <p className="font-mono text-xs text-[var(--text-secondary)]">
+                  {user.id.slice(0, 8)}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="flex w-full flex-col gap-3 lg:w-auto lg:min-w-[360px]">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="flex w-full flex-col gap-3 border-t border-[var(--border-subtle)] pt-4 lg:w-auto lg:min-w-[360px] lg:border-t-0 lg:pt-0">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
             <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
               Rol operativo
             </span>
             <Select value={role} onValueChange={(value) => onRoleChange(user.id, value)}>
-              <SelectTrigger className="w-full border-border/60 bg-[var(--bg-elevated)] text-foreground sm:w-[180px]">
+              <SelectTrigger className="w-full border-border/60 bg-background/30 text-foreground sm:w-[180px]">
                 <SelectValue>{isAdmin ? 'Admin' : 'Cliente'}</SelectValue>
               </SelectTrigger>
               <SelectContent>
