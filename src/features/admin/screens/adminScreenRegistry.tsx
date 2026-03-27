@@ -81,7 +81,6 @@ export function createAdminScreenRegistry(
         ticketsEnProgreso={context.metrics.ticketsEnProgreso}
         ingresosTotales={context.metrics.ingresosTotales}
         ingresosEsteMes={context.metrics.ingresosEsteMes}
-        pagosCount={context.payments.length}
         onSectionChange={context.onSectionChange}
       />
     ),

@@ -1,7 +1,6 @@
 import type { AdminSectionId } from '@/features/admin/constants/adminSections';
 import { AdminOperationalStatus } from '@/features/admin/components/AdminOperationalStatus';
 import { AdminOverviewStats } from '@/features/admin/components/AdminOverviewStats';
-import { AdminQuickActions } from '@/features/admin/components/AdminQuickActions';
 
 interface AdminOverviewScreenProps {
   isCalendarAuthenticated: boolean;
@@ -20,7 +19,6 @@ interface AdminOverviewScreenProps {
   ticketsEnProgreso: number;
   ingresosTotales: number;
   ingresosEsteMes: number;
-  pagosCount: number;
   onSectionChange: (sectionId: AdminSectionId) => void;
 }
 
@@ -41,7 +39,6 @@ export function AdminOverviewScreen({
   ticketsEnProgreso,
   ingresosTotales,
   ingresosEsteMes,
-  pagosCount,
   onSectionChange,
 }: AdminOverviewScreenProps) {
   return (
@@ -59,7 +56,7 @@ export function AdminOverviewScreen({
         ingresosEsteMes={ingresosEsteMes}
       />
 
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] xl:gap-4">
+      <div className="grid grid-cols-1 gap-3">
         <AdminOperationalStatus
           isCalendarAuthenticated={isCalendarAuthenticated}
           calendarLoading={calendarLoading}
@@ -73,13 +70,6 @@ export function AdminOverviewScreen({
           ticketsUrgentes={ticketsUrgentes}
           ingresosTotales={ingresosTotales}
           ingresosEsteMes={ingresosEsteMes}
-        />
-
-        <AdminQuickActions
-          usuariosActivos={usuariosActivos}
-          proyectosEnCurso={proyectosEnCurso}
-          ticketsAbiertos={ticketsAbiertos}
-          pagosCount={pagosCount}
           onSectionChange={onSectionChange}
         />
       </div>

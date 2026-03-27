@@ -2,6 +2,7 @@ import { BarChart3, Calendar, CheckCircle, DollarSign, Eye, FolderOpen, Ticket, 
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import type { AdminSectionId } from '@/features/admin/constants/adminSections';
 
 interface AdminOperationalStatusProps {
   isCalendarAuthenticated: boolean;
@@ -16,6 +17,7 @@ interface AdminOperationalStatusProps {
   ticketsUrgentes: number;
   ingresosTotales: number;
   ingresosEsteMes: number;
+  onSectionChange: (sectionId: AdminSectionId) => void;
 }
 
 export function AdminOperationalStatus({
@@ -31,16 +33,17 @@ export function AdminOperationalStatus({
   ticketsUrgentes,
   ingresosTotales,
   ingresosEsteMes,
+  onSectionChange,
 }: AdminOperationalStatusProps) {
   const statusRows = [
-    { icon: Users, label: 'Clientes con acceso', value: usuariosActivos, toneClassName: 'bg-signal/15 text-signal' },
-    { icon: Users, label: 'Altas del mes', value: `+${usuariosNuevos}`, toneClassName: 'bg-emerald-500/15 text-emerald-400' },
-    { icon: FolderOpen, label: 'Proyectos en seguimiento', value: proyectosEnCurso, toneClassName: 'bg-emerald-500/15 text-emerald-400' },
-    { icon: CheckCircle, label: 'Entrega completada', value: `${tasaCompletacionProyectos}%`, toneClassName: 'bg-sky-500/15 text-sky-300' },
-    { icon: Ticket, label: 'Tickets abiertos', value: ticketsAbiertos, toneClassName: 'bg-amber-500/15 text-amber-300' },
-    { icon: Eye, label: 'Casos urgentes', value: ticketsUrgentes, toneClassName: 'bg-red-500/15 text-red-300' },
-    { icon: DollarSign, label: 'Cobranza acumulada', value: `$${ingresosTotales.toLocaleString()}`, toneClassName: 'bg-violet-500/15 text-violet-300' },
-    { icon: Calendar, label: 'Cobranza del mes', value: `$${ingresosEsteMes.toLocaleString()}`, toneClassName: 'bg-signal/15 text-signal' },
+    { icon: Users, label: 'Clientes con acceso', value: usuariosActivos, toneClassName: 'bg-signal/15 text-signal', sectionId: 'usuarios' as const },
+    { icon: Users, label: 'Altas del mes', value: `+${usuariosNuevos}`, toneClassName: 'bg-emerald-500/15 text-emerald-400', sectionId: 'usuarios' as const },
+    { icon: FolderOpen, label: 'Proyectos en seguimiento', value: proyectosEnCurso, toneClassName: 'bg-emerald-500/15 text-emerald-400', sectionId: 'proyectos' as const },
+    { icon: CheckCircle, label: 'Entrega completada', value: `${tasaCompletacionProyectos}%`, toneClassName: 'bg-sky-500/15 text-sky-300', sectionId: 'proyectos' as const },
+    { icon: Ticket, label: 'Tickets abiertos', value: ticketsAbiertos, toneClassName: 'bg-amber-500/15 text-amber-300', sectionId: 'tickets' as const },
+    { icon: Eye, label: 'Casos urgentes', value: ticketsUrgentes, toneClassName: 'bg-red-500/15 text-red-300', sectionId: 'tickets' as const },
+    { icon: DollarSign, label: 'Cobranza acumulada', value: `$${ingresosTotales.toLocaleString()}`, toneClassName: 'bg-violet-500/15 text-violet-300', sectionId: 'pagos' as const },
+    { icon: Calendar, label: 'Cobranza del mes', value: `$${ingresosEsteMes.toLocaleString()}`, toneClassName: 'bg-signal/15 text-signal', sectionId: 'pagos' as const },
   ] as const;
 
   return (
@@ -104,6 +107,7 @@ export function AdminOperationalStatus({
               label={row.label}
               value={row.value}
               toneClassName={row.toneClassName}
+              onClick={() => onSectionChange(row.sectionId)}
             />
           ))}
         </div>
@@ -117,11 +121,16 @@ interface OperationalRowProps {
   label: string;
   value: number | string;
   toneClassName: string;
+  onClick: () => void;
 }
 
-function OperationalRow({ icon: Icon, label, value, toneClassName }: OperationalRowProps) {
+function OperationalRow({ icon: Icon, label, value, toneClassName, onClick }: OperationalRowProps) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-border/50 bg-background/30 px-3 py-3">
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-full items-center justify-between gap-3 rounded-2xl border border-border/50 bg-background/30 px-3 py-3 text-left transition-colors duration-150 hover:border-border hover:bg-background/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal/50"
+    >
       <span className="flex min-w-0 items-center gap-3 text-sm text-muted-foreground">
         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${toneClassName}`}>
           <Icon className="h-4 w-4" />
@@ -131,6 +140,6 @@ function OperationalRow({ icon: Icon, label, value, toneClassName }: Operational
       <Badge className="shrink-0 rounded-full border border-border/50 bg-[var(--bg-elevated)] px-3 py-1.5 text-sm font-semibold text-foreground shadow-none">
         {value}
       </Badge>
-    </div>
+    </button>
   );
 }
