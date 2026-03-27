@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { ChevronDown, Edit, Shield, Trash2, UserCheck } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -5,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AdminUserDomainReviewDialog } from '@/features/admin/components/AdminUserDomainReviewDialog';
+import { AdminPulseAccessDialog } from '@/features/admin/users/components/AdminPulseAccessDialog';
 import type { PulseAccessActionMode } from '@/features/admin/users/hooks/useAdminUsers';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 
@@ -117,6 +120,7 @@ export function AdminUserCard({
   onDelete,
   onDomainUpdated,
 }: AdminUserCardProps) {
+  const [isPulseAccessDialogOpen, setIsPulseAccessDialogOpen] = useState(false);
   const role = user.role || 'cliente';
   const userInitial = user.full_name?.charAt(0) || user.email?.charAt(0) || 'U';
   const isAdmin = role === 'admin';
@@ -252,7 +256,7 @@ export function AdminUserCard({
                   variant="outline"
                   size="sm"
                   disabled={pulseAccessBusy}
-                  onClick={() => onPulseAccessAction(user.id, 'manage')}
+                  onClick={() => setIsPulseAccessDialogOpen(true)}
                   className="rounded-r-none justify-center border-signal/30 bg-signal/10 text-signal hover:bg-signal/15"
                 >
                   <UserCheck size={14} className="mr-2" />
@@ -311,6 +315,21 @@ export function AdminUserCard({
           </div>
         </div>
       </div>
+
+      {!isAdmin ? (
+        <AdminPulseAccessDialog
+          open={isPulseAccessDialogOpen}
+          onOpenChange={setIsPulseAccessDialogOpen}
+          user={user}
+          isBusy={pulseAccessBusy}
+          onEnable={() => {
+            void onPulseAccessAction(user.id, 'enable');
+          }}
+          onResend={() => {
+            void onPulseAccessAction(user.id, 'resend');
+          }}
+        />
+      ) : null}
     </div>
   );
 }
