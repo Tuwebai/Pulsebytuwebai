@@ -85,10 +85,12 @@ export function AdminNotificationsInboxScreen() {
     isLoading,
     adminsLoading,
     setFilters,
+    syncSources,
     assign,
     markInProgress,
     snooze,
     resolve,
+    isSyncingSources,
     isAssigning,
     isMarkingInProgress,
     isSnoozing,
@@ -114,11 +116,18 @@ export function AdminNotificationsInboxScreen() {
   return (
     <div className="space-y-4">
       <AdminInboxCounters counts={counts ?? EMPTY_COUNTS} activeCounter={activeCounter} onSelect={setActiveCounter} />
-      <AdminInboxFilters activeSegment={activeSegment} search={search} onSearchChange={setSearch} onSelectSegment={setActiveSegment} />
+      <AdminInboxFilters
+        activeSegment={activeSegment}
+        search={search}
+        isSyncing={isSyncingSources}
+        onSearchChange={setSearch}
+        onSelectSegment={setActiveSegment}
+        onSync={() => syncSources()}
+      />
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,55%)_minmax(0,45%)]">
         <div className="space-y-3">
-          {isLoading
+          {isLoading || isSyncingSources
             ? Array.from({ length: 5 }).map((_, index) => (
                 <div key={`skeleton-${index}`} className="rounded-2xl border border-border/70 bg-card/60 p-4">
                   <Skeleton className="h-4 w-1/2" />

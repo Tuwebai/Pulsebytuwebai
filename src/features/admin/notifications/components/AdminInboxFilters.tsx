@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+import { RefreshCw, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
@@ -14,8 +14,10 @@ export type InboxSegmentId =
 interface AdminInboxFiltersProps {
   activeSegment: InboxSegmentId;
   search: string;
+  isSyncing?: boolean;
   onSearchChange: (value: string) => void;
   onSelectSegment: (segment: InboxSegmentId) => void;
+  onSync?: () => void;
 }
 
 const SEGMENTS: Array<{ id: InboxSegmentId; label: string }> = [
@@ -31,12 +33,15 @@ const SEGMENTS: Array<{ id: InboxSegmentId; label: string }> = [
 export function AdminInboxFilters({
   activeSegment,
   search,
+  isSyncing = false,
   onSearchChange,
   onSelectSegment,
+  onSync,
 }: AdminInboxFiltersProps) {
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-border/70 bg-card/70 p-4">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-2">
         {SEGMENTS.map((segment) => {
           const isActive = activeSegment === segment.id;
 
@@ -56,6 +61,22 @@ export function AdminInboxFilters({
             </button>
           );
         })}
+        </div>
+
+        {onSync ? (
+          <button
+            type="button"
+            onClick={onSync}
+            disabled={isSyncing}
+            className={cn(
+              'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
+              'border-border/70 bg-background/50 text-muted-foreground hover:bg-accent/40 disabled:cursor-not-allowed disabled:opacity-60',
+            )}
+          >
+            <RefreshCw className={cn('h-3.5 w-3.5', isSyncing && 'animate-spin')} />
+            {isSyncing ? 'Actualizando eventos' : 'Actualizar eventos'}
+          </button>
+        ) : null}
       </div>
 
       <div className="relative">
