@@ -29,7 +29,7 @@ export async function invokeOperationalEventSync(): Promise<OperationalEventSync
   } = await supabase.auth.getSession();
 
   if (!session?.access_token) {
-    throw new Error('Tu sesión de administrador no está disponible para actualizar eventos.');
+    throw new Error('Tu sesion de administrador no esta disponible para actualizar eventos.');
   }
 
   const { data, error } = await supabase.functions.invoke('sync-operational-events', {
@@ -43,22 +43,26 @@ export async function invokeOperationalEventSync(): Promise<OperationalEventSync
 
   if (error instanceof FunctionsHttpError) {
     if (error.context.status === 401) {
-      throw new Error('Tu sesión no tiene permisos para sincronizar eventos.');
+      throw new Error('Tu sesion no tiene permisos para sincronizar eventos.');
     }
 
     if (error.context.status === 403) {
       throw new Error('Solo un administrador puede sincronizar eventos operativos.');
     }
 
+    if (error.context.status === 404) {
+      throw new Error('La sincronizacion operativa no esta publicada en este entorno de Supabase.');
+    }
+
     throw new Error('El backend no pudo sincronizar los eventos operativos.');
   }
 
   if (error instanceof FunctionsRelayError) {
-    throw new Error('El relay de Supabase rechazó la sincronización de eventos.');
+    throw new Error('El relay de Supabase rechazo la sincronizacion de eventos.');
   }
 
   if (error instanceof FunctionsFetchError) {
-    throw new Error('No pudimos conectarnos con la función de sincronización.');
+    throw new Error('No pudimos conectarnos con la funcion de sincronizacion.');
   }
 
   if (error) {
@@ -66,7 +70,7 @@ export async function invokeOperationalEventSync(): Promise<OperationalEventSync
   }
 
   if (!isValidSyncSummary(data)) {
-    throw new Error('El backend devolvió una respuesta inválida al actualizar eventos.');
+    throw new Error('El backend devolvio una respuesta invalida al actualizar eventos.');
   }
 
   return data;
