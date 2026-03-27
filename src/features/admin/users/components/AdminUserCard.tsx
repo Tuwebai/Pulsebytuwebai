@@ -243,7 +243,7 @@ export function AdminUserCard({
                 size="sm"
                 disabled={pulseAccessBusy}
                 onClick={() => onPulseAccessAction(user.id, 'enable')}
-                className="justify-center border-emerald-500/25 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/15"
+                className="justify-center rounded-xl border-emerald-500/25 bg-emerald-500/10 text-emerald-300 shadow-sm hover:bg-emerald-500/15"
               >
                 <UserCheck size={14} className="mr-2" />
                 {pulseAccessBusy ? 'Habilitando acceso...' : 'Habilitar acceso Pulse'}
@@ -251,31 +251,37 @@ export function AdminUserCard({
             ) : null}
 
             {!isAdmin && pulseAccessEnabled ? (
-              <div className="flex w-full sm:w-auto">
+              <div className="flex w-full overflow-hidden rounded-xl border border-signal/25 bg-signal/10 shadow-sm sm:w-auto">
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
                   disabled={pulseAccessBusy}
                   onClick={() => setIsPulseAccessDialogOpen(true)}
-                  className="rounded-r-none justify-center border-signal/30 bg-signal/10 text-signal hover:bg-signal/15"
+                  className="h-9 flex-1 justify-between rounded-none bg-transparent px-3 text-signal hover:bg-signal/15 sm:min-w-[190px]"
                 >
-                  <UserCheck size={14} className="mr-2" />
-                  {pulseAccessBusy ? 'Actualizando acceso...' : 'Gestionar acceso'}
+                  <span className="inline-flex items-center gap-2">
+                    <UserCheck size={14} />
+                    {pulseAccessBusy ? 'Actualizando acceso...' : 'Gestionar acceso'}
+                  </span>
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       disabled={pulseAccessBusy}
-                      className="rounded-l-none border-l-0 border-signal/30 bg-signal/10 px-2 text-signal hover:bg-signal/15"
+                      className="h-9 rounded-none border-l border-signal/20 bg-transparent px-3 text-signal hover:bg-signal/15"
                     >
                       <ChevronDown size={14} />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="min-w-[180px]">
+                  <DropdownMenuContent
+                    align="end"
+                    className="min-w-[220px] rounded-xl border-border/60 bg-[var(--bg-elevated)] p-1 text-foreground shadow-[var(--shadow-elevated)]"
+                  >
                     <DropdownMenuItem
                       onClick={() => onPulseAccessAction(user.id, 'resend')}
+                      className="rounded-lg px-3 py-2 text-sm focus:bg-signal/10 focus:text-signal"
                     >
                       Reenviar acceso
                     </DropdownMenuItem>
