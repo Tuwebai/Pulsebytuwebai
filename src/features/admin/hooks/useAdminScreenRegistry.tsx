@@ -33,7 +33,7 @@ interface UseAdminScreenRegistryParams {
   onLoadData: AdminScreenRegistryContext['onLoadData'];
   onAddUser: AdminScreenRegistryContext['onAddUser'];
   onRoleChange: AdminScreenRegistryContext['onRoleChange'];
-  onEnablePulseAccess: AdminScreenRegistryContext['onEnablePulseAccess'];
+  onPulseAccessAction: AdminScreenRegistryContext['onPulseAccessAction'];
   onEditUser: AdminScreenRegistryContext['onEditUser'];
   onDeleteUser: AdminScreenRegistryContext['onDeleteUser'];
 }
@@ -56,7 +56,7 @@ export function useAdminScreenRegistry({
   onLoadData,
   onAddUser,
   onRoleChange,
-  onEnablePulseAccess,
+  onPulseAccessAction,
   onEditUser,
   onDeleteUser,
 }: UseAdminScreenRegistryParams) {
@@ -111,7 +111,7 @@ export function useAdminScreenRegistry({
     onLoadData,
     onAddUser,
     onRoleChange,
-    onEnablePulseAccess,
+    onPulseAccessAction,
     onEditUser,
     onDeleteUser,
     onDomainUpdated: (userId, result) => {

@@ -8,14 +8,16 @@ import { AdminOverviewScreen } from '@/features/admin/overview/components/AdminO
 import { AdminNotificationsInboxScreen } from '@/features/admin/notifications/pages/AdminNotificationsInboxScreen';
 import { AdminSettingsScreen } from '@/features/admin/settings/components/AdminSettingsScreen';
 import { AdminUsersScreen } from '@/features/admin/users/components/AdminUsersScreen';
+import type { PulseAccessActionMode } from '@/features/admin/users/hooks/useAdminUsers';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
+import type { WebsiteReviewStatus } from '@/features/admin/services/pulseDomainAdminService';
 import ProjectApprovalManager from '@/components/ProjectApprovalManager';
 import AdvancedTicketManager from '@/components/AdvancedTicketManager';
 import { ProjectsManagement } from '@/components/admin/ProjectsManagement';
 
 interface AdminDomainUpdateResult {
   website?: string | null;
-  website_status?: string | null;
+  website_status?: WebsiteReviewStatus | null;
   website_submitted_at?: string | null;
   website_reviewed_at?: string | null;
   website_reviewed_by?: string | null;
@@ -51,7 +53,7 @@ export interface AdminScreenRegistryContext {
   onLoadData: () => void;
   onAddUser: () => void;
   onRoleChange: (userId: string, newRole: string) => void;
-  onEnablePulseAccess: (userId: string) => void;
+  onPulseAccessAction: (userId: string, mode: PulseAccessActionMode) => void;
   onEditUser: (user: AdminManagedUser) => void;
   onDeleteUser: (user: AdminManagedUser) => void;
   onDomainUpdated: (userId: string, result: AdminDomainUpdateResult) => void;
@@ -92,7 +94,7 @@ export function createAdminScreenRegistry(
         onRefresh={context.onRefreshData}
         onAddUser={context.onAddUser}
         onRoleChange={context.onRoleChange}
-        onEnablePulseAccess={context.onEnablePulseAccess}
+        onPulseAccessAction={context.onPulseAccessAction}
         onEdit={context.onEditUser}
         onDelete={context.onDeleteUser}
         onDomainUpdated={context.onDomainUpdated}

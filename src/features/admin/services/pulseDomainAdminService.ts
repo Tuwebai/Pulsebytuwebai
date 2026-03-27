@@ -37,6 +37,16 @@ interface LatestProjectRecord {
   domain: string | null;
 }
 
+interface UserWebsiteUpdate {
+  website: string | null;
+  website_status: WebsiteReviewStatus;
+  website_submitted_at: string | null;
+  website_reviewed_at: string | null;
+  website_reviewed_by: string | null;
+  website_review_notes: string | null;
+  updated_at: string;
+}
+
 function normalizeOptionalNotes(notes?: string | null): string | null {
   const trimmed = notes?.trim() ?? '';
   return trimmed.length > 0 ? trimmed : null;
@@ -92,7 +102,7 @@ export async function reviewUserWebsite(payload: AdminWebsiteReviewPayload): Pro
       ? normalizedDomain ?? typedCurrentUser.website
       : normalizedDomain;
 
-  const userUpdate = {
+  const userUpdate: UserWebsiteUpdate = {
     website,
     website_status:
       payload.action === 'approve'
@@ -105,7 +115,7 @@ export async function reviewUserWebsite(payload: AdminWebsiteReviewPayload): Pro
     website_reviewed_by: payload.action === 'save_pending' ? null : authUser.id,
     website_review_notes: normalizedNotes,
     updated_at: timestamp,
-  } satisfies Record<string, string | null>;
+  };
 
   const { error: userUpdateError } = await supabase
     .from('users')

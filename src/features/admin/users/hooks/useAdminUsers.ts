@@ -17,6 +17,8 @@ const DEFAULT_NEW_USER_DATA: AdminUserFormData = {
   role: 'cliente',
 };
 
+export type PulseAccessActionMode = 'enable' | 'manage' | 'resend';
+
 export function useAdminUsers() {
   const [users, setUsers] = useState<AdminManagedUser[]>([]);
   const [showAddUserModal, setShowAddUserModal] = useState(false);
@@ -146,7 +148,10 @@ export function useAdminUsers() {
     }
   };
 
-  const handleEnablePulseAccess = async (targetUserId: string) => {
+  const handleEnablePulseAccess = async (
+    targetUserId: string,
+    mode: PulseAccessActionMode = 'enable',
+  ) => {
     try {
       setEnablingPulseUserId(targetUserId);
 
@@ -166,18 +171,40 @@ export function useAdminUsers() {
         ),
       );
 
-      toast({
-        title: 'Acceso a Pulse habilitado',
-        description:
-          result.pulse_access_status === 'active'
-            ? 'El cliente ya tiene acceso activo a Pulse.'
-            : 'El cliente ya puede entrar a Pulse. Si todavia no completa onboarding, va a onboarding.',
-      });
+      if (mode === 'resend') {
+        toast({
+          title: result.invited ? 'Acceso reenviado' : 'Acceso Pulse vigente',
+          description: result.invited
+            ? 'Se envio una nueva invitacion de acceso a Pulse para este cliente.'
+            : 'El acceso sigue habilitado. El reenvio de correo todavia no esta disponible desde este panel.',
+        });
+      } else if (mode === 'manage') {
+        toast({
+          title: 'Acceso Pulse al dia',
+          description:
+            result.pulse_access_status === 'active'
+              ? 'El cliente ya tiene acceso activo a Pulse.'
+              : 'El cliente ya tiene una invitacion vigente para entrar a Pulse.',
+        });
+      } else {
+        toast({
+          title: 'Acceso a Pulse habilitado',
+          description:
+            result.pulse_access_status === 'active'
+              ? 'El cliente ya tiene acceso activo a Pulse.'
+              : 'El cliente ya puede entrar a Pulse. Si todavia no completa onboarding, va a onboarding.',
+        });
+      }
     } catch (error) {
       console.error('Error enabling Pulse access:', error);
       toast({
         title: 'Error',
-        description: 'No se pudo habilitar el acceso a Pulse.',
+        description:
+          mode === 'resend'
+            ? 'No se pudo reenviar el acceso a Pulse.'
+            : mode === 'manage'
+              ? 'No se pudo revisar el acceso a Pulse.'
+              : 'No se pudo habilitar el acceso a Pulse.',
         variant: 'destructive',
       });
     } finally {

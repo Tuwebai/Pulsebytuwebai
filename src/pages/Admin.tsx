@@ -95,8 +95,8 @@ const Admin = React.memo(() => {
     },
     onAddUser: () => setShowAddUserModal(true),
     onRoleChange: updateUserRole,
-    onEnablePulseAccess: (userId) => {
-      void handleEnablePulseAccess(userId);
+    onPulseAccessAction: (userId, mode) => {
+      void handleEnablePulseAccess(userId, mode);
     },
     onEditUser: handleEditUser,
     onDeleteUser: handleDeleteUser,

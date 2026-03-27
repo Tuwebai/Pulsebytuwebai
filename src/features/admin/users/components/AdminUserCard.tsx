@@ -1,9 +1,11 @@
-import { Edit, Shield, Trash2, UserCheck } from 'lucide-react';
+import { ChevronDown, Edit, Shield, Trash2, UserCheck } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AdminUserDomainReviewDialog } from '@/features/admin/components/AdminUserDomainReviewDialog';
+import type { PulseAccessActionMode } from '@/features/admin/users/hooks/useAdminUsers';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 
 interface AdminUserCardWebsiteUpdate {
@@ -19,7 +21,7 @@ interface AdminUserCardProps {
   user: AdminManagedUser;
   enablingPulseUserId: string | null;
   onRoleChange: (userId: string, newRole: string) => void;
-  onEnablePulseAccess: (userId: string) => void;
+  onPulseAccessAction: (userId: string, mode: PulseAccessActionMode) => void;
   onEdit: (user: AdminManagedUser) => void;
   onDelete: (user: AdminManagedUser) => void;
   onDomainUpdated: (userId: string, update: AdminUserCardWebsiteUpdate) => void;
@@ -110,7 +112,7 @@ export function AdminUserCard({
   user,
   enablingPulseUserId,
   onRoleChange,
-  onEnablePulseAccess,
+  onPulseAccessAction,
   onEdit,
   onDelete,
   onDomainUpdated,
@@ -122,6 +124,7 @@ export function AdminUserCard({
   const websiteActionLabel = getWebsiteActionLabel(user.website_status, user.website);
   const pulseAccessLabel = getPulseAccessLabel(user.pulse_access_status);
   const pulseAccessEnabled = user.pulse_access_status === 'invited' || user.pulse_access_status === 'active';
+  const pulseAccessBusy = enablingPulseUserId === user.id;
 
   return (
     <div className="rounded-2xl border border-border/60 bg-background/30 p-4 shadow-sm transition-colors duration-150 hover:border-border hover:bg-background/50 sm:p-5">
@@ -234,13 +237,47 @@ export function AdminUserCard({
               <Button
                 variant="outline"
                 size="sm"
-                disabled={enablingPulseUserId === user.id}
-                onClick={() => onEnablePulseAccess(user.id)}
+                disabled={pulseAccessBusy}
+                onClick={() => onPulseAccessAction(user.id, 'enable')}
                 className="justify-center border-emerald-500/25 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/15"
               >
                 <UserCheck size={14} className="mr-2" />
-                {enablingPulseUserId === user.id ? 'Habilitando acceso...' : 'Habilitar acceso Pulse'}
+                {pulseAccessBusy ? 'Habilitando acceso...' : 'Habilitar acceso Pulse'}
               </Button>
+            ) : null}
+
+            {!isAdmin && pulseAccessEnabled ? (
+              <div className="flex w-full sm:w-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={pulseAccessBusy}
+                  onClick={() => onPulseAccessAction(user.id, 'manage')}
+                  className="rounded-r-none justify-center border-signal/30 bg-signal/10 text-signal hover:bg-signal/15"
+                >
+                  <UserCheck size={14} className="mr-2" />
+                  {pulseAccessBusy ? 'Actualizando acceso...' : 'Gestionar acceso'}
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={pulseAccessBusy}
+                      className="rounded-l-none border-l-0 border-signal/30 bg-signal/10 px-2 text-signal hover:bg-signal/15"
+                    >
+                      <ChevronDown size={14} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="min-w-[180px]">
+                    <DropdownMenuItem
+                      onClick={() => onPulseAccessAction(user.id, 'resend')}
+                    >
+                      Reenviar acceso
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : null}
 
             {!isAdmin ? (

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { AdminAddUserCard } from '@/features/admin/components/AdminAddUserCard';
 import { AdminUserCard } from '@/features/admin/users/components/AdminUserCard';
+import type { PulseAccessActionMode } from '@/features/admin/users/hooks/useAdminUsers';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 
 interface AdminUsersScreenProps {
@@ -14,7 +15,7 @@ interface AdminUsersScreenProps {
   onRefresh: () => void;
   onAddUser: () => void;
   onRoleChange: (userId: string, newRole: string) => void;
-  onEnablePulseAccess: (userId: string) => void;
+  onPulseAccessAction: (userId: string, mode: PulseAccessActionMode) => void;
   onEdit: (user: AdminManagedUser) => void;
   onDelete: (user: AdminManagedUser) => void;
   onDomainUpdated: (
@@ -37,7 +38,7 @@ export function AdminUsersScreen({
   onRefresh,
   onAddUser,
   onRoleChange,
-  onEnablePulseAccess,
+  onPulseAccessAction,
   onEdit,
   onDelete,
   onDomainUpdated,
@@ -123,8 +124,8 @@ export function AdminUsersScreen({
                   user={user}
                   enablingPulseUserId={enablingPulseUserId}
                   onRoleChange={onRoleChange}
-                  onEnablePulseAccess={(userId) => {
-                    void onEnablePulseAccess(userId);
+                  onPulseAccessAction={(userId, mode) => {
+                    void onPulseAccessAction(userId, mode);
                   }}
                   onEdit={onEdit}
                   onDelete={onDelete}
