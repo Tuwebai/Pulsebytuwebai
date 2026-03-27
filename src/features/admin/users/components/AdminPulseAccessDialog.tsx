@@ -25,11 +25,11 @@ function getStatusLabel(status?: AdminManagedUser['pulse_access_status']) {
     case 'active':
       return 'Acceso activo';
     case 'invited':
-      return 'Invitación enviada';
+      return 'Invitacion enviada';
     case 'disabled':
       return 'Acceso revocado';
     case 'pending':
-      return 'Pendiente de habilitación';
+      return 'Pendiente de habilitacion';
     default:
       return 'Sin acceso';
   }
@@ -40,13 +40,13 @@ function getStatusCopy(status?: AdminManagedUser['pulse_access_status']) {
     case 'active':
       return 'El cliente ya puede entrar a Pulse con su acceso vigente.';
     case 'invited':
-      return 'El cliente ya tiene una invitación vigente para entrar a Pulse.';
+      return 'El cliente ya recibio una invitacion para activar su acceso a Pulse, pero todavia no necesariamente ingreso.';
     case 'disabled':
-      return 'El acceso fue revocado y requiere una acción operativa separada.';
+      return 'El acceso fue revocado y requiere una accion operativa separada.';
     case 'pending':
-      return 'El usuario existe en el panel, pero todavía no quedó habilitado para Pulse.';
+      return 'El usuario existe en el panel, pero todavia no quedo habilitado para Pulse.';
     default:
-      return 'Todavía no enviamos el acceso Pulse para este cliente.';
+      return 'Todavia no enviamos el acceso Pulse para este cliente.';
   }
 }
 
@@ -90,7 +90,7 @@ export function AdminPulseAccessDialog({
                 Gestionar acceso Pulse
               </DialogTitle>
               <DialogDescription className="text-sm text-[var(--text-secondary)]">
-                Revisá el estado de acceso operativo de {user.full_name || user.email || 'este cliente'}.
+                Revisa el estado de acceso operativo de {user.full_name || user.email || 'este cliente'}.
               </DialogDescription>
             </div>
           </div>
@@ -122,7 +122,7 @@ export function AdminPulseAccessDialog({
                 <Clock3 className="mt-0.5 h-4 w-4 text-signal" />
                 <div>
                   <p className="text-[var(--text-primary)]">{formatDate(user.pulse_access_granted_at)}</p>
-                  <p>Último registro de habilitación o invitación.</p>
+                  <p>Ultimo registro de habilitacion o invitacion.</p>
                 </div>
               </div>
             </div>
@@ -131,12 +131,12 @@ export function AdminPulseAccessDialog({
           <div className="rounded-2xl border border-[var(--border-default)] bg-background/30 p-4 text-sm text-[var(--text-secondary)]">
             {hasAccess ? (
               <p>
-                Si necesitás volver a notificar al cliente, usá <strong className="text-[var(--text-primary)]">Reenviar acceso</strong>.
-                Pulse reenvía el acceso a través de Supabase Auth y el SMTP configurado para el proyecto, sin depender del frontend.
+                Si necesitas volver a notificar al cliente, usa <strong className="text-[var(--text-primary)]">Reenviar acceso</strong>.
+                Pulse reenvia el acceso a traves de Supabase Auth y el SMTP configurado para el proyecto, sin depender del frontend.
               </p>
             ) : (
               <p>
-                Este cliente todavía no tiene acceso Pulse habilitado. Desde acá podés emitir el acceso inicial y dejarlo listo para onboarding.
+                Este cliente todavia no tiene acceso Pulse habilitado. Desde aca podes emitir el acceso inicial y dejarlo listo para onboarding.
               </p>
             )}
           </div>

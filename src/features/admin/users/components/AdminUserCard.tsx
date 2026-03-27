@@ -86,7 +86,7 @@ function getPulseAccessLabel(status?: string | null) {
     case 'active':
       return 'Acceso Pulse activo';
     case 'invited':
-      return 'Acceso Pulse habilitado';
+      return 'Invitacion Pulse enviada';
     case 'disabled':
       return 'Acceso Pulse revocado';
     case 'pending':
