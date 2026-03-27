@@ -228,6 +228,10 @@ async function sendPulseAccessEmail(params: {
   }
 }
 
+function hasPulseEmailInfrastructure() {
+  return Boolean(Deno.env.get('RESEND_API_KEY'));
+}
+
 export async function deliverPulseAccess(
   adminClient: ReturnType<typeof createSupabaseAdminClient>,
   user: Pick<TargetUserRow, 'email' | 'full_name'>
@@ -235,6 +239,28 @@ export async function deliverPulseAccess(
   const normalizedEmail = normalizeEmail(user.email);
   const redirectTo = getPulseAccessRedirectUrl();
   const existingUser = await findAuthUserByEmail(adminClient, normalizedEmail);
+
+  if (!hasPulseEmailInfrastructure()) {
+    if (existingUser?.email) {
+      return {
+        invited: false,
+        email_sent: false,
+        delivery_type: 'none' as const
+      };
+    }
+
+    const inviteResult = await adminClient.auth.admin.inviteUserByEmail(normalizedEmail);
+
+    if (inviteResult.error) {
+      throw inviteResult.error;
+    }
+
+    return {
+      invited: true,
+      email_sent: true,
+      delivery_type: 'invite' as const
+    };
+  }
 
   if (existingUser?.email) {
     const linkResult = await adminClient.auth.admin.generateLink({

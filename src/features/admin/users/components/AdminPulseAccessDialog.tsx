@@ -121,9 +121,7 @@ export function AdminPulseAccessDialog({
               <div className="flex items-start gap-2">
                 <Clock3 className="mt-0.5 h-4 w-4 text-signal" />
                 <div>
-                  <p className="text-[var(--text-primary)]">
-                    {formatDate(user.pulse_access_granted_at)}
-                  </p>
+                  <p className="text-[var(--text-primary)]">{formatDate(user.pulse_access_granted_at)}</p>
                   <p>Último registro de habilitación o invitación.</p>
                 </div>
               </div>
@@ -134,7 +132,7 @@ export function AdminPulseAccessDialog({
             {hasAccess ? (
               <p>
                 Si necesitás volver a notificar al cliente, usá <strong className="text-[var(--text-primary)]">Reenviar acceso</strong>.
-                Pulse va a enviar un nuevo correo operativo con acceso actualizado y branding TuWebAI.
+                Cuando la capa de correo operativa esté disponible, Pulse envía el correo con branding TuWebAI; si no, el panel te informa el estado real sin mentir.
               </p>
             ) : (
               <p>
