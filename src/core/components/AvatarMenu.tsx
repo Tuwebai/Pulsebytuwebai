@@ -37,6 +37,7 @@ export default function AvatarMenu({ onOpenNotifications, onLogout, user }: Avat
   const displayName = profile?.full_name || user?.full_name || 'Cliente Pulse';
   const displayEmail = profile?.email || user?.email || 'sin email';
   const displayAvatar = profile?.avatar_url || user?.avatar || user?.avatar_url;
+  const showPulseTour = user?.role !== 'admin';
 
   return (
     <DropdownMenu>
@@ -77,16 +78,18 @@ export default function AvatarMenu({ onOpenNotifications, onLogout, user }: Avat
           Mi perfil
         </DropdownMenuItem>
 
-        <DropdownMenuItem
-          className="cursor-pointer rounded-[10px] px-3 py-2 text-[13px] text-[var(--text-primary)] transition-colors duration-150 ease-out focus:bg-[var(--bg-subtle)] focus:text-[var(--text-primary)]"
-          onSelect={() => {
-            navigate('/dashboard');
-            window.dispatchEvent(new CustomEvent(PRODUCT_TOUR_OPEN_EVENT, { detail: DEFAULT_PRODUCT_TOUR_SCOPE }));
-          }}
-        >
-          <Compass className="mr-2 h-4 w-4 text-[var(--signal)]" strokeWidth={1.5} />
-          Ver recorrido de Pulse
-        </DropdownMenuItem>
+        {showPulseTour ? (
+          <DropdownMenuItem
+            className="cursor-pointer rounded-[10px] px-3 py-2 text-[13px] text-[var(--text-primary)] transition-colors duration-150 ease-out focus:bg-[var(--bg-subtle)] focus:text-[var(--text-primary)]"
+            onSelect={() => {
+              navigate('/dashboard');
+              window.dispatchEvent(new CustomEvent(PRODUCT_TOUR_OPEN_EVENT, { detail: DEFAULT_PRODUCT_TOUR_SCOPE }));
+            }}
+          >
+            <Compass className="mr-2 h-4 w-4 text-[var(--signal)]" strokeWidth={1.5} />
+            Ver recorrido de Pulse
+          </DropdownMenuItem>
+        ) : null}
 
         <DropdownMenuItem
           className="cursor-pointer rounded-[10px] px-3 py-2 text-[13px] text-[var(--text-primary)] transition-colors duration-150 ease-out focus:bg-[var(--bg-subtle)] focus:text-[var(--text-primary)]"

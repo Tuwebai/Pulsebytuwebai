@@ -171,8 +171,8 @@ export default function DashboardLayout({ children, dashboardProps }: DashboardL
           </main>
         </div>
 
-        <TutorialOverlay />
-        <FloatingHelpButton />
+        {!isAdminPage ? <TutorialOverlay /> : null}
+        {!isAdminPage ? <FloatingHelpButton /> : null}
       </div>
     </>
   );

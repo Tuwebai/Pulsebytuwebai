@@ -1083,8 +1083,8 @@ export const TutorialProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Filtrar flujos según el rol del usuario
     return TUTORIAL_FLOWS.filter(flow => {
       if (user.role === 'admin') {
-        // Los admins ven todos los flujos
-        return true;
+        // El panel admin no expone onboarding ni tutoriales guiados.
+        return false;
       } else {
         // Los usuarios normales solo ven flujos específicos para clientes
         return flow.id.includes('client') || 
@@ -1120,9 +1120,9 @@ export const TutorialProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Auto-iniciar tutorial para nuevos usuarios (solo una vez)
   useEffect(() => {
-    if (isAuthenticated && user && autoStart) {
+    if (isAuthenticated && user && autoStart && user.role !== 'admin') {
       // Determinar qué tutorial iniciar según el rol
-      const tutorialId = user.role === 'admin' ? 'welcome-tour' : 'client-welcome-tour';
+      const tutorialId = 'client-welcome-tour';
       const storageKey = `tutorial-${tutorialId}-completed`;
       const sessionKey = `tutorial-${tutorialId}-session-${user.id}`;
       
