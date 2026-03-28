@@ -1,10 +1,15 @@
 import { supabase } from '@/lib/supabase';
 import type { AdminManagedUser, AdminUserFormData } from '@/features/admin/users/types/adminUser';
+import { invokeCreateAdminUser } from '@/api/admin/adminUserCreate.api';
+
+function normalizeUserRoleForDb(role: string) {
+  return role === 'admin' ? 'admin' : 'user';
+}
 
 export async function updateAdminUserRecordRole(userId: string, newRole: string): Promise<void> {
   const { error } = await supabase
     .from('users')
-    .update({ role: newRole })
+    .update({ role: normalizeUserRoleForDb(newRole) })
     .eq('id', userId);
 
   if (error) {
@@ -13,27 +18,7 @@ export async function updateAdminUserRecordRole(userId: string, newRole: string)
 }
 
 export async function createAdminUserRecord(newUserData: AdminUserFormData): Promise<AdminManagedUser> {
-  const timestamp = new Date().toISOString();
-
-  const { data, error } = await supabase
-    .from('users')
-    .insert([
-      {
-        email: newUserData.email,
-        full_name: newUserData.full_name,
-        role: newUserData.role,
-        created_at: timestamp,
-        updated_at: timestamp,
-      },
-    ])
-    .select()
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  return data as AdminManagedUser;
+  return invokeCreateAdminUser(newUserData);
 }
 
 export async function updateAdminUserRecord(editingUser: AdminManagedUser): Promise<void> {
@@ -42,7 +27,7 @@ export async function updateAdminUserRecord(editingUser: AdminManagedUser): Prom
     .update({
       email: editingUser.email,
       full_name: editingUser.full_name,
-      role: editingUser.role || 'cliente',
+      role: normalizeUserRoleForDb(editingUser.role || 'cliente'),
       updated_at: new Date().toISOString(),
     })
     .eq('id', editingUser.id);

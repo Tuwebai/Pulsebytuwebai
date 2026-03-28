@@ -111,7 +111,7 @@ export function useAdminUsers() {
 
       toast({
         title: 'Usuario creado',
-        description: 'El usuario ha sido creado correctamente.',
+        description: 'El registro operativo quedó creado y el acceso a Pulse queda pendiente hasta habilitarlo.',
       });
     } catch (error) {
       console.error('Error creating user:', error);

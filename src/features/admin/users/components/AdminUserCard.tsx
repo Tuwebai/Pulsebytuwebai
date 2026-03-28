@@ -121,7 +121,7 @@ export function AdminUserCard({
   onDomainUpdated,
 }: AdminUserCardProps) {
   const [isPulseAccessDialogOpen, setIsPulseAccessDialogOpen] = useState(false);
-  const role = user.role || 'cliente';
+  const role = user.role === 'admin' ? 'admin' : 'cliente';
   const userInitial = user.full_name?.charAt(0) || user.email?.charAt(0) || 'U';
   const isAdmin = role === 'admin';
   const websiteStatusLabel = getWebsiteStatusLabel(user.website_status, user.website);

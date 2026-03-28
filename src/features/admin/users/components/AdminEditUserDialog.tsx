@@ -20,6 +20,8 @@ export function AdminEditUserDialog({
   onUserChange,
   onSubmit,
 }: AdminEditUserDialogProps) {
+  const roleValue = user?.role === 'admin' ? 'admin' : 'cliente';
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="relative border-slate-200 bg-white" aria-describedby="edit-user-description">
@@ -73,7 +75,7 @@ export function AdminEditUserDialog({
             <div>
               <Label htmlFor="edit_role" className="text-slate-700">Rol</Label>
               <Select
-                value={user.role || 'cliente'}
+                value={roleValue}
                 onValueChange={(value) =>
                   onUserChange((prev) => (prev ? { ...prev, role: value } : null))
                 }
