@@ -19,6 +19,7 @@ export default function AdminProjectPhaseDetailPage() {
         phaseKey={phaseId}
         projectId={projectId}
         backLabel={fromAlerts ? 'Volver a alertas' : 'Volver a fases'}
+        fromAlerts={fromAlerts}
         startInEditMode={startInEditMode}
         onBackToPhases={() => navigate(backTo)}
         onEditProject={() => {

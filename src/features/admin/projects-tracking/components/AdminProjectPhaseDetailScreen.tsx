@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { useState } from 'react';
 
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { AdminProjectPhaseDetailHero } from '@/features/admin/projects-tracking/components/AdminProjectPhaseDetailHero';
@@ -7,6 +6,8 @@ import { AdminProjectPhaseDetailSummary } from '@/features/admin/projects-tracki
 import { AdminProjectPhaseDialog } from '@/features/admin/projects-tracking/components/AdminProjectPhaseDialog';
 import { AdminProjectPhaseTasksList } from '@/features/admin/projects-tracking/components/AdminProjectPhaseTasksList';
 import { AdminProjectTaskDialog } from '@/features/admin/projects-tracking/components/AdminProjectTaskDialog';
+import { AdminProjectTrackingContextBanner } from '@/features/admin/projects-tracking/components/AdminProjectTrackingContextBanner';
+import { AdminProjectTrackingErrorState } from '@/features/admin/projects-tracking/components/AdminProjectTrackingErrorState';
 import { AdminProjectTrackingHeader } from '@/features/admin/projects-tracking/components/AdminProjectTrackingHeader';
 import { AdminProjectTrackingResolutionPanel } from '@/features/admin/projects-tracking/components/AdminProjectTrackingResolutionPanel';
 import { getAdminProjectCriticalTaskResolutionActions } from '@/features/admin/projects-tracking/components/adminProjectCriticalTaskResolution.utils';
@@ -19,6 +20,7 @@ interface AdminProjectPhaseDetailScreenProps {
   projectId: string | undefined;
   onBackToPhases: () => void;
   backLabel: string;
+  fromAlerts: boolean;
   startInEditMode: boolean;
   onEditProject: () => void;
 }
@@ -28,20 +30,16 @@ export function AdminProjectPhaseDetailScreen({
   projectId,
   onBackToPhases,
   backLabel,
+  fromAlerts,
   startInEditMode,
   onEditProject,
 }: AdminProjectPhaseDetailScreenProps) {
-  const { loading, savingPhase, savingTask, error, project, refresh, savePhase, saveTask } = useAdminProjectTracking(projectId);
+  const { loading, savingPhase, savingTask, error, project, refresh, savePhase, saveTask } =
+    useAdminProjectTracking(projectId);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showCreateTaskDialog, setShowCreateTaskDialog] = useState(false);
   const [taskDraft, setTaskDraft] = useState<AdminProjectTrackingTask | null>(null);
   const phase = project?.phases.find((currentPhase) => currentPhase.key === phaseKey);
-
-  useEffect(() => {
-    if (startInEditMode && phase) {
-      setShowEditDialog(true);
-    }
-  }, [startInEditMode, phase]);
 
   if (loading) {
     return (
@@ -56,29 +54,13 @@ export function AdminProjectPhaseDetailScreen({
 
   if (error || !project || !phase) {
     return (
-      <section className="rounded-[24px] border border-danger/20 bg-danger/10 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-danger/20 text-danger">
-            <AlertCircle className="h-4 w-4" />
-          </div>
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-[var(--text-primary)]">No pudimos abrir esta fase</p>
-              <p className="text-sm leading-6 text-[var(--text-secondary)]">
-                {error ?? 'La fase no existe o todavía no está disponible en la base operativa.'}
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button className="text-sm font-medium text-signal" onClick={() => void refresh()}>
-                Reintentar carga
-              </button>
-              <button className="text-sm font-medium text-[var(--text-secondary)]" onClick={onBackToPhases}>
-                {backLabel}
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <AdminProjectTrackingErrorState
+        title="No pudimos abrir esta fase"
+        description={error ?? 'La fase no existe o todavía no está disponible en la base operativa.'}
+        backLabel={backLabel}
+        onBack={onBackToPhases}
+        onRetry={() => refresh()}
+      />
     );
   }
 
@@ -90,13 +72,7 @@ export function AdminProjectPhaseDetailScreen({
   };
 
   const handleSubmitTask = async (input: Parameters<typeof saveTask>[0], currentTaskKey?: string) => {
-    const success = await saveTask(
-      {
-        ...input,
-        phaseKey: phase.key,
-      },
-      currentTaskKey,
-    );
+    const success = await saveTask({ ...input, phaseKey: phase.key }, currentTaskKey);
     if (success) {
       setShowCreateTaskDialog(false);
       setTaskDraft(null);
@@ -117,10 +93,7 @@ export function AdminProjectPhaseDetailScreen({
 
   const handleQuickTaskUpdate = async (
     task: AdminProjectTrackingTask,
-    {
-      status = task.status,
-      priority = task.priority ?? 'alta',
-    }: { status?: string; priority?: string },
+    { priority = task.priority ?? 'alta', status = task.status }: { status?: string; priority?: string },
   ) => {
     await saveTask(
       {
@@ -147,7 +120,6 @@ export function AdminProjectPhaseDetailScreen({
     <>
       <div className="space-y-6">
         <AdminProjectTrackingHeader project={project} onEditProject={onEditProject} />
-
         <AdminProjectPhaseDetailHero
           phase={phase}
           backLabel={backLabel}
@@ -155,6 +127,13 @@ export function AdminProjectPhaseDetailScreen({
           onCreateTask={() => setShowCreateTaskDialog(true)}
           onEditPhase={() => setShowEditDialog(true)}
         />
+        {fromAlerts && startInEditMode ? (
+          <AdminProjectTrackingContextBanner
+            ctaLabel="Abrir edición completa"
+            description="Pulse detectó un desvío en esta fase. Revisá el contexto y abrí la edición completa solo si necesitás ajustar responsable, fecha objetivo o estado."
+            onOpenEdit={() => setShowEditDialog(true)}
+          />
+        ) : null}
         <AdminProjectTrackingResolutionPanel actions={resolutionActions} />
         <AdminProjectPhaseDetailSummary phase={phase} />
         <AdminProjectPhaseTasksList
@@ -179,7 +158,6 @@ export function AdminProjectPhaseDetailScreen({
         onClose={() => setShowEditDialog(false)}
         onSubmit={handleSubmitPhase}
       />
-
       <AdminProjectTaskDialog
         open={showCreateTaskDialog || taskDraft !== null}
         saving={savingTask}

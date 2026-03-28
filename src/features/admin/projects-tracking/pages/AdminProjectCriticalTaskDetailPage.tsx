@@ -19,6 +19,7 @@ export default function AdminProjectCriticalTaskDetailPage() {
         projectId={projectId}
         taskKey={taskId}
         backLabel={fromAlerts ? 'Volver a alertas' : 'Volver a tareas críticas'}
+        fromAlerts={fromAlerts}
         startInEditMode={startInEditMode}
         onBackToTasks={() => navigate(backTo)}
         onEditProject={() => {

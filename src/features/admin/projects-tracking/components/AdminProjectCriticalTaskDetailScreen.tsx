@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
-import { AlertCircle, ArrowLeft, SquarePen } from 'lucide-react';
+import { useState } from 'react';
 
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { Button } from '@/components/ui/button';
+import { AdminProjectCriticalTaskDetailHero } from '@/features/admin/projects-tracking/components/AdminProjectCriticalTaskDetailHero';
 import { AdminProjectCriticalTaskDetailSummary } from '@/features/admin/projects-tracking/components/AdminProjectCriticalTaskDetailSummary';
 import { AdminProjectTaskDialog } from '@/features/admin/projects-tracking/components/AdminProjectTaskDialog';
+import { AdminProjectTrackingContextBanner } from '@/features/admin/projects-tracking/components/AdminProjectTrackingContextBanner';
+import { AdminProjectTrackingErrorState } from '@/features/admin/projects-tracking/components/AdminProjectTrackingErrorState';
 import { AdminProjectTrackingHeader } from '@/features/admin/projects-tracking/components/AdminProjectTrackingHeader';
 import { AdminProjectTrackingResolutionPanel } from '@/features/admin/projects-tracking/components/AdminProjectTrackingResolutionPanel';
 import { getAdminProjectCriticalTaskByKey } from '@/features/admin/projects-tracking/components/adminProjectCriticalTasks.utils';
@@ -16,6 +17,7 @@ interface AdminProjectCriticalTaskDetailScreenProps {
   taskKey: string | undefined;
   onBackToTasks: () => void;
   backLabel: string;
+  fromAlerts: boolean;
   startInEditMode: boolean;
   onEditProject: () => void;
 }
@@ -25,18 +27,13 @@ export function AdminProjectCriticalTaskDetailScreen({
   taskKey,
   onBackToTasks,
   backLabel,
+  fromAlerts,
   startInEditMode,
   onEditProject,
 }: AdminProjectCriticalTaskDetailScreenProps) {
   const { loading, savingTask, error, project, refresh, saveTask } = useAdminProjectTracking(projectId);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const item = project && taskKey ? getAdminProjectCriticalTaskByKey(project, taskKey) : null;
-
-  useEffect(() => {
-    if (startInEditMode && item) {
-      setShowEditDialog(true);
-    }
-  }, [startInEditMode, item]);
 
   if (loading) {
     return (
@@ -51,50 +48,28 @@ export function AdminProjectCriticalTaskDetailScreen({
 
   if (error || !project || !item) {
     return (
-      <section className="rounded-[24px] border border-danger/20 bg-danger/10 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-danger/20 text-danger">
-            <AlertCircle className="h-4 w-4" />
-          </div>
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-[var(--text-primary)]">No pudimos abrir esta tarea crítica</p>
-              <p className="text-sm leading-6 text-[var(--text-secondary)]">
-                {error ?? 'La tarea no existe o ya no requiere atención prioritaria.'}
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button className="text-sm font-medium text-signal" onClick={() => void refresh()}>
-                Reintentar carga
-              </button>
-              <button className="text-sm font-medium text-[var(--text-secondary)]" onClick={onBackToTasks}>
-                {backLabel}
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <AdminProjectTrackingErrorState
+        title="No pudimos abrir esta tarea crítica"
+        description={error ?? 'La tarea no existe o ya no requiere atención prioritaria.'}
+        backLabel={backLabel}
+        onBack={onBackToTasks}
+        onRetry={() => refresh()}
+      />
     );
   }
 
-  const { task, reason } = item;
+  const { task } = item;
 
   const handleSubmitTask = async (input: Parameters<typeof saveTask>[0], currentTaskKey?: string) => {
-    const success = await saveTask(
-      {
-        ...input,
-        phaseKey: task.source.phaseKey,
-      },
-      currentTaskKey,
-    );
+    const success = await saveTask({ ...input, phaseKey: task.source.phaseKey }, currentTaskKey);
     if (success) {
       setShowEditDialog(false);
     }
   };
 
   const handleQuickTaskUpdate = async ({
-    status = task.status,
     priority = task.priority ?? 'alta',
+    status = task.status,
   }: {
     status?: string;
     priority?: string;
@@ -125,45 +100,19 @@ export function AdminProjectCriticalTaskDetailScreen({
     <>
       <div className="space-y-6">
         <AdminProjectTrackingHeader project={project} onEditProject={onEditProject} />
-
-        <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="space-y-1">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={onBackToTasks}
-                className="mb-2 h-auto px-0 text-[var(--text-secondary)] hover:bg-transparent hover:text-[var(--text-primary)]"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                {backLabel}
-              </Button>
-              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
-                {task.phaseLabel ?? 'Tarea crítica'}
-              </p>
-              <h1 className="text-2xl font-semibold tracking-tight text-[var(--text-primary)]">{task.title}</h1>
-              <p className="text-sm leading-6 text-[var(--text-secondary)]">
-                {task.description ?? 'Esta tarea quedó marcada como prioritaria por Pulse para seguimiento operativo.'}
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-3 sm:items-end">
-              <span className="rounded-full border border-rose-400/20 bg-rose-500/12 px-4 py-2 text-sm font-medium text-rose-300">
-                {reason}
-              </span>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowEditDialog(true)}
-                className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]"
-              >
-                <SquarePen className="mr-2 h-4 w-4" />
-                Editar tarea
-              </Button>
-            </div>
-          </div>
-        </section>
-
+        <AdminProjectCriticalTaskDetailHero
+          backLabel={backLabel}
+          item={item}
+          onBackToTasks={onBackToTasks}
+          onEditTask={() => setShowEditDialog(true)}
+        />
+        {fromAlerts && startInEditMode ? (
+          <AdminProjectTrackingContextBanner
+            ctaLabel="Abrir edición completa"
+            description="Pulse te trajo desde alertas porque esta tarea necesita corrección. Revisá el contexto y abrí la edición completa solo si necesitás ajustar responsable, prioridad, fecha objetivo o estado."
+            onOpenEdit={() => setShowEditDialog(true)}
+          />
+        ) : null}
         <AdminProjectTrackingResolutionPanel actions={resolutionActions} />
         <AdminProjectCriticalTaskDetailSummary item={item} />
       </div>
