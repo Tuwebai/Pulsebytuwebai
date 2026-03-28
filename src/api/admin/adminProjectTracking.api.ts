@@ -15,6 +15,8 @@ interface AdminProjectTrackingRow {
   tareas: unknown;
 }
 
+type AdminProjectTrackingStoredPhase = Record<string, unknown>;
+
 export async function fetchAdminProjectTracking(projectId: string) {
   const { data, error } = await supabase
     .from('projects')
@@ -29,4 +31,21 @@ export async function fetchAdminProjectTracking(projectId: string) {
   }
 
   return data as AdminProjectTrackingRow;
+}
+
+export async function updateAdminProjectTrackingPhases(
+  projectId: string,
+  phases: AdminProjectTrackingStoredPhase[],
+): Promise<void> {
+  const { error } = await supabase
+    .from('projects')
+    .update({
+      fases: phases,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', projectId);
+
+  if (error) {
+    throw error;
+  }
 }

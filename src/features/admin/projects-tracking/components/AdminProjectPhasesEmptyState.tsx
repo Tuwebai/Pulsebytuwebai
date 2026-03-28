@@ -4,11 +4,13 @@ import { Button } from '@/components/ui/button';
 
 interface AdminProjectPhasesEmptyStateProps {
   onBack: () => void;
+  onCreatePhase: () => void;
   onEditProject: () => void;
 }
 
 export function AdminProjectPhasesEmptyState({
   onBack,
+  onCreatePhase,
   onEditProject,
 }: AdminProjectPhasesEmptyStateProps) {
   return (
@@ -25,7 +27,18 @@ export function AdminProjectPhasesEmptyState({
           estructura inicial para que Pulse pueda mostrar avance, responsables y fechas objetivo.
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <Button type="button" onClick={onEditProject} className="rounded-xl border border-signal/20 bg-signal text-white hover:bg-signal/90">
+          <Button
+            type="button"
+            onClick={onCreatePhase}
+            className="rounded-xl border border-signal/20 bg-signal text-white hover:bg-signal/90"
+          >
+            Crear primera fase
+          </Button>
+          <Button
+            type="button"
+            onClick={onEditProject}
+            className="rounded-xl border border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]"
+          >
             Volver y editar
           </Button>
           <Button

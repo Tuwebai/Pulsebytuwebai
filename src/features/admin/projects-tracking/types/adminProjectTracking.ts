@@ -27,6 +27,7 @@ export interface AdminProjectTrackingPhase {
   responsable?: string;
   tareas: AdminProjectTrackingTask[];
   comentariosCount: number;
+  raw: Record<string, unknown>;
 }
 
 export interface AdminProjectTrackingProject {
@@ -42,4 +43,11 @@ export interface AdminProjectTrackingProject {
   endDate?: string;
   phases: AdminProjectTrackingPhase[];
   rootTasks: AdminProjectTrackingTask[];
+}
+
+export interface AdminProjectTrackingPhaseInput {
+  descripcion: string;
+  estado: string;
+  responsable?: string;
+  fechaEntrega?: string;
 }

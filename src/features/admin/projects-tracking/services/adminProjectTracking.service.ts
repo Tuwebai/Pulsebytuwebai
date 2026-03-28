@@ -1,5 +1,9 @@
-import { fetchAdminProjectTracking } from '@/api/admin/adminProjectTracking.api';
+import {
+  fetchAdminProjectTracking,
+  updateAdminProjectTrackingPhases,
+} from '@/api/admin/adminProjectTracking.api';
 import type {
+  AdminProjectTrackingPhaseInput,
   AdminProjectTrackingPhase,
   AdminProjectTrackingProject,
   AdminProjectTrackingTask,
@@ -67,7 +71,45 @@ function toPhase(rawPhase: unknown, index: number): AdminProjectTrackingPhase | 
       )
       .filter((task): task is AdminProjectTrackingTask => task !== null),
     comentariosCount: comments.length,
+    raw: phase,
   };
+}
+
+function normalizePhaseKey(value: string): string {
+  const normalized = value
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return normalized || `fase-${Date.now()}`;
+}
+
+function omitUndefinedValues(source: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(source).filter(([, value]) => value !== undefined));
+}
+
+function buildStoredPhase(
+  input: AdminProjectTrackingPhaseInput,
+  currentPhase?: AdminProjectTrackingPhase,
+): Record<string, unknown> {
+  const currentRaw = currentPhase?.raw ?? {};
+
+  return omitUndefinedValues({
+    ...currentRaw,
+    key: currentPhase?.key ?? normalizePhaseKey(input.descripcion),
+    estado: input.estado,
+    descripcion: input.descripcion.trim(),
+    responsable: input.responsable?.trim() || undefined,
+    fechaEntrega: input.fechaEntrega || undefined,
+    fechaInicio: typeof currentRaw.fechaInicio === 'string' ? currentRaw.fechaInicio : undefined,
+    fechaFin: typeof currentRaw.fechaFin === 'string' ? currentRaw.fechaFin : undefined,
+    tareas: Array.isArray(currentRaw.tareas) ? currentRaw.tareas : [],
+    comentarios: Array.isArray(currentRaw.comentarios) ? currentRaw.comentarios : [],
+    archivos: Array.isArray(currentRaw.archivos) ? currentRaw.archivos : [],
+  });
 }
 
 export async function getAdminProjectTracking(projectId: string): Promise<AdminProjectTrackingProject> {
@@ -93,4 +135,22 @@ export async function getAdminProjectTracking(projectId: string): Promise<AdminP
       .map((task, index) => toTask(task, `tarea-${index + 1}`))
       .filter((task): task is AdminProjectTrackingTask => task !== null),
   };
+}
+
+export async function saveAdminProjectTrackingPhase(
+  project: AdminProjectTrackingProject,
+  input: AdminProjectTrackingPhaseInput,
+  currentPhaseKey?: string,
+): Promise<AdminProjectTrackingProject> {
+  const currentPhase = currentPhaseKey
+    ? project.phases.find((phase) => phase.key === currentPhaseKey)
+    : undefined;
+
+  const nextPhase = buildStoredPhase(input, currentPhase);
+  const nextPhases = currentPhase
+    ? project.phases.map((phase) => (phase.key === currentPhase.key ? nextPhase : phase.raw))
+    : [...project.phases.map((phase) => phase.raw), nextPhase];
+
+  await updateAdminProjectTrackingPhases(project.id, nextPhases);
+  return getAdminProjectTracking(project.id);
 }

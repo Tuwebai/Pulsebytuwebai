@@ -1,7 +1,10 @@
-import { AlertCircle, KanbanSquare } from 'lucide-react';
+import { useState } from 'react';
+import { AlertCircle, KanbanSquare, Plus } from 'lucide-react';
 
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { Button } from '@/components/ui/button';
 import { AdminProjectPhaseCard } from '@/features/admin/projects-tracking/components/AdminProjectPhaseCard';
+import { AdminProjectPhaseDialog } from '@/features/admin/projects-tracking/components/AdminProjectPhaseDialog';
 import { AdminProjectPhasesEmptyState } from '@/features/admin/projects-tracking/components/AdminProjectPhasesEmptyState';
 import { AdminProjectTrackingHeader } from '@/features/admin/projects-tracking/components/AdminProjectTrackingHeader';
 import { useAdminProjectTracking } from '@/features/admin/projects-tracking/hooks/useAdminProjectTracking';
@@ -17,7 +20,8 @@ export function AdminProjectPhasesScreen({
   onBack,
   onEditProject,
 }: AdminProjectPhasesScreenProps) {
-  const { loading, error, project, refresh } = useAdminProjectTracking(projectId);
+  const { loading, savingPhase, error, project, refresh, savePhase } = useAdminProjectTracking(projectId);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   if (loading) {
     return (
@@ -53,35 +57,70 @@ export function AdminProjectPhasesScreen({
     );
   }
 
+  const handleCreatePhase = async () => {
+    setShowCreateDialog(true);
+  };
+
+  const handleSubmitPhase = async (input: Parameters<typeof savePhase>[0]) => {
+    const success = await savePhase(input);
+    if (success) {
+      setShowCreateDialog(false);
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <AdminProjectTrackingHeader project={project} onEditProject={onEditProject} />
+    <>
+      <div className="space-y-6">
+        <AdminProjectTrackingHeader project={project} onEditProject={onEditProject} />
 
-      <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1">
-            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Fases</p>
-            <h1 className="text-2xl font-semibold tracking-tight text-[var(--text-primary)]">Seguimiento por etapas</h1>
-            <p className="text-sm leading-6 text-[var(--text-secondary)]">
-              Leé el estado del proyecto por fase, responsable y fecha objetivo sin salir del contexto operativo.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 rounded-2xl border border-emerald-400/15 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-            <KanbanSquare className="h-4 w-4" />
-            <span>{project.phases.length} fases cargadas</span>
-          </div>
-        </div>
-      </section>
+        <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-1">
+              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Fases</p>
+              <h1 className="text-2xl font-semibold tracking-tight text-[var(--text-primary)]">Seguimiento por etapas</h1>
+              <p className="text-sm leading-6 text-[var(--text-secondary)]">
+                Leé el estado del proyecto por fase, responsable y fecha objetivo sin salir del contexto operativo.
+              </p>
+            </div>
 
-      {project.phases.length === 0 ? (
-        <AdminProjectPhasesEmptyState onBack={onBack} onEditProject={onEditProject} />
-      ) : (
-        <section className="space-y-4">
-          {project.phases.map((phase, index) => (
-            <AdminProjectPhaseCard key={phase.key} index={index} phase={phase} projectId={project.id} />
-          ))}
+            <div className="flex flex-col gap-3 sm:items-end">
+              <div className="flex items-center gap-2 rounded-2xl border border-emerald-400/15 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+                <KanbanSquare className="h-4 w-4" />
+                <span>{project.phases.length} fases cargadas</span>
+              </div>
+              <Button
+                type="button"
+                onClick={handleCreatePhase}
+                className="rounded-xl border border-signal/20 bg-signal text-white hover:bg-signal/90"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Crear fase
+              </Button>
+            </div>
+          </div>
         </section>
-      )}
-    </div>
+
+        {project.phases.length === 0 ? (
+          <AdminProjectPhasesEmptyState
+            onBack={onBack}
+            onCreatePhase={handleCreatePhase}
+            onEditProject={onEditProject}
+          />
+        ) : (
+          <section className="space-y-4">
+            {project.phases.map((phase, index) => (
+              <AdminProjectPhaseCard key={phase.key} index={index} phase={phase} projectId={project.id} />
+            ))}
+          </section>
+        )}
+      </div>
+
+      <AdminProjectPhaseDialog
+        open={showCreateDialog}
+        saving={savingPhase}
+        onClose={() => setShowCreateDialog(false)}
+        onSubmit={handleSubmitPhase}
+      />
+    </>
   );
 }
