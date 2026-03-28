@@ -1,3 +1,8 @@
+export interface AdminProjectTrackingTaskSource {
+  type: 'root' | 'phase';
+  phaseKey?: string;
+}
+
 export interface AdminProjectTrackingTask {
   key: string;
   title: string;
@@ -15,6 +20,8 @@ export interface AdminProjectTrackingTask {
   completed?: boolean;
   cliente?: boolean;
   forClient?: boolean;
+  source: AdminProjectTrackingTaskSource;
+  raw: Record<string, unknown>;
 }
 
 export interface AdminProjectTrackingPhase {
@@ -50,4 +57,14 @@ export interface AdminProjectTrackingPhaseInput {
   estado: string;
   responsable?: string;
   fechaEntrega?: string;
+}
+
+export interface AdminProjectTrackingTaskInput {
+  title: string;
+  description?: string;
+  status: string;
+  priority?: string;
+  responsable?: string;
+  fechaLimite?: string;
+  phaseKey?: string;
 }

@@ -16,6 +16,7 @@ interface AdminProjectTrackingRow {
 }
 
 type AdminProjectTrackingStoredPhase = Record<string, unknown>;
+type AdminProjectTrackingStoredTask = Record<string, unknown>;
 
 export async function fetchAdminProjectTracking(projectId: string) {
   const { data, error } = await supabase
@@ -37,10 +38,20 @@ export async function updateAdminProjectTrackingPhases(
   projectId: string,
   phases: AdminProjectTrackingStoredPhase[],
 ): Promise<void> {
+  await updateAdminProjectTrackingProject(projectId, { fases: phases });
+}
+
+export async function updateAdminProjectTrackingProject(
+  projectId: string,
+  payload: {
+    fases?: AdminProjectTrackingStoredPhase[];
+    tareas?: AdminProjectTrackingStoredTask[];
+  },
+): Promise<void> {
   const { error } = await supabase
     .from('projects')
     .update({
-      fases: phases,
+      ...payload,
       updated_at: new Date().toISOString(),
     })
     .eq('id', projectId);

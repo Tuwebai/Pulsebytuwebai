@@ -1,11 +1,13 @@
 import {
   fetchAdminProjectTracking,
   updateAdminProjectTrackingPhases,
+  updateAdminProjectTrackingProject,
 } from '@/api/admin/adminProjectTracking.api';
 import type {
   AdminProjectTrackingPhaseInput,
   AdminProjectTrackingPhase,
   AdminProjectTrackingProject,
+  AdminProjectTrackingTaskInput,
   AdminProjectTrackingTask,
 } from '@/features/admin/projects-tracking/types/adminProjectTracking';
 
@@ -42,6 +44,8 @@ function toTask(
     completed: typeof task.completed === 'boolean' ? task.completed : undefined,
     cliente: task.cliente === true,
     forClient: task.forClient === true,
+    source: phaseContext ? { type: 'phase', phaseKey: phaseContext.key } : { type: 'root' },
+    raw: task,
   };
 }
 
@@ -112,6 +116,36 @@ function buildStoredPhase(
   });
 }
 
+function normalizeTaskKey(value: string): string {
+  const normalized = value
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return normalized || `tarea-${Date.now()}`;
+}
+
+function buildStoredTask(
+  input: AdminProjectTrackingTaskInput,
+  currentTask?: AdminProjectTrackingTask,
+): Record<string, unknown> {
+  const currentRaw = currentTask?.raw ?? {};
+
+  return omitUndefinedValues({
+    ...currentRaw,
+    key: currentTask?.key ?? normalizeTaskKey(input.title),
+    title: input.title.trim(),
+    description: input.description?.trim() || undefined,
+    status: input.status,
+    priority: input.priority?.trim() || undefined,
+    responsable: input.responsable?.trim() || undefined,
+    fechaLimite: input.fechaLimite || undefined,
+  });
+}
+
 export async function getAdminProjectTracking(projectId: string): Promise<AdminProjectTrackingProject> {
   const row = await fetchAdminProjectTracking(projectId);
   const phases = Array.isArray(row.fases) ? row.fases : [];
@@ -152,5 +186,54 @@ export async function saveAdminProjectTrackingPhase(
     : [...project.phases.map((phase) => phase.raw), nextPhase];
 
   await updateAdminProjectTrackingPhases(project.id, nextPhases);
+  return getAdminProjectTracking(project.id);
+}
+
+export async function saveAdminProjectTrackingTask(
+  project: AdminProjectTrackingProject,
+  input: AdminProjectTrackingTaskInput,
+  currentTaskKey?: string,
+): Promise<AdminProjectTrackingProject> {
+  const currentTask = currentTaskKey
+    ? [...project.rootTasks, ...project.phases.flatMap((phase) => phase.tareas)].find((task) => task.key === currentTaskKey)
+    : undefined;
+
+  const targetPhaseKey = currentTask?.source.phaseKey ?? input.phaseKey;
+  const nextTask = buildStoredTask(input, currentTask);
+
+  const nextRootTasks = currentTask?.source.type === 'root'
+    ? project.rootTasks.map((task) => (task.key === currentTask.key ? nextTask : task.raw))
+    : !currentTask && !targetPhaseKey
+      ? [...project.rootTasks.map((task) => task.raw), nextTask]
+      : project.rootTasks.map((task) => task.raw);
+
+  const nextPhases = project.phases.map((phase) => {
+    const currentTasks = phase.tareas.map((task) => task.raw);
+
+    if (currentTask?.source.type === 'phase' && phase.key === currentTask.source.phaseKey) {
+      return {
+        ...phase.raw,
+        tareas: phase.tareas.map((task) => (task.key === currentTask.key ? nextTask : task.raw)),
+      };
+    }
+
+    if (!currentTask && targetPhaseKey && phase.key === targetPhaseKey) {
+      return {
+        ...phase.raw,
+        tareas: [...currentTasks, nextTask],
+      };
+    }
+
+    return {
+      ...phase.raw,
+      tareas: currentTasks,
+    };
+  });
+
+  await updateAdminProjectTrackingProject(project.id, {
+    fases: nextPhases,
+    tareas: nextRootTasks,
+  });
+
   return getAdminProjectTracking(project.id);
 }

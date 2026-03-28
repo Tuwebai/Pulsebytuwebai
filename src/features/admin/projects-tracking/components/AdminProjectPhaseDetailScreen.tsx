@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { AlertCircle, ArrowLeft, SquarePen } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Plus, SquarePen } from 'lucide-react';
 
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { AdminProjectPhaseDetailSummary } from '@/features/admin/projects-tracking/components/AdminProjectPhaseDetailSummary';
 import { AdminProjectPhaseDialog } from '@/features/admin/projects-tracking/components/AdminProjectPhaseDialog';
 import { AdminProjectPhaseTasksList } from '@/features/admin/projects-tracking/components/AdminProjectPhaseTasksList';
+import { AdminProjectTaskDialog } from '@/features/admin/projects-tracking/components/AdminProjectTaskDialog';
 import { AdminProjectTrackingHeader } from '@/features/admin/projects-tracking/components/AdminProjectTrackingHeader';
 import { useAdminProjectTracking } from '@/features/admin/projects-tracking/hooks/useAdminProjectTracking';
+import type { AdminProjectTrackingTask } from '@/features/admin/projects-tracking/types/adminProjectTracking';
 
 interface AdminProjectPhaseDetailScreenProps {
   phaseKey: string | undefined;
@@ -22,8 +24,10 @@ export function AdminProjectPhaseDetailScreen({
   onBackToPhases,
   onEditProject,
 }: AdminProjectPhaseDetailScreenProps) {
-  const { loading, savingPhase, error, project, refresh, savePhase } = useAdminProjectTracking(projectId);
+  const { loading, savingPhase, savingTask, error, project, refresh, savePhase, saveTask } = useAdminProjectTracking(projectId);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showCreateTaskDialog, setShowCreateTaskDialog] = useState(false);
+  const [taskDraft, setTaskDraft] = useState<AdminProjectTrackingTask | null>(null);
   const phase = project?.phases.find((currentPhase) => currentPhase.key === phaseKey);
 
   if (loading) {
@@ -72,6 +76,20 @@ export function AdminProjectPhaseDetailScreen({
     }
   };
 
+  const handleSubmitTask = async (input: Parameters<typeof saveTask>[0], currentTaskKey?: string) => {
+    const success = await saveTask(
+      {
+        ...input,
+        phaseKey: phase.key,
+      },
+      currentTaskKey,
+    );
+    if (success) {
+      setShowCreateTaskDialog(false);
+      setTaskDraft(null);
+    }
+  };
+
   return (
     <>
       <div className="space-y-6">
@@ -102,21 +120,35 @@ export function AdminProjectPhaseDetailScreen({
               <span className="rounded-full border border-emerald-400/20 bg-emerald-500/12 px-4 py-2 text-sm font-medium text-emerald-300">
                 {phase.estado}
               </span>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowEditDialog(true)}
-                className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]"
-              >
-                <SquarePen className="mr-2 h-4 w-4" />
-                Editar fase
-              </Button>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button
+                  type="button"
+                  onClick={() => setShowCreateTaskDialog(true)}
+                  className="rounded-xl border border-signal/20 bg-signal text-white hover:bg-signal/90"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Crear tarea
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowEditDialog(true)}
+                  className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]"
+                >
+                  <SquarePen className="mr-2 h-4 w-4" />
+                  Editar fase
+                </Button>
+              </div>
             </div>
           </div>
         </section>
 
         <AdminProjectPhaseDetailSummary phase={phase} />
-        <AdminProjectPhaseTasksList tasks={phase.tareas} />
+        <AdminProjectPhaseTasksList
+          tasks={phase.tareas}
+          onCreateTask={() => setShowCreateTaskDialog(true)}
+          onEditTask={setTaskDraft}
+        />
       </div>
 
       <AdminProjectPhaseDialog
@@ -125,6 +157,19 @@ export function AdminProjectPhaseDetailScreen({
         phase={phase}
         onClose={() => setShowEditDialog(false)}
         onSubmit={handleSubmitPhase}
+      />
+
+      <AdminProjectTaskDialog
+        open={showCreateTaskDialog || taskDraft !== null}
+        saving={savingTask}
+        task={taskDraft}
+        phases={project.phases}
+        fixedPhaseKey={phase.key}
+        onClose={() => {
+          setShowCreateTaskDialog(false);
+          setTaskDraft(null);
+        }}
+        onSubmit={handleSubmitTask}
       />
     </>
   );
