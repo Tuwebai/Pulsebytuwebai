@@ -86,9 +86,11 @@ export function useAdminUsers() {
       setUserToDelete(null);
     } catch (error) {
       console.error('Error deleting user:', error);
+      const message =
+        error instanceof Error ? error.message : 'No se pudo eliminar el usuario.';
       toast({
         title: 'Error',
-        description: 'No se pudo eliminar el usuario.',
+        description: message,
         variant: 'destructive',
       });
     }

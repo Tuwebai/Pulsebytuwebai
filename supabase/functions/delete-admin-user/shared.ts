@@ -38,6 +38,27 @@ export interface DeleteAdminUserResponse {
   deleted_auth_user: boolean;
 }
 
+function isMissingAuthUserError(error: unknown) {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+
+  const payload = error as {
+    status?: number;
+    message?: string;
+    code?: string;
+  };
+
+  const message = payload.message?.toLowerCase() ?? '';
+
+  return (
+    payload.status === 404 ||
+    payload.code === 'user_not_found' ||
+    message.includes('user not found') ||
+    message.includes('not found')
+  );
+}
+
 export function jsonResponse(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
     status,
@@ -206,4 +227,37 @@ export async function getDeletionBlockers(
   );
 
   return counts.filter((check) => check.count > 0) as UserDeletionBlocker[];
+}
+
+export async function deleteAuthUserIfPresent(
+  adminClient: ReturnType<typeof createSupabaseAdminClient>,
+  userId: string,
+) {
+  const { data: authUserData, error: authLookupError } = await adminClient.auth.admin.getUserById(
+    userId,
+  );
+
+  if (authLookupError) {
+    if (isMissingAuthUserError(authLookupError)) {
+      return false;
+    }
+
+    throw authLookupError;
+  }
+
+  if (!authUserData.user) {
+    return false;
+  }
+
+  const { error: authDeleteError } = await adminClient.auth.admin.deleteUser(userId);
+
+  if (authDeleteError) {
+    if (isMissingAuthUserError(authDeleteError)) {
+      return false;
+    }
+
+    throw authDeleteError;
+  }
+
+  return true;
 }

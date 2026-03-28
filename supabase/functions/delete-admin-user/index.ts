@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import {
   corsHeaders,
+  deleteAuthUserIfPresent,
   ensureAuthenticatedAdmin,
   getDeletionBlockers,
   getRemainingAdminCount,
@@ -84,17 +85,13 @@ serve(async (req) => {
       throw profileDeleteError;
     }
 
-    const { error: authDeleteError } = await adminClient.auth.admin.deleteUser(targetUserId);
-
-    if (authDeleteError) {
-      throw authDeleteError;
-    }
+    const deletedAuthUser = await deleteAuthUserIfPresent(adminClient, targetUserId);
 
     return jsonResponse(200, {
       deleted_user_id: targetUser.id,
       deleted_email: targetUser.email,
       deleted_profile: true,
-      deleted_auth_user: true,
+      deleted_auth_user: deletedAuthUser,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'UNKNOWN_ERROR';
@@ -108,6 +105,9 @@ serve(async (req) => {
     }
 
     console.error('Error en delete-admin-user:', message);
-    return jsonResponse(500, { error: 'USER_DELETE_FAILED' });
+    return jsonResponse(500, {
+      error: 'USER_DELETE_FAILED',
+      reason: message,
+    });
   }
 });

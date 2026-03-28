@@ -58,6 +58,7 @@ export async function invokeDeleteAdminUser(userId: string): Promise<DeleteAdmin
       const payload = (await error.context.json().catch(() => null)) as {
         error?: string;
         blockers?: UserDeletionBlocker[];
+        reason?: string;
       } | null;
 
       if (error.context.status === 401) {
@@ -87,6 +88,10 @@ export async function invokeDeleteAdminUser(userId: string): Promise<DeleteAdmin
             ? `No se puede eliminar el usuario porque todavía tiene referencias operativas: ${formatBlockers(blockers)}.`
             : 'No se puede eliminar el usuario porque todavía tiene referencias operativas activas.',
         );
+      }
+
+      if (error.context.status === 500 && payload?.reason) {
+        throw new Error(`No pudimos eliminar el usuario desde el backend: ${payload.reason}.`);
       }
 
       throw new Error('No pudimos eliminar el usuario desde el backend.');
