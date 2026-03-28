@@ -1,7 +1,6 @@
 import {
   BarChart3,
   Bell,
-  CheckCircle,
   Cog,
   CreditCard,
   FolderOpen,
@@ -26,7 +25,6 @@ const SECTION_ICONS: Record<AdminSectionId, typeof Users> = {
   dashboard: BarChart3,
   usuarios: Users,
   proyectos: FolderOpen,
-  'aprobar-proyectos': CheckCircle,
   tickets: Ticket,
   pagos: CreditCard,
   notifications: Bell,

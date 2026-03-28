@@ -14,7 +14,6 @@ import type { PulseAccessActionMode } from '@/features/admin/users/hooks/useAdmi
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 import type { WebsiteReviewStatus } from '@/features/admin/services/pulseDomainAdminService';
 import type { AdminSectionChangeHandler } from '@/features/admin/types/adminNavigation';
-import ProjectApprovalManager from '@/components/ProjectApprovalManager';
 import AdvancedTicketManager from '@/components/AdvancedTicketManager';
 
 interface AdminDomainUpdateResult {
@@ -107,14 +106,6 @@ export function createAdminScreenRegistry(
       />
     ),
     proyectos: <AdminProjectsScreen />,
-    'aprobar-proyectos': (
-      <ProjectApprovalManager
-        user={context.user}
-        onRefresh={() => {
-          context.onLoadData();
-        }}
-      />
-    ),
     tickets: <AdvancedTicketManager />,
     pagos: (
       <AdminPaymentsSection
