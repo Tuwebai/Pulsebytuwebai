@@ -1,10 +1,16 @@
+import { useState } from 'react';
 import { AlertCircle, ListTodo } from 'lucide-react';
 
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { AdminProjectCriticalTaskCard } from '@/features/admin/projects-tracking/components/AdminProjectCriticalTaskCard';
 import { AdminProjectCriticalTasksEmptyState } from '@/features/admin/projects-tracking/components/AdminProjectCriticalTasksEmptyState';
+import { AdminProjectCriticalTasksFilters } from '@/features/admin/projects-tracking/components/AdminProjectCriticalTasksFilters';
 import { AdminProjectTrackingHeader } from '@/features/admin/projects-tracking/components/AdminProjectTrackingHeader';
-import { getAdminProjectCriticalTasks } from '@/features/admin/projects-tracking/components/adminProjectCriticalTasks.utils';
+import {
+  filterAdminProjectCriticalTasks,
+  getAdminProjectCriticalTasks,
+  type AdminProjectCriticalTaskFilter,
+} from '@/features/admin/projects-tracking/components/adminProjectCriticalTasks.utils';
 import { useAdminProjectTracking } from '@/features/admin/projects-tracking/hooks/useAdminProjectTracking';
 
 interface AdminProjectCriticalTasksScreenProps {
@@ -17,6 +23,7 @@ export function AdminProjectCriticalTasksScreen({
   onEditProject,
 }: AdminProjectCriticalTasksScreenProps) {
   const { loading, error, project, refresh } = useAdminProjectTracking(projectId);
+  const [activeFilter, setActiveFilter] = useState<AdminProjectCriticalTaskFilter>('all');
 
   if (loading) {
     return (
@@ -53,6 +60,7 @@ export function AdminProjectCriticalTasksScreen({
   }
 
   const criticalTasks = getAdminProjectCriticalTasks(project);
+  const visibleTasks = filterAdminProjectCriticalTasks(criticalTasks, activeFilter);
 
   return (
     <div className="space-y-6">
@@ -72,13 +80,32 @@ export function AdminProjectCriticalTasksScreen({
             <span>{criticalTasks.length} tareas priorizadas</span>
           </div>
         </div>
+
+        {criticalTasks.length > 0 ? (
+          <div className="mt-4 border-t border-white/10 pt-4">
+            <AdminProjectCriticalTasksFilters
+              activeFilter={activeFilter}
+              items={criticalTasks}
+              onChange={setActiveFilter}
+            />
+          </div>
+        ) : null}
       </section>
 
       {criticalTasks.length === 0 ? (
         <AdminProjectCriticalTasksEmptyState onEditProject={onEditProject} />
+      ) : visibleTasks.length === 0 ? (
+        <section className="rounded-[24px] border border-dashed border-white/10 bg-[var(--bg-surface)]/70 p-8">
+          <div className="mx-auto max-w-2xl space-y-2 text-center">
+            <h2 className="text-xl font-semibold text-[var(--text-primary)]">No hay tareas en este filtro</h2>
+            <p className="text-sm leading-6 text-[var(--text-secondary)]">
+              Pulse no detecta tareas {activeFilter === 'blocked' ? 'bloqueadas' : activeFilter === 'overdue' ? 'vencidas' : 'sin responsable'} en este momento.
+            </p>
+          </div>
+        </section>
       ) : (
         <section className="space-y-4">
-          {criticalTasks.map((item) => (
+          {visibleTasks.map((item) => (
             <AdminProjectCriticalTaskCard key={item.task.key} item={item} projectId={project.id} />
           ))}
         </section>

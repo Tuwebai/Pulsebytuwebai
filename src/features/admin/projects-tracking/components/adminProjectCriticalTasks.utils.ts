@@ -3,7 +3,12 @@ import type { AdminProjectTrackingProject, AdminProjectTrackingTask } from '@/fe
 export interface AdminProjectCriticalTaskItem {
   task: AdminProjectTrackingTask;
   reason: string;
+  blocked: boolean;
+  overdue: boolean;
+  unassigned: boolean;
 }
+
+export type AdminProjectCriticalTaskFilter = 'all' | 'blocked' | 'overdue' | 'unassigned';
 
 function isOverdue(dateValue?: string): boolean {
   if (!dateValue) {
@@ -49,8 +54,11 @@ export function getAdminProjectCriticalTasks(project: AdminProjectTrackingProjec
 
   return allTasks
     .map((task) => {
+      const blocked = task.status.trim().toLowerCase().includes('blocked') || task.status.trim().toLowerCase().includes('bloq');
+      const overdue = isOverdue(task.fechaLimite ?? task.dueDate);
+      const unassigned = !(task.responsable ?? task.assigned_to);
       const reason = getTaskReason(task);
-      return reason ? { task, reason } : null;
+      return reason ? { task, reason, blocked, overdue, unassigned } : null;
     })
     .filter((item): item is AdminProjectCriticalTaskItem => item !== null);
 }
@@ -60,4 +68,32 @@ export function getAdminProjectCriticalTaskByKey(
   taskKey: string,
 ): AdminProjectCriticalTaskItem | null {
   return getAdminProjectCriticalTasks(project).find((item) => item.task.key === taskKey) ?? null;
+}
+
+export function filterAdminProjectCriticalTasks(
+  items: AdminProjectCriticalTaskItem[],
+  filter: AdminProjectCriticalTaskFilter,
+): AdminProjectCriticalTaskItem[] {
+  if (filter === 'all') {
+    return items;
+  }
+
+  return items.filter((item) => {
+    if (filter === 'blocked') {
+      return item.blocked;
+    }
+
+    if (filter === 'overdue') {
+      return item.overdue;
+    }
+
+    return item.unassigned;
+  });
+}
+
+export function getAdminProjectCriticalTaskFilterCount(
+  items: AdminProjectCriticalTaskItem[],
+  filter: Exclude<AdminProjectCriticalTaskFilter, 'all'>,
+): number {
+  return filterAdminProjectCriticalTasks(items, filter).length;
 }
