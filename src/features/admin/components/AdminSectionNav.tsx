@@ -47,10 +47,10 @@ export function AdminSectionNav({ activeSection, onSectionChange }: AdminSection
               type="button"
               variant={isActive ? 'default' : 'outline'}
               className={cn(
-                'rounded-xl px-4 py-2 text-sm font-medium transition-all',
+                'h-10 rounded-full px-4 text-sm font-medium transition-all',
                 isActive
-                  ? 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200'
-                  : 'border-border/60 bg-background/70 text-muted-foreground hover:bg-muted hover:text-foreground'
+                  ? 'border border-signal/25 bg-signal/12 text-signal shadow-[0_0_0_1px_rgba(59,158,245,0.08)] hover:bg-signal/16'
+                  : 'border-white/10 bg-[var(--bg-elevated)]/55 text-[var(--text-secondary)] hover:border-white/15 hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]'
               )}
               onClick={() => onSectionChange(sectionId)}
             >
