@@ -79,7 +79,7 @@ export function AdminProjectCriticalTasksScreen({
       ) : (
         <section className="space-y-4">
           {criticalTasks.map((item) => (
-            <AdminProjectCriticalTaskCard key={item.task.key} item={item} />
+            <AdminProjectCriticalTaskCard key={item.task.key} item={item} projectId={project.id} />
           ))}
         </section>
       )}

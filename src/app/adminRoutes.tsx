@@ -7,6 +7,7 @@ type LazyPage = LazyExoticComponent<ComponentType>;
 
 interface AdminRoutesComponents {
   Admin: LazyPage;
+  AdminProjectCriticalTaskDetailPage: LazyPage;
   AdminProjectCriticalTasksPage: LazyPage;
   AdminProjectPhaseDetailPage: LazyPage;
   AdminProjectPhasesPage: LazyPage;
@@ -21,6 +22,7 @@ interface AdminRoutesComponents {
 
 export function renderAdminRoutes({
   Admin,
+  AdminProjectCriticalTaskDetailPage,
   AdminProjectCriticalTasksPage,
   AdminProjectPhaseDetailPage,
   AdminProjectPhasesPage,
@@ -83,6 +85,14 @@ export function renderAdminRoutes({
         element={
           <ProtectedRoute requiredRole="admin">
             <AdminProjectCriticalTasksPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/proyectos/:projectId/seguimiento/tareas/:taskId"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminProjectCriticalTaskDetailPage />
           </ProtectedRoute>
         }
       />

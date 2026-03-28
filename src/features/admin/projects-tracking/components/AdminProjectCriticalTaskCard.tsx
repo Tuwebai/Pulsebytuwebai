@@ -1,12 +1,14 @@
-import { AlertTriangle, CalendarClock, KanbanSquare, UserRound } from 'lucide-react';
+import { AlertTriangle, ArrowRight, CalendarClock, KanbanSquare, UserRound } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import type { AdminProjectCriticalTaskItem } from '@/features/admin/projects-tracking/components/adminProjectCriticalTasks.utils';
 
 interface AdminProjectCriticalTaskCardProps {
   item: AdminProjectCriticalTaskItem;
+  projectId: string;
 }
 
-export function AdminProjectCriticalTaskCard({ item }: AdminProjectCriticalTaskCardProps) {
+export function AdminProjectCriticalTaskCard({ item, projectId }: AdminProjectCriticalTaskCardProps) {
   const { task, reason } = item;
 
   return (
@@ -52,6 +54,16 @@ export function AdminProjectCriticalTaskCard({ item }: AdminProjectCriticalTaskC
         <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
           <AlertTriangle className="h-4 w-4 text-amber-300" />
           <span>Esta tarea entra en seguimiento prioritario hasta resolver su desvío.</span>
+        </div>
+
+        <div className="flex justify-end">
+          <Link
+            to={`/admin/proyectos/${projectId}/seguimiento/tareas/${encodeURIComponent(task.key)}`}
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:border-white/15 hover:bg-white/[0.06]"
+          >
+            Ver tarea
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </article>

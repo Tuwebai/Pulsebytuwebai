@@ -54,3 +54,10 @@ export function getAdminProjectCriticalTasks(project: AdminProjectTrackingProjec
     })
     .filter((item): item is AdminProjectCriticalTaskItem => item !== null);
 }
+
+export function getAdminProjectCriticalTaskByKey(
+  project: AdminProjectTrackingProject,
+  taskKey: string,
+): AdminProjectCriticalTaskItem | null {
+  return getAdminProjectCriticalTasks(project).find((item) => item.task.key === taskKey) ?? null;
+}
