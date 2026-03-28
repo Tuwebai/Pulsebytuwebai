@@ -13,10 +13,8 @@ interface AdminRoutesComponents {
   AdminProjectPhaseDetailPage: LazyPage;
   AdminProjectPhasesPage: LazyPage;
   AdminProjectTrackingPage: LazyPage;
-  AdminGitHubProfile: LazyPage;
   AdvancedAnalytics: LazyPage;
   AdvancedUserManagement: LazyPage;
-  EnvironmentVariables: LazyPage;
   ProjectsPage: LazyPage;
   UserProfileView: LazyPage;
 }
@@ -29,10 +27,8 @@ export function renderAdminRoutes({
   AdminProjectPhaseDetailPage,
   AdminProjectPhasesPage,
   AdminProjectTrackingPage,
-  AdminGitHubProfile,
   AdvancedAnalytics,
   AdvancedUserManagement,
-  EnvironmentVariables,
   ProjectsPage,
   UserProfileView,
 }: AdminRoutesComponents): ReactNode {
@@ -130,24 +126,6 @@ export function renderAdminRoutes({
           <ProtectedRoute requiredRole="admin">
             <DashboardLayout key="user-profile">
               <UserProfileView key="user-profile-content" />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/profile/:userId/github"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <AdminGitHubProfile />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/environment"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <DashboardLayout>
-              <EnvironmentVariables />
             </DashboardLayout>
           </ProtectedRoute>
         }

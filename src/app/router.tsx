@@ -11,7 +11,6 @@ import { renderAuthRoutes } from '@/features/auth/routes/AuthRoutes';
 import ProtectedRoute from '@/features/auth/components/ProtectedRoute';
 import OnboardingGate from '@/features/onboarding/components/OnboardingGate';
 import DashboardShell from '@/core/layout/DashboardLayout';
-import { GitHubDashboard } from '@/pages/GitHubDashboard';
 import { serviceWorkerManager } from '@/utils/serviceWorker';
 
 type LazyComponentModule = {
@@ -46,8 +45,6 @@ const AdminProjectPhasesPage = createLazyComponent(() => import('@/features/admi
 const AdminProjectTrackingPage = createLazyComponent(() => import('@/features/admin/projects-tracking/pages/AdminProjectTrackingPage'));
 const ProjectsPage = createLazyComponent(() => import('@/pages/ProjectsPage'));
 const ProyectosNuevo = createLazyComponent(() => import('@/pages/ProyectosNuevo'));
-const CollaborationPage = createLazyComponent(() => import('@/pages/CollaborationPage'));
-const AdminCollaborationPage = createLazyComponent(() => import('@/pages/AdminCollaborationPage'));
 const PhasesAndTasksPage = createLazyComponent(() => import('@/pages/PhasesAndTasksPage'));
 const WorkspacePage = createLazyComponent(() => import('@/pages/WorkspacePage'));
 const ProfilePage = createLazyComponent(() => import('@/features/profile/pages/ProfilePage'));
@@ -62,8 +59,6 @@ const AdvancedUserManagement = createLazyComponent(() => import('@/components/Ad
 const InvitationPage = createLazyComponent(() => import('@/pages/InvitationPage'));
 const AuthCallback = createLazyComponent(() => import('@/pages/AuthCallback'));
 const GitHubCallback = createLazyComponent(() => import('@/pages/GitHubCallback'));
-const AdminGitHubProfile = createLazyComponent(() => import('@/pages/AdminGitHubProfile'));
-const EnvironmentVariables = createLazyComponent(() => import('@/pages/EnvironmentVariables'));
 const SSOPage = createLazyComponent(() => import('@/features/auth/pages/SSOPage'));
 
 const ServiceWorkerInitializer = () => {
@@ -202,10 +197,8 @@ function AppRoutes() {
         AdminProjectPhaseDetailPage,
         AdminProjectPhasesPage,
         AdminProjectTrackingPage,
-        AdminGitHubProfile,
         AdvancedAnalytics,
         AdvancedUserManagement,
-        EnvironmentVariables,
         ProjectsPage,
         UserProfileView
       })}
@@ -234,16 +227,6 @@ function AppRoutes() {
         element={
           <ProtectedRoute clientOnly>
             <Navigate replace to="/dashboard/perfil" />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/github-dashboard"
-        element={
-          <ProtectedRoute clientOnly>
-            <DashboardLayout key="github-dashboard">
-              <GitHubDashboard />
-            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -289,34 +272,6 @@ function AppRoutes() {
           <ProtectedRoute clientOnly>
             <DashboardLayout>
               <ProyectosNuevo />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/proyectos/:projectId/colaboracion"
-        element={
-          <ProtectedRoute clientOnly>
-            <DashboardLayout>
-              <CollaborationPage />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/proyectos/:projectId/colaboracion-cliente"
-        element={
-          <ProtectedRoute clientOnly>
-            <Navigate replace to="/dashboard/proyecto" />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/proyectos/:projectId/colaboracion-admin"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <DashboardLayout>
-              <AdminCollaborationPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
