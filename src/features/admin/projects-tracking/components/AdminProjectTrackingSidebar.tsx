@@ -7,8 +7,10 @@ import {
   KanbanSquare,
   ListTodo,
 } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
+import type { AdminProjectTrackingNavItem } from '@/features/admin/projects-tracking/components/AdminProjectTrackingFrame';
 import { cn } from '@/lib/utils';
 
 const trackingNavItems = [
@@ -19,18 +21,24 @@ const trackingNavItems = [
 ] as const;
 
 interface AdminProjectTrackingSidebarProps {
+  activeItem: AdminProjectTrackingNavItem;
   collapsed: boolean;
   onToggleCollapse: () => void;
   onBack: () => void;
+  projectId: string | undefined;
   className?: string;
 }
 
 export function AdminProjectTrackingSidebar({
+  activeItem,
   collapsed,
   onToggleCollapse,
   onBack,
+  projectId,
   className,
 }: AdminProjectTrackingSidebarProps) {
+  const basePath = projectId ? `/admin/proyectos/${projectId}/seguimiento` : '/admin/proyectos';
+
   return (
     <aside
       className={cn(
@@ -60,22 +68,32 @@ export function AdminProjectTrackingSidebar({
       </div>
 
       <nav className="flex-1 space-y-2">
-        {trackingNavItems.map(({ id, label, icon: Icon, iconClassName }) => (
-          <a
-            key={id}
-            href={`#${id}`}
-            className={cn(
-              'flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-sm text-[var(--text-secondary)] transition-colors hover:border-white/10 hover:bg-white/[0.04] hover:text-[var(--text-primary)]',
-              collapsed && 'justify-center px-0',
-            )}
-            title={collapsed ? label : undefined}
-          >
-            <span className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border', iconClassName)}>
-              <Icon className="h-4 w-4 shrink-0" />
-            </span>
-            {!collapsed && <span>{label}</span>}
-          </a>
-        ))}
+        {trackingNavItems.map(({ id, label, icon: Icon, iconClassName }) => {
+          const to =
+            id === 'resumen'
+              ? basePath
+              : id === 'fases'
+                ? `${basePath}/fases`
+                : `${basePath}#${id}`;
+
+          return (
+            <NavLink
+              key={id}
+              to={to}
+              className={cn(
+                'flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-sm text-[var(--text-secondary)] transition-colors hover:border-white/10 hover:bg-white/[0.04] hover:text-[var(--text-primary)]',
+                activeItem === id && 'border-white/10 bg-white/[0.06] text-[var(--text-primary)]',
+                collapsed && 'justify-center px-0',
+              )}
+              title={collapsed ? label : undefined}
+            >
+              <span className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border', iconClassName)}>
+                <Icon className="h-4 w-4 shrink-0" />
+              </span>
+              {!collapsed && <span>{label}</span>}
+            </NavLink>
+          );
+        })}
       </nav>
 
       <div className="pt-3">

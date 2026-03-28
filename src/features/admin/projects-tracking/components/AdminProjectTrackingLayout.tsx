@@ -3,34 +3,41 @@ import { Menu } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { AdminProjectTrackingSidebar } from '@/features/admin/projects-tracking/components/AdminProjectTrackingSidebar';
+import type { AdminProjectTrackingNavItem } from '@/features/admin/projects-tracking/components/AdminProjectTrackingFrame';
 import { cn } from '@/lib/utils';
 
 interface AdminProjectTrackingLayoutProps {
+  activeItem: AdminProjectTrackingNavItem;
   collapsed: boolean;
   mobileSidebarOpen: boolean;
   onToggleCollapse: () => void;
   onOpenMobileSidebar: () => void;
   onCloseMobileSidebar: () => void;
   onBack: () => void;
+  projectId: string | undefined;
   children: ReactNode;
 }
 
 export function AdminProjectTrackingLayout({
+  activeItem,
   collapsed,
   mobileSidebarOpen,
   onToggleCollapse,
   onOpenMobileSidebar,
   onCloseMobileSidebar,
   onBack,
+  projectId,
   children,
 }: AdminProjectTrackingLayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <div className="fixed inset-y-0 left-0 z-30 hidden lg:block">
         <AdminProjectTrackingSidebar
+          activeItem={activeItem}
           collapsed={collapsed}
           onToggleCollapse={onToggleCollapse}
           onBack={onBack}
+          projectId={projectId}
           className="h-screen rounded-none rounded-r-[28px] border-l-0"
         />
       </div>
@@ -74,9 +81,11 @@ export function AdminProjectTrackingLayout({
           />
           <div className="absolute inset-y-0 left-0 w-[min(84vw,320px)]">
             <AdminProjectTrackingSidebar
+              activeItem={activeItem}
               collapsed={false}
               onToggleCollapse={onCloseMobileSidebar}
               onBack={onBack}
+              projectId={projectId}
               className="h-screen rounded-none rounded-r-[28px] border-l-0"
             />
           </div>
