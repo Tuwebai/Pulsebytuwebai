@@ -35,7 +35,7 @@ export function AdminProjectTrackingSidebar({
     <aside
       className={cn(
         'flex h-full flex-col rounded-[28px] border border-white/10 bg-[var(--bg-surface)]/95 p-3 shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur transition-all duration-300',
-        collapsed ? 'w-[92px]' : 'w-full max-w-[280px]',
+        collapsed ? 'w-[92px]' : 'w-[280px]',
         className,
       )}
     >
