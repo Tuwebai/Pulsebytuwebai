@@ -2,13 +2,20 @@ import { AlertTriangle, ArrowRight, CalendarClock, KanbanSquare, UserRound } fro
 import { Link } from 'react-router-dom';
 
 import type { AdminProjectCriticalTaskItem } from '@/features/admin/projects-tracking/components/adminProjectCriticalTasks.utils';
+import { AdminProjectTrackingQuickActions } from '@/features/admin/projects-tracking/components/AdminProjectTrackingQuickActions';
+import type { AdminProjectTrackingResolutionAction } from '@/features/admin/projects-tracking/components/AdminProjectTrackingResolutionPanel';
 
 interface AdminProjectCriticalTaskCardProps {
   item: AdminProjectCriticalTaskItem;
   projectId: string;
+  quickActions?: AdminProjectTrackingResolutionAction[];
 }
 
-export function AdminProjectCriticalTaskCard({ item, projectId }: AdminProjectCriticalTaskCardProps) {
+export function AdminProjectCriticalTaskCard({
+  item,
+  projectId,
+  quickActions = [],
+}: AdminProjectCriticalTaskCardProps) {
   const { task, reason } = item;
 
   return (
@@ -56,14 +63,18 @@ export function AdminProjectCriticalTaskCard({ item, projectId }: AdminProjectCr
           <span>Esta tarea entra en seguimiento prioritario hasta resolver su desvío.</span>
         </div>
 
-        <div className="flex justify-end">
-          <Link
-            to={`/admin/proyectos/${projectId}/seguimiento/tareas/${encodeURIComponent(task.key)}`}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:border-white/15 hover:bg-white/[0.06]"
-          >
-            Ver tarea
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <AdminProjectTrackingQuickActions actions={quickActions} />
+
+          <div className="flex justify-end">
+            <Link
+              to={`/admin/proyectos/${projectId}/seguimiento/tareas/${encodeURIComponent(task.key)}`}
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:border-white/15 hover:bg-white/[0.06]"
+            >
+              Ver tarea
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </div>
     </article>

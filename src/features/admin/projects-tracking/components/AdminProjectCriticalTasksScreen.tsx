@@ -8,12 +8,14 @@ import { AdminProjectCriticalTasksEmptyState } from '@/features/admin/projects-t
 import { AdminProjectCriticalTasksFilters } from '@/features/admin/projects-tracking/components/AdminProjectCriticalTasksFilters';
 import { AdminProjectTaskDialog } from '@/features/admin/projects-tracking/components/AdminProjectTaskDialog';
 import { AdminProjectTrackingHeader } from '@/features/admin/projects-tracking/components/AdminProjectTrackingHeader';
+import { getAdminProjectCriticalTaskResolutionActions } from '@/features/admin/projects-tracking/components/adminProjectCriticalTaskResolution.utils';
 import {
   filterAdminProjectCriticalTasks,
   getAdminProjectCriticalTasks,
   type AdminProjectCriticalTaskFilter,
 } from '@/features/admin/projects-tracking/components/adminProjectCriticalTasks.utils';
 import { useAdminProjectTracking } from '@/features/admin/projects-tracking/hooks/useAdminProjectTracking';
+import type { AdminProjectTrackingTask } from '@/features/admin/projects-tracking/types/adminProjectTracking';
 
 interface AdminProjectCriticalTasksScreenProps {
   projectId: string | undefined;
@@ -27,6 +29,7 @@ export function AdminProjectCriticalTasksScreen({
   const { loading, savingTask, error, project, refresh, saveTask } = useAdminProjectTracking(projectId);
   const [activeFilter, setActiveFilter] = useState<AdminProjectCriticalTaskFilter>('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [taskDraft, setTaskDraft] = useState<AdminProjectTrackingTask | null>(null);
 
   if (loading) {
     return (
@@ -65,12 +68,43 @@ export function AdminProjectCriticalTasksScreen({
   const criticalTasks = getAdminProjectCriticalTasks(project);
   const visibleTasks = filterAdminProjectCriticalTasks(criticalTasks, activeFilter);
 
-  const handleSubmitTask = async (input: Parameters<typeof saveTask>[0]) => {
-    const success = await saveTask(input);
+  const handleSubmitTask = async (
+    input: Parameters<typeof saveTask>[0],
+    currentTaskKey?: string,
+  ) => {
+    const success = await saveTask(
+      {
+        ...input,
+        phaseKey: taskDraft?.source.phaseKey ?? input.phaseKey,
+      },
+      currentTaskKey,
+    );
     if (success) {
       setShowCreateDialog(false);
+      setTaskDraft(null);
       setActiveFilter('all');
     }
+  };
+
+  const handleQuickTaskUpdate = async (
+    task: AdminProjectTrackingTask,
+    {
+      status = task.status,
+      priority = task.priority ?? 'alta',
+    }: { status?: string; priority?: string },
+  ) => {
+    await saveTask(
+      {
+        title: task.title,
+        description: task.description ?? '',
+        status,
+        priority,
+        responsable: task.responsable ?? task.assigned_to ?? '',
+        fechaLimite: task.fechaLimite ?? task.dueDate ?? '',
+        phaseKey: task.source.phaseKey,
+      },
+      task.key,
+    );
   };
 
   return (
@@ -129,17 +163,33 @@ export function AdminProjectCriticalTasksScreen({
         ) : (
           <section className="space-y-4">
             {visibleTasks.map((item) => (
-              <AdminProjectCriticalTaskCard key={item.task.key} item={item} projectId={project.id} />
+              <AdminProjectCriticalTaskCard
+                key={item.task.key}
+                item={item}
+                projectId={project.id}
+                quickActions={getAdminProjectCriticalTaskResolutionActions({
+                  task: item.task,
+                  saving: savingTask,
+                  onOpenEdit: () => setTaskDraft(item.task),
+                  onUpdateStatus: (status) => void handleQuickTaskUpdate(item.task, { status }),
+                  onUpdatePriority: (priority) => void handleQuickTaskUpdate(item.task, { priority }),
+                }).slice(0, 2)}
+              />
             ))}
           </section>
         )}
       </div>
 
       <AdminProjectTaskDialog
-        open={showCreateDialog}
+        open={showCreateDialog || taskDraft !== null}
         saving={savingTask}
+        task={taskDraft}
         phases={project.phases}
-        onClose={() => setShowCreateDialog(false)}
+        fixedPhaseKey={taskDraft?.source.phaseKey}
+        onClose={() => {
+          setShowCreateDialog(false);
+          setTaskDraft(null);
+        }}
         onSubmit={handleSubmitTask}
       />
     </>

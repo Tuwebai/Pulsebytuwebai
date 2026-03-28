@@ -7,7 +7,9 @@ import { AdminProjectPhaseCard } from '@/features/admin/projects-tracking/compon
 import { AdminProjectPhaseDialog } from '@/features/admin/projects-tracking/components/AdminProjectPhaseDialog';
 import { AdminProjectPhasesEmptyState } from '@/features/admin/projects-tracking/components/AdminProjectPhasesEmptyState';
 import { AdminProjectTrackingHeader } from '@/features/admin/projects-tracking/components/AdminProjectTrackingHeader';
+import { getAdminProjectPhaseResolutionActions } from '@/features/admin/projects-tracking/components/adminProjectPhaseResolution.utils';
 import { useAdminProjectTracking } from '@/features/admin/projects-tracking/hooks/useAdminProjectTracking';
+import type { AdminProjectTrackingPhase } from '@/features/admin/projects-tracking/types/adminProjectTracking';
 
 interface AdminProjectPhasesScreenProps {
   projectId: string | undefined;
@@ -22,6 +24,7 @@ export function AdminProjectPhasesScreen({
 }: AdminProjectPhasesScreenProps) {
   const { loading, savingPhase, error, project, refresh, savePhase } = useAdminProjectTracking(projectId);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [phaseDraft, setPhaseDraft] = useState<AdminProjectTrackingPhase | null>(null);
 
   if (loading) {
     return (
@@ -61,11 +64,27 @@ export function AdminProjectPhasesScreen({
     setShowCreateDialog(true);
   };
 
-  const handleSubmitPhase = async (input: Parameters<typeof savePhase>[0]) => {
-    const success = await savePhase(input);
+  const handleSubmitPhase = async (
+    input: Parameters<typeof savePhase>[0],
+    currentPhaseKey?: string,
+  ) => {
+    const success = await savePhase(input, currentPhaseKey ?? phaseDraft?.key);
     if (success) {
       setShowCreateDialog(false);
+      setPhaseDraft(null);
     }
+  };
+
+  const handleQuickPhaseStatus = async (phase: AdminProjectTrackingPhase, nextStatus: string) => {
+    await savePhase(
+      {
+        descripcion: phase.descripcion ?? phase.key,
+        estado: nextStatus,
+        responsable: phase.responsable ?? '',
+        fechaEntrega: phase.fechaEntrega ?? phase.fechaFin ?? '',
+      },
+      phase.key,
+    );
   };
 
   return (
@@ -109,16 +128,31 @@ export function AdminProjectPhasesScreen({
         ) : (
           <section className="space-y-4">
             {project.phases.map((phase, index) => (
-              <AdminProjectPhaseCard key={phase.key} index={index} phase={phase} projectId={project.id} />
+              <AdminProjectPhaseCard
+                key={phase.key}
+                index={index}
+                phase={phase}
+                projectId={project.id}
+                quickActions={getAdminProjectPhaseResolutionActions({
+                  phase,
+                  saving: savingPhase,
+                  onOpenEdit: () => setPhaseDraft(phase),
+                  onUpdateStatus: (status) => void handleQuickPhaseStatus(phase, status),
+                }).slice(0, 2)}
+              />
             ))}
           </section>
         )}
       </div>
 
       <AdminProjectPhaseDialog
-        open={showCreateDialog}
+        open={showCreateDialog || phaseDraft !== null}
         saving={savingPhase}
-        onClose={() => setShowCreateDialog(false)}
+        phase={phaseDraft}
+        onClose={() => {
+          setShowCreateDialog(false);
+          setPhaseDraft(null);
+        }}
         onSubmit={handleSubmitPhase}
       />
     </>
