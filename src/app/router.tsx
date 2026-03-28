@@ -38,6 +38,7 @@ const TerminosCondiciones = createLazyComponent(() => import('@/pages/TerminosCo
 const HomePage = createLazyComponent(() => import('@/features/dashboard/pages/HomePage'));
 const PulsePage = createLazyComponent(() => import('@/features/pulse/pages/PulsePage'));
 const Admin = createLazyComponent(() => import('@/pages/Admin'));
+const AdminProjectAlertsPage = createLazyComponent(() => import('@/features/admin/projects-tracking/pages/AdminProjectAlertsPage'));
 const AdminProjectCriticalTaskDetailPage = createLazyComponent(() => import('@/features/admin/projects-tracking/pages/AdminProjectCriticalTaskDetailPage'));
 const AdminProjectCriticalTasksPage = createLazyComponent(() => import('@/features/admin/projects-tracking/pages/AdminProjectCriticalTasksPage'));
 const AdminProjectPhaseDetailPage = createLazyComponent(() => import('@/features/admin/projects-tracking/pages/AdminProjectPhaseDetailPage'));
@@ -195,6 +196,7 @@ function AppRoutes() {
 
       {renderAdminRoutes({
         Admin,
+        AdminProjectAlertsPage,
         AdminProjectCriticalTaskDetailPage,
         AdminProjectCriticalTasksPage,
         AdminProjectPhaseDetailPage,

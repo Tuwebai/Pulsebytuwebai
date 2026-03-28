@@ -76,7 +76,7 @@ export function AdminProjectTrackingSidebar({
                 ? `${basePath}/fases`
                 : id === 'tareas-criticas'
                   ? `${basePath}/tareas`
-                  : `${basePath}#${id}`;
+                  : `${basePath}/alertas`;
 
           return (
             <NavLink

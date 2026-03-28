@@ -99,31 +99,17 @@ export function AdminProjectTrackingScreen({
               <h2 className="text-xl font-semibold text-[var(--text-primary)]">Base de seguimiento lista</h2>
               <p className="text-sm leading-6 text-[var(--text-secondary)]">
                 El proyecto ya tiene estructura de seguimiento cargada. Desde la navegación lateral ya podés entrar a
-                fases y tareas críticas para leer el estado operativo por separado.
+                fases, tareas críticas y alertas para leer cada desvío operativo por separado.
               </p>
             </div>
           </section>
 
-          <section
-            id="tareas-criticas"
-            className="rounded-[24px] border border-dashed border-white/10 bg-[var(--bg-surface)]/70 p-6"
-          >
+          <section className="rounded-[24px] border border-dashed border-white/10 bg-[var(--bg-surface)]/70 p-6">
             <div className="space-y-2">
-              <h2 className="text-lg font-semibold text-[var(--text-primary)]">Tareas críticas</h2>
+              <h2 className="text-lg font-semibold text-[var(--text-primary)]">Consola lista para operar</h2>
               <p className="text-sm leading-6 text-[var(--text-secondary)]">
-                Este bloque va a concentrar las tareas bloqueadas, vencidas o sin responsable.
-              </p>
-            </div>
-          </section>
-
-          <section
-            id="alertas"
-            className="rounded-[24px] border border-dashed border-white/10 bg-[var(--bg-surface)]/70 p-6"
-          >
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold text-[var(--text-primary)]">Alertas operativas</h2>
-              <p className="text-sm leading-6 text-[var(--text-secondary)]">
-                Acá vamos a mostrar desvíos reales del proyecto cuando existan datos operativos para calcularlos.
+                La pantalla ya quedó preparada para separar resumen, fases, tareas críticas y alertas sin volver al
+                panel legacy ni mezclar contextos.
               </p>
             </div>
           </section>
