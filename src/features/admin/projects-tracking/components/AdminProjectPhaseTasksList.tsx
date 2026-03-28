@@ -1,16 +1,20 @@
 import { CalendarClock, CircleAlert, SquarePen, UserRound } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { AdminProjectTrackingQuickActions } from '@/features/admin/projects-tracking/components/AdminProjectTrackingQuickActions';
+import type { AdminProjectTrackingResolutionAction } from '@/features/admin/projects-tracking/components/AdminProjectTrackingResolutionPanel';
 import type { AdminProjectTrackingTask } from '@/features/admin/projects-tracking/types/adminProjectTracking';
 
 interface AdminProjectPhaseTasksListProps {
   tasks: AdminProjectTrackingTask[];
   onEditTask: (task: AdminProjectTrackingTask) => void;
+  getQuickActions?: (task: AdminProjectTrackingTask) => AdminProjectTrackingResolutionAction[];
 }
 
 export function AdminProjectPhaseTasksList({
   tasks,
   onEditTask,
+  getQuickActions,
 }: AdminProjectPhaseTasksListProps) {
   if (tasks.length === 0) {
     return (
@@ -45,15 +49,6 @@ export function AdminProjectPhaseTasksList({
                 <span className="rounded-full border border-amber-400/20 bg-amber-500/12 px-3 py-1 text-xs font-medium text-amber-300">
                   {task.status}
                 </span>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => onEditTask(task)}
-                  className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]"
-                >
-                  <SquarePen className="mr-2 h-4 w-4" />
-                  Editar tarea
-                </Button>
               </div>
             </div>
 
@@ -76,6 +71,22 @@ export function AdminProjectPhaseTasksList({
                 <CircleAlert className="mb-2 h-4 w-4 text-rose-300" />
                 <p className="text-xs uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Prioridad</p>
                 <p className="mt-1 text-sm font-medium text-[var(--text-primary)]">{task.priority ?? 'Normal'}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <AdminProjectTrackingQuickActions actions={getQuickActions?.(task) ?? []} />
+
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onEditTask(task)}
+                  className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]"
+                >
+                  <SquarePen className="mr-2 h-4 w-4" />
+                  Editar tarea
+                </Button>
               </div>
             </div>
           </div>

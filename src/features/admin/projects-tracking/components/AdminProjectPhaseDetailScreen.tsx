@@ -9,6 +9,7 @@ import { AdminProjectPhaseTasksList } from '@/features/admin/projects-tracking/c
 import { AdminProjectTaskDialog } from '@/features/admin/projects-tracking/components/AdminProjectTaskDialog';
 import { AdminProjectTrackingHeader } from '@/features/admin/projects-tracking/components/AdminProjectTrackingHeader';
 import { AdminProjectTrackingResolutionPanel } from '@/features/admin/projects-tracking/components/AdminProjectTrackingResolutionPanel';
+import { getAdminProjectCriticalTaskResolutionActions } from '@/features/admin/projects-tracking/components/adminProjectCriticalTaskResolution.utils';
 import { getAdminProjectPhaseResolutionActions } from '@/features/admin/projects-tracking/components/adminProjectPhaseResolution.utils';
 import { useAdminProjectTracking } from '@/features/admin/projects-tracking/hooks/useAdminProjectTracking';
 import type { AdminProjectTrackingTask } from '@/features/admin/projects-tracking/types/adminProjectTracking';
@@ -114,6 +115,27 @@ export function AdminProjectPhaseDetailScreen({
     );
   };
 
+  const handleQuickTaskUpdate = async (
+    task: AdminProjectTrackingTask,
+    {
+      status = task.status,
+      priority = task.priority ?? 'alta',
+    }: { status?: string; priority?: string },
+  ) => {
+    await saveTask(
+      {
+        title: task.title,
+        description: task.description ?? '',
+        status,
+        priority,
+        responsable: task.responsable ?? task.assigned_to ?? '',
+        fechaLimite: task.fechaLimite ?? task.dueDate ?? '',
+        phaseKey: phase.key,
+      },
+      task.key,
+    );
+  };
+
   const resolutionActions = getAdminProjectPhaseResolutionActions({
     phase,
     saving: savingPhase,
@@ -138,6 +160,15 @@ export function AdminProjectPhaseDetailScreen({
         <AdminProjectPhaseTasksList
           tasks={phase.tareas}
           onEditTask={setTaskDraft}
+          getQuickActions={(task) =>
+            getAdminProjectCriticalTaskResolutionActions({
+              task,
+              saving: savingTask,
+              onOpenEdit: () => setTaskDraft(task),
+              onUpdateStatus: (status) => void handleQuickTaskUpdate(task, { status }),
+              onUpdatePriority: (priority) => void handleQuickTaskUpdate(task, { priority }),
+            }).slice(0, 2)
+          }
         />
       </div>
 
