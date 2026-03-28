@@ -29,10 +29,6 @@ export function AdminProjectsScreen() {
     openDeleteConfirmation,
     confirmDelete,
     cancelDelete,
-    openCollaborate,
-    updateDevelopmentImage,
-    duplicateProject,
-    renameProject,
     openEditProject,
     openViewProject,
     openEditProjectDetails,
@@ -82,12 +78,8 @@ export function AdminProjectsScreen() {
           <AdminProjectsGrid
             projects={projects}
             onViewProject={openViewProject}
-            onCollaborate={openCollaborate}
             onEditProject={openEditProject}
             onDeleteProject={openDeleteConfirmation}
-            onDuplicateProject={duplicateProject}
-            onUpdateDevelopmentImage={updateDevelopmentImage}
-            onRenameProject={renameProject}
           />
 
           <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.18)] backdrop-blur sm:p-5">

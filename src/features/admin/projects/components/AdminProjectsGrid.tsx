@@ -5,23 +5,15 @@ import { AdminProjectCard } from '@/features/admin/projects/components/AdminProj
 interface AdminProjectsGridProps {
   projects: Project[];
   onViewProject: (projectId: string) => void;
-  onCollaborate: (projectId: string) => void;
   onEditProject: (projectId: string) => void;
   onDeleteProject: (projectId: string) => void;
-  onDuplicateProject: (project: Project) => void;
-  onUpdateDevelopmentImage: (projectId: string, imageFile: File) => void;
-  onRenameProject: (projectId: string, newName: string) => void;
 }
 
 export function AdminProjectsGrid({
   projects,
   onViewProject,
-  onCollaborate,
   onEditProject,
   onDeleteProject,
-  onDuplicateProject,
-  onUpdateDevelopmentImage,
-  onRenameProject,
 }: AdminProjectsGridProps) {
   return (
     <section className="grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3">
@@ -30,12 +22,8 @@ export function AdminProjectsGrid({
           key={project.id}
           project={project}
           onViewProject={onViewProject}
-          onCollaborate={onCollaborate}
           onEditProject={onEditProject}
           onDeleteProject={onDeleteProject}
-          onDuplicateProject={onDuplicateProject}
-          onUpdateDevelopmentImage={onUpdateDevelopmentImage}
-          onRenameProject={onRenameProject}
         />
       ))}
     </section>

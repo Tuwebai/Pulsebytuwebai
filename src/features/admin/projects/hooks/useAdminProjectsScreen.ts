@@ -100,12 +100,6 @@ export function useAdminProjectsScreen() {
       setShowConfirmDelete(false);
       setProjectToDelete(null);
     },
-    openCollaborate: (projectId: string) => {
-      window.open(`/proyectos/${projectId}/colaboracion-admin`, '_blank');
-    },
-    updateDevelopmentImage: actions.updateDevelopmentImage,
-    duplicateProject: actions.duplicateProject,
-    renameProject: actions.renameProject,
     openEditProject,
     openViewProject,
     openEditProjectDetails: (project: Project) => {
