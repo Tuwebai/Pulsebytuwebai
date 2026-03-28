@@ -15,6 +15,7 @@ interface AdminProjectPhaseDetailScreenProps {
   phaseKey: string | undefined;
   projectId: string | undefined;
   onBackToPhases: () => void;
+  backLabel: string;
   onEditProject: () => void;
 }
 
@@ -22,6 +23,7 @@ export function AdminProjectPhaseDetailScreen({
   phaseKey,
   projectId,
   onBackToPhases,
+  backLabel,
   onEditProject,
 }: AdminProjectPhaseDetailScreenProps) {
   const { loading, savingPhase, savingTask, error, project, refresh, savePhase, saveTask } = useAdminProjectTracking(projectId);
@@ -60,7 +62,7 @@ export function AdminProjectPhaseDetailScreen({
                 Reintentar carga
               </button>
               <button className="text-sm font-medium text-[var(--text-secondary)]" onClick={onBackToPhases}>
-                Volver a fases
+                {backLabel}
               </button>
             </div>
           </div>
@@ -105,7 +107,7 @@ export function AdminProjectPhaseDetailScreen({
                 className="mb-2 h-auto px-0 text-[var(--text-secondary)] hover:bg-transparent hover:text-[var(--text-primary)]"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Volver a fases
+                {backLabel}
               </Button>
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Detalle de fase</p>
               <h1 className="text-2xl font-semibold tracking-tight text-[var(--text-primary)]">

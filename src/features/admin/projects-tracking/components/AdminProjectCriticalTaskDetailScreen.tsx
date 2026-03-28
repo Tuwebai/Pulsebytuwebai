@@ -13,6 +13,7 @@ interface AdminProjectCriticalTaskDetailScreenProps {
   projectId: string | undefined;
   taskKey: string | undefined;
   onBackToTasks: () => void;
+  backLabel: string;
   onEditProject: () => void;
 }
 
@@ -20,6 +21,7 @@ export function AdminProjectCriticalTaskDetailScreen({
   projectId,
   taskKey,
   onBackToTasks,
+  backLabel,
   onEditProject,
 }: AdminProjectCriticalTaskDetailScreenProps) {
   const { loading, savingTask, error, project, refresh, saveTask } = useAdminProjectTracking(projectId);
@@ -56,7 +58,7 @@ export function AdminProjectCriticalTaskDetailScreen({
                 Reintentar carga
               </button>
               <button className="text-sm font-medium text-[var(--text-secondary)]" onClick={onBackToTasks}>
-                Volver a tareas
+                {backLabel}
               </button>
             </div>
           </div>
@@ -95,7 +97,7 @@ export function AdminProjectCriticalTaskDetailScreen({
                 className="mb-2 h-auto px-0 text-[var(--text-secondary)] hover:bg-transparent hover:text-[var(--text-primary)]"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Volver a tareas críticas
+                {backLabel}
               </Button>
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
                 {task.phaseLabel ?? 'Tarea crítica'}

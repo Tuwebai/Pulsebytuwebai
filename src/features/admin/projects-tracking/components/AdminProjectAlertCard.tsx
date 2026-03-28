@@ -42,7 +42,7 @@ export function AdminProjectAlertCard({ item }: AdminProjectAlertCardProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => navigate(item.to)}
+          onClick={() => navigate(`${item.to}?from=alertas`)}
           className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]"
         >
           {item.ctaLabel}
