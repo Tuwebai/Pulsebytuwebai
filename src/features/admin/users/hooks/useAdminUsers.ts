@@ -73,13 +73,13 @@ export function useAdminUsers() {
     if (!userToDelete) return;
 
     try {
-      await deleteAdminUser(userToDelete.id);
+      const result = await deleteAdminUser(userToDelete.id);
 
       setUsers((prev) => prev.filter((user) => user.id !== userToDelete.id));
 
       toast({
         title: 'Usuario eliminado',
-        description: 'El usuario ha sido eliminado correctamente.',
+        description: `El usuario ${result.deleted_email} fue eliminado de la base operativa y de Auth.`,
       });
 
       setShowDeleteUserModal(false);

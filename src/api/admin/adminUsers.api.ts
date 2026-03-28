@@ -51,14 +51,3 @@ export async function updateAdminUserRecord(editingUser: AdminManagedUser): Prom
     throw error;
   }
 }
-
-export async function deleteAdminUserRecord(userId: string): Promise<void> {
-  const { error } = await supabase
-    .from('users')
-    .delete()
-    .eq('id', userId);
-
-  if (error) {
-    throw error;
-  }
-}

@@ -1,9 +1,12 @@
 import {
   createAdminUserRecord,
-  deleteAdminUserRecord,
   updateAdminUserRecord,
   updateAdminUserRecordRole,
 } from '@/api/admin/adminUsers.api';
+import {
+  invokeDeleteAdminUser,
+  type DeleteAdminUserResponse,
+} from '@/api/admin/adminUserDelete.api';
 import type { AdminManagedUser, AdminUserFormData } from '@/features/admin/users/types/adminUser';
 
 export async function updateAdminUserRole(userId: string, newRole: string): Promise<void> {
@@ -18,6 +21,6 @@ export async function updateAdminUser(editingUser: AdminManagedUser): Promise<vo
   return updateAdminUserRecord(editingUser);
 }
 
-export async function deleteAdminUser(userId: string): Promise<void> {
-  return deleteAdminUserRecord(userId);
+export async function deleteAdminUser(userId: string): Promise<DeleteAdminUserResponse> {
+  return invokeDeleteAdminUser(userId);
 }
