@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { CalendarClock, KanbanSquare, Loader2, UserRound, X } from 'lucide-react';
+import { KanbanSquare, Loader2, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { AdminProjectPhaseDialogFields } from '@/features/admin/projects-tracking/components/AdminProjectPhaseDialogFields';
 import type {
   AdminProjectTrackingPhase,
   AdminProjectTrackingPhaseInput,
@@ -103,60 +104,7 @@ export function AdminProjectPhaseDialog({
         </div>
 
         <div className="space-y-5 p-5 sm:p-6">
-          <label className="block space-y-2">
-            <span className="text-sm font-medium text-[var(--text-primary)]">Nombre de la fase</span>
-            <input
-              type="text"
-              value={form.descripcion}
-              onChange={(event) => handleChange('descripcion', event.target.value)}
-              placeholder="Ej: QA final, revisión del cliente, publicación"
-              className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition-colors placeholder:text-[var(--text-tertiary)] focus:border-signal/40 focus:bg-white/[0.05]"
-            />
-          </label>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <label className="block space-y-2">
-              <span className="text-sm font-medium text-[var(--text-primary)]">Estado</span>
-              <select
-                value={form.estado}
-                onChange={(event) => handleChange('estado', event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition-colors focus:border-signal/40 focus:bg-white/[0.05]"
-              >
-                {phaseStatuses.map((status) => (
-                  <option key={status} value={status} className="bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                    {status}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="block space-y-2">
-              <span className="inline-flex items-center gap-2 text-sm font-medium text-[var(--text-primary)]">
-                <UserRound className="h-4 w-4 text-sky-300" />
-                Responsable
-              </span>
-              <input
-                type="text"
-                value={form.responsable ?? ''}
-                onChange={(event) => handleChange('responsable', event.target.value)}
-                placeholder="Ej: Juan, Equipo diseño"
-                className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition-colors placeholder:text-[var(--text-tertiary)] focus:border-signal/40 focus:bg-white/[0.05]"
-              />
-            </label>
-
-            <label className="block space-y-2">
-              <span className="inline-flex items-center gap-2 text-sm font-medium text-[var(--text-primary)]">
-                <CalendarClock className="h-4 w-4 text-amber-300" />
-                Fecha objetivo
-              </span>
-              <input
-                type="date"
-                value={form.fechaEntrega ?? ''}
-                onChange={(event) => handleChange('fechaEntrega', event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition-colors focus:border-signal/40 focus:bg-white/[0.05]"
-              />
-            </label>
-          </div>
+          <AdminProjectPhaseDialogFields form={form} statuses={phaseStatuses} onChange={handleChange} />
         </div>
 
         <div className="flex flex-col-reverse gap-3 border-t border-white/10 p-5 sm:flex-row sm:items-center sm:justify-end sm:p-6">
