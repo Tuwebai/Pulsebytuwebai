@@ -1,4 +1,4 @@
-import { CalendarClock, UserRound } from 'lucide-react';
+import { AlertTriangle, CalendarClock, KanbanSquare, UserRound } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
@@ -7,7 +7,7 @@ export interface AdminProjectTrackingResolutionAction {
   title: string;
   description: string;
   ctaLabel: string;
-  icon: 'owner' | 'date';
+  icon: 'owner' | 'date' | 'status' | 'priority';
   disabled?: boolean;
   onClick: () => void;
 }
@@ -19,11 +19,15 @@ interface AdminProjectTrackingResolutionPanelProps {
 const iconMap = {
   owner: UserRound,
   date: CalendarClock,
+  status: KanbanSquare,
+  priority: AlertTriangle,
 } as const;
 
 const accentMap = {
   owner: 'border-sky-400/15 bg-sky-500/10 text-sky-200',
   date: 'border-amber-400/15 bg-amber-500/10 text-amber-200',
+  status: 'border-emerald-400/15 bg-emerald-500/10 text-emerald-200',
+  priority: 'border-rose-400/15 bg-rose-500/10 text-rose-200',
 } as const;
 
 export function AdminProjectTrackingResolutionPanel({

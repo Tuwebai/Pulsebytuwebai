@@ -5,14 +5,10 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { AdminProjectCriticalTaskDetailSummary } from '@/features/admin/projects-tracking/components/AdminProjectCriticalTaskDetailSummary';
 import { AdminProjectTaskDialog } from '@/features/admin/projects-tracking/components/AdminProjectTaskDialog';
-import { AdminProjectTrackingResolutionPanel } from '@/features/admin/projects-tracking/components/AdminProjectTrackingResolutionPanel';
-import type { AdminProjectTrackingResolutionAction } from '@/features/admin/projects-tracking/components/AdminProjectTrackingResolutionPanel';
-import { getAdminProjectCriticalTaskByKey } from '@/features/admin/projects-tracking/components/adminProjectCriticalTasks.utils';
-import {
-  isAdminProjectTrackingDoneStatus,
-  isAdminProjectTrackingOverdue,
-} from '@/features/admin/projects-tracking/components/adminProjectTrackingResolution.utils';
 import { AdminProjectTrackingHeader } from '@/features/admin/projects-tracking/components/AdminProjectTrackingHeader';
+import { AdminProjectTrackingResolutionPanel } from '@/features/admin/projects-tracking/components/AdminProjectTrackingResolutionPanel';
+import { getAdminProjectCriticalTaskByKey } from '@/features/admin/projects-tracking/components/adminProjectCriticalTasks.utils';
+import { getAdminProjectCriticalTaskResolutionActions } from '@/features/admin/projects-tracking/components/adminProjectCriticalTaskResolution.utils';
 import { useAdminProjectTracking } from '@/features/admin/projects-tracking/hooks/useAdminProjectTracking';
 
 interface AdminProjectCriticalTaskDetailScreenProps {
@@ -82,8 +78,6 @@ export function AdminProjectCriticalTaskDetailScreen({
   }
 
   const { task, reason } = item;
-  const owner = task.responsable ?? task.assigned_to;
-  const targetDate = task.fechaLimite ?? task.dueDate;
 
   const handleSubmitTask = async (input: Parameters<typeof saveTask>[0], currentTaskKey?: string) => {
     const success = await saveTask(
@@ -98,13 +92,19 @@ export function AdminProjectCriticalTaskDetailScreen({
     }
   };
 
-  const handleQuickTaskStatus = async (nextStatus: string) => {
+  const handleQuickTaskUpdate = async ({
+    status = task.status,
+    priority = task.priority ?? 'alta',
+  }: {
+    status?: string;
+    priority?: string;
+  }) => {
     await saveTask(
       {
         title: task.title,
         description: task.description ?? '',
-        status: nextStatus,
-        priority: task.priority ?? 'alta',
+        status,
+        priority,
         responsable: task.responsable ?? task.assigned_to ?? '',
         fechaLimite: task.fechaLimite ?? task.dueDate ?? '',
         phaseKey: task.source.phaseKey,
@@ -113,65 +113,13 @@ export function AdminProjectCriticalTaskDetailScreen({
     );
   };
 
-  const resolutionActionsDraft: Array<AdminProjectTrackingResolutionAction | null> = [
-    !owner
-      ? {
-          id: 'task-owner',
-          title: 'Asignar responsable',
-          description: 'La tarea está sin owner visible. Resolverlo ahora le devuelve trazabilidad al seguimiento.',
-          ctaLabel: 'Asignar owner',
-          icon: 'owner' as const,
-          disabled: savingTask,
-          onClick: () => setShowEditDialog(true),
-        }
-      : null,
-    !targetDate
-      ? {
-          id: 'task-date-missing',
-          title: 'Definir fecha objetivo',
-          description: 'Sin fecha objetivo Pulse no puede medir riesgo ni vencimiento de esta tarea crítica.',
-          ctaLabel: 'Definir fecha',
-          icon: 'date' as const,
-          disabled: savingTask,
-          onClick: () => setShowEditDialog(true),
-        }
-      : isAdminProjectTrackingOverdue(targetDate) && !isAdminProjectTrackingDoneStatus(task.status)
-        ? {
-            id: 'task-date-overdue',
-            title: 'Actualizar fecha objetivo',
-            description: 'La fecha actual ya venció y la tarea sigue abierta. Conviene replanificar o cerrar el desvío.',
-            ctaLabel: 'Actualizar fecha',
-            icon: 'date' as const,
-            disabled: savingTask,
-            onClick: () => setShowEditDialog(true),
-          }
-        : null,
-    task.status !== 'En Progreso'
-      ? {
-          id: 'task-progress',
-          title: 'Mover a en progreso',
-          description: 'Si ya se está trabajando este bloqueo, marcá la tarea en progreso para reflejarlo en Pulse.',
-          ctaLabel: 'Marcar en progreso',
-          icon: 'owner' as const,
-          disabled: savingTask,
-          onClick: () => void handleQuickTaskStatus('En Progreso'),
-        }
-      : null,
-    !isAdminProjectTrackingDoneStatus(task.status)
-      ? {
-          id: 'task-done',
-          title: 'Cerrar tarea',
-          description: 'Si el desvío ya quedó resuelto, podés terminar la tarea y limpiar la prioridad operativa.',
-          ctaLabel: 'Marcar terminada',
-          icon: 'date' as const,
-          disabled: savingTask,
-          onClick: () => void handleQuickTaskStatus('Terminada'),
-        }
-      : null,
-  ];
-  const resolutionActions = resolutionActionsDraft.filter(
-    (action): action is AdminProjectTrackingResolutionAction => action !== null,
-  );
+  const resolutionActions = getAdminProjectCriticalTaskResolutionActions({
+    task,
+    saving: savingTask,
+    onOpenEdit: () => setShowEditDialog(true),
+    onUpdateStatus: (status) => void handleQuickTaskUpdate({ status }),
+    onUpdatePriority: (priority) => void handleQuickTaskUpdate({ priority }),
+  });
 
   return (
     <>
@@ -198,6 +146,7 @@ export function AdminProjectCriticalTaskDetailScreen({
                 {task.description ?? 'Esta tarea quedó marcada como prioritaria por Pulse para seguimiento operativo.'}
               </p>
             </div>
+
             <div className="flex flex-col gap-3 sm:items-end">
               <span className="rounded-full border border-rose-400/20 bg-rose-500/12 px-4 py-2 text-sm font-medium text-rose-300">
                 {reason}
