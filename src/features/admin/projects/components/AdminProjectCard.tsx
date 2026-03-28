@@ -1,9 +1,11 @@
 import type { Project } from '@/types/project.types';
 
-import { AdminProjectCard } from '@/features/admin/projects/components/AdminProjectCard';
+import { AdminProjectCardActions } from '@/features/admin/projects/components/AdminProjectCardActions';
+import { AdminProjectCardHeader } from '@/features/admin/projects/components/AdminProjectCardHeader';
+import { AdminProjectCardMetrics } from '@/features/admin/projects/components/AdminProjectCardMetrics';
 
-interface AdminProjectsGridProps {
-  projects: Project[];
+interface AdminProjectCardProps {
+  project: Project;
   onViewProject: (projectId: string) => void;
   onCollaborate: (projectId: string) => void;
   onEditProject: (projectId: string) => void;
@@ -13,8 +15,8 @@ interface AdminProjectsGridProps {
   onRenameProject: (projectId: string, newName: string) => void;
 }
 
-export function AdminProjectsGrid({
-  projects,
+export function AdminProjectCard({
+  project,
   onViewProject,
   onCollaborate,
   onEditProject,
@@ -22,12 +24,13 @@ export function AdminProjectsGrid({
   onDuplicateProject,
   onUpdateDevelopmentImage,
   onRenameProject,
-}: AdminProjectsGridProps) {
+}: AdminProjectCardProps) {
   return (
-    <section className="grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3">
-      {projects.map((project) => (
-        <AdminProjectCard
-          key={project.id}
+    <article className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-colors duration-150 hover:border-white/15 sm:p-6">
+      <div className="space-y-5">
+        <AdminProjectCardHeader project={project} />
+        <AdminProjectCardMetrics project={project} />
+        <AdminProjectCardActions
           project={project}
           onViewProject={onViewProject}
           onCollaborate={onCollaborate}
@@ -37,7 +40,7 @@ export function AdminProjectsGrid({
           onUpdateDevelopmentImage={onUpdateDevelopmentImage}
           onRenameProject={onRenameProject}
         />
-      ))}
-    </section>
+      </div>
+    </article>
   );
 }

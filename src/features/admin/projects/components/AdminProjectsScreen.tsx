@@ -2,7 +2,6 @@ import { AlertCircle } from 'lucide-react';
 
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { ProjectDetails } from '@/components/admin/ProjectDetails';
-import { ProjectFiltersComponent } from '@/components/admin/ProjectFilters';
 import { ProjectForm } from '@/components/admin/ProjectForm';
 import { ProjectPagination } from '@/components/admin/ProjectPagination';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
@@ -13,11 +12,8 @@ import { useAdminProjectsScreen } from '@/features/admin/projects/hooks/useAdmin
 
 export function AdminProjectsScreen() {
   const {
-    user,
     loading,
     error,
-    filters,
-    sort,
     pagination,
     projects,
     stats,
@@ -27,9 +23,6 @@ export function AdminProjectsScreen() {
     formLoading,
     showConfirmDelete,
     projectToDelete,
-    applyFilters,
-    applySort,
-    clearFilters,
     changePage,
     changeLimit,
     openCreateForm,
@@ -70,16 +63,6 @@ export function AdminProjectsScreen() {
         onCreate={openCreateForm}
       />
 
-      <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.18)] backdrop-blur sm:p-5">
-        <ProjectFiltersComponent
-          filters={filters}
-          sort={sort}
-          onFiltersChange={applyFilters}
-          onSortChange={applySort}
-          onClearFilters={clearFilters}
-        />
-      </section>
-
       {error && (
         <section className="rounded-[24px] border border-danger/20 bg-danger/10 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
           <div className="flex items-start gap-3">
@@ -100,8 +83,6 @@ export function AdminProjectsScreen() {
         <>
           <AdminProjectsGrid
             projects={projects}
-            userId={user?.id ?? null}
-            userRole={user?.role ?? null}
             onViewProject={openViewProject}
             onCollaborate={openCollaborate}
             onEditProject={openEditProject}
