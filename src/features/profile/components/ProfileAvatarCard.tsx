@@ -8,8 +8,10 @@ import {
   PROFILE_AVATAR_ACCEPT,
   PROFILE_SURFACE_CLASSNAME,
 } from '@/features/profile/constants/profile.constants';
+import { getIdentityInitials } from '@/lib/identity/userIdentity';
 
 interface ProfileAvatarCardProps {
+  avatarUrl?: string;
   email: string;
   fullName: string | null;
   isUploading: boolean;
@@ -17,19 +19,7 @@ interface ProfileAvatarCardProps {
   profile: ProfileRow;
 }
 
-function getInitials(fullName: string | null, email: string) {
-  if (fullName?.trim()) {
-    return fullName
-      .split(' ')
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase())
-      .join('');
-  }
-
-  return email.slice(0, 2).toUpperCase();
-}
-
-export function ProfileAvatarCard({ email, fullName, isUploading, onUpload, profile }: ProfileAvatarCardProps) {
+export function ProfileAvatarCard({ avatarUrl, email, fullName, isUploading, onUpload, profile }: ProfileAvatarCardProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const profileReady = Boolean(profile.full_name?.trim() && profile.business_name?.trim());
 
@@ -39,9 +29,9 @@ export function ProfileAvatarCard({ email, fullName, isUploading, onUpload, prof
         <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative mx-auto sm:mx-0">
             <Avatar className="h-20 w-20 border border-[var(--signal-border)] shadow-[0_0_0_1px_var(--signal-glow),0_18px_36px_-24px_var(--signal)]">
-              <AvatarImage alt={fullName ?? email} className="object-cover" src={profile.avatar_url ?? undefined} />
+              <AvatarImage alt={fullName ?? email} className="object-cover" src={avatarUrl} />
               <AvatarFallback className="bg-[var(--signal-glow)] text-[18px] font-medium text-[var(--text-primary)]">
-                {getInitials(fullName, email)}
+                {getIdentityInitials(fullName, email)}
               </AvatarFallback>
             </Avatar>
 

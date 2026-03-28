@@ -12,6 +12,12 @@ import {
 import type { User } from '@/contexts/appContext.types';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import { DEFAULT_PRODUCT_TOUR_SCOPE, PRODUCT_TOUR_OPEN_EVENT } from '@/features/product-tour/services/productTour.service';
+import {
+  getDisplayAvatar,
+  getDisplayEmail,
+  getDisplayName,
+  getIdentityInitials,
+} from '@/lib/identity/userIdentity';
 
 interface AvatarMenuProps {
   onOpenNotifications: () => void;
@@ -19,25 +25,16 @@ interface AvatarMenuProps {
   user: User | null;
 }
 
-function getInitials(name?: string | null, email?: string) {
-  if (name?.trim()) {
-    return name
-      .split(' ')
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase())
-      .join('');
-  }
-
-  return email?.slice(0, 2).toUpperCase() || 'PU';
-}
-
 export default function AvatarMenu({ onOpenNotifications, onLogout, user }: AvatarMenuProps) {
   const navigate = useNavigate();
   const { profile } = useProfile();
-  const displayName = profile?.full_name || user?.full_name || 'Cliente Pulse';
-  const displayEmail = profile?.email || user?.email || 'sin email';
-  const displayAvatar = profile?.avatar_url || user?.avatar || user?.avatar_url;
-  const showPulseTour = user?.role !== 'admin';
+  const isAdmin = user?.role === 'admin';
+  const displayName = getDisplayName(profile, user, isAdmin ? 'Operador Pulse' : 'Cliente Pulse');
+  const displayEmail = getDisplayEmail(profile, user);
+  const displayAvatar = getDisplayAvatar(profile, user);
+  const accountRoute = isAdmin ? '/admin/settings' : '/dashboard/perfil';
+  const homeRoute = isAdmin ? '/admin' : '/dashboard';
+  const showPulseTour = !isAdmin;
 
   return (
     <DropdownMenu>
@@ -50,7 +47,7 @@ export default function AvatarMenu({ onOpenNotifications, onLogout, user }: Avat
           <Avatar className="h-9 w-9 ring-0">
             <AvatarImage alt={displayName || displayEmail} src={displayAvatar} />
             <AvatarFallback className="bg-[var(--bg-elevated)] text-[var(--text-primary)]">
-              {getInitials(displayName, displayEmail)}
+              {getIdentityInitials(displayName, displayEmail)}
             </AvatarFallback>
           </Avatar>
         </button>
@@ -72,17 +69,17 @@ export default function AvatarMenu({ onOpenNotifications, onLogout, user }: Avat
 
         <DropdownMenuItem
           className="cursor-pointer rounded-[10px] px-3 py-2 text-[13px] text-[var(--text-primary)] transition-colors duration-150 ease-out focus:bg-[var(--bg-subtle)] focus:text-[var(--text-primary)]"
-          onSelect={() => navigate('/dashboard/perfil')}
+          onSelect={() => navigate(accountRoute)}
         >
           <UserCircle2 className="mr-2 h-4 w-4 text-[var(--text-secondary)]" strokeWidth={1.5} />
-          Mi perfil
+          Mi cuenta
         </DropdownMenuItem>
 
         {showPulseTour ? (
           <DropdownMenuItem
             className="cursor-pointer rounded-[10px] px-3 py-2 text-[13px] text-[var(--text-primary)] transition-colors duration-150 ease-out focus:bg-[var(--bg-subtle)] focus:text-[var(--text-primary)]"
             onSelect={() => {
-              navigate('/dashboard');
+              navigate(homeRoute);
               window.dispatchEvent(new CustomEvent(PRODUCT_TOUR_OPEN_EVENT, { detail: DEFAULT_PRODUCT_TOUR_SCOPE }));
             }}
           >

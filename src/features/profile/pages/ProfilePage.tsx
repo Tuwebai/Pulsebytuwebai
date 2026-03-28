@@ -15,6 +15,7 @@ import { PRODUCT_TOUR_STEP_CHANGE_EVENT } from '@/features/product-tour/services
 import type { ProductTourStep } from '@/features/product-tour/types/productTour.types';
 import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 import { toast } from '@/hooks/use-toast';
+import { getDisplayAvatar } from '@/lib/identity/userIdentity';
 
 export default function ProfilePage() {
   const { user } = useApp();
@@ -66,6 +67,8 @@ export default function ProfilePage() {
     );
   }
 
+  const displayAvatar = getDisplayAvatar(profile, user);
+
   return (
     <div className="mx-auto flex w-full max-w-[880px] flex-col gap-4 px-4 py-4 md:px-6 md:py-6" data-tour="profile-root">
       <header className="space-y-1" data-tour="profile-header">
@@ -77,25 +80,26 @@ export default function ProfilePage() {
 
       <div data-tour="profile-avatar-card">
         <ProfileAvatarCard
-        email={profile.email}
-        fullName={profile.full_name}
-        isUploading={isUploading}
-        profile={profile}
-        onUpload={async (file) => {
-          try {
-            await upload(file);
-            toast({
-              title: 'Avatar actualizado',
-              description: 'Tu foto de perfil ya se ve en Pulse.',
-            });
-          } catch (uploadError) {
-            toast({
-              title: 'No pudimos subir tu avatar',
-              description: uploadError instanceof Error ? uploadError.message : 'Intentá nuevamente.',
-              variant: 'destructive',
-            });
-          }
-        }}
+          avatarUrl={displayAvatar}
+          email={profile.email}
+          fullName={profile.full_name}
+          isUploading={isUploading}
+          profile={profile}
+          onUpload={async (file) => {
+            try {
+              await upload(file);
+              toast({
+                title: 'Avatar actualizado',
+                description: 'Tu foto de perfil ya se ve en Pulse.',
+              });
+            } catch (uploadError) {
+              toast({
+                title: 'No pudimos subir tu avatar',
+                description: uploadError instanceof Error ? uploadError.message : 'Intentá nuevamente.',
+                variant: 'destructive',
+              });
+            }
+          }}
         />
       </div>
 

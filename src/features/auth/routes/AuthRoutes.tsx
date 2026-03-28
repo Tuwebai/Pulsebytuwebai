@@ -30,7 +30,7 @@ export function renderAuthRoutes({
       <Route
         path="/onboarding"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <OnboardingGate allowIncomplete>
               <Onboarding />
             </OnboardingGate>
@@ -41,7 +41,7 @@ export function renderAuthRoutes({
       <Route
         path="/pulse-access"
         element={
-          <ProtectedRoute allowWithoutPulseAccess>
+          <ProtectedRoute allowWithoutPulseAccess clientOnly>
             <PulseAccessPendingPage />
           </ProtectedRoute>
         }

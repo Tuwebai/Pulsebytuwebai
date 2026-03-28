@@ -112,7 +112,7 @@ function AppRoutes() {
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <OnboardingGate>
               <DashboardShell>
                 <HomePage />
@@ -124,7 +124,7 @@ function AppRoutes() {
       <Route
         path="/dashboard/pulse"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <OnboardingGate>
               <DashboardShell>
                 <PulsePage />
@@ -136,7 +136,7 @@ function AppRoutes() {
       <Route
         path="/dashboard/proyecto"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <OnboardingGate>
               <DashboardShell>
                 <ProjectsPage />
@@ -148,7 +148,7 @@ function AppRoutes() {
       <Route
         path="/dashboard/pagos"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <OnboardingGate>
               <DashboardShell>
                 <Facturacion />
@@ -160,7 +160,7 @@ function AppRoutes() {
       <Route
         path="/dashboard/soporte"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <OnboardingGate>
               <DashboardShell>
                 <Soporte />
@@ -172,7 +172,7 @@ function AppRoutes() {
       <Route
         path="/dashboard/configuracion"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <OnboardingGate>
               <DashboardShell>
                 <Configuracion />
@@ -184,7 +184,7 @@ function AppRoutes() {
       <Route
         path="/dashboard/perfil"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <OnboardingGate>
               <DashboardShell>
                 <ProfilePage />
@@ -212,7 +212,7 @@ function AppRoutes() {
       <Route
         path="/proyectos"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <DashboardLayout key="proyectos">
               <ProjectsPage key="proyectos-content" />
             </DashboardLayout>
@@ -222,7 +222,7 @@ function AppRoutes() {
       <Route
         path="/fases-tareas"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <DashboardLayout key="fases-tareas">
               <PhasesAndTasksPage key="fases-tareas-content" />
             </DashboardLayout>
@@ -232,7 +232,7 @@ function AppRoutes() {
       <Route
         path="/perfil"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <Navigate replace to="/dashboard/perfil" />
           </ProtectedRoute>
         }
@@ -240,7 +240,7 @@ function AppRoutes() {
       <Route
         path="/github-dashboard"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <DashboardLayout key="github-dashboard">
               <GitHubDashboard />
             </DashboardLayout>
@@ -250,7 +250,7 @@ function AppRoutes() {
       <Route
         path="/configuracion"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <DashboardLayout key="configuracion">
               <Configuracion key="configuracion-content" />
             </DashboardLayout>
@@ -260,7 +260,7 @@ function AppRoutes() {
       <Route
         path="/facturacion"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <Navigate replace to="/dashboard/pagos" />
           </ProtectedRoute>
         }
@@ -268,7 +268,7 @@ function AppRoutes() {
       <Route
         path="/dashboard/facturacion"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <Navigate replace to="/dashboard/pagos" />
           </ProtectedRoute>
         }
@@ -276,7 +276,7 @@ function AppRoutes() {
       <Route
         path="/soporte"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <DashboardLayout key="soporte">
               <Soporte key="soporte-content" />
             </DashboardLayout>
@@ -286,7 +286,7 @@ function AppRoutes() {
       <Route
         path="/proyectos/nuevo"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <DashboardLayout>
               <ProyectosNuevo />
             </DashboardLayout>
@@ -296,7 +296,7 @@ function AppRoutes() {
       <Route
         path="/proyectos/:projectId/colaboracion"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <DashboardLayout>
               <CollaborationPage />
             </DashboardLayout>
@@ -306,7 +306,7 @@ function AppRoutes() {
       <Route
         path="/proyectos/:projectId/colaboracion-cliente"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <Navigate replace to="/dashboard/proyecto" />
           </ProtectedRoute>
         }
@@ -314,7 +314,7 @@ function AppRoutes() {
       <Route
         path="/proyectos/:projectId/colaboracion-admin"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="admin">
             <DashboardLayout>
               <AdminCollaborationPage />
             </DashboardLayout>
@@ -324,7 +324,7 @@ function AppRoutes() {
       <Route
         path="/workspace"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <DashboardLayout>
               <WorkspacePage />
             </DashboardLayout>
@@ -334,7 +334,7 @@ function AppRoutes() {
       <Route
         path="/dashboard-custom"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute clientOnly>
             <DashboardLayout>
               <CustomizableDashboard />
             </DashboardLayout>

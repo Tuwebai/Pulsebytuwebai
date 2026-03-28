@@ -4,6 +4,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PulseLogo } from '@/core/components';
 import { useApp } from '@/contexts/AppContext';
 import { useProfile } from '@/features/profile/hooks/useProfile';
+import {
+  getDisplayAvatar,
+  getDisplayEmail,
+  getDisplayName,
+  getIdentityInitials,
+} from '@/lib/identity/userIdentity';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -14,25 +20,13 @@ const navItems = [
   { icon: LifeBuoy, label: 'Soporte', to: '/dashboard/soporte' }
 ] as const;
 
-function getInitials(name?: string | null, email?: string) {
-  if (name?.trim()) {
-    return name
-      .split(' ')
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase())
-      .join('');
-  }
-
-  return email?.slice(0, 2).toUpperCase() || 'PU';
-}
-
 export default function Sidebar() {
   const navigate = useNavigate();
   const { user } = useApp();
   const { profile } = useProfile();
-  const displayName = profile?.full_name || user?.full_name || 'Cliente Pulse';
-  const displayAvatar = profile?.avatar_url || user?.avatar || user?.avatar_url;
-  const displayEmail = profile?.email || user?.email;
+  const displayName = getDisplayName(profile, user, 'Cliente Pulse');
+  const displayAvatar = getDisplayAvatar(profile, user);
+  const displayEmail = getDisplayEmail(profile, user, '');
 
   return (
     <aside className="sticky top-0 hidden h-screen w-[240px] shrink-0 flex-col overflow-hidden border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] md:flex" data-tour="shell-sidebar">
@@ -96,7 +90,7 @@ export default function Sidebar() {
             <Avatar className="h-10 w-10 ring-0">
               <AvatarImage alt={displayName || displayEmail || 'Usuario Pulse'} src={displayAvatar} />
               <AvatarFallback className="bg-[var(--bg-elevated)] text-[var(--text-primary)]">
-                {getInitials(displayName, displayEmail)}
+                {getIdentityInitials(displayName, displayEmail)}
               </AvatarFallback>
             </Avatar>
 

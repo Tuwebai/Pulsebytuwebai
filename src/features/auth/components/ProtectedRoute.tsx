@@ -7,12 +7,14 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: 'admin' | 'user';
   allowWithoutPulseAccess?: boolean;
+  clientOnly?: boolean;
 }
 
 export default function ProtectedRoute({
   children,
   requiredRole,
   allowWithoutPulseAccess = false,
+  clientOnly = false,
 }: ProtectedRouteProps) {
   const { isAuthenticated, user, authReady } = useApp();
 
@@ -24,8 +26,12 @@ export default function ProtectedRoute({
     return <Navigate to="/login" replace />;
   }
 
+  if (clientOnly && user?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
   if (requiredRole && user?.role !== requiredRole) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={user?.role === 'admin' ? '/admin' : '/dashboard'} replace />;
   }
 
   if (user?.role !== 'admin' && !allowWithoutPulseAccess && !hasPulseAccess(user?.pulse_access_status)) {
