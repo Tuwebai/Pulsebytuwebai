@@ -1,13 +1,11 @@
 import { AlertCircle } from 'lucide-react';
 
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { ProjectDetails } from '@/components/admin/ProjectDetails';
-import { ProjectForm } from '@/components/admin/ProjectForm';
 import { ProjectPagination } from '@/components/admin/ProjectPagination';
-import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { AdminProjectsEmptyState } from '@/features/admin/projects/components/AdminProjectsEmptyState';
 import { AdminProjectsGrid } from '@/features/admin/projects/components/AdminProjectsGrid';
 import { AdminProjectsHeader } from '@/features/admin/projects/components/AdminProjectsHeader';
+import { AdminProjectsOverlays } from '@/features/admin/projects/components/AdminProjectsOverlays';
 import { useAdminProjectsScreen } from '@/features/admin/projects/hooks/useAdminProjectsScreen';
 
 export function AdminProjectsScreen() {
@@ -105,33 +103,19 @@ export function AdminProjectsScreen() {
         </>
       )}
 
-      {(showForm || editingProject) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[28px] border border-white/10 bg-[var(--bg-surface)] shadow-[0_32px_80px_rgba(0,0,0,0.45)]">
-            <ProjectForm
-              project={editingProject || undefined}
-              onSubmit={editingProject ? handleUpdateProject : handleCreateProject}
-              onCancel={closeForm}
-              loading={formLoading}
-            />
-          </div>
-        </div>
-      )}
-
-      {viewingProject && (
-        <ProjectDetails project={viewingProject} onEdit={openEditProjectDetails} onClose={closeDetails} />
-      )}
-
-      <ConfirmationDialog
-        isOpen={showConfirmDelete}
-        onClose={cancelDelete}
-        onConfirm={confirmDelete}
-        title="Confirmar eliminacion"
-        description={`Estas seguro de que quieres eliminar el proyecto "${projectToDelete?.name}"? Esta accion no se puede deshacer.`}
-        confirmText="Eliminar"
-        cancelText="Cancelar"
-        variant="destructive"
-        loading={false}
+      <AdminProjectsOverlays
+        showForm={showForm}
+        editingProject={editingProject}
+        viewingProject={viewingProject}
+        formLoading={formLoading}
+        showConfirmDelete={showConfirmDelete}
+        projectToDelete={projectToDelete}
+        onCloseForm={closeForm}
+        onCloseDetails={closeDetails}
+        onCancelDelete={cancelDelete}
+        onConfirmDelete={confirmDelete}
+        onOpenEditFromDetails={openEditProjectDetails}
+        onSubmit={editingProject ? handleUpdateProject : handleCreateProject}
       />
     </div>
   );
