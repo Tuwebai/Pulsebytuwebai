@@ -1,15 +1,13 @@
-import { ArrowLeft, CheckCircle2, SquarePen } from 'lucide-react';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
 interface AdminProjectAlertsEmptyStateProps {
   onBackToTracking: () => void;
-  onEditProject: () => void;
 }
 
 export function AdminProjectAlertsEmptyState({
   onBackToTracking,
-  onEditProject,
 }: AdminProjectAlertsEmptyStateProps) {
   return (
     <section className="rounded-[28px] border border-white/10 bg-[var(--bg-surface)]/95 p-8 shadow-[0_24px_60px_rgba(0,0,0,0.18)]">
@@ -26,11 +24,7 @@ export function AdminProjectAlertsEmptyState({
           </p>
         </div>
 
-        <div className="flex flex-col justify-center gap-3 sm:flex-row">
-          <Button type="button" onClick={onEditProject} className="rounded-xl border border-signal/20 bg-signal text-white hover:bg-signal/90">
-            <SquarePen className="mr-2 h-4 w-4" />
-            Volver y editar
-          </Button>
+        <div className="flex justify-center">
           <Button
             type="button"
             variant="outline"

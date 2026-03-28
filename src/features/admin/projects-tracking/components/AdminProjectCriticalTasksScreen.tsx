@@ -79,6 +79,7 @@ export function AdminProjectCriticalTasksScreen({
       },
       currentTaskKey,
     );
+
     if (success) {
       setShowCreateDialog(false);
       setTaskDraft(null);
@@ -150,7 +151,7 @@ export function AdminProjectCriticalTasksScreen({
         </section>
 
         {criticalTasks.length === 0 ? (
-          <AdminProjectCriticalTasksEmptyState onEditProject={onEditProject} />
+          <AdminProjectCriticalTasksEmptyState />
         ) : visibleTasks.length === 0 ? (
           <section className="rounded-[24px] border border-dashed border-white/10 bg-[var(--bg-surface)]/70 p-8">
             <div className="mx-auto max-w-2xl space-y-2 text-center">

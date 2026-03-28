@@ -93,7 +93,7 @@ export function AdminProjectAlertsScreen({
       </section>
 
       {alerts.length === 0 ? (
-        <AdminProjectAlertsEmptyState onBackToTracking={onBackToTracking} onEditProject={onEditProject} />
+        <AdminProjectAlertsEmptyState onBackToTracking={onBackToTracking} />
       ) : (
         <section className="space-y-4">
           {alerts.map((item) => (
