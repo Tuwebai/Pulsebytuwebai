@@ -81,7 +81,7 @@ export default function HomePage() {
   const projects = getUserProjects();
   const primaryProject = projects[0] ?? null;
   const { period } = usePulsePeriod();
-  const { projectId, domain, loading: projectLoading, projectsReady } = useUserProject();
+  const { projectId, domain, ga4PropertyId, loading: projectLoading, projectsReady } = useUserProject();
   const { data, isLoading } = usePulseMetrics(projectId, period);
   const { latestPayment, openTickets, paymentsCount, remainingTasks, secondaryLoading, ticketsCount } =
     useHomeOverviewCards(user, primaryProject);
@@ -120,12 +120,14 @@ export default function HomePage() {
         {!hasProject && !loading ? (
           <PulseEmptyState
             hasProject={false}
+            ga4PropertyId={ga4PropertyId}
             onConnect={() => navigate('/dashboard/configuracion')}
             website={user?.website ?? null}
             websiteStatus={user?.website_status ?? null}
           />
         ) : !hasDomain || !data?.hasData ? (
           <PulseEmptyState
+            ga4PropertyId={ga4PropertyId}
             onConnect={() => navigate('/dashboard/configuracion')}
             website={user?.website ?? null}
             websiteStatus={user?.website_status ?? null}

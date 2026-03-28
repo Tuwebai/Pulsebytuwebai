@@ -9,10 +9,12 @@ const statusRing = {
   admin: 'ring-2 ring-yellow-400',
   client: 'ring-2 ring-blue-500',
   default: 'ring-2 ring-zinc-700',
-};
+} as const;
+
+type AvatarStatus = keyof typeof statusRing;
 
 interface AvatarProps extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root> {
-  status?: 'online' | 'offline' | 'admin' | 'client';
+  status?: AvatarStatus;
   glow?: boolean;
 }
 
@@ -40,6 +42,8 @@ const AvatarImage = React.forwardRef<
   <AvatarPrimitive.Image
     ref={ref}
     className={cn("aspect-square h-full w-full", className)}
+    crossOrigin="anonymous"
+    referrerPolicy="no-referrer"
     {...props}
   />
 ))

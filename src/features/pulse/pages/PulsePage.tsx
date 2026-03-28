@@ -57,6 +57,7 @@ export default function PulsePage() {
         <div className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)]">
           <PulseEmptyState
             hasProject={false}
+            ga4PropertyId={ga4PropertyId}
             onConnect={() => navigate('/dashboard/configuracion')}
             website={user?.website ?? null}
             websiteStatus={user?.website_status ?? null}
@@ -73,14 +74,18 @@ export default function PulsePage() {
                 {websitePendingReview
                   ? 'Tu URL esta en revision antes de conectar los datos reales.'
                   : websiteApprovedWithoutData
-                    ? 'Tu dominio ya esta aprobado y estamos conectando los datos.'
+                    ? hasGa4
+                      ? 'Tu dominio ya esta aprobado y estamos conectando los datos.'
+                      : 'Tu dominio ya esta aprobado. Falta terminar la vinculacion de datos.'
                     : 'Conecta tu dominio para ver los datos reales.'}
               </p>
               <p className="mt-1 text-[13px] leading-5 text-[color:rgba(240,244,255,0.82)]">
                 {websitePendingReview
                   ? 'Cuando el equipo lo confirme, Pulse va a empezar a mostrar tu informacion real.'
                   : websiteApprovedWithoutData
-                    ? 'Este estado se completa solo cuando termina la integracion del proyecto.'
+                    ? hasGa4
+                      ? 'Este estado se completa solo cuando termina la integracion del proyecto.'
+                      : 'La URL ya quedo validada. Ahora falta conectar la capa de datos para que Pulse empiece a mostrar actividad.'
                     : 'Tu equipo de TuWebAI lo configura automaticamente al entregar tu proyecto.'}
               </p>
             </div>

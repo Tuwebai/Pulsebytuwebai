@@ -6,6 +6,7 @@ export interface PulseEmptyStateProps {
   onConnect?: () => void;
   website?: string | null;
   websiteStatus?: 'missing' | 'pending_review' | 'approved' | 'rejected' | null;
+  ga4PropertyId?: string | null;
 }
 
 const WHATSAPP_SUPPORT_URL = 'https://wa.me/5491130187377?text=Necesito%20ayuda%20con%20Pulse';
@@ -15,10 +16,13 @@ export default function PulseEmptyState({
   onConnect,
   website,
   websiteStatus,
+  ga4PropertyId,
 }: PulseEmptyStateProps) {
   const isPendingReview = websiteStatus === 'pending_review' && Boolean(website);
-  const isApprovedWithoutData = websiteStatus === 'approved' && Boolean(website);
-  const isWebsiteReadyWithoutProject = !hasProject && isApprovedWithoutData;
+  const isApprovedWebsite = websiteStatus === 'approved' && Boolean(website);
+  const isApprovedWithoutTracking = isApprovedWebsite && !ga4PropertyId;
+  const isApprovedWaitingForData = isApprovedWebsite && Boolean(ga4PropertyId);
+  const isWebsiteReadyWithoutProject = !hasProject && isApprovedWithoutTracking;
   const isWebsitePendingWithoutProject = !hasProject && isPendingReview;
 
   const title = isWebsiteReadyWithoutProject
@@ -26,25 +30,29 @@ export default function PulseEmptyState({
     : isWebsitePendingWithoutProject
       ? 'Tu dominio ya esta en revision'
       : isPendingReview
-    ? 'Tu URL ya esta en revision'
-    : isApprovedWithoutData
-      ? 'Estamos terminando de conectar tu web'
-      : 'Los datos de tu web aparecen aca';
+        ? 'Tu URL ya esta en revision'
+        : isApprovedWithoutTracking
+          ? 'Tu dominio ya quedo aprobado'
+          : isApprovedWaitingForData
+            ? 'Estamos terminando de conectar tu web'
+            : 'Los datos de tu web aparecen aca';
 
   const description = isWebsiteReadyWithoutProject
     ? 'Ya validamos tu URL. Ahora estamos terminando de vincular tu espacio Pulse para mostrarte datos reales apenas quede listo.'
     : isWebsitePendingWithoutProject
       ? 'Tu URL ya entro en revision. Cuando el equipo la confirme, vamos a terminar de preparar tu espacio Pulse.'
       : isPendingReview
-    ? 'Tu equipo de TuWebAI ya recibio la URL y la esta revisando antes de conectar los datos reales.'
-    : isApprovedWithoutData
-      ? 'Tu dominio ya quedo aprobado. Apenas termine la conexion de datos, vas a empezar a ver movimiento aca.'
-      : 'Conecta tu dominio para ver cuantas personas te estan visitando cada dia.';
+        ? 'Tu equipo de TuWebAI ya recibio la URL y la esta revisando antes de conectar los datos reales.'
+        : isApprovedWithoutTracking
+          ? 'Ya confirmamos tu URL. El siguiente paso es terminar la vinculacion de datos del proyecto para que Pulse te muestre actividad real.'
+          : isApprovedWaitingForData
+            ? 'Tu dominio ya quedo aprobado. Apenas termine la conexion de datos, vas a empezar a ver movimiento aca.'
+            : 'Conecta tu dominio para ver cuantas personas te estan visitando cada dia.';
 
   const buttonLabel =
-    isPendingReview || isApprovedWithoutData ? 'Revisar configuracion ->' : 'Conectar mi web ->';
+    isPendingReview || isApprovedWebsite ? 'Revisar configuracion ->' : 'Conectar mi web ->';
   const helpLabel =
-    isPendingReview || isApprovedWithoutData ? 'Quieres avisarnos algo? Escribinos' : 'Necesitas ayuda? Escribinos';
+    isPendingReview || isApprovedWebsite ? 'Quieres avisarnos algo? Escribinos' : 'Necesitas ayuda? Escribinos';
 
   return (
     <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 px-6 py-10 text-center">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { ChevronDown, Edit, Shield, Trash2, UserCheck } from 'lucide-react';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -10,6 +11,7 @@ import { AdminUserDomainReviewDialog } from '@/features/admin/components/AdminUs
 import { AdminPulseAccessDialog } from '@/features/admin/users/components/AdminPulseAccessDialog';
 import type { PulseAccessActionMode } from '@/features/admin/users/hooks/useAdminUsers';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
+import { getDisplayAvatar, getIdentityInitials } from '@/lib/identity/userIdentity';
 
 interface AdminUserCardWebsiteUpdate {
   website?: string | null;
@@ -122,7 +124,7 @@ export function AdminUserCard({
 }: AdminUserCardProps) {
   const [isPulseAccessDialogOpen, setIsPulseAccessDialogOpen] = useState(false);
   const role = user.role === 'admin' ? 'admin' : 'cliente';
-  const userInitial = user.full_name?.charAt(0) || user.email?.charAt(0) || 'U';
+  const userInitial = getIdentityInitials(user.full_name, user.email ?? undefined);
   const isAdmin = role === 'admin';
   const websiteStatusLabel = getWebsiteStatusLabel(user.website_status, user.website);
   const websiteActionLabel = getWebsiteActionLabel(user.website_status, user.website);
@@ -130,39 +132,23 @@ export function AdminUserCard({
   const pulseAccessEnabled = user.pulse_access_status === 'invited' || user.pulse_access_status === 'active';
   const pulseAccessBusy = enablingPulseUserId === user.id;
   const websiteSummary = user.website ? user.website : 'Sin dominio operativo cargado';
+  const displayAvatar = getDisplayAvatar(undefined, user);
 
   return (
     <div className="rounded-[var(--radius-xl)] border border-border/60 bg-[var(--bg-elevated)] p-4 shadow-sm transition-colors duration-150 hover:border-border hover:bg-[var(--bg-elevated)]/90 sm:p-5">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 items-start gap-3 sm:gap-4">
           <div className="relative shrink-0">
-            {user.avatar_url ? (
-              <div className="h-12 w-12 overflow-hidden rounded-2xl border border-white/10 bg-[var(--bg-elevated)] sm:h-14 sm:w-14">
-                <img
-                  src={user.avatar_url}
-                  alt={`Avatar de ${user.full_name || user.email}`}
-                  className="h-full w-full object-cover"
-                  onError={(event) => {
-                    const target = event.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const fallback = target.nextElementSibling as HTMLElement | null;
-                    if (fallback) {
-                      fallback.style.display = 'flex';
-                    }
-                  }}
-                />
-                <div
-                  className="hidden h-full w-full items-center justify-center bg-signal/15 text-base font-semibold text-signal"
-                  style={{ display: 'none' }}
-                >
-                  {userInitial}
-                </div>
-              </div>
-            ) : (
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-signal/15 text-base font-semibold text-signal sm:h-14 sm:w-14">
+            <Avatar className="h-12 w-12 rounded-2xl border border-white/10 bg-[var(--bg-elevated)] ring-0 sm:h-14 sm:w-14">
+              <AvatarImage
+                alt={`Avatar de ${user.full_name || user.email}`}
+                className="object-cover"
+                src={displayAvatar}
+              />
+              <AvatarFallback className="rounded-2xl bg-signal/15 text-base font-semibold text-signal">
                 {userInitial}
-              </div>
-            )}
+              </AvatarFallback>
+            </Avatar>
 
             {isAdmin ? (
               <div className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-slate-950">
