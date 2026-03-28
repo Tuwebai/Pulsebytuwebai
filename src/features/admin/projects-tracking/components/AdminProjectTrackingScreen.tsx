@@ -98,7 +98,8 @@ export function AdminProjectTrackingScreen({
             <div className="space-y-2">
               <h2 className="text-xl font-semibold text-[var(--text-primary)]">Base de seguimiento lista</h2>
               <p className="text-sm leading-6 text-[var(--text-secondary)]">
-                El proyecto ya tiene estructura de seguimiento cargada. En el próximo slice vamos a abrir las fases y las tareas críticas en una vista operativa completa.
+                El proyecto ya tiene estructura de seguimiento cargada. Desde la navegación lateral ya podés entrar a
+                fases y tareas críticas para leer el estado operativo por separado.
               </p>
             </div>
           </section>

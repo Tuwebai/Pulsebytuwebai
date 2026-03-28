@@ -4,6 +4,8 @@ export interface AdminProjectTrackingTask {
   description?: string;
   status: string;
   priority?: string;
+  phaseKey?: string;
+  phaseLabel?: string;
   responsable?: string;
   assigned_to?: string;
   assigned_role?: string;

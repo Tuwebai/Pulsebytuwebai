@@ -5,7 +5,11 @@ import type {
   AdminProjectTrackingTask,
 } from '@/features/admin/projects-tracking/types/adminProjectTracking';
 
-function toTask(rawTask: unknown, fallbackKey: string): AdminProjectTrackingTask | null {
+function toTask(
+  rawTask: unknown,
+  fallbackKey: string,
+  phaseContext?: { key: string; label?: string },
+): AdminProjectTrackingTask | null {
   if (!rawTask || typeof rawTask !== 'object') {
     return null;
   }
@@ -23,6 +27,8 @@ function toTask(rawTask: unknown, fallbackKey: string): AdminProjectTrackingTask
     description: typeof task.description === 'string' ? task.description : undefined,
     status: typeof task.status === 'string' ? task.status : 'pending',
     priority: typeof task.priority === 'string' ? task.priority : typeof task.prioridad === 'string' ? task.prioridad : undefined,
+    phaseKey: phaseContext?.key,
+    phaseLabel: phaseContext?.label,
     responsable: typeof task.responsable === 'string' ? task.responsable : undefined,
     assigned_to: typeof task.assigned_to === 'string' ? task.assigned_to : undefined,
     assigned_role: typeof task.assigned_role === 'string' ? task.assigned_role : undefined,
@@ -53,7 +59,12 @@ function toPhase(rawPhase: unknown, index: number): AdminProjectTrackingPhase | 
     fechaFin: typeof phase.fechaFin === 'string' ? phase.fechaFin : undefined,
     responsable: typeof phase.responsable === 'string' ? phase.responsable : undefined,
     tareas: phaseTasks
-      .map((task, taskIndex) => toTask(task, `fase-${index + 1}-tarea-${taskIndex + 1}`))
+      .map((task, taskIndex) =>
+        toTask(task, `fase-${index + 1}-tarea-${taskIndex + 1}`, {
+          key: typeof phase.key === 'string' ? phase.key : `fase-${index + 1}`,
+          label: typeof phase.descripcion === 'string' ? phase.descripcion : undefined,
+        }),
+      )
       .filter((task): task is AdminProjectTrackingTask => task !== null),
     comentariosCount: comments.length,
   };
