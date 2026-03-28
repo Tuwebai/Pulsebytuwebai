@@ -1,40 +1,37 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { AdminProjectTrackingLayout } from '@/features/admin/projects-tracking/components/AdminProjectTrackingLayout';
 import { AdminProjectTrackingScreen } from '@/features/admin/projects-tracking/components/AdminProjectTrackingScreen';
-import { AdminShell } from '@/features/admin/layout/AdminShell';
-
-function navigateToAdminSection(navigate: ReturnType<typeof useNavigate>, sectionId: string) {
-  const nextPath = sectionId === 'dashboard' ? '/admin' : `/admin/${sectionId}`;
-  navigate(nextPath);
-}
 
 export default function AdminProjectTrackingPage() {
   const navigate = useNavigate();
   const { projectId } = useParams<{ projectId: string }>();
-  const [lastUpdate, setLastUpdate] = useState(() => new Date());
-  const [refreshSignal, setRefreshSignal] = useState(0);
+  const refreshSignal = 0;
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  const handleBack = () => {
+    navigate('/admin/proyectos');
+  };
 
   return (
-    <AdminShell
-      activeSection="proyectos"
-      lastUpdate={lastUpdate}
-      onRefresh={() => {
-        setRefreshSignal((currentValue) => currentValue + 1);
-        setLastUpdate(new Date());
-      }}
-      onSectionChange={(sectionId) => navigateToAdminSection(navigate, sectionId)}
+    <AdminProjectTrackingLayout
+      collapsed={sidebarCollapsed}
+      mobileSidebarOpen={mobileSidebarOpen}
+      onToggleCollapse={() => setSidebarCollapsed((currentValue) => !currentValue)}
+      onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
+      onCloseMobileSidebar={() => setMobileSidebarOpen(false)}
+      onBack={handleBack}
     >
       <AdminProjectTrackingScreen
         projectId={projectId}
         refreshSignal={refreshSignal}
-        onBack={() => {
-          navigate('/admin/proyectos');
-        }}
+        onBack={handleBack}
         onEditProject={() => {
           navigate('/admin/proyectos', { state: { editProjectId: projectId } });
         }}
       />
-    </AdminShell>
+    </AdminProjectTrackingLayout>
   );
 }

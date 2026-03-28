@@ -60,9 +60,9 @@ export function AdminProjectTrackingScreen({
 
   return (
     <div className="space-y-6">
-      <AdminProjectTrackingHeader project={project} onBack={onBack} onEditProject={onEditProject} />
+      <AdminProjectTrackingHeader project={project} onEditProject={onEditProject} />
 
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+      <section id="resumen" className="grid grid-cols-1 gap-4 lg:grid-cols-4">
         <div className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
           <KanbanSquare className="mb-3 h-5 w-5 text-signal" />
           <p className="text-sm text-[var(--text-secondary)]">Fases cargadas</p>
@@ -90,14 +90,43 @@ export function AdminProjectTrackingScreen({
       {project.phases.length === 0 && project.rootTasks.length === 0 ? (
         <AdminProjectTrackingEmptyState onBack={onBack} onEditProject={onEditProject} />
       ) : (
-        <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.18)]">
-          <div className="space-y-2">
-            <h2 className="text-xl font-semibold text-[var(--text-primary)]">Base de seguimiento lista</h2>
-            <p className="text-sm leading-6 text-[var(--text-secondary)]">
-              El proyecto ya tiene estructura de seguimiento cargada. En el próximo slice vamos a abrir las fases y las tareas críticas en una vista operativa completa.
-            </p>
-          </div>
-        </section>
+        <>
+          <section
+            id="fases"
+            className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.18)]"
+          >
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold text-[var(--text-primary)]">Base de seguimiento lista</h2>
+              <p className="text-sm leading-6 text-[var(--text-secondary)]">
+                El proyecto ya tiene estructura de seguimiento cargada. En el próximo slice vamos a abrir las fases y las tareas críticas en una vista operativa completa.
+              </p>
+            </div>
+          </section>
+
+          <section
+            id="tareas-criticas"
+            className="rounded-[24px] border border-dashed border-white/10 bg-[var(--bg-surface)]/70 p-6"
+          >
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold text-[var(--text-primary)]">Tareas críticas</h2>
+              <p className="text-sm leading-6 text-[var(--text-secondary)]">
+                Este bloque va a concentrar las tareas bloqueadas, vencidas o sin responsable.
+              </p>
+            </div>
+          </section>
+
+          <section
+            id="alertas"
+            className="rounded-[24px] border border-dashed border-white/10 bg-[var(--bg-surface)]/70 p-6"
+          >
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold text-[var(--text-primary)]">Alertas operativas</h2>
+              <p className="text-sm leading-6 text-[var(--text-secondary)]">
+                Acá vamos a mostrar desvíos reales del proyecto cuando existan datos operativos para calcularlos.
+              </p>
+            </div>
+          </section>
+        </>
       )}
     </div>
   );

@@ -52,9 +52,7 @@ export function renderAdminRoutes({
         path="/admin/proyectos/:projectId/seguimiento"
         element={
           <ProtectedRoute requiredRole="admin">
-            <DashboardLayout>
-              <AdminProjectTrackingPage />
-            </DashboardLayout>
+            <AdminProjectTrackingPage />
           </ProtectedRoute>
         }
       />

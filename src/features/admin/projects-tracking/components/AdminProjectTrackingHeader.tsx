@@ -1,19 +1,14 @@
-import { ArrowLeft, FolderKanban, SquarePen } from 'lucide-react';
+import { FolderKanban, SquarePen } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import type { AdminProjectTrackingProject } from '@/features/admin/projects-tracking/types/adminProjectTracking';
 
 interface AdminProjectTrackingHeaderProps {
   project: AdminProjectTrackingProject;
-  onBack: () => void;
   onEditProject: () => void;
 }
 
-export function AdminProjectTrackingHeader({
-  project,
-  onBack,
-  onEditProject,
-}: AdminProjectTrackingHeaderProps) {
+export function AdminProjectTrackingHeader({ project, onEditProject }: AdminProjectTrackingHeaderProps) {
   return (
     <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur sm:p-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -37,15 +32,6 @@ export function AdminProjectTrackingHeader({
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onBack}
-            className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a proyectos
-          </Button>
           <Button
             type="button"
             onClick={onEditProject}
