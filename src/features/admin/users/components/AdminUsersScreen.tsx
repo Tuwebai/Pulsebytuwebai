@@ -1,9 +1,8 @@
-import { RefreshCw, Users } from 'lucide-react';
+import { Plus, RefreshCw, Users } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { AdminAddUserCard } from '@/features/admin/components/AdminAddUserCard';
 import { AdminUserCard } from '@/features/admin/users/components/AdminUserCard';
 import type { PulseAccessActionMode } from '@/features/admin/users/hooks/useAdminUsers';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
@@ -74,7 +73,15 @@ export function AdminUsersScreen({
                 </div>
               </div>
 
-              <div className="flex w-full sm:w-auto">
+              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                <Button
+                  onClick={onAddUser}
+                  size="sm"
+                  className="w-full bg-signal text-white shadow-none hover:bg-signal/90 sm:w-auto"
+                >
+                  <Plus className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                  Agregar cliente
+                </Button>
                 <Button
                   onClick={onRefresh}
                   variant="outline"
@@ -107,14 +114,23 @@ export function AdminUsersScreen({
               <p className="mb-6 text-muted-foreground">
                 Los accesos Pulse van a aparecer aca cuando la operacion tenga usuarios reales.
               </p>
-              <Button
-                onClick={onRefresh}
-                variant="outline"
-                className="border-border/60 bg-[var(--bg-elevated)] text-foreground hover:border-signal/40 hover:bg-[var(--bg-elevated)]"
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Reintentar carga
-              </Button>
+              <div className="flex flex-col justify-center gap-3 sm:flex-row">
+                <Button
+                  onClick={onAddUser}
+                  className="bg-signal text-white shadow-none hover:bg-signal/90"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Crear primer acceso
+                </Button>
+                <Button
+                  onClick={onRefresh}
+                  variant="outline"
+                  className="border-border/60 bg-[var(--bg-elevated)] text-foreground hover:border-signal/40 hover:bg-[var(--bg-elevated)]"
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Reintentar carga
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
@@ -136,8 +152,6 @@ export function AdminUsersScreen({
               ))}
             </div>
           )}
-
-          <AdminAddUserCard onAddUser={onAddUser} />
         </CardContent>
       </Card>
     </div>
