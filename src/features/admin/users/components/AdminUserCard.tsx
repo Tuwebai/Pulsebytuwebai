@@ -49,18 +49,18 @@ function getWebsiteStatusLabel(status?: string | null, website?: string | null) 
 
 function getWebsiteStatusBadgeClass(status?: string | null, website?: string | null) {
   if (!website) {
-    return 'border-border/60 bg-[var(--bg-elevated)] text-muted-foreground';
+    return 'border-white/10 bg-white/[0.06] text-slate-200';
   }
 
   switch (status) {
     case 'approved':
-      return 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300';
+      return 'border-emerald-400/30 bg-emerald-500/15 text-emerald-100';
     case 'pending_review':
-      return 'border-amber-500/30 bg-amber-500/10 text-amber-300';
+      return 'border-amber-400/30 bg-amber-500/15 text-amber-100';
     case 'rejected':
-      return 'border-red-500/25 bg-red-500/10 text-red-300';
+      return 'border-red-400/30 bg-red-500/15 text-red-100';
     default:
-      return 'border-border/60 bg-[var(--bg-elevated)] text-foreground';
+      return 'border-slate-400/20 bg-slate-400/10 text-slate-100';
   }
 }
 
@@ -99,15 +99,15 @@ function getPulseAccessLabel(status?: string | null) {
 function getPulseAccessBadgeClass(status?: string | null) {
   switch (status) {
     case 'active':
-      return 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300';
+      return 'border-emerald-400/30 bg-emerald-500/15 text-emerald-100';
     case 'invited':
-      return 'border-signal/30 bg-signal/10 text-signal';
+      return 'border-sky-400/30 bg-sky-500/15 text-sky-100';
     case 'disabled':
-      return 'border-red-500/25 bg-red-500/10 text-red-300';
+      return 'border-red-400/30 bg-red-500/15 text-red-100';
     case 'pending':
-      return 'border-amber-500/30 bg-amber-500/10 text-amber-300';
+      return 'border-amber-400/30 bg-amber-500/15 text-amber-100';
     default:
-      return 'border-border/60 bg-[var(--bg-elevated)] text-muted-foreground';
+      return 'border-white/10 bg-white/[0.06] text-slate-200';
   }
 }
 
@@ -184,8 +184,8 @@ export function AdminUserCard({
                 variant="outline"
                 className={
                   isAdmin
-                    ? 'border-amber-500/30 bg-amber-500/10 text-amber-300'
-                    : 'border-border/60 bg-[var(--bg-elevated)] text-foreground'
+                    ? 'border-amber-400/30 bg-amber-500/15 text-amber-100'
+                    : 'border-white/10 bg-white/[0.06] text-slate-100'
                 }
               >
                 {isAdmin ? 'Administrador' : 'Cliente'}

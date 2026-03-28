@@ -64,10 +64,10 @@ export function AdminUsersScreen({
                     Revisa accesos Pulse, roles y estado operativo de cada cliente.
                   </p>
                   <div className="flex flex-wrap items-center gap-2 pt-1">
-                    <Badge variant="outline" className="border-border/60 bg-background/40 text-foreground">
+                    <Badge variant="outline" className="border-white/10 bg-white/[0.06] text-slate-100">
                       {clientUsers} clientes
                     </Badge>
-                    <Badge variant="outline" className="border-amber-500/30 bg-amber-500/10 text-amber-300">
+                    <Badge variant="outline" className="border-amber-400/30 bg-amber-500/15 text-amber-100">
                       {adminUsers} admins
                     </Badge>
                   </div>
