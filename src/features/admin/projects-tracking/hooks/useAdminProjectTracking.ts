@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { toast } from '@/hooks/use-toast';
 
@@ -24,52 +25,82 @@ interface UseAdminProjectTrackingResult {
   saveTask: (input: AdminProjectTrackingTaskInput, currentTaskKey?: string) => Promise<boolean>;
 }
 
+const adminProjectTrackingQueryKey = (projectId: string | undefined) =>
+  ['admin-project-tracking', projectId] as const;
+
 export function useAdminProjectTracking(
   projectId: string | undefined,
-  refreshSignal = 0,
+  _refreshSignal = 0,
 ): UseAdminProjectTrackingResult {
-  const [loading, setLoading] = useState(true);
-  const [savingPhase, setSavingPhase] = useState(false);
-  const [savingTask, setSavingTask] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [project, setProject] = useState<AdminProjectTrackingProject | null>(null);
+  void _refreshSignal;
 
-  const loadProject = useCallback(async () => {
-    if (!projectId) {
-      setError('Proyecto no encontrado.');
-      setProject(null);
-      setLoading(false);
+  const queryClient = useQueryClient();
+  const queryKey = adminProjectTrackingQueryKey(projectId);
+
+  const projectQuery = useQuery<AdminProjectTrackingProject>({
+    queryKey,
+    enabled: Boolean(projectId),
+    queryFn: async () => {
+      if (!projectId) {
+        throw new Error('Proyecto no encontrado.');
+      }
+
+      return getAdminProjectTracking(projectId);
+    },
+  });
+
+  const savePhaseMutation = useMutation({
+    mutationFn: async ({
+      currentPhaseKey,
+      currentProject,
+      input,
+    }: {
+      currentPhaseKey?: string;
+      currentProject: AdminProjectTrackingProject;
+      input: AdminProjectTrackingPhaseInput;
+    }) => saveAdminProjectTrackingPhase(currentProject, input, currentPhaseKey),
+    onSuccess: (nextProject) => {
+      queryClient.setQueryData(queryKey, nextProject);
+    },
+  });
+
+  const saveTaskMutation = useMutation({
+    mutationFn: async ({
+      currentProject,
+      currentTaskKey,
+      input,
+    }: {
+      currentProject: AdminProjectTrackingProject;
+      currentTaskKey?: string;
+      input: AdminProjectTrackingTaskInput;
+    }) => saveAdminProjectTrackingTask(currentProject, input, currentTaskKey),
+    onSuccess: (nextProject) => {
+      queryClient.setQueryData(queryKey, nextProject);
+    },
+  });
+
+  const refresh = useCallback(async () => {
+    const result = await projectQuery.refetch();
+
+    if (result.error) {
+      toast({
+        title: 'Error',
+        description: 'No pudimos actualizar el seguimiento operativo.',
+        variant: 'destructive',
+      });
       return;
     }
 
-    try {
-      setLoading(true);
-      setError(null);
-      const nextProject = await getAdminProjectTracking(projectId);
-      setProject(nextProject);
-    } catch (loadError) {
-      console.error('Error cargando seguimiento operativo del proyecto:', loadError);
-      setError('No pudimos cargar el seguimiento operativo del proyecto.');
-      setProject(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId]);
-
-  useEffect(() => {
-    void loadProject();
-  }, [loadProject, refreshSignal]);
-
-  const refresh = useCallback(async () => {
-    await loadProject();
     toast({
       title: 'Actualizado',
       description: 'Seguimiento operativo actualizado correctamente.',
     });
-  }, [loadProject]);
+  }, [projectQuery]);
 
   const savePhase = useCallback(
     async (input: AdminProjectTrackingPhaseInput, currentPhaseKey?: string) => {
+      const project = projectQuery.data ?? null;
+
       if (!project) {
         toast({
           title: 'Error',
@@ -80,10 +111,11 @@ export function useAdminProjectTracking(
       }
 
       try {
-        setSavingPhase(true);
-        setError(null);
-        const nextProject = await saveAdminProjectTrackingPhase(project, input, currentPhaseKey);
-        setProject(nextProject);
+        await savePhaseMutation.mutateAsync({
+          currentPhaseKey,
+          currentProject: project,
+          input,
+        });
         toast({
           title: currentPhaseKey ? 'Fase actualizada' : 'Fase creada',
           description: currentPhaseKey
@@ -99,15 +131,15 @@ export function useAdminProjectTracking(
           variant: 'destructive',
         });
         return false;
-      } finally {
-        setSavingPhase(false);
       }
     },
-    [project],
+    [projectQuery.data, savePhaseMutation],
   );
 
   const saveTask = useCallback(
     async (input: AdminProjectTrackingTaskInput, currentTaskKey?: string) => {
+      const project = projectQuery.data ?? null;
+
       if (!project) {
         toast({
           title: 'Error',
@@ -118,10 +150,11 @@ export function useAdminProjectTracking(
       }
 
       try {
-        setSavingTask(true);
-        setError(null);
-        const nextProject = await saveAdminProjectTrackingTask(project, input, currentTaskKey);
-        setProject(nextProject);
+        await saveTaskMutation.mutateAsync({
+          currentProject: project,
+          currentTaskKey,
+          input,
+        });
         toast({
           title: currentTaskKey ? 'Tarea actualizada' : 'Tarea creada',
           description: currentTaskKey
@@ -137,19 +170,21 @@ export function useAdminProjectTracking(
           variant: 'destructive',
         });
         return false;
-      } finally {
-        setSavingTask(false);
       }
     },
-    [project],
+    [projectQuery.data, saveTaskMutation],
   );
 
   return {
-    loading,
-    savingPhase,
-    savingTask,
-    error,
-    project,
+    loading: projectQuery.isLoading,
+    savingPhase: savePhaseMutation.isPending,
+    savingTask: saveTaskMutation.isPending,
+    error: projectQuery.isError
+      ? projectId
+        ? 'No pudimos cargar el seguimiento operativo del proyecto.'
+        : 'Proyecto no encontrado.'
+      : null,
+    project: projectQuery.data ?? null,
     refresh,
     savePhase,
     saveTask,
