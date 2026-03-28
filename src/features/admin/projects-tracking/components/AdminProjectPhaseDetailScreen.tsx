@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AlertCircle, ArrowLeft, Plus, SquarePen } from 'lucide-react';
 
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -16,6 +16,7 @@ interface AdminProjectPhaseDetailScreenProps {
   projectId: string | undefined;
   onBackToPhases: () => void;
   backLabel: string;
+  startInEditMode: boolean;
   onEditProject: () => void;
 }
 
@@ -24,6 +25,7 @@ export function AdminProjectPhaseDetailScreen({
   projectId,
   onBackToPhases,
   backLabel,
+  startInEditMode,
   onEditProject,
 }: AdminProjectPhaseDetailScreenProps) {
   const { loading, savingPhase, savingTask, error, project, refresh, savePhase, saveTask } = useAdminProjectTracking(projectId);
@@ -31,6 +33,12 @@ export function AdminProjectPhaseDetailScreen({
   const [showCreateTaskDialog, setShowCreateTaskDialog] = useState(false);
   const [taskDraft, setTaskDraft] = useState<AdminProjectTrackingTask | null>(null);
   const phase = project?.phases.find((currentPhase) => currentPhase.key === phaseKey);
+
+  useEffect(() => {
+    if (startInEditMode && phase) {
+      setShowEditDialog(true);
+    }
+  }, [startInEditMode, phase]);
 
   if (loading) {
     return (

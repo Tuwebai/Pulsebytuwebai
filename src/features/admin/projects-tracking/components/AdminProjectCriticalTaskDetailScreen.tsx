@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AlertCircle, ArrowLeft, SquarePen } from 'lucide-react';
 
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -14,6 +14,7 @@ interface AdminProjectCriticalTaskDetailScreenProps {
   taskKey: string | undefined;
   onBackToTasks: () => void;
   backLabel: string;
+  startInEditMode: boolean;
   onEditProject: () => void;
 }
 
@@ -22,11 +23,18 @@ export function AdminProjectCriticalTaskDetailScreen({
   taskKey,
   onBackToTasks,
   backLabel,
+  startInEditMode,
   onEditProject,
 }: AdminProjectCriticalTaskDetailScreenProps) {
   const { loading, savingTask, error, project, refresh, saveTask } = useAdminProjectTracking(projectId);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const item = project && taskKey ? getAdminProjectCriticalTaskByKey(project, taskKey) : null;
+
+  useEffect(() => {
+    if (startInEditMode && item) {
+      setShowEditDialog(true);
+    }
+  }, [startInEditMode, item]);
 
   if (loading) {
     return (

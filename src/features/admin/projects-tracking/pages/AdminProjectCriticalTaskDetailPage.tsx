@@ -8,6 +8,7 @@ export default function AdminProjectCriticalTaskDetailPage() {
   const [searchParams] = useSearchParams();
   const { projectId, taskId } = useParams<{ projectId: string; taskId: string }>();
   const fromAlerts = searchParams.get('from') === 'alertas';
+  const startInEditMode = searchParams.get('edit') === '1';
   const backTo = fromAlerts
     ? `/admin/proyectos/${projectId}/seguimiento/alertas`
     : `/admin/proyectos/${projectId}/seguimiento/tareas`;
@@ -18,6 +19,7 @@ export default function AdminProjectCriticalTaskDetailPage() {
         projectId={projectId}
         taskKey={taskId}
         backLabel={fromAlerts ? 'Volver a alertas' : 'Volver a tareas críticas'}
+        startInEditMode={startInEditMode}
         onBackToTasks={() => navigate(backTo)}
         onEditProject={() => {
           navigate('/admin/proyectos', { state: { editProjectId: projectId } });

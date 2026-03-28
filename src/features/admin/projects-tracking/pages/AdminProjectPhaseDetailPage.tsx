@@ -8,6 +8,7 @@ export default function AdminProjectPhaseDetailPage() {
   const [searchParams] = useSearchParams();
   const { projectId, phaseId } = useParams<{ projectId: string; phaseId: string }>();
   const fromAlerts = searchParams.get('from') === 'alertas';
+  const startInEditMode = searchParams.get('edit') === '1';
   const backTo = fromAlerts
     ? `/admin/proyectos/${projectId}/seguimiento/alertas`
     : `/admin/proyectos/${projectId}/seguimiento/fases`;
@@ -18,6 +19,7 @@ export default function AdminProjectPhaseDetailPage() {
         phaseKey={phaseId}
         projectId={projectId}
         backLabel={fromAlerts ? 'Volver a alertas' : 'Volver a fases'}
+        startInEditMode={startInEditMode}
         onBackToPhases={() => navigate(backTo)}
         onEditProject={() => {
           navigate('/admin/proyectos', { state: { editProjectId: projectId } });
