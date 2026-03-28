@@ -102,7 +102,7 @@ export default function DashboardLayout({ children, dashboardProps }: DashboardL
     return <Navigate to="/login" replace />;
   }
 
-  const isAdminPage = location.pathname === '/admin';
+  const isAdminPage = location.pathname === '/admin' || location.pathname.startsWith('/admin/');
   const isClientDashboardPage = location.pathname === '/dashboard';
 
   return (
