@@ -4,13 +4,11 @@ import { Button } from '@/components/ui/button';
 
 interface AdminProjectPhasesEmptyStateProps {
   onBack: () => void;
-  onCreatePhase: () => void;
   onEditProject: () => void;
 }
 
 export function AdminProjectPhasesEmptyState({
   onBack,
-  onCreatePhase,
   onEditProject,
 }: AdminProjectPhasesEmptyStateProps) {
   return (
@@ -23,17 +21,10 @@ export function AdminProjectPhasesEmptyState({
           Todavía no hay fases operativas
         </h1>
         <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
-          Este proyecto todavía no tiene etapas cargadas en la base operativa. El siguiente paso es definir la
-          estructura inicial para que Pulse pueda mostrar avance, responsables y fechas objetivo.
+          Usá el botón superior para crear la primera fase y definir la estructura inicial que Pulse necesita para
+          mostrar avance, responsables y fechas objetivo.
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <Button
-            type="button"
-            onClick={onCreatePhase}
-            className="rounded-xl border border-signal/20 bg-signal text-white hover:bg-signal/90"
-          >
-            Crear primera fase
-          </Button>
           <Button
             type="button"
             onClick={onEditProject}

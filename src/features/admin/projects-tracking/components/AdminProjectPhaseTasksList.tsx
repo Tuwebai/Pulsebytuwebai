@@ -1,37 +1,26 @@
-import { CalendarClock, CircleAlert, Plus, SquarePen, UserRound } from 'lucide-react';
+import { CalendarClock, CircleAlert, SquarePen, UserRound } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import type { AdminProjectTrackingTask } from '@/features/admin/projects-tracking/types/adminProjectTracking';
 
 interface AdminProjectPhaseTasksListProps {
   tasks: AdminProjectTrackingTask[];
-  onCreateTask: () => void;
   onEditTask: (task: AdminProjectTrackingTask) => void;
 }
 
 export function AdminProjectPhaseTasksList({
   tasks,
-  onCreateTask,
   onEditTask,
 }: AdminProjectPhaseTasksListProps) {
   if (tasks.length === 0) {
     return (
       <section className="rounded-[24px] border border-dashed border-white/10 bg-[var(--bg-surface)]/70 p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="space-y-2">
-            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Todavía no hay tareas en esta fase</h2>
-            <p className="text-sm leading-6 text-[var(--text-secondary)]">
-              Cargá la primera tarea operativa para que Pulse pueda seguir responsables, fechas objetivo y bloqueos.
-            </p>
-          </div>
-          <Button
-            type="button"
-            onClick={onCreateTask}
-            className="rounded-xl border border-signal/20 bg-signal text-white hover:bg-signal/90"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Crear tarea
-          </Button>
+        <div className="space-y-2">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">Todavía no hay tareas en esta fase</h2>
+          <p className="text-sm leading-6 text-[var(--text-secondary)]">
+            Usá el botón superior para cargar la primera tarea operativa y empezar a seguir responsables, fechas
+            objetivo y bloqueos desde Pulse.
+          </p>
         </div>
       </section>
     );
@@ -39,17 +28,6 @@ export function AdminProjectPhaseTasksList({
 
   return (
     <section className="space-y-4">
-      <div className="flex items-center justify-end">
-        <Button
-          type="button"
-          onClick={onCreateTask}
-          className="rounded-xl border border-signal/20 bg-signal text-white hover:bg-signal/90"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Crear tarea
-        </Button>
-      </div>
-
       {tasks.map((task) => (
         <article
           key={task.key}

@@ -137,7 +137,6 @@ export function AdminProjectPhaseDetailScreen({
         <AdminProjectPhaseDetailSummary phase={phase} />
         <AdminProjectPhaseTasksList
           tasks={phase.tareas}
-          onCreateTask={() => setShowCreateTaskDialog(true)}
           onEditTask={setTaskDraft}
         />
       </div>

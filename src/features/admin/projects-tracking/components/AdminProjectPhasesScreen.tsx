@@ -122,7 +122,6 @@ export function AdminProjectPhasesScreen({
         {project.phases.length === 0 ? (
           <AdminProjectPhasesEmptyState
             onBack={onBack}
-            onCreatePhase={handleCreatePhase}
             onEditProject={onEditProject}
           />
         ) : (
