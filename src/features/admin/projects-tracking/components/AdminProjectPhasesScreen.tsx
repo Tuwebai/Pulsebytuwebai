@@ -78,7 +78,7 @@ export function AdminProjectPhasesScreen({
       ) : (
         <section className="space-y-4">
           {project.phases.map((phase, index) => (
-            <AdminProjectPhaseCard key={phase.key} index={index} phase={phase} />
+            <AdminProjectPhaseCard key={phase.key} index={index} phase={phase} projectId={project.id} />
           ))}
         </section>
       )}

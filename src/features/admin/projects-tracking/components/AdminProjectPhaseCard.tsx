@@ -1,13 +1,15 @@
-import { CalendarClock, CheckCircle2, ListTodo, UserRound } from 'lucide-react';
+import { ArrowRight, CalendarClock, CheckCircle2, ListTodo, UserRound } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import type { AdminProjectTrackingPhase } from '@/features/admin/projects-tracking/types/adminProjectTracking';
 
 interface AdminProjectPhaseCardProps {
   phase: AdminProjectTrackingPhase;
   index: number;
+  projectId: string;
 }
 
-export function AdminProjectPhaseCard({ phase, index }: AdminProjectPhaseCardProps) {
+export function AdminProjectPhaseCard({ phase, index, projectId }: AdminProjectPhaseCardProps) {
   return (
     <article className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
       <div className="flex flex-col gap-4">
@@ -48,6 +50,16 @@ export function AdminProjectPhaseCard({ phase, index }: AdminProjectPhaseCardPro
         <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
           <CheckCircle2 className="h-4 w-4 text-emerald-300" />
           <span>{phase.comentariosCount} comentarios operativos cargados</span>
+        </div>
+
+        <div className="flex justify-end">
+          <Link
+            to={`/admin/proyectos/${projectId}/seguimiento/fases/${encodeURIComponent(phase.key)}`}
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:border-white/15 hover:bg-white/[0.06]"
+          >
+            Ver fase
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </article>
