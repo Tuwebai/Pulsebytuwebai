@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useApp } from '@/contexts/AppContext';
 import { useProjects } from '@/hooks/useProjects';
@@ -8,6 +9,7 @@ import { getAdminProjectStats } from '@/features/admin/projects/hooks/adminProje
 import { useAdminProjectActions } from '@/features/admin/projects/hooks/useAdminProjectActions';
 
 export function useAdminProjectsScreen() {
+  const navigate = useNavigate();
   const { user } = useApp();
   const projectsState = useProjects();
 
@@ -99,6 +101,9 @@ export function useAdminProjectsScreen() {
     cancelDelete: () => {
       setShowConfirmDelete(false);
       setProjectToDelete(null);
+    },
+    openTrackingProject: (projectId: string) => {
+      navigate(`/admin/proyectos/${projectId}/seguimiento`);
     },
     openEditProject,
     openViewProject,

@@ -6,6 +6,7 @@ import { AdminProjectCardMetrics } from '@/features/admin/projects/components/Ad
 
 interface AdminProjectCardProps {
   project: Project;
+  onOpenTracking: (projectId: string) => void;
   onViewProject: (projectId: string) => void;
   onEditProject: (projectId: string) => void;
   onDeleteProject: (projectId: string) => void;
@@ -13,6 +14,7 @@ interface AdminProjectCardProps {
 
 export function AdminProjectCard({
   project,
+  onOpenTracking,
   onViewProject,
   onEditProject,
   onDeleteProject,
@@ -24,6 +26,7 @@ export function AdminProjectCard({
         <AdminProjectCardMetrics project={project} />
         <AdminProjectCardActions
           projectId={project.id}
+          onOpenTracking={onOpenTracking}
           onViewProject={onViewProject}
           onEditProject={onEditProject}
           onDeleteProject={onDeleteProject}

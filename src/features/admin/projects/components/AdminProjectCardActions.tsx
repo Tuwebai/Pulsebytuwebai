@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 
 interface AdminProjectCardActionsProps {
   projectId: string;
+  onOpenTracking: (projectId: string) => void;
   onViewProject: (projectId: string) => void;
   onEditProject: (projectId: string) => void;
   onDeleteProject: (projectId: string) => void;
@@ -11,6 +12,7 @@ interface AdminProjectCardActionsProps {
 
 export function AdminProjectCardActions({
   projectId,
+  onOpenTracking,
   onViewProject,
   onEditProject,
   onDeleteProject,
@@ -18,6 +20,13 @@ export function AdminProjectCardActions({
   return (
     <div className="flex flex-col gap-3 border-t border-white/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          className="rounded-xl border-signal/20 bg-signal/10 text-signal hover:bg-signal/16"
+          onClick={() => onOpenTracking(projectId)}
+        >
+          Seguimiento
+        </Button>
         <Button
           variant="outline"
           className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-signal/20 hover:bg-signal/10 hover:text-signal"

@@ -1,3 +1,6 @@
+import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import { AlertCircle } from 'lucide-react';
 
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -9,6 +12,8 @@ import { AdminProjectsOverlays } from '@/features/admin/projects/components/Admi
 import { useAdminProjectsScreen } from '@/features/admin/projects/hooks/useAdminProjectsScreen';
 
 export function AdminProjectsScreen() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const {
     loading,
     error,
@@ -29,12 +34,27 @@ export function AdminProjectsScreen() {
     openDeleteConfirmation,
     confirmDelete,
     cancelDelete,
+    openTrackingProject,
     openEditProject,
     openViewProject,
     openEditProjectDetails,
     closeForm,
     closeDetails,
   } = useAdminProjectsScreen();
+
+  useEffect(() => {
+    const editProjectId =
+      location.state && typeof location.state === 'object' && 'editProjectId' in location.state
+        ? location.state.editProjectId
+        : null;
+
+    if (typeof editProjectId !== 'string' || !projects.some((project) => project.id === editProjectId)) {
+      return;
+    }
+
+    openEditProject(editProjectId);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.pathname, location.state, navigate, openEditProject, projects]);
 
   if (loading && projects.length === 0) {
     return (
@@ -77,6 +97,7 @@ export function AdminProjectsScreen() {
         <>
           <AdminProjectsGrid
             projects={projects}
+            onOpenTracking={openTrackingProject}
             onViewProject={openViewProject}
             onEditProject={openEditProject}
             onDeleteProject={openDeleteConfirmation}

@@ -4,6 +4,7 @@ import { AdminProjectCard } from '@/features/admin/projects/components/AdminProj
 
 interface AdminProjectsGridProps {
   projects: Project[];
+  onOpenTracking: (projectId: string) => void;
   onViewProject: (projectId: string) => void;
   onEditProject: (projectId: string) => void;
   onDeleteProject: (projectId: string) => void;
@@ -11,6 +12,7 @@ interface AdminProjectsGridProps {
 
 export function AdminProjectsGrid({
   projects,
+  onOpenTracking,
   onViewProject,
   onEditProject,
   onDeleteProject,
@@ -21,6 +23,7 @@ export function AdminProjectsGrid({
         <AdminProjectCard
           key={project.id}
           project={project}
+          onOpenTracking={onOpenTracking}
           onViewProject={onViewProject}
           onEditProject={onEditProject}
           onDeleteProject={onDeleteProject}
