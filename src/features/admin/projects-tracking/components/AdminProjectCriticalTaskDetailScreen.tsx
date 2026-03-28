@@ -5,7 +5,13 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { AdminProjectCriticalTaskDetailSummary } from '@/features/admin/projects-tracking/components/AdminProjectCriticalTaskDetailSummary';
 import { AdminProjectTaskDialog } from '@/features/admin/projects-tracking/components/AdminProjectTaskDialog';
+import { AdminProjectTrackingResolutionPanel } from '@/features/admin/projects-tracking/components/AdminProjectTrackingResolutionPanel';
+import type { AdminProjectTrackingResolutionAction } from '@/features/admin/projects-tracking/components/AdminProjectTrackingResolutionPanel';
 import { getAdminProjectCriticalTaskByKey } from '@/features/admin/projects-tracking/components/adminProjectCriticalTasks.utils';
+import {
+  isAdminProjectTrackingDoneStatus,
+  isAdminProjectTrackingOverdue,
+} from '@/features/admin/projects-tracking/components/adminProjectTrackingResolution.utils';
 import { AdminProjectTrackingHeader } from '@/features/admin/projects-tracking/components/AdminProjectTrackingHeader';
 import { useAdminProjectTracking } from '@/features/admin/projects-tracking/hooks/useAdminProjectTracking';
 
@@ -76,6 +82,39 @@ export function AdminProjectCriticalTaskDetailScreen({
   }
 
   const { task, reason } = item;
+  const owner = task.responsable ?? task.assigned_to;
+  const targetDate = task.fechaLimite ?? task.dueDate;
+  const resolutionActions = [
+    !owner
+      ? {
+          id: 'task-owner',
+          title: 'Asignar responsable',
+          description: 'La tarea está sin owner visible. Resolverlo ahora le devuelve trazabilidad al seguimiento.',
+          ctaLabel: 'Asignar owner',
+          icon: 'owner' as const,
+          onClick: () => setShowEditDialog(true),
+        }
+      : null,
+    !targetDate
+      ? {
+          id: 'task-date-missing',
+          title: 'Definir fecha objetivo',
+          description: 'Sin fecha objetivo Pulse no puede medir riesgo ni vencimiento de esta tarea crítica.',
+          ctaLabel: 'Definir fecha',
+          icon: 'date' as const,
+          onClick: () => setShowEditDialog(true),
+        }
+      : isAdminProjectTrackingOverdue(targetDate) && !isAdminProjectTrackingDoneStatus(task.status)
+        ? {
+            id: 'task-date-overdue',
+            title: 'Actualizar fecha objetivo',
+            description: 'La fecha actual ya venció y la tarea sigue abierta. Conviene replanificar o cerrar el desvío.',
+            ctaLabel: 'Actualizar fecha',
+            icon: 'date' as const,
+            onClick: () => setShowEditDialog(true),
+          }
+        : null,
+  ].filter((action): action is AdminProjectTrackingResolutionAction => action !== null);
 
   const handleSubmitTask = async (input: Parameters<typeof saveTask>[0], currentTaskKey?: string) => {
     const success = await saveTask(
@@ -132,6 +171,7 @@ export function AdminProjectCriticalTaskDetailScreen({
           </div>
         </section>
 
+        <AdminProjectTrackingResolutionPanel actions={resolutionActions} />
         <AdminProjectCriticalTaskDetailSummary item={item} />
       </div>
 

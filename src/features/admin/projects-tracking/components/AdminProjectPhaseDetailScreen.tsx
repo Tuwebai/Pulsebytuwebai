@@ -8,6 +8,12 @@ import { AdminProjectPhaseDialog } from '@/features/admin/projects-tracking/comp
 import { AdminProjectPhaseTasksList } from '@/features/admin/projects-tracking/components/AdminProjectPhaseTasksList';
 import { AdminProjectTaskDialog } from '@/features/admin/projects-tracking/components/AdminProjectTaskDialog';
 import { AdminProjectTrackingHeader } from '@/features/admin/projects-tracking/components/AdminProjectTrackingHeader';
+import { AdminProjectTrackingResolutionPanel } from '@/features/admin/projects-tracking/components/AdminProjectTrackingResolutionPanel';
+import type { AdminProjectTrackingResolutionAction } from '@/features/admin/projects-tracking/components/AdminProjectTrackingResolutionPanel';
+import {
+  isAdminProjectTrackingDoneStatus,
+  isAdminProjectTrackingOverdue,
+} from '@/features/admin/projects-tracking/components/adminProjectTrackingResolution.utils';
 import { useAdminProjectTracking } from '@/features/admin/projects-tracking/hooks/useAdminProjectTracking';
 import type { AdminProjectTrackingTask } from '@/features/admin/projects-tracking/types/adminProjectTracking';
 
@@ -100,6 +106,39 @@ export function AdminProjectPhaseDetailScreen({
     }
   };
 
+  const targetDate = phase.fechaEntrega ?? phase.fechaFin;
+  const resolutionActions = [
+    !phase.responsable
+      ? {
+          id: 'phase-owner',
+          title: 'Asignar responsable',
+          description: 'Esta fase sigue sin owner visible. Definirlo ahora evita más desvíos de seguimiento.',
+          ctaLabel: 'Asignar owner',
+          icon: 'owner' as const,
+          onClick: () => setShowEditDialog(true),
+        }
+      : null,
+    !targetDate
+      ? {
+          id: 'phase-date-missing',
+          title: 'Definir fecha objetivo',
+          description: 'Pulse necesita una fecha visible para medir desvío y priorizar esta etapa correctamente.',
+          ctaLabel: 'Definir fecha',
+          icon: 'date' as const,
+          onClick: () => setShowEditDialog(true),
+        }
+      : isAdminProjectTrackingOverdue(targetDate) && !isAdminProjectTrackingDoneStatus(phase.estado)
+        ? {
+            id: 'phase-date-overdue',
+            title: 'Actualizar fecha objetivo',
+            description: 'La fecha actual ya venció y la fase sigue abierta. Conviene replanificar o cerrar la etapa.',
+            ctaLabel: 'Actualizar fecha',
+            icon: 'date' as const,
+            onClick: () => setShowEditDialog(true),
+          }
+        : null,
+  ].filter((action): action is AdminProjectTrackingResolutionAction => action !== null);
+
   return (
     <>
       <div className="space-y-6">
@@ -153,6 +192,7 @@ export function AdminProjectPhaseDetailScreen({
           </div>
         </section>
 
+        <AdminProjectTrackingResolutionPanel actions={resolutionActions} />
         <AdminProjectPhaseDetailSummary phase={phase} />
         <AdminProjectPhaseTasksList
           tasks={phase.tareas}
