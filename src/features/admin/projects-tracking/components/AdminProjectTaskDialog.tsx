@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ListTodo, Loader2, X } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { AdminProjectTaskDialogFields } from '@/features/admin/projects-tracking/components/AdminProjectTaskDialogFields';
+import { AdminProjectTaskDialogHeader } from '@/features/admin/projects-tracking/components/AdminProjectTaskDialogHeader';
 import type {
   AdminProjectTrackingPhase,
   AdminProjectTrackingTask,
@@ -82,7 +83,7 @@ export function AdminProjectTaskDialog({
     await onSubmit(
       {
         ...form,
-      phaseKey: fixedPhaseKey ?? (form.phaseKey || undefined),
+        phaseKey: fixedPhaseKey ?? (form.phaseKey || undefined),
       },
       task?.key,
     );
@@ -93,22 +94,7 @@ export function AdminProjectTaskDialog({
       <div className="w-full max-w-3xl rounded-[28px] border border-white/10 bg-[var(--bg-surface)] shadow-[0_32px_80px_rgba(0,0,0,0.45)]">
         <div className="border-b border-white/10 p-5 sm:p-6">
           <div className="flex items-start justify-between gap-4">
-            <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-amber-400/20 bg-amber-500/10 text-amber-300">
-                <ListTodo className="h-5 w-5" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
-                  Tareas operativas
-                </p>
-                <h2 className="text-xl font-semibold tracking-tight text-[var(--text-primary)]">
-                  {task ? 'Editar tarea' : 'Nueva tarea'}
-                </h2>
-                <p className="text-sm leading-6 text-[var(--text-secondary)]">
-                  Definí el desvío, el responsable y la fecha objetivo desde una vista operativa Pulse.
-                </p>
-              </div>
-            </div>
+            <AdminProjectTaskDialogHeader editing={Boolean(task)} />
 
             <Button
               type="button"
