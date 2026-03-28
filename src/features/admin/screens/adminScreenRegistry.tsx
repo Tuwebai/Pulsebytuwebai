@@ -6,6 +6,7 @@ import { AdminPaymentsSection } from '@/features/admin/billing/components/AdminP
 import type { AdminSectionId } from '@/features/admin/constants/adminSections';
 import { AdminOverviewScreen } from '@/features/admin/overview/components/AdminOverviewScreen';
 import { AdminNotificationsInboxScreen } from '@/features/admin/notifications/pages/AdminNotificationsInboxScreen';
+import { AdminProjectsScreen } from '@/features/admin/projects/components/AdminProjectsScreen';
 import { AdminSettingsScreen } from '@/features/admin/settings/components/AdminSettingsScreen';
 import { AdminUsersScreen } from '@/features/admin/users/components/AdminUsersScreen';
 import type { PulseAccessActionMode } from '@/features/admin/users/hooks/useAdminUsers';
@@ -13,7 +14,6 @@ import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 import type { WebsiteReviewStatus } from '@/features/admin/services/pulseDomainAdminService';
 import ProjectApprovalManager from '@/components/ProjectApprovalManager';
 import AdvancedTicketManager from '@/components/AdvancedTicketManager';
-import { ProjectsManagement } from '@/components/admin/ProjectsManagement';
 
 interface AdminDomainUpdateResult {
   website?: string | null;
@@ -100,7 +100,7 @@ export function createAdminScreenRegistry(
         onDomainUpdated={context.onDomainUpdated}
       />
     ),
-    proyectos: <ProjectsManagement />,
+    proyectos: <AdminProjectsScreen />,
     'aprobar-proyectos': (
       <ProjectApprovalManager
         user={context.user}
