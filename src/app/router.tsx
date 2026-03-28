@@ -1,7 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import type { ComponentType } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
-import DashboardLayout from '@/components/DashboardLayout';
 import { PulseLoaderScreen } from '@/components/PulseLoaderScreen';
 import TouchGestureProvider from '@/components/TouchGestureProvider';
 import RouteLoadErrorState from '@/core/components/RouteLoadErrorState';
@@ -206,9 +205,7 @@ function AppRoutes() {
         path="/proyectos"
         element={
           <ProtectedRoute clientOnly>
-            <DashboardLayout key="proyectos">
-              <ProjectsPage key="proyectos-content" />
-            </DashboardLayout>
+            <Navigate replace to="/dashboard/proyecto" />
           </ProtectedRoute>
         }
       />
@@ -216,9 +213,9 @@ function AppRoutes() {
         path="/fases-tareas"
         element={
           <ProtectedRoute clientOnly>
-            <DashboardLayout key="fases-tareas">
-              <PhasesAndTasksPage key="fases-tareas-content" />
-            </DashboardLayout>
+            <DashboardShell>
+              <PhasesAndTasksPage />
+            </DashboardShell>
           </ProtectedRoute>
         }
       />
@@ -234,9 +231,7 @@ function AppRoutes() {
         path="/configuracion"
         element={
           <ProtectedRoute clientOnly>
-            <DashboardLayout key="configuracion">
-              <Configuracion key="configuracion-content" />
-            </DashboardLayout>
+            <Navigate replace to="/dashboard/configuracion" />
           </ProtectedRoute>
         }
       />
@@ -260,9 +255,7 @@ function AppRoutes() {
         path="/soporte"
         element={
           <ProtectedRoute clientOnly>
-            <DashboardLayout key="soporte">
-              <Soporte key="soporte-content" />
-            </DashboardLayout>
+            <Navigate replace to="/dashboard/soporte" />
           </ProtectedRoute>
         }
       />
@@ -270,9 +263,9 @@ function AppRoutes() {
         path="/proyectos/nuevo"
         element={
           <ProtectedRoute clientOnly>
-            <DashboardLayout>
+            <DashboardShell>
               <ProyectosNuevo />
-            </DashboardLayout>
+            </DashboardShell>
           </ProtectedRoute>
         }
       />
@@ -280,9 +273,9 @@ function AppRoutes() {
         path="/workspace"
         element={
           <ProtectedRoute clientOnly>
-            <DashboardLayout>
+            <DashboardShell>
               <WorkspacePage />
-            </DashboardLayout>
+            </DashboardShell>
           </ProtectedRoute>
         }
       />
@@ -290,9 +283,9 @@ function AppRoutes() {
         path="/dashboard-custom"
         element={
           <ProtectedRoute clientOnly>
-            <DashboardLayout>
+            <DashboardShell>
               <CustomizableDashboard />
-            </DashboardLayout>
+            </DashboardShell>
           </ProtectedRoute>
         }
       />
