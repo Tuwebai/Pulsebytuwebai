@@ -7,6 +7,7 @@ import {
   createAdminScreenRegistry,
   type AdminScreenRegistryContext,
 } from '@/features/admin/screens/adminScreenRegistry';
+import type { AdminUsersFilterId } from '@/features/admin/users/constants/adminUsersFilters';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 import { toast } from '@/hooks/use-toast';
 
@@ -28,7 +29,9 @@ interface UseAdminScreenRegistryParams {
   calendarUserInfo: CalendarUserInfo | null;
   onAuthenticateCalendar: () => Promise<boolean>;
   metrics: AdminScreenRegistryContext['metrics'];
+  activeUsersFilter: AdminUsersFilterId;
   onSectionChange: AdminScreenRegistryContext['onSectionChange'];
+  onUsersFilterChange: AdminScreenRegistryContext['onUsersFilterChange'];
   onRefreshData: AdminScreenRegistryContext['onRefreshData'];
   onLoadData: AdminScreenRegistryContext['onLoadData'];
   onAddUser: AdminScreenRegistryContext['onAddUser'];
@@ -51,7 +54,9 @@ export function useAdminScreenRegistry({
   calendarUserInfo,
   onAuthenticateCalendar,
   metrics,
+  activeUsersFilter,
   onSectionChange,
+  onUsersFilterChange,
   onRefreshData,
   onLoadData,
   onAddUser,
@@ -78,7 +83,7 @@ export function useAdminScreenRegistry({
         ),
       );
       toast({
-        title: 'Éxito',
+        title: 'Exito',
         description: 'Estado del pago actualizado correctamente.',
       });
     } catch (error) {
@@ -106,7 +111,9 @@ export function useAdminScreenRegistry({
         : 'Agenda no conectada',
     onAuthenticateCalendar,
     metrics,
+    activeUsersFilter,
     onSectionChange,
+    onUsersFilterChange,
     onRefreshData,
     onLoadData,
     onAddUser,
@@ -136,7 +143,7 @@ export function useAdminScreenRegistry({
     onSaveSettingsReference: () => {
       toast({
         title: 'Info',
-        description: 'Este panel todavía no persiste cambios.',
+        description: 'Este panel todavia no persiste cambios.',
       });
     },
   });

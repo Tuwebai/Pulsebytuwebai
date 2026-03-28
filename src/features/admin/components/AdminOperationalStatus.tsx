@@ -1,8 +1,17 @@
-import { BarChart3, Calendar, CheckCircle, DollarSign, Eye, FolderOpen, Ticket, Users } from 'lucide-react';
+import {
+  BarChart3,
+  Calendar,
+  CheckCircle,
+  DollarSign,
+  Eye,
+  FolderOpen,
+  Ticket,
+  Users,
+} from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { AdminSectionId } from '@/features/admin/constants/adminSections';
+import type { AdminSectionChangeHandler } from '@/features/admin/types/adminNavigation';
 
 interface AdminOperationalStatusProps {
   isCalendarAuthenticated: boolean;
@@ -17,7 +26,18 @@ interface AdminOperationalStatusProps {
   ticketsUrgentes: number;
   ingresosTotales: number;
   ingresosEsteMes: number;
-  onSectionChange: (sectionId: AdminSectionId) => void;
+  onSectionChange: AdminSectionChangeHandler;
+}
+
+interface AdminOperationalStatusRow {
+  icon: typeof Users;
+  label: string;
+  value: number | string;
+  toneClassName: string;
+  sectionId: 'usuarios' | 'proyectos' | 'tickets' | 'pagos';
+  options?: {
+    usersFilter?: 'with-access' | 'new-this-month';
+  };
 }
 
 export function AdminOperationalStatus({
@@ -35,16 +55,66 @@ export function AdminOperationalStatus({
   ingresosEsteMes,
   onSectionChange,
 }: AdminOperationalStatusProps) {
-  const statusRows = [
-    { icon: Users, label: 'Clientes con acceso', value: usuariosActivos, toneClassName: 'bg-signal/15 text-signal', sectionId: 'usuarios' as const },
-    { icon: Users, label: 'Altas del mes', value: `+${usuariosNuevos}`, toneClassName: 'bg-emerald-500/15 text-emerald-400', sectionId: 'usuarios' as const },
-    { icon: FolderOpen, label: 'Proyectos en seguimiento', value: proyectosEnCurso, toneClassName: 'bg-emerald-500/15 text-emerald-400', sectionId: 'proyectos' as const },
-    { icon: CheckCircle, label: 'Entrega completada', value: `${tasaCompletacionProyectos}%`, toneClassName: 'bg-sky-500/15 text-sky-300', sectionId: 'proyectos' as const },
-    { icon: Ticket, label: 'Tickets abiertos', value: ticketsAbiertos, toneClassName: 'bg-amber-500/15 text-amber-300', sectionId: 'tickets' as const },
-    { icon: Eye, label: 'Casos urgentes', value: ticketsUrgentes, toneClassName: 'bg-red-500/15 text-red-300', sectionId: 'tickets' as const },
-    { icon: DollarSign, label: 'Cobranza acumulada', value: `$${ingresosTotales.toLocaleString()}`, toneClassName: 'bg-violet-500/15 text-violet-300', sectionId: 'pagos' as const },
-    { icon: Calendar, label: 'Cobranza del mes', value: `$${ingresosEsteMes.toLocaleString()}`, toneClassName: 'bg-signal/15 text-signal', sectionId: 'pagos' as const },
-  ] as const;
+  const statusRows: AdminOperationalStatusRow[] = [
+    {
+      icon: Users,
+      label: 'Clientes con acceso',
+      value: usuariosActivos,
+      toneClassName: 'bg-signal/15 text-signal',
+      sectionId: 'usuarios' as const,
+      options: { usersFilter: 'with-access' as const },
+    },
+    {
+      icon: Users,
+      label: 'Altas del mes',
+      value: `+${usuariosNuevos}`,
+      toneClassName: 'bg-emerald-500/15 text-emerald-400',
+      sectionId: 'usuarios' as const,
+      options: { usersFilter: 'new-this-month' as const },
+    },
+    {
+      icon: FolderOpen,
+      label: 'Proyectos en seguimiento',
+      value: proyectosEnCurso,
+      toneClassName: 'bg-emerald-500/15 text-emerald-400',
+      sectionId: 'proyectos' as const,
+    },
+    {
+      icon: CheckCircle,
+      label: 'Entrega completada',
+      value: `${tasaCompletacionProyectos}%`,
+      toneClassName: 'bg-sky-500/15 text-sky-300',
+      sectionId: 'proyectos' as const,
+    },
+    {
+      icon: Ticket,
+      label: 'Tickets abiertos',
+      value: ticketsAbiertos,
+      toneClassName: 'bg-amber-500/15 text-amber-300',
+      sectionId: 'tickets' as const,
+    },
+    {
+      icon: Eye,
+      label: 'Casos urgentes',
+      value: ticketsUrgentes,
+      toneClassName: 'bg-red-500/15 text-red-300',
+      sectionId: 'tickets' as const,
+    },
+    {
+      icon: DollarSign,
+      label: 'Cobranza acumulada',
+      value: `$${ingresosTotales.toLocaleString()}`,
+      toneClassName: 'bg-violet-500/15 text-violet-300',
+      sectionId: 'pagos' as const,
+    },
+    {
+      icon: Calendar,
+      label: 'Cobranza del mes',
+      value: `$${ingresosEsteMes.toLocaleString()}`,
+      toneClassName: 'bg-signal/15 text-signal',
+      sectionId: 'pagos' as const,
+    },
+  ];
 
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -54,9 +124,11 @@ export function AdminOperationalStatus({
             <BarChart3 className="h-5 w-5" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-semibold leading-tight text-foreground">Estado operativo Pulse</h3>
+            <h3 className="text-lg font-semibold leading-tight text-foreground">
+              Estado operativo Pulse
+            </h3>
             <p className="text-sm text-muted-foreground">
-              Lectura rápida de clientes, soporte, proyectos y cobranza.
+              Lectura rapida de clientes, soporte, proyectos y cobranza.
             </p>
           </div>
         </div>
@@ -69,7 +141,7 @@ export function AdminOperationalStatus({
               label={row.label}
               value={row.value}
               toneClassName={row.toneClassName}
-              onClick={() => onSectionChange(row.sectionId)}
+              onClick={() => onSectionChange(row.sectionId, row.options)}
             />
           ))}
         </div>

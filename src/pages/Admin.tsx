@@ -54,7 +54,7 @@ const Admin = React.memo(() => {
     setUsers: setUsuarios,
   });
 
-  const { activeSection, navigateToSection } = useAdminSectionNavigation();
+  const { activeSection, activeUsersFilter, navigateToSection } = useAdminSectionNavigation();
   const {
     isAuthenticated: isCalendarAuthenticated,
     userInfo: calendarUserInfo,
@@ -88,7 +88,9 @@ const Admin = React.memo(() => {
     calendarUserInfo,
     onAuthenticateCalendar: authenticateCalendar,
     metrics,
+    activeUsersFilter,
     onSectionChange: navigateToSection,
+    onUsersFilterChange: (filterId) => navigateToSection('usuarios', { usersFilter: filterId }),
     onRefreshData: refreshData,
     onLoadData: () => {
       void loadData();

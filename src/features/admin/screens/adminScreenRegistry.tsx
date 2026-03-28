@@ -9,9 +9,11 @@ import { AdminNotificationsInboxScreen } from '@/features/admin/notifications/pa
 import { AdminProjectsScreen } from '@/features/admin/projects/components/AdminProjectsScreen';
 import { AdminSettingsScreen } from '@/features/admin/settings/components/AdminSettingsScreen';
 import { AdminUsersScreen } from '@/features/admin/users/components/AdminUsersScreen';
+import type { AdminUsersFilterId } from '@/features/admin/users/constants/adminUsersFilters';
 import type { PulseAccessActionMode } from '@/features/admin/users/hooks/useAdminUsers';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 import type { WebsiteReviewStatus } from '@/features/admin/services/pulseDomainAdminService';
+import type { AdminSectionChangeHandler } from '@/features/admin/types/adminNavigation';
 import ProjectApprovalManager from '@/components/ProjectApprovalManager';
 import AdvancedTicketManager from '@/components/AdvancedTicketManager';
 
@@ -48,7 +50,9 @@ export interface AdminScreenRegistryContext {
     ingresosTotales: number;
     ingresosEsteMes: number;
   };
-  onSectionChange: (sectionId: AdminSectionId) => void;
+  activeUsersFilter: AdminUsersFilterId;
+  onSectionChange: AdminSectionChangeHandler;
+  onUsersFilterChange: (filterId: AdminUsersFilterId) => void;
   onRefreshData: () => void;
   onLoadData: () => void;
   onAddUser: () => void;
@@ -90,7 +94,9 @@ export function createAdminScreenRegistry(
       <AdminUsersScreen
         loading={context.loading}
         users={context.users}
+        activeFilter={context.activeUsersFilter}
         enablingPulseUserId={context.enablingPulseUserId}
+        onFilterChange={context.onUsersFilterChange}
         onRefresh={context.onRefreshData}
         onAddUser={context.onAddUser}
         onRoleChange={context.onRoleChange}

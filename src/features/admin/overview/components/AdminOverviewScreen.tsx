@@ -1,6 +1,6 @@
-import type { AdminSectionId } from '@/features/admin/constants/adminSections';
 import { AdminOperationalStatus } from '@/features/admin/components/AdminOperationalStatus';
 import { AdminOverviewStats } from '@/features/admin/components/AdminOverviewStats';
+import type { AdminSectionChangeHandler } from '@/features/admin/types/adminNavigation';
 
 interface AdminOverviewScreenProps {
   isCalendarAuthenticated: boolean;
@@ -19,7 +19,7 @@ interface AdminOverviewScreenProps {
   ticketsEnProgreso: number;
   ingresosTotales: number;
   ingresosEsteMes: number;
-  onSectionChange: (sectionId: AdminSectionId) => void;
+  onSectionChange: AdminSectionChangeHandler;
 }
 
 export function AdminOverviewScreen({

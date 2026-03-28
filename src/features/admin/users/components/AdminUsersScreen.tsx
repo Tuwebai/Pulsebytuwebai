@@ -1,16 +1,22 @@
-import { Plus, RefreshCw, Users } from 'lucide-react';
-
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { AdminUserCard } from '@/features/admin/users/components/AdminUserCard';
+import { AdminUsersHeader } from '@/features/admin/users/components/AdminUsersHeader';
+import {
+  countAdminUsersByFilter,
+  filterAdminUsers,
+  getAdminUsersFilterLabel,
+  type AdminUsersFilterId,
+} from '@/features/admin/users/constants/adminUsersFilters';
 import type { PulseAccessActionMode } from '@/features/admin/users/hooks/useAdminUsers';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 
 interface AdminUsersScreenProps {
   loading: boolean;
   users: AdminManagedUser[];
+  activeFilter: AdminUsersFilterId;
   enablingPulseUserId: string | null;
+  onFilterChange: (filterId: AdminUsersFilterId) => void;
   onRefresh: () => void;
   onAddUser: () => void;
   onRoleChange: (userId: string, newRole: string) => void;
@@ -33,7 +39,9 @@ interface AdminUsersScreenProps {
 export function AdminUsersScreen({
   loading,
   users,
+  activeFilter,
   enablingPulseUserId,
+  onFilterChange,
   onRefresh,
   onAddUser,
   onRoleChange,
@@ -44,56 +52,22 @@ export function AdminUsersScreen({
 }: AdminUsersScreenProps) {
   const adminUsers = users.filter((user) => user.role === 'admin').length;
   const clientUsers = users.length - adminUsers;
+  const filterCounts = countAdminUsersByFilter(users);
+  const visibleUsers = filterAdminUsers(users, activeFilter);
 
   return (
     <div className="flex h-full flex-col">
       <Card className="flex-1 rounded-2xl border border-border/60 bg-[var(--bg-surface)] shadow-sm">
         <CardContent className="flex-1 p-4 sm:p-5 lg:p-6">
-          <div className="mb-6 space-y-4">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-signal/15 text-signal sm:h-11 sm:w-11">
-                  <Users size={20} className="sm:h-5 sm:w-5" />
-                </div>
-                <div className="space-y-1">
-                  <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
-                    Clientes y accesos
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Revisa accesos Pulse, roles y estado operativo de cada cliente.
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    <Badge variant="outline" className="border-white/10 bg-white/[0.06] text-slate-100">
-                      {clientUsers} clientes
-                    </Badge>
-                    <Badge variant="outline" className="border-amber-400/30 bg-amber-500/15 text-amber-100">
-                      {adminUsers} admins
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-                <Button
-                  onClick={onAddUser}
-                  size="sm"
-                  className="w-full bg-signal text-white shadow-none hover:bg-signal/90 sm:w-auto"
-                >
-                  <Plus className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                  Agregar cliente
-                </Button>
-                <Button
-                  onClick={onRefresh}
-                  variant="outline"
-                  size="sm"
-                  className="w-full border-border/60 bg-[var(--bg-elevated)] text-foreground hover:border-signal/40 hover:bg-[var(--bg-elevated)] sm:w-auto"
-                >
-                  <RefreshCw className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                  Actualizar
-                </Button>
-              </div>
-            </div>
-          </div>
+          <AdminUsersHeader
+            clientUsers={clientUsers}
+            adminUsers={adminUsers}
+            activeFilter={activeFilter}
+            filterCounts={filterCounts}
+            onFilterChange={onFilterChange}
+            onAddUser={onAddUser}
+            onRefresh={onRefresh}
+          />
 
           {loading ? (
             <div className="py-12 text-center">
@@ -106,7 +80,7 @@ export function AdminUsersScreen({
           ) : users.length === 0 ? (
             <div className="py-12 text-center">
               <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-muted-foreground">
-                <Users className="h-10 w-10" />
+                <div className="text-3xl font-semibold">0</div>
               </div>
               <h3 className="mb-2 text-lg font-semibold text-foreground">
                 Todavia no hay clientes cargados
@@ -119,7 +93,6 @@ export function AdminUsersScreen({
                   onClick={onAddUser}
                   className="bg-signal text-white shadow-none hover:bg-signal/90"
                 >
-                  <Plus className="mr-2 h-4 w-4" />
                   Crear primer acceso
                 </Button>
                 <Button
@@ -127,14 +100,42 @@ export function AdminUsersScreen({
                   variant="outline"
                   className="border-border/60 bg-[var(--bg-elevated)] text-foreground hover:border-signal/40 hover:bg-[var(--bg-elevated)]"
                 >
-                  <RefreshCw className="mr-2 h-4 w-4" />
                   Reintentar carga
                 </Button>
               </div>
             </div>
+          ) : visibleUsers.length === 0 ? (
+            <div className="py-12 text-center">
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-muted-foreground">
+                <div className="text-3xl font-semibold">0</div>
+              </div>
+              <h3 className="mb-2 text-lg font-semibold text-foreground">
+                No encontramos resultados para {getAdminUsersFilterLabel(activeFilter).toLowerCase()}
+              </h3>
+              <p className="mb-6 text-muted-foreground">
+                Ajusta el filtro o actualiza la operacion para revisar nuevos movimientos del panel.
+              </p>
+              <div className="flex flex-col justify-center gap-3 sm:flex-row">
+                <Button
+                  onClick={onRefresh}
+                  variant="outline"
+                  className="border-border/60 bg-[var(--bg-elevated)] text-foreground hover:border-signal/40 hover:bg-[var(--bg-elevated)]"
+                >
+                  Reintentar carga
+                </Button>
+                {activeFilter !== 'all' ? (
+                  <Button
+                    onClick={() => onFilterChange('all')}
+                    className="bg-signal text-white shadow-none hover:bg-signal/90"
+                  >
+                    Ver todos los usuarios
+                  </Button>
+                ) : null}
+              </div>
+            </div>
           ) : (
             <div className="space-y-4">
-              {users.map((user) => (
+              {visibleUsers.map((user) => (
                 <AdminUserCard
                   key={user.id}
                   user={user}
