@@ -106,8 +106,20 @@ export function AdminProjectPhaseDetailScreen({
     }
   };
 
+  const handleQuickPhaseStatus = async (nextStatus: string) => {
+    await savePhase(
+      {
+        descripcion: phase.descripcion ?? phase.key,
+        estado: nextStatus,
+        responsable: phase.responsable ?? '',
+        fechaEntrega: phase.fechaEntrega ?? phase.fechaFin ?? '',
+      },
+      phase.key,
+    );
+  };
+
   const targetDate = phase.fechaEntrega ?? phase.fechaFin;
-  const resolutionActions = [
+  const resolutionActionsDraft: Array<AdminProjectTrackingResolutionAction | null> = [
     !phase.responsable
       ? {
           id: 'phase-owner',
@@ -115,6 +127,7 @@ export function AdminProjectPhaseDetailScreen({
           description: 'Esta fase sigue sin owner visible. Definirlo ahora evita más desvíos de seguimiento.',
           ctaLabel: 'Asignar owner',
           icon: 'owner' as const,
+          disabled: savingPhase,
           onClick: () => setShowEditDialog(true),
         }
       : null,
@@ -125,6 +138,7 @@ export function AdminProjectPhaseDetailScreen({
           description: 'Pulse necesita una fecha visible para medir desvío y priorizar esta etapa correctamente.',
           ctaLabel: 'Definir fecha',
           icon: 'date' as const,
+          disabled: savingPhase,
           onClick: () => setShowEditDialog(true),
         }
       : isAdminProjectTrackingOverdue(targetDate) && !isAdminProjectTrackingDoneStatus(phase.estado)
@@ -134,10 +148,36 @@ export function AdminProjectPhaseDetailScreen({
             description: 'La fecha actual ya venció y la fase sigue abierta. Conviene replanificar o cerrar la etapa.',
             ctaLabel: 'Actualizar fecha',
             icon: 'date' as const,
+            disabled: savingPhase,
             onClick: () => setShowEditDialog(true),
           }
         : null,
-  ].filter((action): action is AdminProjectTrackingResolutionAction => action !== null);
+    phase.estado !== 'En Progreso'
+      ? {
+          id: 'phase-progress',
+          title: 'Mover a en progreso',
+          description: 'Si la etapa ya está activa, marcala en progreso para reflejar el estado operativo real.',
+          ctaLabel: 'Marcar en progreso',
+          icon: 'owner' as const,
+          disabled: savingPhase,
+          onClick: () => void handleQuickPhaseStatus('En Progreso'),
+        }
+      : null,
+    !isAdminProjectTrackingDoneStatus(phase.estado)
+      ? {
+          id: 'phase-done',
+          title: 'Cerrar fase',
+          description: 'Si esta etapa ya quedó resuelta, podés marcarla terminada y sacar el desvío del radar.',
+          ctaLabel: 'Marcar terminada',
+          icon: 'date' as const,
+          disabled: savingPhase,
+          onClick: () => void handleQuickPhaseStatus('Terminada'),
+        }
+      : null,
+  ];
+  const resolutionActions = resolutionActionsDraft.filter(
+    (action): action is AdminProjectTrackingResolutionAction => action !== null,
+  );
 
   return (
     <>

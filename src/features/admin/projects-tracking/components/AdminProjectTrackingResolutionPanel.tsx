@@ -8,6 +8,7 @@ export interface AdminProjectTrackingResolutionAction {
   description: string;
   ctaLabel: string;
   icon: 'owner' | 'date';
+  disabled?: boolean;
   onClick: () => void;
 }
 
@@ -64,6 +65,7 @@ export function AdminProjectTrackingResolutionPanel({
                 <Button
                   type="button"
                   onClick={action.onClick}
+                  disabled={action.disabled}
                   className="rounded-xl border border-signal/20 bg-signal text-white hover:bg-signal/90"
                 >
                   {action.ctaLabel}

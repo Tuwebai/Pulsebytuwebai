@@ -84,37 +84,6 @@ export function AdminProjectCriticalTaskDetailScreen({
   const { task, reason } = item;
   const owner = task.responsable ?? task.assigned_to;
   const targetDate = task.fechaLimite ?? task.dueDate;
-  const resolutionActions = [
-    !owner
-      ? {
-          id: 'task-owner',
-          title: 'Asignar responsable',
-          description: 'La tarea está sin owner visible. Resolverlo ahora le devuelve trazabilidad al seguimiento.',
-          ctaLabel: 'Asignar owner',
-          icon: 'owner' as const,
-          onClick: () => setShowEditDialog(true),
-        }
-      : null,
-    !targetDate
-      ? {
-          id: 'task-date-missing',
-          title: 'Definir fecha objetivo',
-          description: 'Sin fecha objetivo Pulse no puede medir riesgo ni vencimiento de esta tarea crítica.',
-          ctaLabel: 'Definir fecha',
-          icon: 'date' as const,
-          onClick: () => setShowEditDialog(true),
-        }
-      : isAdminProjectTrackingOverdue(targetDate) && !isAdminProjectTrackingDoneStatus(task.status)
-        ? {
-            id: 'task-date-overdue',
-            title: 'Actualizar fecha objetivo',
-            description: 'La fecha actual ya venció y la tarea sigue abierta. Conviene replanificar o cerrar el desvío.',
-            ctaLabel: 'Actualizar fecha',
-            icon: 'date' as const,
-            onClick: () => setShowEditDialog(true),
-          }
-        : null,
-  ].filter((action): action is AdminProjectTrackingResolutionAction => action !== null);
 
   const handleSubmitTask = async (input: Parameters<typeof saveTask>[0], currentTaskKey?: string) => {
     const success = await saveTask(
@@ -128,6 +97,81 @@ export function AdminProjectCriticalTaskDetailScreen({
       setShowEditDialog(false);
     }
   };
+
+  const handleQuickTaskStatus = async (nextStatus: string) => {
+    await saveTask(
+      {
+        title: task.title,
+        description: task.description ?? '',
+        status: nextStatus,
+        priority: task.priority ?? 'alta',
+        responsable: task.responsable ?? task.assigned_to ?? '',
+        fechaLimite: task.fechaLimite ?? task.dueDate ?? '',
+        phaseKey: task.source.phaseKey,
+      },
+      task.key,
+    );
+  };
+
+  const resolutionActionsDraft: Array<AdminProjectTrackingResolutionAction | null> = [
+    !owner
+      ? {
+          id: 'task-owner',
+          title: 'Asignar responsable',
+          description: 'La tarea está sin owner visible. Resolverlo ahora le devuelve trazabilidad al seguimiento.',
+          ctaLabel: 'Asignar owner',
+          icon: 'owner' as const,
+          disabled: savingTask,
+          onClick: () => setShowEditDialog(true),
+        }
+      : null,
+    !targetDate
+      ? {
+          id: 'task-date-missing',
+          title: 'Definir fecha objetivo',
+          description: 'Sin fecha objetivo Pulse no puede medir riesgo ni vencimiento de esta tarea crítica.',
+          ctaLabel: 'Definir fecha',
+          icon: 'date' as const,
+          disabled: savingTask,
+          onClick: () => setShowEditDialog(true),
+        }
+      : isAdminProjectTrackingOverdue(targetDate) && !isAdminProjectTrackingDoneStatus(task.status)
+        ? {
+            id: 'task-date-overdue',
+            title: 'Actualizar fecha objetivo',
+            description: 'La fecha actual ya venció y la tarea sigue abierta. Conviene replanificar o cerrar el desvío.',
+            ctaLabel: 'Actualizar fecha',
+            icon: 'date' as const,
+            disabled: savingTask,
+            onClick: () => setShowEditDialog(true),
+          }
+        : null,
+    task.status !== 'En Progreso'
+      ? {
+          id: 'task-progress',
+          title: 'Mover a en progreso',
+          description: 'Si ya se está trabajando este bloqueo, marcá la tarea en progreso para reflejarlo en Pulse.',
+          ctaLabel: 'Marcar en progreso',
+          icon: 'owner' as const,
+          disabled: savingTask,
+          onClick: () => void handleQuickTaskStatus('En Progreso'),
+        }
+      : null,
+    !isAdminProjectTrackingDoneStatus(task.status)
+      ? {
+          id: 'task-done',
+          title: 'Cerrar tarea',
+          description: 'Si el desvío ya quedó resuelto, podés terminar la tarea y limpiar la prioridad operativa.',
+          ctaLabel: 'Marcar terminada',
+          icon: 'date' as const,
+          disabled: savingTask,
+          onClick: () => void handleQuickTaskStatus('Terminada'),
+        }
+      : null,
+  ];
+  const resolutionActions = resolutionActionsDraft.filter(
+    (action): action is AdminProjectTrackingResolutionAction => action !== null,
+  );
 
   return (
     <>
