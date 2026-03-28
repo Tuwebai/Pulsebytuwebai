@@ -127,10 +127,10 @@ export function useAdminUsers() {
     if (!editingUser) return;
 
     try {
-      await updateAdminUser(editingUser);
+      const updatedUser = await updateAdminUser(editingUser);
 
       setUsers((prev) =>
-        prev.map((user) => (user.id === editingUser.id ? editingUser : user)),
+        prev.map((user) => (user.id === updatedUser.id ? updatedUser : user)),
       );
 
       setShowEditUserModal(false);

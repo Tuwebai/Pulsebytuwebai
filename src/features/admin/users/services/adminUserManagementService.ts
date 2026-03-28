@@ -17,7 +17,7 @@ export async function createAdminUser(newUserData: AdminUserFormData): Promise<A
   return createAdminUserRecord(newUserData);
 }
 
-export async function updateAdminUser(editingUser: AdminManagedUser): Promise<void> {
+export async function updateAdminUser(editingUser: AdminManagedUser): Promise<AdminManagedUser> {
   return updateAdminUserRecord(editingUser);
 }
 
