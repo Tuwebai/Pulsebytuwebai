@@ -321,6 +321,12 @@ verify_jwt = false
 [functions.sync-operational-events]
 verify_jwt = false
 
+[functions.request-account-deletion]
+verify_jwt = false
+
+[functions.review-account-deletion-request]
+verify_jwt = false
+
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
