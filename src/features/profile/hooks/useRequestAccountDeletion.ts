@@ -1,18 +1,25 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { submitAccountDeletionRequest } from '@/features/profile/services/accountDeletion.service';
 import { useApp } from '@/contexts/AppContext';
-import { requestAccountDeletion } from '@/features/profile/services/profile.service';
 
 export function useRequestAccountDeletion() {
   const { user } = useApp();
+  const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async () => requestAccountDeletion(user!.id, user!.email)
+    mutationFn: async (reason: string) => submitAccountDeletionRequest(reason),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['profile', 'account-deletion-request', user?.id],
+      });
+    },
   });
 
   return {
     requestDeletion: mutation.mutateAsync,
     isRequesting: mutation.isPending,
     error: mutation.error,
-    isSuccess: mutation.isSuccess
+    isSuccess: mutation.isSuccess,
   };
 }

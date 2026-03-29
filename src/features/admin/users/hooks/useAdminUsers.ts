@@ -4,11 +4,19 @@ import { toast } from '@/hooks/use-toast';
 import { notificationService } from '@/lib/notificationService';
 import { enablePulseAccess } from '@/features/admin/services/pulseAccessAdminService';
 import {
-  createAdminUser,
-  deleteAdminUser,
-  updateAdminUser,
   updateAdminUserRole,
 } from '@/features/admin/users/services/adminUserManagementService';
+import {
+  confirmAdminUserDeletion,
+  createAdminUserRecord,
+  updateAdminUserRecord,
+} from '@/features/admin/users/hooks/adminUsers.crud';
+import { reviewAdminUserDeletion } from '@/features/admin/users/hooks/adminUsers.deletion';
+import {
+  getPulseAccessErrorMessage,
+  getPulseAccessSuccessToast,
+  getRoleUpdatedMessage,
+} from '@/features/admin/users/hooks/adminUsers.feedback';
 import type { AdminManagedUser, AdminUserFormData } from '@/features/admin/users/types/adminUser';
 
 const DEFAULT_NEW_USER_DATA: AdminUserFormData = {
@@ -24,6 +32,7 @@ export function useAdminUsers() {
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [enablingPulseUserId, setEnablingPulseUserId] = useState<string | null>(null);
+  const [reviewingDeletionUserId, setReviewingDeletionUserId] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<AdminManagedUser | null>(null);
   const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState<AdminManagedUser | null>(null);
@@ -32,20 +41,17 @@ export function useAdminUsers() {
   const updateUserRole = async (userId: string, newRole: string) => {
     try {
       await updateAdminUserRole(userId, newRole);
-
-      setUsers((prev) =>
-        prev.map((user) => (user.id === userId ? { ...user, role: newRole } : user)),
-      );
+      setUsers((prev) => prev.map((user) => (user.id === userId ? { ...user, role: newRole } : user)));
 
       await notificationService.createNotification({
-        title: 'Rol de Usuario Actualizado',
-        message: `El rol del usuario ha sido cambiado a ${newRole}`,
+        title: 'Rol de usuario actualizado',
+        message: getRoleUpdatedMessage(newRole),
         type: 'info',
         user_id: userId,
         category: 'user',
       });
 
-      toast({ title: 'Exito', description: 'Rol de usuario actualizado correctamente.' });
+      toast({ title: 'Éxito', description: 'Rol de usuario actualizado correctamente.' });
     } catch (error) {
       console.error('Error updating user role:', error);
       toast({
@@ -57,10 +63,7 @@ export function useAdminUsers() {
   };
 
   const handleEditUser = (user: AdminManagedUser) => {
-    setEditingUser({
-      ...user,
-      role: user.role || 'cliente',
-    });
+    setEditingUser({ ...user, role: user.role || 'cliente' });
     setShowEditUserModal(true);
   };
 
@@ -70,27 +73,20 @@ export function useAdminUsers() {
   };
 
   const confirmDeleteUser = async () => {
-    if (!userToDelete) return;
+    if (!userToDelete) {
+      return;
+    }
 
     try {
-      const result = await deleteAdminUser(userToDelete.id);
-
-      setUsers((prev) => prev.filter((user) => user.id !== userToDelete.id));
-
-      toast({
-        title: 'Usuario eliminado',
-        description: `El usuario ${result.deleted_email} fue eliminado de la base operativa y de Auth.`,
+      await confirmAdminUserDeletion(userToDelete.id, setUsers, () => {
+        setShowDeleteUserModal(false);
+        setUserToDelete(null);
       });
-
-      setShowDeleteUserModal(false);
-      setUserToDelete(null);
     } catch (error) {
       console.error('Error deleting user:', error);
-      const message =
-        error instanceof Error ? error.message : 'No se pudo eliminar el usuario.';
       toast({
         title: 'Error',
-        description: message,
+        description: error instanceof Error ? error.message : 'No se pudo eliminar el usuario.',
         variant: 'destructive',
       });
     }
@@ -103,15 +99,9 @@ export function useAdminUsers() {
 
   const handleCreateUser = async () => {
     try {
-      const createdUser = await createAdminUser(newUserData);
-
-      setUsers((prev) => [createdUser, ...prev]);
-      setNewUserData(DEFAULT_NEW_USER_DATA);
-      setShowAddUserModal(false);
-
-      toast({
-        title: 'Usuario creado',
-        description: 'El registro operativo quedó creado y el acceso a Pulse queda pendiente hasta habilitarlo.',
+      await createAdminUserRecord(newUserData, setUsers, () => {
+        setNewUserData(DEFAULT_NEW_USER_DATA);
+        setShowAddUserModal(false);
       });
     } catch (error) {
       console.error('Error creating user:', error);
@@ -124,21 +114,14 @@ export function useAdminUsers() {
   };
 
   const handleUpdateUser = async () => {
-    if (!editingUser) return;
+    if (!editingUser) {
+      return;
+    }
 
     try {
-      const updatedUser = await updateAdminUser(editingUser);
-
-      setUsers((prev) =>
-        prev.map((user) => (user.id === updatedUser.id ? updatedUser : user)),
-      );
-
-      setShowEditUserModal(false);
-      setEditingUser(null);
-
-      toast({
-        title: 'Usuario actualizado',
-        description: 'El usuario ha sido actualizado correctamente.',
+      await updateAdminUserRecord(editingUser, setUsers, () => {
+        setShowEditUserModal(false);
+        setEditingUser(null);
       });
     } catch (error) {
       console.error('Error updating user:', error);
@@ -156,11 +139,7 @@ export function useAdminUsers() {
   ) => {
     try {
       setEnablingPulseUserId(targetUserId);
-
-      const result = await enablePulseAccess(
-        targetUserId,
-        mode === 'resend' ? 'resend' : 'enable',
-      );
+      const result = await enablePulseAccess(targetUserId, mode === 'resend' ? 'resend' : 'enable');
 
       setUsers((prev) =>
         prev.map((currentUser) =>
@@ -176,56 +155,35 @@ export function useAdminUsers() {
         ),
       );
 
-      if (mode === 'resend') {
-        const resendDescription =
-          result.email_mode === 'welcome'
-            ? 'Se envió un nuevo correo de bienvenida a Pulse.'
-            : result.delivery_type === 'invite'
-              ? 'Se envió una nueva invitación Pulse con branding TuWebAI.'
-              : result.delivery_type === 'magiclink'
-                ? 'Se envió un nuevo enlace de acceso directo a Pulse.'
-                : 'El acceso Pulse del cliente sigue vigente. Si todavía no llegó el correo, revisá la configuración del mailer propio.'
-
-        toast({
-          title: 'Acceso reenviado',
-          description: resendDescription,
-        });
-      } else if (mode === 'manage') {
-        toast({
-          title: 'Acceso Pulse al dia',
-          description:
-            result.pulse_access_status === 'active'
-              ? 'El cliente ya tiene acceso activo a Pulse.'
-              : 'El cliente ya tiene una invitación vigente para entrar a Pulse.',
-        });
-      } else {
-        toast({
-          title: 'Acceso a Pulse habilitado',
-          description:
-            result.pulse_access_status === 'active'
-              ? 'El cliente ya tiene acceso activo a Pulse.'
-              : result.email_mode === 'welcome'
-                ? 'El cliente ya tiene su bienvenida Pulse lista y puede entrar desde el correo inicial.'
-                : 'El cliente ya puede entrar a Pulse desde el nuevo enlace enviado.',
-        });
-      }
+      toast(getPulseAccessSuccessToast(mode, result));
     } catch (error) {
       console.error('Error enabling Pulse access:', error);
-      const message =
-        error instanceof Error
-          ? error.message
-          : mode === 'resend'
-            ? 'No se pudo reenviar el acceso a Pulse.'
-            : mode === 'manage'
-              ? 'No se pudo revisar el acceso a Pulse.'
-              : 'No se pudo habilitar el acceso a Pulse.';
       toast({
         title: 'Error',
-        description: message,
+        description: error instanceof Error ? error.message : getPulseAccessErrorMessage(mode),
         variant: 'destructive',
       });
     } finally {
       setEnablingPulseUserId(null);
+    }
+  };
+
+  const handleReviewAccountDeletion = async (
+    user: AdminManagedUser,
+    decision: 'approve' | 'deny',
+    note?: string,
+  ) => {
+    try {
+      setReviewingDeletionUserId(user.id);
+      await reviewAdminUserDeletion(user, decision, setUsers, note);
+    } catch (error) {
+      toast({
+        title: 'No pudimos revisar la solicitud',
+        description: error instanceof Error ? error.message : 'Intentá nuevamente en unos minutos.',
+        variant: 'destructive',
+      });
+    } finally {
+      setReviewingDeletionUserId(null);
     }
   };
 
@@ -237,6 +195,7 @@ export function useAdminUsers() {
     showEditUserModal,
     setShowEditUserModal,
     enablingPulseUserId,
+    reviewingDeletionUserId,
     editingUser,
     setEditingUser,
     showDeleteUserModal,
@@ -251,5 +210,6 @@ export function useAdminUsers() {
     handleCreateUser,
     handleUpdateUser,
     handleEnablePulseAccess,
+    handleReviewAccountDeletion,
   };
 }

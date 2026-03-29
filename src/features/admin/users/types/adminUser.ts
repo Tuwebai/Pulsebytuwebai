@@ -13,6 +13,9 @@ export interface AdminManagedUser extends AdminUserRecord {
   pulse_access_granted_at?: string | null;
   pulse_access_granted_by?: string | null;
   pulse_access_disabled_at?: string | null;
+  account_deletion_request_id?: string | null;
+  account_deletion_requested_at?: string | null;
+  account_deletion_reason?: string | null;
   updated_at?: string | null;
 }
 

@@ -22,6 +22,7 @@ interface UseAdminScreenRegistryParams {
   users: AdminManagedUser[];
   setUsers: Dispatch<SetStateAction<AdminManagedUser[]>>;
   enablingPulseUserId: string | null;
+  reviewingDeletionUserId: string | null;
   payments: AdminPaymentRecord[];
   setPayments: Dispatch<SetStateAction<AdminPaymentRecord[]>>;
   isCalendarAuthenticated: boolean;
@@ -37,6 +38,7 @@ interface UseAdminScreenRegistryParams {
   onAddUser: AdminScreenRegistryContext['onAddUser'];
   onRoleChange: AdminScreenRegistryContext['onRoleChange'];
   onPulseAccessAction: AdminScreenRegistryContext['onPulseAccessAction'];
+  onReviewAccountDeletion: AdminScreenRegistryContext['onReviewAccountDeletion'];
   onEditUser: AdminScreenRegistryContext['onEditUser'];
   onDeleteUser: AdminScreenRegistryContext['onDeleteUser'];
 }
@@ -47,6 +49,7 @@ export function useAdminScreenRegistry({
   users,
   setUsers,
   enablingPulseUserId,
+  reviewingDeletionUserId,
   payments,
   setPayments,
   isCalendarAuthenticated,
@@ -62,6 +65,7 @@ export function useAdminScreenRegistry({
   onAddUser,
   onRoleChange,
   onPulseAccessAction,
+  onReviewAccountDeletion,
   onEditUser,
   onDeleteUser,
 }: UseAdminScreenRegistryParams) {
@@ -101,6 +105,7 @@ export function useAdminScreenRegistry({
     loading,
     users,
     enablingPulseUserId,
+    reviewingDeletionUserId,
     payments,
     isCalendarAuthenticated,
     calendarLoading,
@@ -119,6 +124,7 @@ export function useAdminScreenRegistry({
     onAddUser,
     onRoleChange,
     onPulseAccessAction,
+    onReviewAccountDeletion,
     onEditUser,
     onDeleteUser,
     onDomainUpdated: (userId, result) => {

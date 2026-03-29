@@ -1,6 +1,6 @@
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 
-export const ADMIN_USERS_FILTER_IDS = ['all', 'with-access', 'new-this-month'] as const;
+export const ADMIN_USERS_FILTER_IDS = ['all', 'with-access', 'new-this-month', 'deletion-requests'] as const;
 
 export type AdminUsersFilterId = (typeof ADMIN_USERS_FILTER_IDS)[number];
 
@@ -16,6 +16,8 @@ export function getAdminUsersFilterLabel(filterId: AdminUsersFilterId): string {
       return 'Clientes con acceso';
     case 'new-this-month':
       return 'Altas del mes';
+    case 'deletion-requests':
+      return 'Bajas solicitadas';
     default:
       return 'Todos';
   }
@@ -34,6 +36,8 @@ export function filterAdminUsers(
       );
     case 'new-this-month':
       return users.filter((user) => isSameMonth(user.created_at, now));
+    case 'deletion-requests':
+      return users.filter((user) => Boolean(user.account_deletion_request_id));
     default:
       return users;
   }
@@ -47,6 +51,7 @@ export function countAdminUsersByFilter(
     all: users.length,
     'with-access': filterAdminUsers(users, 'with-access', now).length,
     'new-this-month': filterAdminUsers(users, 'new-this-month', now).length,
+    'deletion-requests': filterAdminUsers(users, 'deletion-requests', now).length,
   };
 }
 

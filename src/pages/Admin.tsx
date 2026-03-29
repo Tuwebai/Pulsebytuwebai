@@ -25,6 +25,7 @@ const Admin = React.memo(() => {
     showEditUserModal,
     setShowEditUserModal,
     enablingPulseUserId,
+    reviewingDeletionUserId,
     editingUser,
     setEditingUser,
     showDeleteUserModal,
@@ -39,6 +40,7 @@ const Admin = React.memo(() => {
     handleCreateUser,
     handleUpdateUser,
     handleEnablePulseAccess,
+    handleReviewAccountDeletion,
   } = useAdminUsers();
 
   const {
@@ -81,6 +83,7 @@ const Admin = React.memo(() => {
     users: usuarios,
     setUsers: setUsuarios,
     enablingPulseUserId,
+    reviewingDeletionUserId,
     payments: pagos,
     setPayments: setPagos,
     isCalendarAuthenticated,
@@ -99,6 +102,9 @@ const Admin = React.memo(() => {
     onRoleChange: updateUserRole,
     onPulseAccessAction: (userId, mode) => {
       void handleEnablePulseAccess(userId, mode);
+    },
+    onReviewAccountDeletion: (targetUser, decision, note) => {
+      void handleReviewAccountDeletion(targetUser, decision, note);
     },
     onEditUser: handleEditUser,
     onDeleteUser: handleDeleteUser,

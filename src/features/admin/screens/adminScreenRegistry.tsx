@@ -30,6 +30,7 @@ export interface AdminScreenRegistryContext {
   loading: boolean;
   users: AdminManagedUser[];
   enablingPulseUserId: string | null;
+  reviewingDeletionUserId: string | null;
   payments: AdminPaymentRecord[];
   isCalendarAuthenticated: boolean;
   calendarLoading: boolean;
@@ -57,6 +58,11 @@ export interface AdminScreenRegistryContext {
   onAddUser: () => void;
   onRoleChange: (userId: string, newRole: string) => void;
   onPulseAccessAction: (userId: string, mode: PulseAccessActionMode) => void;
+  onReviewAccountDeletion: (
+    user: AdminManagedUser,
+    decision: 'approve' | 'deny',
+    note?: string,
+  ) => void;
   onEditUser: (user: AdminManagedUser) => void;
   onDeleteUser: (user: AdminManagedUser) => void;
   onDomainUpdated: (userId: string, result: AdminDomainUpdateResult) => void;
@@ -95,11 +101,13 @@ export function createAdminScreenRegistry(
         users={context.users}
         activeFilter={context.activeUsersFilter}
         enablingPulseUserId={context.enablingPulseUserId}
+        reviewingDeletionUserId={context.reviewingDeletionUserId}
         onFilterChange={context.onUsersFilterChange}
         onRefresh={context.onRefreshData}
         onAddUser={context.onAddUser}
         onRoleChange={context.onRoleChange}
         onPulseAccessAction={context.onPulseAccessAction}
+        onReviewAccountDeletion={context.onReviewAccountDeletion}
         onEdit={context.onEditUser}
         onDelete={context.onDeleteUser}
         onDomainUpdated={context.onDomainUpdated}

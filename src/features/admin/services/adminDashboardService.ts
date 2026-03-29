@@ -1,9 +1,11 @@
 import {
+  fetchAdminAccountDeletionRequests,
   fetchAdminPayments,
   fetchAdminProjects,
   fetchAdminTickets,
   fetchAdminTicketUsers,
   fetchAdminUsers,
+  type AdminAccountDeletionRequestRecord,
   type AdminPaymentRecord,
   type AdminProjectRecord,
   type AdminRawTicketRecord,
@@ -33,6 +35,34 @@ export interface AdminDashboardData {
   projects: AdminProjectRecord[];
   tickets: AdminDashboardTicket[];
   payments: AdminPaymentRecord[];
+}
+
+function buildDeletionRequestMap(requests: AdminAccountDeletionRequestRecord[]) {
+  return new Map(requests.map((request) => [request.user_id, request]));
+}
+
+function transformUsers(
+  users: AdminUserRecord[],
+  requests: AdminAccountDeletionRequestRecord[],
+): AdminUserRecord[] {
+  const requestsMap = buildDeletionRequestMap(
+    requests.filter((request): request is AdminAccountDeletionRequestRecord & { user_id: string } => Boolean(request.user_id)),
+  );
+
+  return users.map((user) => {
+    const request = requestsMap.get(user.id);
+
+    if (!request) {
+      return user;
+    }
+
+    return {
+      ...user,
+      account_deletion_request_id: request.id,
+      account_deletion_requested_at: request.created_at,
+      account_deletion_reason: request.description ?? request.mensaje ?? null,
+    };
+  });
 }
 
 function buildTicketUserMap(
@@ -77,11 +107,12 @@ function transformTickets(
 }
 
 export async function getAdminDashboardData(): Promise<AdminDashboardData> {
-  const [users, projects, rawTickets, payments] = await Promise.all([
+  const [users, projects, rawTickets, payments, deletionRequests] = await Promise.all([
     fetchAdminUsers(),
     fetchAdminProjects(),
     fetchAdminTickets(),
     fetchAdminPayments(),
+    fetchAdminAccountDeletionRequests(),
   ]);
 
   const ticketUserIds = [
@@ -95,7 +126,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const ticketUsers = await fetchAdminTicketUsers(ticketUserIds);
 
   return {
-    users,
+    users: transformUsers(users, deletionRequests),
     projects,
     tickets: transformTickets(rawTickets, ticketUsers),
     payments,

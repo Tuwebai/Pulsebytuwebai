@@ -1,12 +1,6 @@
 import type { BusinessIndustry, ProfileRow, ProfileUpdatePayload } from '@/data/types/profile';
-import {
-  fetchProfile,
-  signOutAllDevices,
-  updatePassword,
-  updateProfile,
-  uploadAvatar
-} from '@/api/profile/profile.api';
-import { createAccountDeletionTicket } from '@/api/support/support.api';
+import { fetchProfile, signOutAllDevices, updatePassword, updateProfile, uploadAvatar } from '@/api/profile/profile.api';
+import { submitAccountDeletionRequest } from '@/features/profile/services/accountDeletion.service';
 
 const VALID_INDUSTRIES = new Set<BusinessIndustry>([
   'gastronomia',
@@ -18,7 +12,7 @@ const VALID_INDUSTRIES = new Set<BusinessIndustry>([
   'inmobiliaria',
   'tecnologia',
   'comercio',
-  'otro'
+  'otro',
 ]);
 
 function validateProfilePayload(data: ProfileUpdatePayload) {
@@ -76,6 +70,6 @@ export async function closeAllSessions(): Promise<void> {
   await signOutAllDevices();
 }
 
-export async function requestAccountDeletion(userId: string, email: string): Promise<void> {
-  await createAccountDeletionTicket({ userId, email });
+export async function requestAccountDeletion(reason: string): Promise<void> {
+  await submitAccountDeletionRequest(reason);
 }

@@ -16,11 +16,17 @@ interface AdminUsersScreenProps {
   users: AdminManagedUser[];
   activeFilter: AdminUsersFilterId;
   enablingPulseUserId: string | null;
+  reviewingDeletionUserId: string | null;
   onFilterChange: (filterId: AdminUsersFilterId) => void;
   onRefresh: () => void;
   onAddUser: () => void;
   onRoleChange: (userId: string, newRole: string) => void;
   onPulseAccessAction: (userId: string, mode: PulseAccessActionMode) => void;
+  onReviewAccountDeletion: (
+    user: AdminManagedUser,
+    decision: 'approve' | 'deny',
+    note?: string,
+  ) => void;
   onEdit: (user: AdminManagedUser) => void;
   onDelete: (user: AdminManagedUser) => void;
   onDomainUpdated: (
@@ -41,11 +47,13 @@ export function AdminUsersScreen({
   users,
   activeFilter,
   enablingPulseUserId,
+  reviewingDeletionUserId,
   onFilterChange,
   onRefresh,
   onAddUser,
   onRoleChange,
   onPulseAccessAction,
+  onReviewAccountDeletion,
   onEdit,
   onDelete,
   onDomainUpdated,
@@ -83,10 +91,10 @@ export function AdminUsersScreen({
                 <div className="text-3xl font-semibold">0</div>
               </div>
               <h3 className="mb-2 text-lg font-semibold text-foreground">
-                Todavia no hay clientes cargados
+                Todavía no hay clientes cargados
               </h3>
               <p className="mb-6 text-muted-foreground">
-                Los accesos Pulse van a aparecer aca cuando la operacion tenga usuarios reales.
+                Los accesos Pulse van a aparecer acá cuando la operación tenga usuarios reales.
               </p>
               <div className="flex flex-col justify-center gap-3 sm:flex-row">
                 <Button
@@ -113,7 +121,7 @@ export function AdminUsersScreen({
                 No encontramos resultados para {getAdminUsersFilterLabel(activeFilter).toLowerCase()}
               </h3>
               <p className="mb-6 text-muted-foreground">
-                Ajusta el filtro o actualiza la operacion para revisar nuevos movimientos del panel.
+                Ajustá el filtro o actualizá la operación para revisar nuevos movimientos del panel.
               </p>
               <div className="flex flex-col justify-center gap-3 sm:flex-row">
                 <Button
@@ -140,11 +148,13 @@ export function AdminUsersScreen({
                   key={user.id}
                   user={user}
                   enablingPulseUserId={enablingPulseUserId}
+                  reviewingDeletionUserId={reviewingDeletionUserId}
                   onRoleChange={onRoleChange}
                   onPulseAccessAction={(userId, mode) => {
                     void onPulseAccessAction(userId, mode);
                   }}
                   onEdit={onEdit}
+                  onReviewAccountDeletion={onReviewAccountDeletion}
                   onDelete={onDelete}
                   onDomainUpdated={(userId, result) => {
                     onDomainUpdated(userId, result);
