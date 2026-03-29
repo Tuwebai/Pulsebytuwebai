@@ -1,22 +1,24 @@
 import type { ProjectDetailPhase, ProjectDetailProject, ProjectDetailTask } from './projectDetail.types';
 import type { ProjectsPageProject } from './projectPage.types';
 
-function toDetailTask(task: Record<string, unknown>): ProjectDetailTask {
+type ProjectsPageTask = NonNullable<ProjectsPageProject['tareas']>[number];
+
+function toDetailTask(task: ProjectsPageTask): ProjectDetailTask {
   return {
     assignedRole: typeof task.assignedRole === 'string' ? task.assignedRole : undefined,
-    assigned_to: typeof task.assigned_to === 'string' ? task.assigned_to : undefined,
-    cliente: typeof task.cliente === 'boolean' ? task.cliente : undefined,
-    descripcion: typeof task.descripcion === 'string' ? task.descripcion : undefined,
-    dueDate: typeof task.dueDate === 'string' ? task.dueDate : undefined,
-    fechaLimite: typeof task.fechaLimite === 'string' ? task.fechaLimite : undefined,
-    forClient: typeof task.forClient === 'boolean' ? task.forClient : undefined,
-    id: typeof task.id === 'string' ? task.id : undefined,
-    prioridad: typeof task.prioridad === 'string' ? task.prioridad : undefined,
-    priority: typeof task.priority === 'string' ? task.priority : undefined,
-    responsable: typeof task.responsable === 'string' ? task.responsable : undefined,
-    status: typeof task.status === 'string' ? task.status : undefined,
-    title: typeof task.title === 'string' ? task.title : undefined,
-    titulo: typeof task.titulo === 'string' ? task.titulo : undefined,
+    assigned_to: task.assigned_to,
+    cliente: task.cliente,
+    descripcion: task.descripcion,
+    dueDate: task.dueDate,
+    fechaLimite: task.fechaLimite,
+    forClient: task.forClient,
+    id: task.id,
+    prioridad: task.prioridad,
+    priority: task.priority,
+    responsable: task.responsable,
+    status: task.status,
+    title: task.title,
+    titulo: task.titulo,
   };
 }
 
@@ -24,6 +26,11 @@ function toDetailPhase(phase: NonNullable<ProjectsPageProject['fases']>[number])
   return {
     descripcion: phase.descripcion,
     estado: phase.estado,
+    tareas: Array.isArray(phase.tareas)
+      ? phase.tareas.map(toDetailTask)
+      : Array.isArray(phase.tasks)
+        ? phase.tasks.map(toDetailTask)
+        : undefined,
     key: phase.key,
   };
 }
@@ -34,8 +41,6 @@ export function toProjectDetailProject(project: ProjectsPageProject): ProjectDet
     completion_percentage: project.completion_percentage ?? undefined,
     fases: Array.isArray(project.fases) ? project.fases.map(toDetailPhase) : undefined,
     progress: project.progress ?? undefined,
-    tareas: Array.isArray(project.tareas)
-      ? project.tareas.map((task: Record<string, unknown>) => toDetailTask(task))
-      : undefined,
+    tareas: Array.isArray(project.tareas) ? project.tareas.map(toDetailTask) : undefined,
   };
 }

@@ -30,7 +30,7 @@ export interface ProjectDetailPhase {
   tareas?: ProjectDetailTask[];
 }
 
-export interface ProjectDetailProject extends Project {
+export interface ProjectDetailProject extends Omit<Project, 'fases' | 'tareas'> {
   completion_percentage?: number;
   progress?: number;
   updated_at: string;
