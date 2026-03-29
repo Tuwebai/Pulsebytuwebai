@@ -1,11 +1,12 @@
 import { CreditCard, FolderOpen, LifeBuoy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, PulseEmptyState, Skeleton } from '@/core/components';
+import { Badge, Skeleton } from '@/core/components';
 import AnimatedList, { AnimatedReveal } from '@/core/components/AnimatedList';
 import { useApp } from '@/contexts/AppContext';
 import { useHomeOverviewCards } from '@/features/dashboard/hooks/useHomeOverviewCards';
 import { useUserProject } from '@/features/project/hooks/useUserProject';
 import PulseChart from '@/features/pulse/components/PulseChart';
+import PulseDomainRequestGate from '@/features/pulse/components/PulseDomainRequestGate';
 import { usePulseMetrics } from '@/features/pulse/hooks/usePulseMetrics';
 import { usePulsePeriod } from '@/features/pulse/hooks/usePulsePeriod';
 import { usePulseRealtime } from '@/features/pulse/hooks/usePulseRealtime';
@@ -95,19 +96,19 @@ export default function HomePage() {
   const canOpenSite = Boolean(domain);
   const projectProgress = Math.max(0, Math.min(primaryProject?.completion_percentage ?? primaryProject?.progress ?? 0, 100));
   const projectSummary = !hasProject
-    ? 'Tu proyecto va a aparecer aca cuando quede asignado en Pulse.'
+    ? 'Tu proyecto va a aparecer acá cuando quede asignado en Pulse.'
     : remainingTasks === null
-      ? 'Todavia no hay tareas visibles para mostrarte en este modulo.'
+      ? 'Todavía no hay tareas visibles para mostrarte en este módulo.'
       : remainingTasks === 0
         ? 'No hay tareas pendientes por ahora.'
         : `${remainingTasks} ${remainingTasks === 1 ? 'tarea pendiente' : 'tareas pendientes'}`;
   const paymentSummary = latestPayment
     ? `${latestPayment.description ?? 'Pago registrado'} · ${formatCurrency(latestPayment.amount ?? 0, latestPayment.currency ?? 'ARS')}`
-    : 'Todavia no registramos pagos en tu cuenta.';
+    : 'Todavía no registramos pagos en tu cuenta.';
   const supportSummary =
     ticketsCount > 0
       ? `${openTickets} ${openTickets === 1 ? 'ticket abierto' : 'tickets abiertos'} para revisar con el equipo.`
-      : 'Cuando necesites ayuda, vas a poder escribirnos desde aca.';
+      : 'Cuando necesites ayuda, vas a poder escribirnos desde acá.';
 
   return (
     <div className="space-y-6">
@@ -118,20 +119,9 @@ export default function HomePage() {
         key={`${period}-${loading ? 'loading' : hasDomain && data?.hasData ? 'ready' : 'empty'}`}
       >
         {!hasProject && !loading ? (
-          <PulseEmptyState
-            hasProject={false}
-            ga4PropertyId={ga4PropertyId}
-            onConnect={() => navigate('/dashboard/configuracion')}
-            website={user?.website ?? null}
-            websiteStatus={user?.website_status ?? null}
-          />
+          <PulseDomainRequestGate ga4PropertyId={ga4PropertyId} hasProject={false} />
         ) : !hasDomain || !data?.hasData ? (
-          <PulseEmptyState
-            ga4PropertyId={ga4PropertyId}
-            onConnect={() => navigate('/dashboard/configuracion')}
-            website={user?.website ?? null}
-            websiteStatus={user?.website_status ?? null}
-          />
+          <PulseDomainRequestGate ga4PropertyId={ga4PropertyId} />
         ) : (
           <div className="space-y-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -172,7 +162,7 @@ export default function HomePage() {
             <div className="space-y-3">
               <PulseChart data={data?.chartData ?? []} height={80} loading={loading || !projectId} />
               <div className="flex flex-wrap items-center justify-between gap-3 text-[12px] text-[var(--text-tertiary)]">
-                <span>Visitas por dia</span>
+                <span>Visitas por día</span>
                 <button
                   className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={!canOpenSite}

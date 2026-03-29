@@ -1,6 +1,6 @@
-import { PulseEmptyState } from '@/core/components';
 import PulseChart from '../components/PulseChart';
 import PulseConnectionBanner from '../components/PulseConnectionBanner';
+import PulseDomainRequestGate from '../components/PulseDomainRequestGate';
 import PulseMetricsGrid from '../components/PulseMetricsGrid';
 import PulsePageHeader from '../components/PulsePageHeader';
 import PulseSummaryCard from '../components/PulseSummaryCard';
@@ -20,8 +20,6 @@ export default function PulsePage() {
     onOpenSite,
     period,
     setPeriod,
-    userWebsite,
-    userWebsiteStatus,
     websiteApprovedWithoutData,
     websitePendingReview,
   } = usePulsePageState();
@@ -39,13 +37,7 @@ export default function PulsePage() {
 
       {!hasProject && !loading ? (
         <div className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)]">
-          <PulseEmptyState
-            ga4PropertyId={ga4PropertyId}
-            hasProject={false}
-            onConnect={onOpenSettings}
-            website={userWebsite}
-            websiteStatus={userWebsiteStatus}
-          />
+          <PulseDomainRequestGate ga4PropertyId={ga4PropertyId} hasProject={false} />
         </div>
       ) : null}
 

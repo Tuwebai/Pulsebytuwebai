@@ -36,8 +36,6 @@ export function usePulsePageState() {
     },
     period,
     setPeriod,
-    userWebsite: user?.website ?? null,
-    userWebsiteStatus: user?.website_status ?? null,
     websiteApprovedWithoutData,
     websitePendingReview,
   };
