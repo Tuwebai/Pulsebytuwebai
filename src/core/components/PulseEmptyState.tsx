@@ -40,13 +40,13 @@ export default function PulseEmptyState({
             : 'Los datos de tu web aparecen acá';
 
   const description = isWebsiteReadyWithoutProject
-    ? 'Ya validamos tu URL. Ahora estamos terminando de vincular tu espacio Pulse para mostrarte datos reales apenas quede listo.'
+    ? 'Ya confirmamos tu dominio. Ahora estamos terminando de preparar tu espacio Pulse para mostrarte datos reales apenas quede listo.'
     : isWebsitePendingWithoutProject
-      ? 'Tu URL ya entró en revisión. Cuando el equipo la confirme, vamos a terminar de preparar tu espacio Pulse.'
+      ? 'Tu dominio ya entró en revisión. Cuando quede confirmado, vamos a terminar de preparar tu espacio Pulse.'
       : isPendingReview
-        ? 'Tu equipo de TuWebAI ya recibió la URL y la está revisando antes de conectar los datos reales.'
+        ? 'Ya recibimos tu dominio y lo estamos revisando antes de conectar tus datos reales.'
         : isApprovedWithoutTracking
-          ? 'Ya confirmamos tu URL. El siguiente paso es terminar la vinculación de datos del proyecto para que Pulse te muestre actividad real.'
+          ? 'Ya confirmamos tu dominio. El siguiente paso es terminar la conexión para que Pulse te muestre actividad real.'
           : isApprovedWaitingForData
             ? 'Tu dominio ya quedó aprobado. Apenas termine la conexión de datos, vas a empezar a ver movimiento acá.'
             : 'Conectá tu dominio para ver cuántas personas te están visitando cada día.';

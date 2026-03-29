@@ -14,16 +14,16 @@ export default function PulseConnectionBanner({
         <div>
           <p className="font-medium leading-5 text-[var(--text-primary)]">
             {websitePendingReview
-              ? 'Tu URL está en revisión antes de conectar los datos reales.'
+              ? 'Estamos revisando tu dominio para terminar de conectar Pulse.'
               : websiteApprovedWithoutData
-                ? 'Tu dominio ya está aprobado. Falta terminar la vinculación de datos.'
+                ? 'Tu dominio ya está confirmado. Estamos terminando de conectar tus datos.'
                 : 'Conectá tu dominio para ver los datos reales.'}
           </p>
           <p className="mt-1 text-[13px] leading-5 text-[color:rgba(240,244,255,0.82)]">
             {websitePendingReview
-              ? 'Cuando el equipo lo confirme, Pulse va a empezar a mostrar tu información real.'
+              ? 'Apenas quede confirmado, vas a empezar a ver la actividad real de tu sitio.'
               : websiteApprovedWithoutData
-                ? 'La URL ya quedó validada. Ahora falta conectar la capa de datos para que Pulse empiece a mostrar actividad.'
+                ? 'Apenas quede lista la conexión, vas a empezar a ver movimiento real acá.'
                 : 'Tu equipo de TuWebAI lo configura automáticamente al entregar tu proyecto.'}
           </p>
         </div>
