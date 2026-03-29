@@ -10,7 +10,6 @@ import {
   BarChart3,
   LogOut,
   User,
-  Target,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -152,7 +151,6 @@ export default function Sidebar() {
               <div className="space-y-1">
                 {navItem('/dashboard', <Home size={18} />, t('Dashboard'))}
                 {navItem('/proyectos', <FolderKanban size={18} />, t('Proyectos'))}
-                {navItem('/fases-tareas', <Target size={18} />, 'Fases y Tareas')}
               </div>
             </div>
 
