@@ -10,6 +10,7 @@
     "build": "pnpm vite build",
     "build:dev": "pnpm vite build --mode development",
     "lint": "eslint .",
+    "lint:copy": "node scripts/lint-copy.mjs",
     "preview": "vite preview",
     "smoke": "pnpm build",
     "clean": "node scripts/clean-and-rebuild.js",
