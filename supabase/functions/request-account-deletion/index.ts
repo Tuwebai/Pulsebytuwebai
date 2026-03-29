@@ -55,7 +55,7 @@ serve(async (req) => {
         id: request.id,
         status: request.status,
         created_at: request.created_at,
-        description: request.description ?? request.mensaje ?? null,
+        description: request.mensaje ?? null,
         respuesta: request.respuesta ?? null,
       },
     });

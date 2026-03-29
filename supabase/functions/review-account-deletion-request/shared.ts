@@ -19,8 +19,9 @@ interface AdminUserRow {
 interface DeletionTicketRow {
   id: string;
   user_id: string | null;
-  category: string | null;
+  asunto: string | null;
   status: string | null;
+  estado: string | null;
   email: string | null;
 }
 
@@ -118,7 +119,7 @@ export async function getDeletionTicket(
 ) {
   const { data, error } = await adminClient
     .from('tickets')
-    .select('id, user_id, category, status, email')
+    .select('id, user_id, asunto, status, estado, email')
     .eq('id', requestId)
     .maybeSingle();
 
@@ -151,12 +152,12 @@ async function countRows(
   table: string,
   column: string,
   userId: string,
-  categoryToExclude?: string,
+  subjectToExclude?: string,
 ) {
   let query = adminClient.from(table).select('id', { count: 'exact', head: true }).eq(column, userId);
 
-  if (categoryToExclude) {
-    query = query.neq('category', categoryToExclude);
+  if (subjectToExclude) {
+    query = query.neq('asunto', subjectToExclude);
   }
 
   const { count, error } = await query;
@@ -174,7 +175,7 @@ export async function getDeletionBlockers(
 ) {
   const checks = [
     { code: 'PROJECTS_CREATED', label: 'proyectos creados', table: 'projects', column: 'created_by' },
-    { code: 'SUPPORT_TICKETS', label: 'tickets activos', table: 'tickets', column: 'user_id', categoryToExclude: 'account_deletion' },
+    { code: 'SUPPORT_TICKETS', label: 'tickets activos', table: 'tickets', column: 'user_id', subjectToExclude: 'Solicitud de baja de cuenta' },
     { code: 'EXPORT_JOBS', label: 'exportaciones', table: 'export_jobs', column: 'created_by' },
     { code: 'OPERATIONAL_EVENTS_OWNER', label: 'eventos operativos asignados', table: 'operational_events', column: 'owner_id' },
     { code: 'APPROVAL_REQUESTS_REQUESTED', label: 'solicitudes de aprobación', table: 'project_approval_requests', column: 'requested_by' },
@@ -194,7 +195,7 @@ export async function getDeletionBlockers(
     checks.map(async (check) => ({
       code: check.code,
       label: check.label,
-      count: await countRows(adminClient, check.table, check.column, userId, check.categoryToExclude),
+      count: await countRows(adminClient, check.table, check.column, userId, check.subjectToExclude),
     })),
   );
 

@@ -53,11 +53,17 @@ serve(async (req) => {
     const { adminClient, reviewer } = await ensureAuthenticatedAdmin(authorization);
     const ticket = await getDeletionTicket(adminClient, body.requestId.trim());
 
-    if (!ticket || ticket.category !== 'account_deletion' || !ticket.user_id) {
+    if (!ticket || ticket.asunto !== 'Solicitud de baja de cuenta' || !ticket.user_id) {
       return jsonResponse(404, { error: 'REQUEST_NOT_FOUND' });
     }
 
-    if (ticket.status !== 'open' && ticket.status !== 'in_progress') {
+    const isOpenRequest =
+      ticket.status === 'open' ||
+      ticket.status === 'in_progress' ||
+      ticket.estado === 'abierto' ||
+      ticket.estado === 'en_progreso';
+
+    if (!isOpenRequest) {
       return jsonResponse(409, { error: 'REQUEST_ALREADY_REVIEWED' });
     }
 
@@ -122,7 +128,7 @@ serve(async (req) => {
       .from('tickets')
       .delete()
       .eq('user_id', targetUser.id)
-      .eq('category', 'account_deletion');
+      .eq('asunto', 'Solicitud de baja de cuenta');
 
     if (deleteTicketsError) {
       throw deleteTicketsError;

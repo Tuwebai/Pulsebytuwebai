@@ -140,7 +140,7 @@ export async function fetchAdminAccountDeletionRequests(): Promise<AdminAccountD
   const { data, error } = await supabase
     .from('tickets')
     .select('id, user_id, created_at, mensaje')
-    .eq('category', 'account_deletion')
+    .eq('asunto', 'Solicitud de baja de cuenta')
     .in('status', ['open', 'in_progress'])
     .order('created_at', { ascending: false });
 

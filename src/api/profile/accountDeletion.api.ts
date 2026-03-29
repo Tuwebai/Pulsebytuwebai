@@ -61,7 +61,7 @@ export async function fetchAccountDeletionRequest(userId: string): Promise<Accou
     .from('tickets')
     .select('id, status, created_at, mensaje, respuesta')
     .eq('user_id', userId)
-    .eq('category', 'account_deletion')
+    .eq('asunto', 'Solicitud de baja de cuenta')
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();

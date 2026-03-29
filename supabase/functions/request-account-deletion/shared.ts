@@ -93,7 +93,7 @@ export async function ensureNoOpenDeletionRequest(
     .from('tickets')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
-    .eq('category', 'account_deletion')
+    .eq('asunto', 'Solicitud de baja de cuenta')
     .in('status', ['open', 'in_progress']);
 
   if (error) {
@@ -116,21 +116,17 @@ export async function createDeletionTicket(
   const { data, error } = await adminClient
     .from('tickets')
     .insert({
-      title,
       asunto: title,
       mensaje: reason,
       email: user.email,
       user_id: user.id,
-      category: 'account_deletion',
       priority: 'high',
       prioridad: 'alta',
-      urgency: 'high',
       status: 'open',
       estado: 'abierto',
       created_at: now,
       updated_at: now,
       fecha: now,
-      tags: ['account-deletion'],
     })
     .select('id, status, created_at, mensaje, respuesta')
     .single();
