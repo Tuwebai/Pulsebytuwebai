@@ -60,7 +60,7 @@ function transformUsers(
       ...user,
       account_deletion_request_id: request.id,
       account_deletion_requested_at: request.created_at,
-      account_deletion_reason: request.description ?? request.mensaje ?? null,
+      account_deletion_reason: request.mensaje ?? null,
     };
   });
 }

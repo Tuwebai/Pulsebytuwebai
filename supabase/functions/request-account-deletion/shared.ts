@@ -118,7 +118,6 @@ export async function createDeletionTicket(
     .insert({
       title,
       asunto: title,
-      description: reason,
       mensaje: reason,
       email: user.email,
       user_id: user.id,
@@ -133,7 +132,7 @@ export async function createDeletionTicket(
       fecha: now,
       tags: ['account-deletion'],
     })
-    .select('id, status, created_at, description, mensaje, respuesta')
+    .select('id, status, created_at, mensaje, respuesta')
     .single();
 
   if (error) {
@@ -163,6 +162,7 @@ export async function notifyAdminsAboutDeletionRequest(
     return;
   }
 
+  const now = new Date().toISOString();
   const { error } = await adminClient.from('notifications').insert(
     adminIds.map((adminId) => ({
       user_id: adminId,
@@ -177,8 +177,8 @@ export async function notifyAdminsAboutDeletionRequest(
         requested_user_id: user.id,
         requested_user_email: user.email,
       },
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      created_at: now,
+      updated_at: now,
     })),
   );
 

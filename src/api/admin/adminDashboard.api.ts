@@ -62,7 +62,6 @@ export interface AdminAccountDeletionRequestRecord {
   id: string;
   user_id: string | null;
   created_at: string;
-  description: string | null;
   mensaje: string | null;
 }
 
@@ -140,7 +139,7 @@ export async function fetchAdminTicketUsers(
 export async function fetchAdminAccountDeletionRequests(): Promise<AdminAccountDeletionRequestRecord[]> {
   const { data, error } = await supabase
     .from('tickets')
-    .select('id, user_id, created_at, description, mensaje')
+    .select('id, user_id, created_at, mensaje')
     .eq('category', 'account_deletion')
     .in('status', ['open', 'in_progress'])
     .order('created_at', { ascending: false });

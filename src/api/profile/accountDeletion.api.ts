@@ -20,12 +20,7 @@ function mapDeletionSnapshot(row: Record<string, unknown> | null): AccountDeleti
     id: typeof row.id === 'string' ? row.id : '',
     state: status === 'open' || status === 'in_progress' ? 'pending' : 'denied',
     requestedAt: typeof row.created_at === 'string' ? row.created_at : null,
-    reason:
-      typeof row.description === 'string'
-        ? row.description
-        : typeof row.mensaje === 'string'
-          ? row.mensaje
-          : null,
+    reason: typeof row.mensaje === 'string' ? row.mensaje : null,
     response: typeof row.respuesta === 'string' ? row.respuesta : null,
   };
 }
@@ -64,7 +59,7 @@ function getFunctionErrorMessage(error: unknown, fallback: string) {
 export async function fetchAccountDeletionRequest(userId: string): Promise<AccountDeletionRequestSnapshot> {
   const { data, error } = await supabase
     .from('tickets')
-    .select('id, status, created_at, description, mensaje, respuesta')
+    .select('id, status, created_at, mensaje, respuesta')
     .eq('user_id', userId)
     .eq('category', 'account_deletion')
     .order('created_at', { ascending: false })
