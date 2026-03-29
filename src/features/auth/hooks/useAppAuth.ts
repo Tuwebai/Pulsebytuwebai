@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { SUPPORT_CONTACT } from '@/config/supportContact';
 import { clearCache } from '@/contexts/appContext.cache';
 import type { User } from '@/contexts/appContext.types';
 
@@ -26,12 +27,20 @@ export function useAppAuth({
   signOut,
   signUpWithEmail,
 }: UseAppAuthParams) {
+  const loginErrorMessage = `No pudimos iniciar tu sesión con esos datos. Si tu acceso sigue pendiente o tu cuenta fue dada de baja, escribinos a ${SUPPORT_CONTACT.publicEmail}.`;
+
   const login = useCallback(
     async (email: string, password: string): Promise<boolean> => {
       try {
         setLoading(true);
         setError(null);
-        return await signInWithEmail(email, password);
+        const success = await signInWithEmail(email, password);
+
+        if (!success) {
+          setError(loginErrorMessage);
+        }
+
+        return success;
       } catch {
         setError('Error al iniciar sesión');
         return false;
@@ -39,7 +48,7 @@ export function useAppAuth({
         setLoading(false);
       }
     },
-    [setError, setLoading, signInWithEmail],
+    [loginErrorMessage, setError, setLoading, signInWithEmail],
   );
 
   const register = useCallback(

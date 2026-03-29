@@ -14,24 +14,47 @@ interface IdentityUser {
   full_name?: string | null;
 }
 
+function isGeneratedAvatarUrl(url: string) {
+  return (
+    url.includes('ui-avatars.com') ||
+    url.includes('gravatar.com/avatar') ||
+    url.includes('dicebear.com')
+  );
+}
+
 function normalizeAvatarUrl(url?: string | null) {
   if (typeof url !== 'string') {
     return undefined;
   }
 
   const trimmed = url.trim();
-  return trimmed.length > 0 ? trimmed : undefined;
+  if (trimmed.length === 0 || isGeneratedAvatarUrl(trimmed)) {
+    return undefined;
+  }
+
+  return trimmed;
 }
 
-export function getDisplayName(profile: IdentityProfile, user: IdentityUser, fallback: string) {
+export function getDisplayName(
+  profile: IdentityProfile | null | undefined,
+  user: IdentityUser | null | undefined,
+  fallback: string,
+) {
   return profile?.full_name || user?.full_name || fallback;
 }
 
-export function getDisplayEmail(profile: IdentityProfile, user: IdentityUser, fallback = 'sin email') {
+export function getDisplayEmail(
+  profile: IdentityProfile | null | undefined,
+  user: IdentityUser | null | undefined,
+  fallback = 'sin email',
+) {
   return profile?.email || user?.email || fallback;
 }
 
-export function getDisplayAvatar(profile: IdentityProfile, user: IdentityUser) {
+export function getDisplayAvatar(
+  profile: IdentityProfile | null | undefined,
+  user: IdentityUser | null | undefined,
+) {
   return (
     normalizeAvatarUrl(profile?.avatar_url) ||
     normalizeAvatarUrl(user?.avatar_url) ||

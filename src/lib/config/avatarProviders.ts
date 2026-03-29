@@ -5,7 +5,7 @@
 import { supabase } from '../supabase';
 
 export interface AvatarResult {
-  url: string;
+  url: string | null;
   provider: string;
   isReal: boolean;
 }
@@ -80,19 +80,16 @@ export class RealAvatarService {
       }
 
       // 3. Generar avatar temporal como Ãºltimo recurso (ui-avatars.com)
-      const tempAvatar = this.generateTemporaryAvatar(email);
-
       return {
-        url: tempAvatar,
-        provider: 'ui-avatars.com',
+        url: null,
+        provider: 'Pulse initials fallback',
         isReal: false
       };
 
     } catch (error) {
-      const tempAvatar = this.generateTemporaryAvatar(email);
       return {
-        url: tempAvatar,
-        provider: 'ui-avatars.com',
+        url: null,
+        provider: 'Pulse initials fallback',
         isReal: false
       };
     }
@@ -179,17 +176,6 @@ export class RealAvatarService {
     return isReal && !isGenerated;
   }
 
-  private generateTemporaryAvatar(email: string): string {
-    // Usar ui-avatars.com como fallback
-    const colors = ['b6e3f4', 'c0aede', 'd1d4f9', 'ffd5dc', 'ffdfbf'];
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    
-    // Generar iniciales del email
-    const initials = email.substring(0, 2).toUpperCase();
-    
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=${randomColor}&color=fff&size=200&font-size=0.8&bold=true&format=svg`;
-  }
-
   // =====================================================
   // MÃ‰TODOS PÃšBLICOS PARA SINCRONIZACIÃ“N
   // =====================================================
@@ -201,6 +187,10 @@ export class RealAvatarService {
     try {
       const avatarResult = await this.getRealAvatar(email);
       
+      if (!avatarResult.url) {
+        return;
+      }
+
       await this.saveAvatarToDatabase(email, avatarResult.url);
       
     } catch (error) {

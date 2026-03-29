@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { SUPPORT_CONTACT } from '@/config/supportContact';
 import { PulseLogo } from '@/core/components';
 import { useApp } from '@/contexts/AppContext';
 import { getPostLoginPath } from '../utils/getPostLoginPath';
@@ -110,7 +111,15 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {error ? <p className="text-sm text-[var(--danger)]">{error}</p> : null}
+            {error ? (
+              <div className="rounded-[14px] border border-[var(--danger)]/30 bg-[var(--danger)]/10 p-3 text-sm text-[var(--text-primary)]">
+                <p className="font-medium text-[var(--danger)]">No pudimos iniciar tu sesión</p>
+                <p className="mt-1 leading-6">{error}</p>
+                <p className="mt-2 text-xs text-[var(--text-secondary)]">
+                  Si seguís con este problema, escribinos a {SUPPORT_CONTACT.publicEmail}.
+                </p>
+              </div>
+            ) : null}
 
             <Button
               className="h-12 w-full rounded-[10px] bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]"

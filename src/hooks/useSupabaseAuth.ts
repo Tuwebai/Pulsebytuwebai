@@ -3,9 +3,24 @@ import { useState, useEffect } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { config } from '@/config/environment';
+import { SUPPORT_CONTACT } from '@/config/supportContact';
 
 // Función para obtener la URL base correcta según el entorno
 const getBaseUrl = () => config.getBaseUrl();
+
+function getFriendlyAuthErrorMessage(error: AuthError | Error) {
+  const normalizedMessage = error.message.toLowerCase();
+
+  if (normalizedMessage.includes('invalid login credentials')) {
+    return `No pudimos iniciar tu sesión con esos datos. Si tu acceso sigue pendiente o tu cuenta fue dada de baja, escribinos a ${SUPPORT_CONTACT.publicEmail}.`;
+  }
+
+  if (normalizedMessage.includes('email not confirmed')) {
+    return 'Primero necesitás confirmar tu email para entrar a Pulse.';
+  }
+
+  return error.message;
+}
 
 export function useSupabaseAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -34,7 +49,7 @@ export function useSupabaseAuth() {
         }
       } catch (error: any) {
         console.warn('Error en getInitialSession:', error);
-        setError(error.message);
+        setError(getFriendlyAuthErrorMessage(error));
       } finally {
         setLoading(false);
       }
@@ -76,7 +91,7 @@ export function useSupabaseAuth() {
 
       if (error) {
         console.warn('Error en autenticación con Google:', error);
-        setError(error.message);
+        setError(getFriendlyAuthErrorMessage(error));
         setLoading(false);
         return false;
       }
@@ -87,7 +102,7 @@ export function useSupabaseAuth() {
       
     } catch (error: any) {
       console.warn('Error en signInWithGoogle:', error);
-      setError(error.message);
+      setError(getFriendlyAuthErrorMessage(error));
       setLoading(false);
       return false;
     }
@@ -109,7 +124,7 @@ export function useSupabaseAuth() {
 
       if (error) {
         console.warn('Error en autenticación con GitHub:', error);
-        setError(error.message);
+        setError(getFriendlyAuthErrorMessage(error));
         setLoading(false);
         return false;
       }
@@ -120,7 +135,7 @@ export function useSupabaseAuth() {
       
     } catch (error: any) {
       console.warn('Error en signInWithGithub:', error);
-      setError(error.message);
+      setError(getFriendlyAuthErrorMessage(error));
       setLoading(false);
       return false;
     }
