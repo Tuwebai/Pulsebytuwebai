@@ -130,7 +130,7 @@ export async function invokeEnablePulseAccess(
 
       if (error.context.status === 502 && payload?.error === 'PULSE_ACCESS_EMAIL_CONFIG_MISSING') {
         throw new Error(
-          'Falta configurar RESEND_API_KEY o el remitente para enviar el correo de acceso a Pulse.',
+          'Falta configurar ZEPTOMAIL_SEND_MAIL_TOKEN o el remitente para enviar el correo de acceso a Pulse.',
         );
       }
 

@@ -71,36 +71,58 @@ export async function sendPulseAccessEmail(params: {
   accessUrl: string;
   mode: PulseAccessEmailMode;
 }) {
-  const resendApiKey = Deno.env.get('RESEND_API_KEY');
+  const zeptoMailToken = Deno.env.get('ZEPTOMAIL_SEND_MAIL_TOKEN');
+  const zeptoMailApiUrl =
+    Deno.env.get('ZEPTOMAIL_API_URL') || 'https://api.zeptomail.com/v1.1/email';
   const from = Deno.env.get('SMTP_FROM') || 'pulse@tuweb-ai.com';
   const replyTo = Deno.env.get('EMAIL_REPLY_TO') || 'hola@tuweb-ai.com';
+  const fromName = Deno.env.get('EMAIL_FROM_NAME') || 'Pulse by TuWebAI';
 
-  if (!resendApiKey) {
+  if (!zeptoMailToken) {
     throw new Error('PULSE_ACCESS_EMAIL_CONFIG_MISSING');
   }
 
-  const response = await fetch('https://api.resend.com/emails', {
+  const response = await fetch(zeptoMailApiUrl, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${resendApiKey}`,
+      Accept: 'application/json',
+      Authorization: `Zoho-enczapikey ${zeptoMailToken}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from,
-      to: params.to,
-      reply_to: replyTo,
+      from: {
+        address: from,
+        name: fromName,
+      },
+      to: [
+        {
+          email_address: {
+            address: params.to,
+            name: params.name,
+          },
+        },
+      ],
+      reply_to: [
+        {
+          address: replyTo,
+          name: fromName,
+        },
+      ],
       subject: generatePulseAccessEmailSubject({
         to: params.to,
         name: params.name,
         accessUrl: params.accessUrl,
         mode: params.mode,
       }),
-      html: generatePulseAccessEmailHtml({
+      htmlbody: generatePulseAccessEmailHtml({
         to: params.to,
         name: params.name,
         accessUrl: params.accessUrl,
         mode: params.mode,
       }),
+      track_clicks: false,
+      track_opens: false,
+      client_reference: `pulse-access:${params.mode}:${params.to}`,
     }),
   });
 

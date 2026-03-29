@@ -64,31 +64,53 @@ function calcDelta(current: number, previous: number): number | null {
 }
 
 async function sendMonthlyEmail(payload: MonthlyEmailPayload): Promise<void> {
-  const resendApiKey = Deno.env.get('RESEND_API_KEY');
+  const zeptoMailToken = Deno.env.get('ZEPTOMAIL_SEND_MAIL_TOKEN');
+  const zeptoMailApiUrl =
+    Deno.env.get('ZEPTOMAIL_API_URL') || 'https://api.zeptomail.com/v1.1/email';
   const from = Deno.env.get('SMTP_FROM') || 'pulse@tuweb-ai.com';
   const replyTo = Deno.env.get('EMAIL_REPLY_TO') || 'hola@tuweb-ai.com';
+  const fromName = Deno.env.get('EMAIL_FROM_NAME') || 'Pulse by TuWebAI';
 
-  if (!resendApiKey) {
-    throw new Error('Falta RESEND_API_KEY para enviar el resumen mensual.');
+  if (!zeptoMailToken) {
+    throw new Error('Falta ZEPTOMAIL_SEND_MAIL_TOKEN para enviar el resumen mensual.');
   }
 
-  const response = await fetch('https://api.resend.com/emails', {
+  const response = await fetch(zeptoMailApiUrl, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${resendApiKey}`,
+      Accept: 'application/json',
+      Authorization: `Zoho-enczapikey ${zeptoMailToken}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      from,
-      to: payload.to,
-      reply_to: replyTo,
+      from: {
+        address: from,
+        name: fromName
+      },
+      to: [
+        {
+          email_address: {
+            address: payload.to,
+            name: payload.name
+          }
+        }
+      ],
+      reply_to: [
+        {
+          address: replyTo,
+          name: fromName
+        }
+      ],
       subject: generateMonthlyEmailSubject(payload),
-      html: generateMonthlyEmailHtml(payload)
+      htmlbody: generateMonthlyEmailHtml(payload),
+      track_clicks: false,
+      track_opens: false,
+      client_reference: `monthly-summary:${payload.to}:${payload.monthName}`
     })
   });
 
   if (!response.ok) {
-    throw new Error(`Resend devolvió ${response.status}: ${await response.text()}`);
+    throw new Error(`ZeptoMail devolvió ${response.status}: ${await response.text()}`);
   }
 }
 
