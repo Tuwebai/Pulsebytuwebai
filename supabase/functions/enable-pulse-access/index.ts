@@ -166,8 +166,7 @@ serve(async (req) => {
 
     let user = await findTargetUser(adminClient, payload);
     const previousStatus = user?.pulse_access_status ?? null;
-    const action = payload.action === 'resend' ? 'resend' : 'enable';
-
+    const hadGrantedAccessBefore = Boolean(user?.pulse_access_granted_at);
     if (!user) {
       if (!requestedEmail) {
         return jsonResponse(404, { error: 'USER_NOT_FOUND' });
@@ -183,7 +182,7 @@ serve(async (req) => {
     const existingAuthUser = await findAuthUserByEmail(adminClient, user.email);
     const redirectTo = Deno.env.get('PULSE_ACCESS_REDIRECT_URL') || 'https://pulse.tuweb-ai.com/';
     const emailMode: PulseAccessEmailMode =
-      action === 'resend' || previousStatus === 'active' || previousStatus === 'invited'
+      hadGrantedAccessBefore || previousStatus === 'active' || previousStatus === 'invited'
         ? 'reentry'
         : 'welcome';
 

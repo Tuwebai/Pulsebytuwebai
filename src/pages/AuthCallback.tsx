@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
-import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import { userService } from '@/lib/supabaseService';
 
@@ -18,26 +17,27 @@ export default function AuthCallback() {
         } = await supabase.auth.getSession();
 
         if (error) {
-          console.error('Error en callback de autenticacion:', error);
+          console.error('Error en callback de autenticación:', error);
           navigate('/login?error=auth_callback_failed');
           return;
         }
 
         if (session?.user) {
-          toast({
-            title: 'Bienvenido',
-            description: 'Has iniciado sesion correctamente.',
-          });
-
           let appUser = await userService.getUserById(session.user.id);
 
           if (!appUser) {
             const metadata = session.user.user_metadata ?? {};
             const email = session.user.email ?? '';
             const fullName =
-              metadata.full_name ?? metadata.name ?? (email ? email.split('@')[0] : 'Cliente Pulse');
+              metadata.full_name ??
+              metadata.name ??
+              (email ? email.split('@')[0] : 'Cliente Pulse');
             const avatar =
-              metadata.avatar_url ?? metadata.picture ?? metadata.photoURL ?? metadata.image ?? undefined;
+              metadata.avatar_url ??
+              metadata.picture ??
+              metadata.photoURL ??
+              metadata.image ??
+              undefined;
 
             await userService.upsertUser({
               id: session.user.id,
@@ -71,7 +71,7 @@ export default function AuthCallback() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <div className="text-center">
         <LoadingSpinner size="lg" />
-        <p className="mt-4 text-white">Procesando autenticacion...</p>
+        <p className="mt-4 text-white">Procesando autenticación...</p>
       </div>
     </div>
   );

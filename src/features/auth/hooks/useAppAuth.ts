@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { toast as toastGlobal } from '@/hooks/use-toast';
 import { clearCache } from '@/contexts/appContext.cache';
 import type { User } from '@/contexts/appContext.types';
 
@@ -10,7 +9,11 @@ interface UseAppAuthParams {
   signInWithGithub: () => Promise<boolean>;
   signInWithGoogle: () => Promise<boolean>;
   signOut: () => Promise<void>;
-  signUpWithEmail: (email: string, password: string, metadata?: { full_name?: string }) => Promise<boolean>;
+  signUpWithEmail: (
+    email: string,
+    password: string,
+    metadata?: { full_name?: string },
+  ) => Promise<boolean>;
   user: User | null;
 }
 
@@ -21,32 +24,22 @@ export function useAppAuth({
   signInWithGithub,
   signInWithGoogle,
   signOut,
-  signUpWithEmail
+  signUpWithEmail,
 }: UseAppAuthParams) {
   const login = useCallback(
     async (email: string, password: string): Promise<boolean> => {
       try {
         setLoading(true);
         setError(null);
-
-        const result = await signInWithEmail(email, password);
-
-        if (result) {
-          toastGlobal({
-            title: 'Â¡Bienvenido!',
-            description: 'Has iniciado sesiÃ³n correctamente.'
-          });
-        }
-
-        return result;
+        return await signInWithEmail(email, password);
       } catch {
-        setError('Error al iniciar sesiÃ³n');
+        setError('Error al iniciar sesión');
         return false;
       } finally {
         setLoading(false);
       }
     },
-    [setError, setLoading, signInWithEmail]
+    [setError, setLoading, signInWithEmail],
   );
 
   const register = useCallback(
@@ -54,7 +47,6 @@ export function useAppAuth({
       try {
         setLoading(true);
         setError(null);
-
         await signUpWithEmail(email, password, { full_name: name });
         return true;
       } catch {
@@ -64,7 +56,7 @@ export function useAppAuth({
         setLoading(false);
       }
     },
-    [setError, setLoading, signUpWithEmail]
+    [setError, setLoading, signUpWithEmail],
   );
 
   const loginWithGoogle = useCallback(async (): Promise<boolean> => {
@@ -73,7 +65,7 @@ export function useAppAuth({
       setError(null);
       return await signInWithGoogle();
     } catch {
-      setError('Error al iniciar sesiÃ³n con Google');
+      setError('Error al iniciar sesión con Google');
       return false;
     } finally {
       setLoading(false);
@@ -86,7 +78,7 @@ export function useAppAuth({
       setError(null);
       return await signInWithGithub();
     } catch {
-      setError('Error al iniciar sesiÃ³n con GitHub');
+      setError('Error al iniciar sesión con GitHub');
       return false;
     } finally {
       setLoading(false);
@@ -99,7 +91,7 @@ export function useAppAuth({
       await signOut();
       clearCache();
     } catch {
-      setError('Error al cerrar sesiÃ³n');
+      setError('Error al cerrar sesión');
     } finally {
       setLoading(false);
     }
@@ -110,6 +102,6 @@ export function useAppAuth({
     loginWithGithub,
     loginWithGoogle,
     logout,
-    register
+    register,
   };
 }

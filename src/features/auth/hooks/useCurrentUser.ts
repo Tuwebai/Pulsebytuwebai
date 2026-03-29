@@ -8,6 +8,7 @@ import { clearCache, getCachedData, setCachedData } from '@/contexts/appContext.
 import type { User } from '@/contexts/appContext.types';
 import { realAvatarService } from '@/lib/config/avatarProviders';
 import { onboardingApi } from '@/api/pulse/onboardingApi';
+import { hasPulseAccess } from '@/features/auth/utils/pulseAccess';
 
 interface UserUpdatePayload {
   full_name?: string | null;
@@ -190,7 +191,7 @@ export function useCurrentUser({
           await userPreferencesService.migrateLocalStorageToDB(userData.id);
         }
 
-        if (userData && userData.id && !isStaleAuthFlow()) {
+        if (userData && userData.id && hasPulseAccess(userData.pulse_access_status) && !isStaleAuthFlow()) {
           const welcomeBack = await userPreferencesService.getUserPreferences(userData.id, 'welcome_back');
           if (welcomeBack.length === 0) {
             toastGlobal({
