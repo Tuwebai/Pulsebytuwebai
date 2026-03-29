@@ -4,7 +4,6 @@ import { useApp } from '@/contexts/AppContext';
 import {
   canSubmitDomainRequest,
   getDomainRequestAttemptCount,
-  getRemainingDomainRequestAttempts,
   saveDomainRequestAttemptCount,
   submitPulseDomainRequest,
 } from '../services/pulseDomainRequest.service';
@@ -26,7 +25,6 @@ export function usePulseDomainRequest() {
 
   const status = user?.website_status ?? 'missing';
   const canSubmit = canSubmitDomainRequest(status, attemptCount);
-  const remainingAttempts = getRemainingDomainRequestAttempts(attemptCount);
   const hasReachedLimit = !canSubmit && status === 'rejected';
 
   const openDialog = () => setOpen(true);
@@ -82,7 +80,6 @@ export function usePulseDomainRequest() {
     hasReachedLimit,
     open,
     openDialog,
-    remainingAttempts,
     setDomain,
     setOpen,
     status,

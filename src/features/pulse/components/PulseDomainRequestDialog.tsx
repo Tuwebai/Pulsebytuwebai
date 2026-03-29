@@ -15,7 +15,6 @@ interface PulseDomainRequestDialogProps {
   onDomainChange: (value: string) => void;
   onOpenChange: (open: boolean) => void;
   onSubmit: () => Promise<boolean>;
-  remainingAttempts: number;
   status: 'missing' | 'pending_review' | 'approved' | 'rejected';
   submitting: boolean;
   website: string | null;
@@ -32,7 +31,6 @@ export default function PulseDomainRequestDialog({
   onDomainChange,
   onOpenChange,
   onSubmit,
-  remainingAttempts,
   status,
   submitting,
   website,
@@ -87,12 +85,11 @@ export default function PulseDomainRequestDialog({
           <div className="rounded-[16px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-4 py-3 text-sm text-[var(--text-secondary)]">
             <div className="flex items-center gap-2 text-[var(--text-primary)]">
               <ShieldCheck className="h-4 w-4 text-[var(--signal)]" />
-              <span>Control operativo</span>
+              <span>Qué pasa después</span>
             </div>
             <p className="mt-2 leading-6">
-              El cliente puede enviar hasta dos veces el dominio desde este flujo. Si hace falta un tercer ajuste, lo toma el equipo para evitar spam operativo.
+              Cuando envíes tu dominio, el equipo lo revisa antes de conectarlo a Pulse. Si hace falta ajustar algo, te acompañamos para dejarlo listo.
             </p>
-            <p className="mt-2 text-xs text-[var(--text-secondary)]">Intentos disponibles desde esta cuenta: {remainingAttempts}</p>
           </div>
         </div>
 

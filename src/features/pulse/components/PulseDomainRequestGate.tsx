@@ -36,7 +36,6 @@ export default function PulseDomainRequestGate({ ga4PropertyId, hasProject = tru
         onOpenChange={domainRequest.setOpen}
         onSubmit={domainRequest.submit}
         open={domainRequest.open}
-        remainingAttempts={domainRequest.remainingAttempts}
         status={domainRequest.status}
         submitting={domainRequest.submitting}
         website={domainRequest.website}
