@@ -178,11 +178,13 @@ export function useAdminUsers() {
 
       if (mode === 'resend') {
         const resendDescription =
-          result.delivery_type === 'invite'
-            ? 'Se envió una nueva invitación Pulse con branding TuWebAI.'
-            : result.delivery_type === 'magiclink'
-              ? 'Se envió un nuevo enlace de acceso directo a Pulse.'
-              : 'El acceso Pulse del cliente sigue vigente. Si todavía no llegó el correo, revisá la configuración SMTP de Supabase Auth.';
+          result.email_mode === 'welcome'
+            ? 'Se envió un nuevo correo de bienvenida a Pulse.'
+            : result.delivery_type === 'invite'
+              ? 'Se envió una nueva invitación Pulse con branding TuWebAI.'
+              : result.delivery_type === 'magiclink'
+                ? 'Se envió un nuevo enlace de acceso directo a Pulse.'
+                : 'El acceso Pulse del cliente sigue vigente. Si todavía no llegó el correo, revisá la configuración del mailer propio.'
 
         toast({
           title: 'Acceso reenviado',
@@ -202,7 +204,9 @@ export function useAdminUsers() {
           description:
             result.pulse_access_status === 'active'
               ? 'El cliente ya tiene acceso activo a Pulse.'
-              : 'El cliente ya puede entrar a Pulse. Si todavía no completa onboarding, va a onboarding.',
+              : result.email_mode === 'welcome'
+                ? 'El cliente ya tiene su bienvenida Pulse lista y puede entrar desde el correo inicial.'
+                : 'El cliente ya puede entrar a Pulse desde el nuevo enlace enviado.',
         });
       }
     } catch (error) {

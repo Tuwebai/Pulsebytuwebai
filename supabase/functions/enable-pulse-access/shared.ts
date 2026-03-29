@@ -36,6 +36,7 @@ export interface EnablePulseAccessResponse {
   invited: boolean;
   email_sent: boolean;
   delivery_type: 'invite' | 'magiclink' | 'none';
+  email_mode: 'welcome' | 'reentry' | 'none';
   user_id: string;
   email: string;
   pulse_access_status: Extract<PulseAccessStatus, 'invited' | 'active'>;
@@ -65,10 +66,6 @@ export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 
-function getPulseAccessRedirectUrl() {
-  return Deno.env.get('PULSE_ACCESS_REDIRECT_URL') || 'https://pulse.tuweb-ai.com/';
-}
-
 export function createSupabaseAdminClient() {
   const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
@@ -94,18 +91,6 @@ export function createSupabaseUserClient(authHeader: string) {
       headers: {
         Authorization: authHeader
       }
-    }
-  });
-}
-
-export function createSupabasePublicClient() {
-  const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-  const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
-
-  return createClient(supabaseUrl, anonKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
     }
   });
 }
@@ -183,48 +168,4 @@ export async function findAuthUserByEmail(
   }
 
   return null;
-}
-
-export async function deliverPulseAccess(
-  adminClient: ReturnType<typeof createSupabaseAdminClient>,
-  user: Pick<TargetUserRow, 'email' | 'full_name'>
-) {
-  const normalizedEmail = normalizeEmail(user.email);
-  const redirectTo = getPulseAccessRedirectUrl();
-  const existingUser = await findAuthUserByEmail(adminClient, normalizedEmail);
-
-  if (existingUser?.email) {
-    const publicClient = createSupabasePublicClient();
-    const signInResult = await publicClient.auth.signInWithOtp({
-      email: normalizedEmail,
-      options: {
-        shouldCreateUser: false,
-        emailRedirectTo: redirectTo
-      }
-    });
-
-    if (signInResult.error) {
-      throw signInResult.error;
-    }
-
-    return {
-      invited: false,
-      email_sent: true,
-      delivery_type: 'magiclink' as const
-    };
-  }
-
-  const inviteResult = await adminClient.auth.admin.inviteUserByEmail(normalizedEmail, {
-    redirectTo
-  });
-
-  if (inviteResult.error) {
-    throw inviteResult.error;
-  }
-
-  return {
-    invited: true,
-    email_sent: true,
-    delivery_type: 'invite' as const
-  };
 }

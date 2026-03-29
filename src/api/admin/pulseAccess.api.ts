@@ -5,6 +5,7 @@ export interface EnablePulseAccessResponse {
   invited: boolean;
   email_sent: boolean;
   delivery_type: 'invite' | 'magiclink' | 'none';
+  email_mode: 'welcome' | 'reentry' | 'none';
   user_id: string;
   email: string;
   pulse_access_status: 'invited' | 'active';
@@ -51,6 +52,9 @@ function isEnablePulseAccessResponse(value: unknown): value is EnablePulseAccess
     (payload.delivery_type === 'invite' ||
       payload.delivery_type === 'magiclink' ||
       payload.delivery_type === 'none') &&
+    (payload.email_mode === 'welcome' ||
+      payload.email_mode === 'reentry' ||
+      payload.email_mode === 'none') &&
     typeof payload.user_id === 'string' &&
     typeof payload.email === 'string' &&
     (payload.pulse_access_status === 'invited' || payload.pulse_access_status === 'active') &&
@@ -69,6 +73,7 @@ function normalizeEnablePulseAccessResponse(data: unknown): EnablePulseAccessRes
       ...data,
       email_sent: false,
       delivery_type: 'none',
+      email_mode: 'none',
     };
   }
 
@@ -117,15 +122,21 @@ export async function invokeEnablePulseAccess(
         throw new Error('El usuario tiene el acceso a Pulse revocado. Reactivarlo requiere una acción separada.');
       }
 
-      if (error.context.status === 502 && payload?.error === 'MAGIC_LINK_EMAIL_FAILED') {
+      if (error.context.status === 502 && payload?.error === 'PULSE_ACCESS_LINK_MISSING') {
         throw new Error(
-          'Supabase Auth no pudo enviar el enlace de acceso. Revisá SMTP y el template de Magic Link en Authentication > Email.',
+          'No pudimos generar el enlace de acceso para Pulse desde el backend.',
         );
       }
 
-      if (error.context.status === 502 && payload?.error === 'INVITE_EMAIL_FAILED') {
+      if (error.context.status === 502 && payload?.error === 'PULSE_ACCESS_EMAIL_CONFIG_MISSING') {
         throw new Error(
-          'Supabase Auth no pudo enviar la invitación inicial. Revisá SMTP y el template de Invite user en Authentication > Email.',
+          'Falta configurar RESEND_API_KEY o el remitente para enviar el correo de acceso a Pulse.',
+        );
+      }
+
+      if (error.context.status === 502 && payload?.error === 'PULSE_ACCESS_EMAIL_FAILED') {
+        throw new Error(
+          'No pudimos enviar el correo de acceso a Pulse con el mailer propio.',
         );
       }
 

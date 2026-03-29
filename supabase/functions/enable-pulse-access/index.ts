@@ -1,10 +1,11 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+import { deliverPulseAccess, type PulseAccessEmailMode } from './delivery.ts';
 import {
   corsHeaders,
-  deliverPulseAccess,
   ensureAuthenticatedAdmin,
   type EnablePulseAccessBody,
   type EnablePulseAccessResponse,
+  findAuthUserByEmail,
   type TargetUserRow,
   isPlainObject,
   isValidEmail,
@@ -114,12 +115,14 @@ function toResponse(
     invited: boolean;
     email_sent: boolean;
     delivery_type: 'invite' | 'magiclink' | 'none';
+    email_mode: PulseAccessEmailMode | 'none';
   }
 ): EnablePulseAccessResponse {
   return {
     invited: delivery.invited,
     email_sent: delivery.email_sent,
     delivery_type: delivery.delivery_type,
+    email_mode: delivery.email_mode,
     user_id: user.id,
     email: normalizeEmail(user.email),
     pulse_access_status: user.pulse_access_status === 'active' ? 'active' : 'invited',
@@ -162,6 +165,8 @@ serve(async (req) => {
       typeof payload.email === 'string' && isValidEmail(payload.email) ? normalizeEmail(payload.email) : null;
 
     let user = await findTargetUser(adminClient, payload);
+    const previousStatus = user?.pulse_access_status ?? null;
+    const action = payload.action === 'resend' ? 'resend' : 'enable';
 
     if (!user) {
       if (!requestedEmail) {
@@ -175,7 +180,22 @@ serve(async (req) => {
       user = await promotePendingUser(adminClient, user.id, authUserId);
     }
 
-    const delivery = await deliverPulseAccess(adminClient, user);
+    const existingAuthUser = await findAuthUserByEmail(adminClient, user.email);
+    const redirectTo = Deno.env.get('PULSE_ACCESS_REDIRECT_URL') || 'https://pulse.tuweb-ai.com/';
+    const emailMode: PulseAccessEmailMode =
+      action === 'resend' || previousStatus === 'active' || previousStatus === 'invited'
+        ? 'reentry'
+        : 'welcome';
+
+    const delivery = await deliverPulseAccess({
+      adminClient,
+      email: normalizeEmail(user.email),
+      fullName: user.full_name,
+      invited: !existingAuthUser?.email,
+      redirectTo,
+      mode: emailMode,
+    });
+
     return jsonResponse(200, toResponse(user, delivery));
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
@@ -188,12 +208,16 @@ serve(async (req) => {
       return jsonResponse(403, { error: message });
     }
 
-    if (message.includes('Error sending magic link email')) {
-      return jsonResponse(502, { error: 'MAGIC_LINK_EMAIL_FAILED' });
+    if (message === 'PULSE_ACCESS_LINK_MISSING') {
+      return jsonResponse(502, { error: 'PULSE_ACCESS_LINK_MISSING' });
     }
 
-    if (message.includes('Error sending invite email')) {
-      return jsonResponse(502, { error: 'INVITE_EMAIL_FAILED' });
+    if (message === 'PULSE_ACCESS_EMAIL_CONFIG_MISSING') {
+      return jsonResponse(502, { error: 'PULSE_ACCESS_EMAIL_CONFIG_MISSING' });
+    }
+
+    if (message.startsWith('PULSE_ACCESS_EMAIL_FAILED:')) {
+      return jsonResponse(502, { error: 'PULSE_ACCESS_EMAIL_FAILED' });
     }
 
     console.error('Error en enable-pulse-access:', message);

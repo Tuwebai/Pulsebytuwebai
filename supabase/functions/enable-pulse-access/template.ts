@@ -2,7 +2,7 @@ export interface PulseAccessEmailPayload {
   to: string;
   name: string;
   accessUrl: string;
-  mode: 'invite' | 'magiclink';
+  mode: 'welcome' | 'reentry';
 }
 
 function escapeHtml(value: string): string {
@@ -15,7 +15,7 @@ function escapeHtml(value: string): string {
 }
 
 export function generatePulseAccessEmailSubject(payload: PulseAccessEmailPayload): string {
-  return payload.mode === 'invite'
+  return payload.mode === 'welcome'
     ? 'Tu acceso a Pulse ya está listo'
     : 'Tu acceso a Pulse fue renovado';
 }
@@ -24,12 +24,12 @@ export function generatePulseAccessEmailHtml(payload: PulseAccessEmailPayload): 
   const safeName = escapeHtml(payload.name || 'cliente');
   const safeAccessUrl = escapeHtml(payload.accessUrl);
   const intro =
-    payload.mode === 'invite'
+    payload.mode === 'welcome'
       ? 'Ya tenés tu acceso listo para entrar a Pulse y seguir la operación de tu web con TuWebAI.'
       : 'Te enviamos un nuevo enlace para volver a entrar a Pulse y retomar el seguimiento de tu web.';
 
   const helper =
-    payload.mode === 'invite'
+    payload.mode === 'welcome'
       ? 'Cuando entres, Pulse te va a llevar a tu espacio y, si todavía corresponde, al onboarding inicial.'
       : 'Este enlace te permite retomar el acceso sin fricción desde el correo principal del cliente.';
 
