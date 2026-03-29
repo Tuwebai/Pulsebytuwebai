@@ -13,6 +13,23 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   asChild?: boolean;
 }
 
+const buttonVariantStyles = {
+  default: "bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary shadow-sm hover:shadow-md active:scale-95",
+  primary: "bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary shadow-sm hover:shadow-md active:scale-95",
+  secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-secondary shadow-sm hover:shadow-md active:scale-95",
+  destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive shadow-sm hover:shadow-md active:scale-95",
+  outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground focus:ring-ring shadow-sm hover:shadow-md active:scale-95",
+  ghost: "hover:bg-accent hover:text-accent-foreground focus:ring-ring active:scale-95",
+  link: "text-primary underline-offset-4 hover:underline focus:ring-primary"
+} as const;
+
+const buttonSizeStyles = {
+  sm: "h-8 px-3 text-sm",
+  md: "h-10 px-4 text-base",
+  lg: "h-12 px-6 text-lg",
+  xl: "h-14 px-8 text-xl"
+} as const;
+
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ 
     className, 
@@ -31,31 +48,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : 'button';
     const baseStyles = "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 relative overflow-hidden";
     
-    const variants = {
-      default: "bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary shadow-sm hover:shadow-md active:scale-95",
-      primary: "bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary shadow-sm hover:shadow-md active:scale-95",
-      secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-secondary shadow-sm hover:shadow-md active:scale-95",
-      destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive shadow-sm hover:shadow-md active:scale-95",
-      outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground focus:ring-ring shadow-sm hover:shadow-md active:scale-95",
-      ghost: "hover:bg-accent hover:text-accent-foreground focus:ring-ring active:scale-95",
-      link: "text-primary underline-offset-4 hover:underline focus:ring-primary"
-    };
-
-    const sizes = {
-      sm: "h-8 px-3 text-sm",
-      md: "h-10 px-4 text-base",
-      lg: "h-12 px-6 text-lg",
-      xl: "h-14 px-8 text-xl"
-    };
-
     const widthStyles = fullWidth ? "w-full" : "";
 
     return (
       <Comp
         className={cn(
           baseStyles,
-          variants[variant],
-          sizes[size],
+          buttonVariantStyles[variant],
+          buttonSizeStyles[size],
           widthStyles,
           prefersReducedMotion && "transition-none active:scale-100",
           className
@@ -94,22 +94,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = "Button";
 
-// Export button variants for external use
-export const buttonVariants = {
-  default: "bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary shadow-sm hover:shadow-md active:scale-95",
-  primary: "bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary shadow-sm hover:shadow-md active:scale-95",
-  secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-secondary shadow-sm hover:shadow-md active:scale-95",
-  destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive shadow-sm hover:shadow-md active:scale-95",
-  outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground focus:ring-ring shadow-sm hover:shadow-md active:scale-95",
-  ghost: "hover:bg-accent hover:text-accent-foreground focus:ring-ring active:scale-95",
-  link: "text-primary underline-offset-4 hover:underline focus:ring-primary"
-};
+export function buttonVariants({
+  variant = 'primary',
+  size = 'md',
+  className,
+}: {
+  variant?: ButtonProps['variant'];
+  size?: ButtonProps['size'];
+  className?: string;
+} = {}) {
+  return cn(buttonVariantStyles[variant], buttonSizeStyles[size], className);
+}
 
-export const buttonSizes = {
-  sm: "h-8 px-3 text-sm",
-  md: "h-10 px-4 text-base",
-  lg: "h-12 px-6 text-lg",
-  xl: "h-14 px-8 text-xl"
-};
+export const buttonSizes = buttonSizeStyles;
 
 export { Button };
