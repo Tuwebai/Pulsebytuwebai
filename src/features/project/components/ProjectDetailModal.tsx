@@ -1,5 +1,6 @@
 import { ExternalLink, MessageCircle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import Badge from '@/core/components/Badge';
 import type { ProjectDetailProject } from './projectDetail.types';
 import ProjectDetailTasksBanner from './ProjectDetailTasksBanner';
@@ -39,8 +40,15 @@ export default function ProjectDetailModal({ project, onClose }: ProjectDetailMo
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)] p-4">
-      <div className="w-full max-w-2xl rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-[var(--shadow-elevated)]">
+    <Dialog onOpenChange={(open) => !open && onClose()} open>
+      <DialogContent
+        className="w-full max-w-2xl overflow-hidden rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-0 sm:p-0 shadow-[var(--shadow-elevated)]"
+        hideCloseButton
+      >
+        <DialogTitle className="sr-only">{project.name}</DialogTitle>
+        <DialogDescription className="sr-only">
+          Estado, progreso y próximos pasos de tu proyecto.
+        </DialogDescription>
         <div className="flex items-start justify-between gap-4 border-b border-[var(--border-subtle)] px-6 py-5">
           <div className="min-w-0">
             <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Mi Proyecto</p>
@@ -107,7 +115,7 @@ export default function ProjectDetailModal({ project, onClose }: ProjectDetailMo
             </Button>
           </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
