@@ -53,10 +53,10 @@
   ],
   "shortcuts": [
     {
-      "name": "Nuevo Proyecto",
-      "short_name": "Proyecto",
-      "description": "Crear un nuevo proyecto",
-      "url": "/proyectos/nuevo",
+      "name": "Proyectos",
+      "short_name": "Proyectos",
+      "description": "Ir a la vista de proyectos",
+      "url": "/dashboard/proyecto",
       "icons": [
         {
           "src": "/favicon.svg",

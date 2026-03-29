@@ -64,19 +64,6 @@ export const useKeyboardShortcuts = (config: KeyboardShortcutsConfig) => {
         }
         break;
 
-      case 'n':
-        if (isCtrlOrCmd && !altKey && !shiftKey) {
-          event.preventDefault();
-          if (onCreateProject) {
-            onCreateProject();
-            toast({
-              title: 'Crear nuevo proyecto',
-              description: 'Navegando al formulario de creación...',
-            });
-          }
-        }
-        break;
-
       case 'f':
         if (isCtrlOrCmd && !altKey && !shiftKey) {
           event.preventDefault();
@@ -216,7 +203,7 @@ export const useKeyboardShortcuts = (config: KeyboardShortcutsConfig) => {
           event.preventDefault();
           toast({
             title: 'Atajos de teclado disponibles',
-            description: 'Ctrl+D: Arrastrar | Ctrl+N: Nuevo | Ctrl+F: Buscar | Ctrl+R: Actualizar | Ctrl+E: Exportar | Ctrl+B: Selección múltiple | ESC: Salir del modo actual',
+            description: 'Ctrl+D: Arrastrar | Ctrl+F: Buscar | Ctrl+R: Actualizar | Ctrl+E: Exportar | Ctrl+B: Selección múltiple | ESC: Salir del modo actual',
             duration: 8000,
           });
         }
@@ -248,7 +235,6 @@ export const useKeyboardShortcuts = (config: KeyboardShortcutsConfig) => {
     const shortcutsText = [
       '🎯 Atajos de teclado disponibles:',
       '• Ctrl+D: Activar/desactivar modo arrastrar',
-      '• Ctrl+N: Crear nuevo proyecto',
       '• Ctrl+F: Enfocar búsqueda',
       '• Ctrl+R: Actualizar datos',
       '• Ctrl+E: Exportar datos',

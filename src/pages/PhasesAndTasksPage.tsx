@@ -323,12 +323,12 @@ const PhasesAndTasksPage: React.FC = () => {
               
               <div className="space-y-4">
                 <Button
-                  onClick={() => navigate('/proyectos/nuevo')}
+                  onClick={() => navigate('/dashboard/proyecto')}
                   className="w-full sm:w-auto"
                   size="lg"
                 >
                   <Plus className="h-5 w-5 mr-2" />
-                  Crear Primer Proyecto
+                  Ver Proyectos
                 </Button>
                 
                 <div>

@@ -43,7 +43,6 @@ const AdminProjectPhaseDetailPage = createLazyComponent(() => import('@/features
 const AdminProjectPhasesPage = createLazyComponent(() => import('@/features/admin/projects-tracking/pages/AdminProjectPhasesPage'));
 const AdminProjectTrackingPage = createLazyComponent(() => import('@/features/admin/projects-tracking/pages/AdminProjectTrackingPage'));
 const ProjectsPage = createLazyComponent(() => import('@/pages/ProjectsPage'));
-const ProyectosNuevo = createLazyComponent(() => import('@/pages/ProyectosNuevo'));
 const PhasesAndTasksPage = createLazyComponent(() => import('@/pages/PhasesAndTasksPage'));
 const WorkspacePage = createLazyComponent(() => import('@/pages/WorkspacePage'));
 const ProfilePage = createLazyComponent(() => import('@/features/profile/pages/ProfilePage'));
@@ -263,9 +262,7 @@ function AppRoutes() {
         path="/proyectos/nuevo"
         element={
           <ProtectedRoute clientOnly>
-            <DashboardShell>
-              <ProyectosNuevo />
-            </DashboardShell>
+            <Navigate replace to="/dashboard/proyecto" />
           </ProtectedRoute>
         }
       />
