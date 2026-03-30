@@ -1,7 +1,11 @@
-import { MessageCircle, Send, ShieldCheck } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import {
+  PulseDialogCard,
+  PulseDialogFooterActions,
+  PulseDomainInputCard,
+  PulseNextStepCard,
+  PulseStatusRow,
+} from './pulseDomainRequestDialogSections';
 import {
   getPulseDomainRequestDialogDescription,
   getPulseDomainRequestDialogTitle,
@@ -26,22 +30,23 @@ interface PulseDomainRequestDialogProps {
 
 const WHATSAPP_SUPPORT_URL = 'https://wa.me/5491130187377?text=Necesito%20ayuda%20con%20el%20dominio%20de%20Pulse';
 
-export default function PulseDomainRequestDialog({
-  canSubmit,
-  domain,
-  hasReachedLimit,
-  historicalSyncLabel,
-  isSyncingMetrics = false,
-  liveSyncLabel,
-  open,
-  onDomainChange,
-  onOpenChange,
-  onSubmit,
-  status,
-  submitting,
-  website,
-  websiteReviewNotes,
-}: PulseDomainRequestDialogProps) {
+export default function PulseDomainRequestDialog(props: PulseDomainRequestDialogProps) {
+  const {
+    canSubmit,
+    domain,
+    hasReachedLimit,
+    historicalSyncLabel,
+    isSyncingMetrics = false,
+    liveSyncLabel,
+    open,
+    onDomainChange,
+    onOpenChange,
+    onSubmit,
+    status,
+    submitting,
+    website,
+    websiteReviewNotes,
+  } = props;
   const title = getPulseDomainRequestDialogTitle({ hasReachedLimit, status });
   const description = getPulseDomainRequestDialogDescription({ hasReachedLimit, status });
   const canEdit = canSubmit && (status === 'missing' || status === 'rejected');
@@ -50,99 +55,49 @@ export default function PulseDomainRequestDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-primary)] sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="text-[22px] font-medium text-[var(--text-primary)]">{title}</DialogTitle>
-          <DialogDescription className="text-sm leading-6 text-[var(--text-secondary)]">{description}</DialogDescription>
+      <DialogContent className="border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-primary)] sm:max-w-2xl">
+        <DialogHeader className="space-y-3">
+          <DialogTitle className="text-[24px] font-medium text-[var(--text-primary)]">{title}</DialogTitle>
+          <DialogDescription className="max-w-[62ch] text-sm leading-6 text-[var(--text-secondary)]">{description}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          {website ? (
-            <div className="rounded-[16px] border border-[var(--signal-border)] bg-[color:var(--signal-glow)] px-4 py-3">
-              <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">Dominio actual</p>
-              <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">{website}</p>
-            </div>
-          ) : null}
+          <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
+            {website ? (
+              <PulseDialogCard className="border-[var(--signal-border)] bg-[color:var(--signal-glow)]" title="Dominio actual">
+                <p className="mt-3 break-all text-base font-medium text-[var(--text-primary)]">{website}</p>
+              </PulseDialogCard>
+            ) : null}
 
-          {canEdit ? (
-            <div className="space-y-2">
-              <label className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]" htmlFor="pulse-domain-request-input">
-                Dominio a revisar
-              </label>
-              <Input
-                ariaLabel="Dominio a revisar"
-                className="h-12 rounded-[12px] border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
-                id="pulse-domain-request-input"
-                onChange={(event) => onDomainChange(event.target.value)}
-                placeholder="tuempresa.com"
-                value={domain}
-              />
-              <p className="text-xs leading-5 text-[var(--text-secondary)]">
-                Aceptamos dominios como <span className="font-medium text-[var(--text-primary)]">tuempresa.com</span> o <span className="font-medium text-[var(--text-primary)]">tienda.tuempresa.com</span>.
-              </p>
-            </div>
-          ) : null}
+            <PulseDialogCard className="border-[var(--border-subtle)] bg-[var(--bg-elevated)]" title="Estado de Pulse">
+              <div className="mt-3 space-y-3 text-sm">
+                <PulseStatusRow accentClassName="bg-[var(--signal)]" label="Historial del tablero" value={syncStatusLabel} />
+                <PulseStatusRow accentClassName="bg-[var(--success)]" label="Actividad en vivo" value={liveStatusLabel} />
+              </div>
+            </PulseDialogCard>
+          </div>
+
+          {canEdit ? <PulseDomainInputCard domain={domain} onDomainChange={onDomainChange} /> : null}
 
           {websiteReviewNotes ? (
-            <div className="rounded-[16px] border border-[color:rgba(245,158,11,0.24)] bg-[color:rgba(245,158,11,0.12)] px-4 py-3">
-              <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">Observación del equipo</p>
-              <p className="mt-2 text-sm leading-6 text-[var(--text-primary)]">{websiteReviewNotes}</p>
-            </div>
+            <PulseDialogCard className="border-[color:rgba(245,158,11,0.24)] bg-[color:rgba(245,158,11,0.12)]" title="Observación del equipo">
+              <p className="mt-3 text-sm leading-6 text-[var(--text-primary)]">{websiteReviewNotes}</p>
+            </PulseDialogCard>
           ) : null}
 
-          <div className="rounded-[16px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-4 py-3">
-            <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">Estado de Pulse</p>
-            <div className="mt-3 space-y-3 text-sm">
-              <div className="flex items-center gap-3">
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)]" />
-                <span className="text-[var(--text-secondary)]">Historial del tablero</span>
-                <span className="ml-auto text-[var(--text-primary)]">{syncStatusLabel}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--success)]" />
-                <span className="text-[var(--text-secondary)]">Actividad en vivo</span>
-                <span className="ml-auto text-[var(--text-primary)]">{liveStatusLabel}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-[16px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-4 py-3 text-sm text-[var(--text-secondary)]">
-            <div className="flex items-center gap-2 text-[var(--text-primary)]">
-              <ShieldCheck className="h-4 w-4 text-[var(--signal)]" />
-              <span>Qué pasa después</span>
-            </div>
-            <p className="mt-2 leading-6">
-              Cuando compartís tu dominio, el equipo lo valida y termina la conexión para que Pulse te muestre datos reales de tu web.
-            </p>
-          </div>
+          <PulseNextStepCard />
         </div>
 
-        <DialogFooter className="gap-3 sm:justify-between">
-          <a
-            className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] underline decoration-[var(--border-strong)] underline-offset-4 transition-colors hover:text-[var(--signal)]"
-            href={WHATSAPP_SUPPORT_URL}
-            rel="noreferrer"
-            target="_blank"
-          >
-            <MessageCircle className="h-4 w-4" />
-            Hablar con el equipo
-          </a>
-          <div className="flex gap-3">
-            <Button className="border border-[var(--border-default)] bg-transparent text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]" onClick={() => onOpenChange(false)} type="button" variant="ghost">
-              Cerrar
-            </Button>
-            {canEdit ? (
-              <Button
-                className="bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]"
-                disabled={submitting || !domain.trim()}
-                leftIcon={<Send className="h-4 w-4" />}
-                onClick={() => void onSubmit()}
-                type="button"
-              >
-                {status === 'rejected' ? 'Corregir dominio' : 'Compartir dominio'}
-              </Button>
-            ) : null}
-          </div>
+        <DialogFooter className="flex-col-reverse gap-3 border-t border-[var(--border-subtle)] pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <PulseDialogFooterActions
+            canEdit={canEdit}
+            domain={domain}
+            onClose={() => onOpenChange(false)}
+            onSubmit={() => void onSubmit()}
+            status={status}
+            submitting={submitting}
+            whatsappSupportUrl={WHATSAPP_SUPPORT_URL}
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>
