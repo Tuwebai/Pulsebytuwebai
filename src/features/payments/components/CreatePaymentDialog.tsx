@@ -19,12 +19,13 @@ export default function CreatePaymentDialog({
   return (
     <Dialog onOpenChange={onClose} open={open}>
       <DialogContent
-        className="max-h-[88vh] !w-[95vw] !max-w-[1320px] overflow-hidden rounded-[30px] border border-[var(--border-default)] bg-[linear-gradient(180deg,rgba(11,15,30,0.98)_0%,rgba(20,18,42,0.98)_100%)] p-0 text-[var(--text-primary)] shadow-[0_36px_110px_rgba(0,0,0,0.62)] backdrop-blur"
+        className="max-h-[92vh] !w-[96vw] !max-w-[1480px] overflow-hidden rounded-[30px] border border-[var(--border-default)] bg-[linear-gradient(180deg,rgba(11,15,30,0.98)_0%,rgba(20,18,42,0.98)_100%)] p-0 text-[var(--text-primary)] shadow-[0_36px_110px_rgba(0,0,0,0.62)] backdrop-blur"
         hideCloseButton
+        style={{ maxHeight: '92vh', maxWidth: '1480px', width: 'min(96vw, 1480px)' }}
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_center,rgba(59,158,245,0.18),transparent_24%),radial-gradient(circle_at_top_right,rgba(123,76,212,0.22),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent_22%)]" />
 
-        <div className="relative overflow-y-auto px-5 pb-6 pt-6 sm:px-6 lg:px-8 lg:pb-8">
+        <div className="relative overflow-y-auto px-5 pb-8 pt-6 sm:px-6 lg:px-10 lg:pb-10 xl:px-12">
           <Button
             className="absolute right-5 top-5 rounded-full border border-[var(--border-default)] bg-[rgba(34,45,66,0.92)] px-4 text-[var(--text-primary)] hover:border-[rgba(59,158,245,0.32)] hover:bg-[rgba(39,51,74,0.98)]"
             onClick={onClose}
@@ -34,7 +35,7 @@ export default function CreatePaymentDialog({
             Cerrar
           </Button>
 
-          <DialogHeader className="mx-auto max-w-[620px] items-center px-2 pb-8 pt-8 text-center sm:pt-10">
+          <DialogHeader className="mx-auto max-w-[860px] items-center px-2 pb-7 pt-8 text-center sm:pt-10">
             <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--signal)]">Planes TuWebAI</p>
             <DialogTitle className="mt-3 text-balance text-[30px] font-semibold leading-[1.08] text-[var(--text-primary)] sm:text-[38px]">
               Tres planes. Precios claros.
@@ -48,10 +49,10 @@ export default function CreatePaymentDialog({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="mx-auto grid max-w-[1040px] gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mx-auto grid w-full max-w-[1360px] gap-5 md:grid-cols-2 lg:grid-cols-3 xl:gap-6">
             {Object.entries(PAYMENT_TYPES).map(([key, value]) => (
               <button
-                className={`group relative flex min-h-[380px] flex-col overflow-hidden rounded-[24px] border p-5 text-left transition-all disabled:cursor-not-allowed disabled:opacity-60 sm:p-6 ${
+                className={`group relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[24px] border p-5 text-left transition-all disabled:cursor-not-allowed disabled:opacity-60 sm:p-6 ${
                   value.badge
                     ? 'border-[rgba(59,158,245,0.55)] bg-[linear-gradient(180deg,rgba(19,25,44,0.98)_0%,rgba(25,22,50,0.98)_100%)] shadow-[0_0_0_1px_rgba(59,158,245,0.12),0_0_28px_rgba(59,158,245,0.18)]'
                     : 'border-[rgba(123,135,173,0.22)] bg-[linear-gradient(180deg,rgba(19,24,40,0.96)_0%,rgba(23,20,44,0.96)_100%)] hover:border-[rgba(59,158,245,0.28)]'
@@ -71,17 +72,17 @@ export default function CreatePaymentDialog({
                   <CreditCard className="h-4 w-4 text-[var(--signal)]" strokeWidth={1.7} />
                 </div>
 
-                <div className="mt-6">
+                <div className="mt-5">
                   <p className="text-[17px] font-semibold leading-tight text-[var(--text-primary)]">{value.name}</p>
                   <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">{value.description}</p>
                 </div>
 
-                <p className="mt-6 text-[17px] font-semibold text-[var(--text-primary)] sm:text-[20px]">
+                <p className="mt-5 text-[17px] font-semibold text-[var(--text-primary)] sm:text-[20px]">
                   {value.pricePrefix ? `${value.pricePrefix} ` : ''}
                   {formatCurrency(value.price, value.currency)}
                 </p>
 
-                <div className="mt-5 rounded-[14px] border border-[var(--border-default)] bg-[rgba(7,13,24,0.52)] px-4 py-3">
+                <div className="mt-4 rounded-[14px] border border-[var(--border-default)] bg-[rgba(7,13,24,0.52)] px-4 py-3">
                   <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--signal)]">
                     <Clock3 className="h-3.5 w-3.5" strokeWidth={1.8} />
                     Entrega estimada
@@ -89,13 +90,13 @@ export default function CreatePaymentDialog({
                   <p className="mt-2 text-sm font-medium leading-5 text-[var(--text-primary)]">{value.timeline}</p>
                 </div>
 
-                <div className="mt-5 space-y-2 text-sm leading-6 text-[var(--text-secondary)]">
-                  {value.features.slice(0, 5).map((feature) => (
+                <div className="mt-4 space-y-2 text-sm leading-6 text-[var(--text-secondary)]">
+                  {value.features.slice(0, 4).map((feature) => (
                     <p key={feature}>• {feature}</p>
                   ))}
                 </div>
 
-                <div className="mt-auto pt-6">
+                <div className="mt-auto pt-5">
                   <div className="flex items-center justify-between rounded-[14px] border border-[var(--border-default)] bg-[rgba(10,15,28,0.52)] px-4 py-3 transition-colors group-hover:border-[rgba(59,158,245,0.32)]">
                     <div>
                       <p className="text-sm font-medium text-[var(--text-primary)]">{value.cta}</p>
