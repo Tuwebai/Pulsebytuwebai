@@ -5,7 +5,6 @@ import OnboardingGate from '@/features/onboarding/components/OnboardingGate';
 
 interface AuthRoutesProps {
   AuthCallback: ComponentType;
-  GitHubCallback: ComponentType;
   Login: ComponentType;
   Onboarding: ComponentType;
   PulseAccessPendingPage: ComponentType;
@@ -15,7 +14,6 @@ interface AuthRoutesProps {
 
 export function renderAuthRoutes({
   AuthCallback,
-  GitHubCallback,
   Login,
   Onboarding,
   PulseAccessPendingPage,
@@ -45,7 +43,6 @@ export function renderAuthRoutes({
         }
       />
       <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route path="/auth/github/callback" element={<GitHubCallback />} />
       <Route path="/auth/sso" element={<SSOPage />} />
     </>
   );

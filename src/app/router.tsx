@@ -45,11 +45,10 @@ const AdminProjectTrackingPage = createLazyComponent(() => import('@/features/ad
 const ProjectsPage = createLazyComponent(() => import('@/pages/ProjectsPage'));
 const ProfilePage = createLazyComponent(() => import('@/features/profile/pages/ProfilePage'));
 const Configuracion = createLazyComponent(() => import('@/pages/Configuracion'));
-const Facturacion = createLazyComponent(() => import('@/pages/Facturacion'));
+const Facturacion = createLazyComponent(() => import('@/features/payments/pages/PaymentsPage'));
 const Soporte = createLazyComponent(() => import('@/pages/Soporte'));
 const NotFound = createLazyComponent(() => import('@/pages/NotFound'));
 const AuthCallback = createLazyComponent(() => import('@/pages/AuthCallback'));
-const GitHubCallback = createLazyComponent(() => import('@/pages/GitHubCallback'));
 const SSOPage = createLazyComponent(() => import('@/features/auth/pages/SSOPage'));
 
 const ServiceWorkerInitializer = () => {
@@ -86,7 +85,6 @@ function AppRoutes() {
       <Route path="/terminos-condiciones" element={<TerminosCondiciones />} />
       {renderAuthRoutes({
         AuthCallback,
-        GitHubCallback,
         Login,
         Onboarding,
         PulseAccessPendingPage,
