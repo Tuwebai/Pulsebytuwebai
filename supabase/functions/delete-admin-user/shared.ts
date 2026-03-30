@@ -203,18 +203,13 @@ export async function getDeletionBlockers(
   const checks = [
     { code: 'PROJECTS_CREATED', label: 'proyectos creados', table: 'projects', column: 'created_by' },
     { code: 'TICKETS', label: 'tickets', table: 'tickets', column: 'user_id' },
-    { code: 'EXPORT_JOBS', label: 'exportaciones', table: 'export_jobs', column: 'created_by' },
     { code: 'OPERATIONAL_EVENTS_OWNER', label: 'eventos operativos asignados', table: 'operational_events', column: 'owner_id' },
     { code: 'APPROVAL_REQUESTS_REQUESTED', label: 'solicitudes de aprobacion', table: 'project_approval_requests', column: 'requested_by' },
     { code: 'APPROVAL_REQUESTS_REVIEWED', label: 'revisiones de aprobacion', table: 'project_approval_requests', column: 'reviewed_by' },
     { code: 'PROJECTS_APPROVED', label: 'proyectos aprobados', table: 'projects', column: 'approved_by' },
-    { code: 'REPORT_EXECUTIONS', label: 'ejecuciones de reportes', table: 'report_executions', column: 'created_by' },
     { code: 'REPORT_TEMPLATES_CREATED', label: 'plantillas de reportes creadas', table: 'report_templates', column: 'created_by' },
     { code: 'REPORT_TEMPLATES_UPDATED', label: 'plantillas de reportes actualizadas', table: 'report_templates', column: 'updated_by' },
     { code: 'SATISFACTION_SURVEYS', label: 'encuestas', table: 'satisfaction_surveys', column: 'user_id' },
-    { code: 'SCHEDULED_EXPORTS_CREATED', label: 'exportaciones programadas creadas', table: 'scheduled_exports', column: 'created_by' },
-    { code: 'SCHEDULED_EXPORTS_UPDATED', label: 'exportaciones programadas actualizadas', table: 'scheduled_exports', column: 'updated_by' },
-    { code: 'SYSTEM_ALERTS', label: 'alertas reconocidas', table: 'system_alerts', column: 'acknowledged_by' },
     { code: 'USER_INVITATIONS', label: 'invitaciones emitidas', table: 'user_invitations', column: 'invited_by' },
   ] as const;
 
