@@ -49,10 +49,10 @@ export default function CreatePaymentDialog({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="mx-auto grid w-full max-w-[1360px] gap-5 md:grid-cols-2 lg:grid-cols-3 xl:gap-6">
+          <div className="mx-auto grid w-full max-w-[1360px] gap-5 pt-3 md:grid-cols-2 lg:grid-cols-3 xl:gap-6">
             {Object.entries(PAYMENT_TYPES).map(([key, value]) => (
               <button
-                className={`group relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[24px] border p-5 text-left transition-all disabled:cursor-not-allowed disabled:opacity-60 sm:p-6 ${
+                className={`group relative flex min-h-0 min-w-0 flex-col overflow-visible rounded-[24px] border p-5 text-left transition-all disabled:cursor-not-allowed disabled:opacity-60 sm:p-6 ${
                   value.badge
                     ? 'border-[rgba(59,158,245,0.55)] bg-[linear-gradient(180deg,rgba(19,25,44,0.98)_0%,rgba(25,22,50,0.98)_100%)] shadow-[0_0_0_1px_rgba(59,158,245,0.12),0_0_28px_rgba(59,158,245,0.18)]'
                     : 'border-[rgba(123,135,173,0.22)] bg-[linear-gradient(180deg,rgba(19,24,40,0.96)_0%,rgba(23,20,44,0.96)_100%)] hover:border-[rgba(59,158,245,0.28)]'
@@ -63,7 +63,7 @@ export default function CreatePaymentDialog({
                 type="button"
               >
                 {value.badge ? (
-                  <span className="absolute left-6 top-0 -translate-y-1/2 rounded-full border border-[rgba(59,158,245,0.42)] bg-[rgba(15,23,42,0.96)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--signal)]">
+                  <span className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-[60%] rounded-full border border-[rgba(59,158,245,0.42)] bg-[rgba(15,23,42,0.98)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--signal)] shadow-[0_10px_24px_rgba(8,12,24,0.36)]">
                     {value.badge}
                   </span>
                 ) : null}
@@ -91,7 +91,7 @@ export default function CreatePaymentDialog({
                 </div>
 
                 <div className="mt-4 space-y-2 text-sm leading-6 text-[var(--text-secondary)]">
-                  {value.features.slice(0, 4).map((feature) => (
+                  {value.features.map((feature) => (
                     <p key={feature}>• {feature}</p>
                   ))}
                 </div>
