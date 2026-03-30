@@ -14,8 +14,6 @@ export const useSupabaseContext = () => {
       let tasks = [];
       let phases = [];
       let metrics = [];
-      let activities = [];
-      let attachments = [];
       let comments = [];
       let dependencies = [];
 
@@ -115,39 +113,6 @@ export const useSupabaseContext = () => {
         console.warn('Error en consulta de métricas:', error);
       }
 
-      // Consulta de actividades - tabla real project_activity_log
-      try {
-        const { data, error } = await supabase
-          .from('project_activity_log')
-          .select('id, action, description, created_at')
-          .order('created_at', { ascending: false })
-          .limit(15);
-        
-        if (error) {
-          console.warn('Error consultando actividades:', error.message);
-        } else {
-          activities = data || [];
-        }
-      } catch (error) {
-        console.warn('Error en consulta de actividades:', error);
-      }
-
-      // Consulta de archivos - tabla real project_attachments
-      try {
-        const { data, error } = await supabase
-          .from('project_attachments')
-          .select('id, file_name, file_path, mime_type, file_size, created_at')
-          .limit(10);
-        
-        if (error) {
-          console.warn('Error consultando archivos:', error.message);
-        } else {
-          attachments = data || [];
-        }
-      } catch (error) {
-        console.warn('Error en consulta de archivos:', error);
-      }
-
       // Consulta de comentarios - tabla real task_comments
       try {
         const { data, error } = await supabase
@@ -188,8 +153,6 @@ export const useSupabaseContext = () => {
         tasks,
         phases,
         metrics,
-        activities,
-        attachments,
         comments,
         dependencies,
         timestamp: new Date().toISOString(),
@@ -201,8 +164,6 @@ export const useSupabaseContext = () => {
           tasks: tasks.length,
           phases: phases.length,
           metrics: metrics.length,
-          activities: activities.length,
-          attachments: attachments.length,
           comments: comments.length,
           dependencies: dependencies.length
         }
@@ -216,8 +177,6 @@ export const useSupabaseContext = () => {
         tasks: [],
         phases: [],
         metrics: [],
-        activities: [],
-        attachments: [],
         comments: [],
         dependencies: [],
         timestamp: new Date().toISOString(),
@@ -229,8 +188,6 @@ export const useSupabaseContext = () => {
           tasks: 0,
           phases: 0,
           metrics: 0,
-          activities: 0,
-          attachments: 0,
           comments: 0,
           dependencies: 0
         }
