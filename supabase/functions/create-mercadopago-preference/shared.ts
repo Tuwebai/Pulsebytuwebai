@@ -136,14 +136,38 @@ export function getPaymentTypeConfig(paymentType: PaymentTypeKey) {
   return PAYMENT_TYPES[paymentType];
 }
 
+function normalizePublicAppUrl(rawUrl: string, environment: string) {
+  const fallbackUrl = 'https://pulse.tuweb-ai.com';
+
+  if (!rawUrl) {
+    return fallbackUrl;
+  }
+
+  try {
+    const parsedUrl = new URL(rawUrl);
+    const isLocalHost = parsedUrl.hostname === 'localhost' || parsedUrl.hostname === '127.0.0.1';
+
+    if (environment === 'production' && isLocalHost) {
+      return fallbackUrl;
+    }
+
+    return parsedUrl.origin.replace(/\/$/, '');
+  } catch {
+    return fallbackUrl;
+  }
+}
+
 export function getMercadoPagoConfig() {
   const accessToken = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || Deno.env.get('VITE_MERCADOPAGO_ACCESS_TOKEN') || '';
   const environment = Deno.env.get('MERCADOPAGO_ENVIRONMENT') || Deno.env.get('VITE_MERCADOPAGO_ENVIRONMENT') || 'production';
-  const appUrl = Deno.env.get('PULSE_PUBLIC_URL') || Deno.env.get('VITE_PUBLIC_URL') || 'http://127.0.0.1:8083';
+  const appUrl = normalizePublicAppUrl(
+    Deno.env.get('PULSE_PUBLIC_URL') || Deno.env.get('VITE_PUBLIC_URL') || '',
+    environment,
+  );
   const webhookUrl =
     Deno.env.get('MERCADOPAGO_WEBHOOK_URL') ||
     Deno.env.get('VITE_MERCADOPAGO_WEBHOOK_URL') ||
-    `${appUrl.replace(/\/$/, '')}/api/webhooks/mercadopago`;
+    `${appUrl}/api/webhooks/mercadopago`;
 
   if (!accessToken) {
     throw new Error('MERCADOPAGO_CONFIG_MISSING');
@@ -151,7 +175,7 @@ export function getMercadoPagoConfig() {
 
   return {
     accessToken,
-    appUrl: appUrl.replace(/\/$/, ''),
+    appUrl,
     environment,
     webhookUrl,
   };

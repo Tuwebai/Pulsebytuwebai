@@ -100,14 +100,7 @@ serve(async (req) => {
           email: user.email,
           name: user.full_name ?? user.email,
         },
-        back_urls: {
-          success: `${config.appUrl}/dashboard/pagos?status=success`,
-          pending: `${config.appUrl}/dashboard/pagos?status=pending`,
-          failure: `${config.appUrl}/dashboard/pagos?status=failure`,
-        },
-        auto_return: 'approved',
         external_reference: paymentRecord.id,
-        notification_url: config.webhookUrl,
         metadata: {
           payment_id: paymentRecord.id,
           payment_type: body.paymentType,
