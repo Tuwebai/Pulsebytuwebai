@@ -20,12 +20,10 @@ export default function Topbar({
   const isClientPulseRoute =
     location.pathname === '/dashboard' || location.pathname.startsWith('/dashboard/');
   const isClientDashboardHome = location.pathname === '/dashboard';
-  const { aiLoading, greeting } = useTopbarGreeting({
+  const { greeting } = useTopbarGreeting({
     isAdminPage,
     isClientPulseRoute,
   });
-
-  const title = aiLoading ? 'Websy AI pensando...' : greeting;
 
   return (
     <header
@@ -35,7 +33,7 @@ export default function Topbar({
         className={`flex items-center justify-between px-6 ${isAdminPage || isClientPulseRoute ? 'py-6' : 'h-full'}`}
       >
         <TopbarHeaderContent
-          greeting={title}
+          greeting={greeting}
           isAdminPage={isAdminPage}
           isClientPulseRoute={isClientPulseRoute}
           onMenuClick={onMenuClick}

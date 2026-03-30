@@ -1,91 +1,48 @@
-const GREETING_KEY = 'websy_ai_greeting';
-const GREETING_TIME_KEY = 'websy_ai_greeting_time';
-const TEN_HOURS_IN_MS = 10 * 60 * 60 * 1000;
+interface PulseGreetingParams {
+  isAdminPage: boolean;
+  isClientPulseRoute: boolean;
+  projectCount: number;
+  userName: string | null;
+}
 
-export function isStoredGreetingValid() {
-  const storedGreeting = localStorage.getItem(GREETING_KEY);
-  const storedTime = localStorage.getItem(GREETING_TIME_KEY);
+function getTimeGreeting() {
+  const hour = new Date().getHours();
 
-  if (!storedGreeting || !storedTime) {
-    return false;
+  if (hour < 12) {
+    return 'Buenos días';
   }
 
-  const greetingTime = new Date(storedTime).getTime();
-  const currentTime = new Date().getTime();
-  return currentTime - greetingTime < TEN_HOURS_IN_MS;
-}
-
-export function loadStoredGreeting() {
-  if (!isStoredGreetingValid()) {
-    return null;
+  if (hour < 20) {
+    return 'Buenas tardes';
   }
 
-  return localStorage.getItem(GREETING_KEY);
+  return 'Buenas noches';
 }
 
-export function saveGreeting(greeting: string) {
-  localStorage.setItem(GREETING_KEY, greeting);
-  localStorage.setItem(GREETING_TIME_KEY, new Date().toISOString());
-}
+export function getPulseGreeting({
+  isAdminPage,
+  isClientPulseRoute,
+  projectCount,
+  userName,
+}: PulseGreetingParams) {
+  const baseGreeting = getTimeGreeting();
+  const resolvedName = userName ?? (isAdminPage ? 'equipo' : 'tu equipo');
 
-function getSpanishDayName(dayOfWeek: number) {
-  switch (dayOfWeek) {
-    case 0:
-      return 'Domingo';
-    case 1:
-      return 'Lunes';
-    case 2:
-      return 'Martes';
-    case 3:
-      return 'Miércoles';
-    case 4:
-      return 'Jueves';
-    case 5:
-      return 'Viernes';
-    default:
-      return 'Sábado';
+  if (isAdminPage) {
+    return `${baseGreeting}, ${resolvedName}`;
   }
-}
 
-export function buildAdminGreetingPrompt(userName: string, hour: number, dayOfWeek: number) {
-  return `Genera un saludo corto y motivacional para el administrador ${userName}.
+  if (isClientPulseRoute) {
+    if (projectCount > 1) {
+      return `${baseGreeting}, ${resolvedName}. Hoy Pulse sigue ${projectCount} proyectos`;
+    }
 
-Contexto:
-- Hora: ${hour}:00
-- Día: ${getSpanishDayName(dayOfWeek)}
-- Eres Websy AI
+    if (projectCount === 1) {
+      return `${baseGreeting}, ${resolvedName}. Hoy Pulse sigue tu proyecto activo`;
+    }
 
-Instrucciones:
-- Saludo corto (máximo 8 palabras)
-- Incluye el nombre ${userName}
-- Usa 1 emoji simple
-- Tono motivacional
-- Varía cada vez
+    return `${baseGreeting}, ${resolvedName}. Pulse ya está listo para tu web`;
+  }
 
-Responde SOLO con el saludo, sin explicaciones.`;
-}
-
-export function buildClientGreetingPrompt(userName: string, hour: number, dayOfWeek: number, projectCount: number) {
-  return `Genera un saludo corto y motivacional para el cliente ${userName}.
-
-Contexto:
-- Nombre: ${userName}
-- Hora: ${hour}:00
-- Día: ${getSpanishDayName(dayOfWeek)}
-- Proyectos: ${projectCount}
-- Eres Websy AI
-
-Instrucciones:
-- Saludo corto (máximo 8 palabras)
-- Incluye el nombre ${userName}
-- Usa 1 emoji simple
-- Tono motivacional
-- Menciona brevemente sus proyectos
-- Varía cada vez
-
-Responde SOLO con el saludo, sin explicaciones.`;
-}
-
-export function getFallbackGreeting() {
-  return '¡Hola! Websy AI aquí';
+  return `${baseGreeting}, ${resolvedName}`;
 }

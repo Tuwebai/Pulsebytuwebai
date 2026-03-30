@@ -323,7 +323,7 @@ ${cleanMessage}
 • Planificar acciones concretas
 
 ---
-*Evento programado por Websy AI - Pulse by TuWebAI*
+*Evento programado desde Pulse by TuWebAI*
 *Para mas informacion: https://pulse.tuweb-ai.com*`;
       }
 
@@ -347,7 +347,7 @@ ${cleanMessage}
 • Establecer próximos pasos
 
 ---
-*Evento programado por Websy AI - Pulse by TuWebAI*
+*Evento programado desde Pulse by TuWebAI*
 *Para mas informacion: https://pulse.tuweb-ai.com*`;
     };
 
