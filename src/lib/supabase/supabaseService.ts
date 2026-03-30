@@ -1,6 +1,5 @@
 import { toast } from '@/hooks/use-toast';
 import type {
-  Payment,
   Project,
   SecurityLog,
   Task,
@@ -97,23 +96,6 @@ export class SupabaseService {
     return data || [];
   }
 
-  static async getPayments(): Promise<Payment[]> {
-    const { data, error } = await supabase.from('payments').select('*').order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
-  }
-
-  static async createPayment(payment: Omit<Payment, 'id' | 'created_at' | 'updated_at'>): Promise<Payment> {
-    const { data, error } = await supabase.from('payments').insert([payment]).select().single();
-    if (error) throw error;
-    return data;
-  }
-
-  static async updatePayment(id: string, updates: Partial<Payment>): Promise<void> {
-    const { error } = await supabase.from('payments').update(updates).eq('id', id);
-    if (error) throw error;
-  }
-
   static subscribeToTable(table: string, callback: (payload: RealtimePayload) => void) {
     return supabase
       .channel(`public:${table}`)
@@ -149,7 +131,6 @@ export class SupabaseService {
 export const supabaseService = new SupabaseService();
 
 export type {
-  Payment,
   Project,
   SecurityLog,
   Task,

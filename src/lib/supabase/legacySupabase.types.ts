@@ -12,19 +12,6 @@ export interface Project {
   team_members?: string[];
 }
 
-export interface Payment {
-  id: string;
-  user_id: string;
-  amount: number;
-  currency: string;
-  status: string;
-  payment_method: string;
-  created_at: string;
-  updated_at: string;
-  project_id?: string;
-  invoice_id?: string;
-}
-
 export interface Task {
   id: string;
   title: string;
