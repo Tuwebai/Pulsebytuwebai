@@ -79,29 +79,6 @@ export interface Payment {
   invoice_id?: string;
 }
 
-export interface Comment {
-  id: string;
-  text: string;
-  author_id: string;
-  author_name: string;
-  author_role: 'admin' | 'user';
-  timestamp: string;
-  project_id: string;
-  phase_key?: string;
-  parent_id?: string;
-  replies?: Comment[];
-  reactions?: {
-    [key: string]: string[];
-  };
-  mentions?: string[];
-  attachments?: Array<{
-    name: string;
-    url: string;
-    type: string;
-  }>;
-  is_edited: boolean;
-  edited_at?: string;
-}
 
 export interface Task {
   id: string;
@@ -118,63 +95,6 @@ export interface Task {
   updated_at: string;
   tags?: string[];
   attachments?: string[];
-}
-
-export interface ProjectFile {
-  id: string;
-  name: string;
-  url: string;
-  size: number;
-  type: string;
-  uploaded_by: string;
-  uploaded_by_name: string;
-  uploaded_at: string;
-  project_id: string;
-  phase_key?: string;
-  version: number;
-  description?: string;
-  tags?: string[];
-}
-
-export interface ChatRoom {
-  id: string;
-  name: string;
-  project_id: string;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-  participants: string[];
-  is_private: boolean;
-}
-
-export interface ChatMessage {
-  id: string;
-  room_id: string;
-  sender_id: string;
-  sender_name: string;
-  content: string;
-  timestamp: string;
-  message_type: 'text' | 'file' | 'system';
-  attachments?: Array<{
-    name: string;
-    url: string;
-    type: string;
-  }>;
-}
-
-export interface EditorDocument {
-  id: string;
-  project_id: string;
-  title: string;
-  content: string;
-  language: string;
-  version: number;
-  last_modified: string;
-  last_modified_by: string;
-  last_modified_by_name: string;
-  collaborators: string[];
-  is_public: boolean;
-  tags: string[];
 }
 
 export interface UserPresence {
@@ -355,53 +275,6 @@ export class SupabaseService {
     if (error) throw error;
   }
 
-  // Comentarios
-  static async getComments(projectId: string, phaseKey?: string): Promise<Comment[]> {
-    let query = supabase
-      .from('comments')
-      .select('*')
-      .eq('project_id', projectId)
-      .is('parent_id', null)
-      .order('timestamp', { ascending: false });
-
-    if (phaseKey) {
-      query = query.eq('phase_key', phaseKey);
-    }
-
-    const { data, error } = await query;
-    if (error) throw error;
-    return data || [];
-  }
-
-  static async createComment(comment: Omit<Comment, 'id'>): Promise<Comment> {
-    const { data, error } = await supabase
-      .from('comments')
-      .insert([comment])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  }
-
-  static async updateComment(id: string, updates: Partial<Comment>): Promise<void> {
-    const { error } = await supabase
-      .from('comments')
-      .update(updates)
-      .eq('id', id);
-
-    if (error) throw error;
-  }
-
-  static async deleteComment(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('comments')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-  }
-
   // Tareas
   static async getTasks(projectId: string): Promise<Task[]> {
     const { data, error } = await supabase
@@ -438,115 +311,6 @@ export class SupabaseService {
     const { error } = await supabase
       .from('tasks')
       .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-  }
-
-  // Archivos
-  static async getProjectFiles(projectId: string): Promise<ProjectFile[]> {
-    const { data, error } = await supabase
-      .from('project_files')
-      .select('*')
-      .eq('project_id', projectId)
-      .order('uploaded_at', { ascending: false });
-
-    if (error) throw error;
-    return data || [];
-  }
-
-  static async createProjectFile(file: Omit<ProjectFile, 'id'>): Promise<ProjectFile> {
-    const { data, error } = await supabase
-      .from('project_files')
-      .insert([file])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  }
-
-  static async deleteProjectFile(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('project_files')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-  }
-
-  // Chat
-  static async getChatRooms(projectId: string): Promise<ChatRoom[]> {
-    const { data, error } = await supabase
-      .from('chat_rooms')
-      .select('*')
-      .eq('project_id', projectId)
-      .order('updated_at', { ascending: false });
-
-    if (error) throw error;
-    return data || [];
-  }
-
-  static async createChatRoom(room: Omit<ChatRoom, 'id' | 'created_at' | 'updated_at'>): Promise<ChatRoom> {
-    const { data, error } = await supabase
-      .from('chat_rooms')
-      .insert([room])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  }
-
-  static async getChatMessages(roomId: string): Promise<ChatMessage[]> {
-    const { data, error } = await supabase
-      .from('chat_messages')
-      .select('*')
-      .eq('room_id', roomId)
-      .order('timestamp', { ascending: true });
-
-    if (error) throw error;
-    return data || [];
-  }
-
-  static async createChatMessage(message: Omit<ChatMessage, 'id'>): Promise<ChatMessage> {
-    const { data, error } = await supabase
-      .from('chat_messages')
-      .insert([message])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  }
-
-  // Documentos del editor
-  static async getEditorDocuments(projectId: string): Promise<EditorDocument[]> {
-    const { data, error } = await supabase
-      .from('editor_documents')
-      .select('*')
-      .eq('project_id', projectId)
-      .order('last_modified', { ascending: false });
-
-    if (error) throw error;
-    return data || [];
-  }
-
-  static async createEditorDocument(document: Omit<EditorDocument, 'id'>): Promise<EditorDocument> {
-    const { data, error } = await supabase
-      .from('editor_documents')
-      .insert([document])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  }
-
-  static async updateEditorDocument(id: string, updates: Partial<EditorDocument>): Promise<void> {
-    const { error } = await supabase
-      .from('editor_documents')
-      .update(updates)
       .eq('id', id);
 
     if (error) throw error;
