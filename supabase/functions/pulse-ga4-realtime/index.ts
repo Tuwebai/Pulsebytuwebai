@@ -1,22 +1,17 @@
 // @ts-expect-error - Deno runtime
 /// <reference lib="deno.window" />
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
-import { createSupabaseAdminClient } from '../sync-ga4-metrics/request.ts';
 import { getGoogleAccessToken } from '../sync-ga4-metrics/ga4.ts';
+import { createSupabaseAdminClient } from '../sync-ga4-metrics/request.ts';
 import { corsHeaders, jsonResponse, SyncGa4MetricsError } from '../sync-ga4-metrics/types.ts';
+import { buildRealtimeEvents, getEventCount } from './events.ts';
 
 interface RealtimeRow {
   dimensionValues?: Array<{ value?: string }>;
   metricValues?: Array<{ value?: string }>;
 }
 
-interface RealtimeEventSummary {
-  name: string;
-  count: number;
-  keyEvents: number;
-}
-
-function extractBearerToken(authorization: string): string {
+function extractBearerToken(authorization: string) {
   const [scheme, token] = authorization.trim().split(/\s+/, 2);
 
   if (scheme?.toLowerCase() !== 'bearer' || !token) {
@@ -28,40 +23,6 @@ function extractBearerToken(authorization: string): string {
 
 function parseRealtimeRows(rows: RealtimeRow[] | undefined) {
   return rows || [];
-}
-
-function normalizeEventName(name: string): string {
-  switch (name) {
-    case 'click_cta':
-      return 'Clics en contacto';
-    case 'page_view':
-      return 'Páginas vistas';
-    case 'section_view':
-      return 'Secciones vistas';
-    case 'session_start':
-      return 'Nuevas sesiones';
-    case 'first_visit':
-      return 'Primeras visitas';
-    case 'user_engagement':
-      return 'Interacción activa';
-    case 'web_vitals':
-      return 'Chequeos de rendimiento';
-    default:
-      return name === '(other)' ? 'Otros eventos' : name;
-  }
-}
-
-function buildRealtimeEvents(rows: RealtimeRow[]): RealtimeEventSummary[] {
-  return rows.map((row) => ({
-    name: normalizeEventName(row.dimensionValues?.[0]?.value || 'evento'),
-    count: parseInt(row.metricValues?.[0]?.value || '0', 10),
-    keyEvents: parseInt(row.metricValues?.[1]?.value || '0', 10),
-  }));
-}
-
-function getEventCount(events: RealtimeEventSummary[], targetName: string): number {
-  const target = normalizeEventName(targetName);
-  return events.find((event) => event.name === target)?.count || 0;
 }
 
 serve(async (req) => {
@@ -178,9 +139,7 @@ serve(async (req) => {
     ]);
 
     if (!totalsResponse.ok || !pagesResponse.ok || !eventsResponse.ok) {
-      throw new Error(
-        `GA4 realtime error: ${totalsResponse.status}/${pagesResponse.status}/${eventsResponse.status}`,
-      );
+      throw new Error(`GA4 realtime error: ${totalsResponse.status}/${pagesResponse.status}/${eventsResponse.status}`);
     }
 
     const [totalsRaw, pagesRaw, eventsRaw] = await Promise.all([
@@ -195,17 +154,19 @@ serve(async (req) => {
 
     return jsonResponse(200, {
       activeUsers: parseInt(totalRow?.metricValues?.[0]?.value || '0', 10),
-      pageViews: getEventCount(eventRows, 'page_view'),
-      ctaClicks: getEventCount(eventRows, 'click_cta'),
+      pageViews: getEventCount(eventRows, ['Paginas vistas']),
+      ctaClicks: getEventCount(eventRows, [
+        'Clics en contacto',
+        'Clics en WhatsApp',
+        'Clics en llamada',
+        'Clics en email',
+      ]),
       topPages: pageRows.map((row) => ({
         label: row.dimensionValues?.[0]?.value || 'Página sin nombre',
         activeUsers: parseInt(row.metricValues?.[0]?.value || '0', 10),
         views: parseInt(row.metricValues?.[1]?.value || '0', 10),
       })),
-      topEvents: eventRows
-        .filter((event) => event.count > 0)
-        .sort((left, right) => right.count - left.count)
-        .slice(0, 5),
+      topEvents: eventRows.slice(0, 5),
       sampledAt: new Date().toISOString(),
     });
   } catch (error) {
@@ -214,6 +175,7 @@ serve(async (req) => {
     }
 
     console.error('[pulse-ga4-realtime]', error);
+
     return jsonResponse(500, {
       error: 'PULSE_GA4_REALTIME_FAILED',
       message: 'No pudimos consultar la actividad en vivo de tu web.',

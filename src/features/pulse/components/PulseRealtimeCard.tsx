@@ -29,6 +29,8 @@ function RealtimeStat({
 }
 
 export default function PulseRealtimeCard({ data, error, loading }: PulseRealtimeCardProps) {
+  const hasRelevantEvents = Boolean(data && data.topEvents.length > 0);
+
   return (
     <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
       <div className="flex flex-col gap-1 md:flex-row md:items-end md:justify-between">
@@ -76,15 +78,21 @@ export default function PulseRealtimeCard({ data, error, loading }: PulseRealtim
             </div>
 
             <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)]/50 p-4">
-              <h3 className="text-sm font-medium text-[var(--text-primary)]">Eventos más frecuentes</h3>
-              <div className="mt-4 space-y-3">
-                {data.topEvents.map((event) => (
-                  <div key={event.name} className="flex items-center gap-3 text-sm">
-                    <span className="min-w-0 flex-1 truncate text-[var(--text-secondary)]">{event.name}</span>
-                    <span className="font-data text-[var(--text-primary)]">{event.count}</span>
-                  </div>
-                ))}
-              </div>
+              <h3 className="text-sm font-medium text-[var(--text-primary)]">Movimientos relevantes</h3>
+              {hasRelevantEvents ? (
+                <div className="mt-4 space-y-3">
+                  {data.topEvents.map((event) => (
+                    <div key={event.name} className="flex items-center gap-3 text-sm">
+                      <span className="min-w-0 flex-1 truncate text-[var(--text-secondary)]">{event.name}</span>
+                      <span className="font-data text-[var(--text-primary)]">{event.count}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-[var(--text-secondary)]">
+                  Todavía no vemos movimientos relevantes en esta muestra en vivo.
+                </p>
+              )}
             </div>
           </div>
         </div>
