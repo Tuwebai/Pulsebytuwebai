@@ -118,15 +118,18 @@ export function aggregateMetrics(rows: PulseMetricRow[]) {
 }
 
 export function getTopPages(rows: PulseMetricRow[]): TopPage[] {
-  const pages = new Map<string, { label: string; path: string; visits: number }>();
+  const pages = new Map<string, { label: string; labelVisits: number; path: string; visits: number }>();
 
   rows.forEach((row) => {
     if (row.top_pages.length > 0) {
       row.top_pages.forEach((page) => {
         const normalizedPath = normalizePagePath(page.path);
         const previous = pages.get(normalizedPath);
+        const nextLabel = resolvePulsePageLabel(normalizedPath, page.label);
+        const shouldReplaceLabel = !previous || page.visits > previous.labelVisits;
         pages.set(normalizedPath, {
-          label: resolvePulsePageLabel(normalizedPath, page.label),
+          label: shouldReplaceLabel ? nextLabel : previous.label,
+          labelVisits: shouldReplaceLabel ? page.visits : previous.labelVisits,
           path: normalizedPath,
           visits: (previous?.visits || 0) + page.visits,
         });
@@ -141,7 +144,8 @@ export function getTopPages(rows: PulseMetricRow[]): TopPage[] {
     const normalizedPath = normalizePagePath(row.top_page);
     const previous = pages.get(normalizedPath);
     pages.set(normalizedPath, {
-      label: resolvePulsePageLabel(normalizedPath),
+      label: previous?.label ?? resolvePulsePageLabel(normalizedPath),
+      labelVisits: previous?.labelVisits ?? row.top_page_visits,
       path: normalizedPath,
       visits: (previous?.visits || 0) + row.top_page_visits,
     });
