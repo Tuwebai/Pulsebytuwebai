@@ -2,7 +2,7 @@
 export const MERCADOPAGO_CONFIG = {
   // Configuración pública (frontend)
   PUBLIC_KEY: import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '',
-  ACCESS_TOKEN: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || '',
+  ENVIRONMENT: import.meta.env.VITE_MERCADOPAGO_ENVIRONMENT || 'production',
   
   // URLs de webhooks
   WEBHOOK_URL: `${config.app.publicUrl}/api/webhooks/mercadopago`,

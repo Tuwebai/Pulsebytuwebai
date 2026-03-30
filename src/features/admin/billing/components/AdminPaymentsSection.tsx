@@ -1,9 +1,15 @@
 import { CreditCard } from 'lucide-react';
-
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { AdminPaymentRecord } from '@/api/admin/adminDashboard.api';
+import { Badge, MetricCard, PulseFeedbackState } from '@/core/components';
+import {
+  formatAdminPaymentAmount,
+  getAdminPaymentStatusLabel,
+  getAdminPaymentStatusVariant,
+  getApprovedAdminPaymentsTotal,
+  getPendingAdminPaymentsCount,
+  normalizeAdminPaymentStatus,
+} from '../adminPayments.utils';
 
 interface AdminPaymentsSectionProps {
   payments: AdminPaymentRecord[];
@@ -14,82 +20,79 @@ export function AdminPaymentsSection({
   payments,
   onUpdatePaymentStatus,
 }: AdminPaymentsSectionProps) {
+  const pendingPayments = getPendingAdminPaymentsCount(payments);
+  const approvedTotal = getApprovedAdminPaymentsTotal(payments);
+
+  if (payments.length === 0) {
+    return (
+      <PulseFeedbackState
+        description="Los movimientos de pago van a aparecer acá cuando exista actividad real para revisar."
+        title="Todavía no hay pagos para revisar"
+        variant="empty"
+      />
+    );
+  }
+
   return (
-    <div className="h-full flex flex-col">
-      <Card className="h-full rounded-2xl border border-border/50 bg-card shadow-lg transition-all duration-300 hover:shadow-xl">
-        <CardHeader className="rounded-t-2xl bg-gradient-to-r from-slate-50 to-slate-100">
-          <CardTitle className="flex items-center space-x-3 text-xl font-bold text-card-foreground sm:text-2xl">
-            <CreditCard size={20} className="text-violet-600 sm:h-6 sm:w-6" />
-            <span>Gestión de Pagos</span>
-          </CardTitle>
-          <CardDescription className="text-sm text-slate-600 sm:text-base">
-            Administra pagos y transacciones del sistema
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex-1 p-4 sm:p-6">
-          {payments.length === 0 ? (
-            <div className="flex h-full items-center justify-center">
-              <div className="text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-violet-100 to-violet-200 sm:h-20 sm:w-20">
-                  <CreditCard className="h-8 w-8 text-violet-400 sm:h-10 sm:w-10" />
-                </div>
-                <h3 className="mb-2 text-lg font-semibold text-slate-700">No hay pagos registrados</h3>
-                <p className="text-sm text-slate-500">Los pagos aparecerán aquí cuando se registren</p>
+    <section className="space-y-5">
+      <div className="flex items-start gap-3">
+        <div className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[var(--bg-elevated)]">
+          <CreditCard className="h-5 w-5 text-[var(--signal)]" strokeWidth={1.5} />
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold text-[var(--text-primary)]">Pagos del sistema</h2>
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">
+            Revisá el estado real de los cobros y actualizá el seguimiento cuando haga falta.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        <MetricCard label="Pagos registrados" period="base total" value={payments.length} />
+        <MetricCard label="Monto acreditado" period="solo pagos aprobados" value={formatAdminPaymentAmount(approvedTotal)} />
+        <MetricCard label="Pendientes" period="requieren seguimiento" value={pendingPayments} />
+      </div>
+
+      <div className="overflow-hidden rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)]">
+        <div className="grid grid-cols-[minmax(0,1.6fr)_minmax(120px,0.8fr)_minmax(120px,0.9fr)] gap-4 border-b border-[var(--border-subtle)] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+          <span>Movimiento</span>
+          <span>Estado</span>
+          <span>Actualizar</span>
+        </div>
+
+        <div className="divide-y divide-[var(--border-subtle)]">
+          {payments.map((payment) => (
+            <div className="grid grid-cols-1 gap-4 px-5 py-4 md:grid-cols-[minmax(0,1.6fr)_minmax(120px,0.8fr)_minmax(120px,0.9fr)]" key={payment.id}>
+              <div>
+                <p className="text-sm font-medium text-[var(--text-primary)]">{payment.description || 'Pago sin descripción'}</p>
+                <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                  {formatAdminPaymentAmount(payment.amount)} · {new Date(payment.created_at).toLocaleDateString('es-AR')}
+                </p>
               </div>
+
+              <div className="flex items-center">
+                <Badge variant={getAdminPaymentStatusVariant(payment.status)}>{getAdminPaymentStatusLabel(payment.status)}</Badge>
+              </div>
+
+              <Select
+                value={normalizeAdminPaymentStatus(payment.status)}
+                onValueChange={(value) => void onUpdatePaymentStatus(payment.id, value)}
+              >
+                <SelectTrigger className="w-full text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">Pendiente</SelectItem>
+                  <SelectItem value="approved">Acreditado</SelectItem>
+                  <SelectItem value="in_process">En revisión</SelectItem>
+                  <SelectItem value="rejected">Rechazado</SelectItem>
+                  <SelectItem value="cancelled">Cancelado</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          ) : (
-            <div className="flex-1 space-y-3 overflow-y-auto sm:space-y-4">
-              {payments.map((payment) => (
-                <div
-                  key={payment.id}
-                  className="flex items-center justify-between rounded-xl bg-muted/50 p-3 transition-all duration-200 hover:bg-muted sm:p-4"
-                >
-                  <div className="flex items-center space-x-3 sm:space-x-4">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-violet-600 text-sm font-bold text-white sm:h-10 sm:w-10 sm:text-base">
-                      $
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-card-foreground sm:text-base">
-                        ${payment.amount}
-                      </div>
-                      <div className="text-xs text-slate-500 sm:text-sm">
-                        {payment.description || 'Sin descripción'}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 sm:space-x-3">
-                    <Badge
-                      variant={
-                        payment.status === 'completed'
-                          ? 'default'
-                          : payment.status === 'pending'
-                            ? 'secondary'
-                            : 'destructive'
-                      }
-                      className="text-xs"
-                    >
-                      {payment.status || 'pending'}
-                    </Badge>
-                    <Select
-                      value={payment.status || 'pending'}
-                      onValueChange={(value) => void onUpdatePaymentStatus(payment.id, value)}
-                    >
-                      <SelectTrigger className="w-24 text-xs sm:w-32 sm:text-sm">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">Pendiente</SelectItem>
-                        <SelectItem value="completed">Completado</SelectItem>
-                        <SelectItem value="failed">Fallido</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

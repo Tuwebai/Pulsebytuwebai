@@ -74,8 +74,8 @@ export function useAdminScreenRegistry({
         ),
       );
       toast({
-        title: 'Exito',
-        description: 'Estado del pago actualizado correctamente.',
+        title: 'Listo',
+        description: 'El estado del pago se actualizó correctamente.',
       });
     } catch (error) {
       console.error('Error updating payment status:', error);

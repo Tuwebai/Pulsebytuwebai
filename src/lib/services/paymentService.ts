@@ -1,4 +1,5 @@
-import { MERCADOPAGO_CONFIG, PAYMENT_TYPES, formatCurrency } from '../integrations/mercadopago';
+import { PAYMENT_TYPES, formatCurrency } from '../integrations/mercadopago';
+import { requestMercadoPagoPreference } from '@/api/payments/mercadoPago.api';
 import { supabase } from '../supabase';
 import type { CreatePaymentData, Payment } from '@/types';
 
@@ -70,67 +71,10 @@ export const createMercadoPagoPreference = async (paymentData: CreatePaymentData
       throw new Error('Tipo de pago no valido');
     }
 
-    const amount = paymentData.customAmount || paymentType.price;
-    const preference = {
-      items: [
-        {
-          title: paymentType.name,
-          description: paymentType.description,
-          quantity: 1,
-          unit_price: fromCents(amount),
-        },
-      ],
-      payer: {
-        email: paymentData.userEmail,
-        name: paymentData.userName,
-      },
-      back_urls: {
-        success: MERCADOPAGO_CONFIG.SUCCESS_URL,
-        pending: MERCADOPAGO_CONFIG.PENDING_URL,
-        failure: MERCADOPAGO_CONFIG.FAILURE_URL,
-      },
-      auto_return: 'approved',
-      external_reference: `payment_${Date.now()}`,
-      notification_url: MERCADOPAGO_CONFIG.WEBHOOK_URL,
-      expires: true,
-      expiration_date_to: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    };
-
-    const mockPreferenceId = `pref_${Date.now()}`;
-
-    const { data: paymentDoc, error: paymentError } = await supabase
-      .from('payments')
-      .insert({
-        user_id: paymentData.userId,
-        user_email: paymentData.userEmail,
-        user_name: paymentData.userName,
-        payment_type: paymentData.paymentType,
-        amount,
-        currency: paymentType.currency,
-        status: 'pending',
-        mercadopago_id: mockPreferenceId,
-        description: paymentType.description,
-        features: paymentType.features,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        metadata: {
-          preference,
-          paymentType,
-        },
-      })
-      .select('id')
-      .single();
-
-    if (paymentError) {
-      throw paymentError;
-    }
-
-    return {
-      preferenceId: mockPreferenceId,
-      paymentId: paymentDoc.id,
-      initPoint: `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${mockPreferenceId}`,
-      sandboxInitPoint: `https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=${mockPreferenceId}`,
-    };
+    return requestMercadoPagoPreference({
+      customAmount: paymentData.customAmount,
+      paymentType: paymentData.paymentType,
+    });
   } catch (error) {
     console.error('Error creating Mercado Pago preference:', error);
     throw error;
@@ -152,7 +96,7 @@ export const processMercadoPagoWebhook = async (webhookData: unknown) => {
     const { data: paymentsData, error: paymentsError } = await supabase
       .from('payments')
       .select('*')
-      .eq('mercadopago_id', paymentInfo.external_reference);
+      .eq('id', paymentInfo.external_reference);
 
     if (paymentsError) {
       throw paymentsError;
@@ -321,5 +265,3 @@ export const getAllPayments = (callback: (payments: Payment[]) => void) => {
 
   return () => subscription.unsubscribe();
 };
-
-const fromCents = (amount: number) => amount / 100;

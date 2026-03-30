@@ -1,5 +1,6 @@
 import { updateAdminPaymentRecordStatus } from '@/api/admin/adminBilling.api';
 import { notificationService } from '@/lib/services/notificationService';
+import { getAdminPaymentStatusLabel } from '../adminPayments.utils';
 
 export async function updateAdminPaymentStatus(
   paymentId: string,
@@ -9,8 +10,8 @@ export async function updateAdminPaymentStatus(
   await updateAdminPaymentRecordStatus(paymentId, newStatus);
 
   await notificationService.createNotification({
-    title: 'Estado de Pago Actualizado',
-    message: `El pago ha sido marcado como ${newStatus}`,
+    title: 'Estado de pago actualizado',
+    message: `El pago ahora figura como ${getAdminPaymentStatusLabel(newStatus).toLowerCase()}.`,
     type: 'info',
     user_id: actorUserId,
     category: 'payment',
