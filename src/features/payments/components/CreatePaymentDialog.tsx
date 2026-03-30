@@ -1,4 +1,4 @@
-import { ArrowRight, CreditCard } from 'lucide-react';
+import { ArrowRight, Clock3, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PAYMENT_TYPES, formatCurrency } from '@/lib/mercadopago';
@@ -18,91 +18,94 @@ export default function CreatePaymentDialog({
 }: CreatePaymentDialogProps) {
   return (
     <Dialog onOpenChange={onClose} open={open}>
-      <DialogContent className="max-w-5xl rounded-[28px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-0 text-[var(--text-primary)]">
-        <DialogHeader className="border-b border-[var(--border-subtle)] px-6 py-6">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--signal)]">Planes TuWebAI</p>
-          <DialogTitle className="mt-2 text-[28px] font-semibold leading-tight text-[var(--text-primary)]">
-            Elegí qué querés pagar hoy
-          </DialogTitle>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--text-secondary)]">
-            Te llevamos a un checkout seguro de Mercado Pago. Si necesitás otra etapa o un alcance distinto, lo revisamos con vos desde Soporte.
-          </p>
-        </DialogHeader>
+      <DialogContent
+        className="max-h-[88vh] !w-[95vw] !max-w-[1320px] overflow-hidden rounded-[30px] border border-[var(--border-default)] bg-[linear-gradient(180deg,rgba(11,15,30,0.98)_0%,rgba(20,18,42,0.98)_100%)] p-0 text-[var(--text-primary)] shadow-[0_36px_110px_rgba(0,0,0,0.62)] backdrop-blur"
+        hideCloseButton
+      >
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_center,rgba(59,158,245,0.18),transparent_24%),radial-gradient(circle_at_top_right,rgba(123,76,212,0.22),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent_22%)]" />
 
-        <div className="space-y-6 px-6 pb-6">
-          <div className="grid gap-4 xl:grid-cols-3">
+        <div className="relative overflow-y-auto px-5 pb-6 pt-6 sm:px-6 lg:px-8 lg:pb-8">
+          <Button
+            className="absolute right-5 top-5 rounded-full border border-[var(--border-default)] bg-[rgba(34,45,66,0.92)] px-4 text-[var(--text-primary)] hover:border-[rgba(59,158,245,0.32)] hover:bg-[rgba(39,51,74,0.98)]"
+            onClick={onClose}
+            type="button"
+            variant="outline"
+          >
+            Cerrar
+          </Button>
+
+          <DialogHeader className="mx-auto max-w-[620px] items-center px-2 pb-8 pt-8 text-center sm:pt-10">
+            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--signal)]">Planes TuWebAI</p>
+            <DialogTitle className="mt-3 text-balance text-[30px] font-semibold leading-[1.08] text-[var(--text-primary)] sm:text-[38px]">
+              Tres planes. Precios claros.
+              <span className="mt-1 block bg-[linear-gradient(90deg,#39b4ff_0%,#7b4cd4_56%,#a855f7_100%)] bg-clip-text text-transparent">
+                Sin sorpresas al final del proyecto.
+              </span>
+            </DialogTitle>
+            <p className="mt-4 max-w-[520px] text-sm leading-6 text-[var(--text-secondary)]">
+              Elegí el punto de partida para tu negocio. La consulta inicial siempre es sin cargo y el pago se abre en un checkout
+              seguro de Mercado Pago.
+            </p>
+          </DialogHeader>
+
+          <div className="mx-auto grid max-w-[1040px] gap-5 md:grid-cols-2 xl:grid-cols-3">
             {Object.entries(PAYMENT_TYPES).map(([key, value]) => (
               <button
-                className={`rounded-[22px] border p-5 text-left transition-all disabled:cursor-not-allowed disabled:opacity-60 ${
+                className={`group relative flex min-h-[380px] flex-col overflow-hidden rounded-[24px] border p-5 text-left transition-all disabled:cursor-not-allowed disabled:opacity-60 sm:p-6 ${
                   value.badge
-                    ? 'border-[var(--signal)] bg-[linear-gradient(180deg,rgba(16,24,40,0.98)_0%,rgba(20,27,45,0.96)_100%)] shadow-[0_0_0_1px_rgba(60,188,252,0.08)]'
-                    : 'border-[var(--border-default)] bg-[var(--bg-elevated)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-subtle)]'
+                    ? 'border-[rgba(59,158,245,0.55)] bg-[linear-gradient(180deg,rgba(19,25,44,0.98)_0%,rgba(25,22,50,0.98)_100%)] shadow-[0_0_0_1px_rgba(59,158,245,0.12),0_0_28px_rgba(59,158,245,0.18)]'
+                    : 'border-[rgba(123,135,173,0.22)] bg-[linear-gradient(180deg,rgba(19,24,40,0.96)_0%,rgba(23,20,44,0.96)_100%)] hover:border-[rgba(59,158,245,0.28)]'
                 }`}
                 disabled={processingPayment}
                 key={key}
                 onClick={() => void onCreatePayment(key)}
                 type="button"
               >
-                <div className="flex h-full flex-col gap-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[rgba(8,14,24,0.72)]">
-                      <CreditCard className="h-4 w-4 text-[var(--signal)]" strokeWidth={1.6} />
-                    </div>
-                    {value.badge ? (
-                      <span className="rounded-full border border-[rgba(60,188,252,0.35)] bg-[rgba(60,188,252,0.08)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--signal)]">
-                        {value.badge}
-                      </span>
-                    ) : null}
-                  </div>
+                {value.badge ? (
+                  <span className="absolute left-6 top-0 -translate-y-1/2 rounded-full border border-[rgba(59,158,245,0.42)] bg-[rgba(15,23,42,0.96)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--signal)]">
+                    {value.badge}
+                  </span>
+                ) : null}
 
-                  <div>
-                    <p className="text-[22px] font-semibold leading-tight text-[var(--text-primary)]">{value.name}</p>
-                    <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">{value.description}</p>
-                  </div>
+                <div className="flex h-11 w-11 items-center justify-center rounded-[14px] border border-[rgba(59,158,245,0.18)] bg-[rgba(8,14,24,0.48)]">
+                  <CreditCard className="h-4 w-4 text-[var(--signal)]" strokeWidth={1.7} />
+                </div>
 
-                  <div>
-                    <p className="text-[30px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
-                      {value.pricePrefix ? `${value.pricePrefix} ` : ''}
-                      {formatCurrency(value.price, value.currency)}
-                    </p>
-                    <div className="mt-4 rounded-[14px] border border-[var(--border-default)] bg-[rgba(8,14,24,0.55)] px-4 py-3">
-                      <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--signal)]">Entrega estimada</p>
-                      <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">{value.timeline}</p>
-                    </div>
-                  </div>
+                <div className="mt-6">
+                  <p className="text-[17px] font-semibold leading-tight text-[var(--text-primary)]">{value.name}</p>
+                  <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">{value.description}</p>
+                </div>
 
-                  <div className="space-y-2 text-sm leading-6 text-[var(--text-secondary)]">
-                    {value.features.slice(0, 5).map((feature) => (
-                      <p key={feature}>• {feature}</p>
-                    ))}
-                  </div>
+                <p className="mt-6 text-[17px] font-semibold text-[var(--text-primary)] sm:text-[20px]">
+                  {value.pricePrefix ? `${value.pricePrefix} ` : ''}
+                  {formatCurrency(value.price, value.currency)}
+                </p>
 
-                  <div className="mt-auto flex items-center justify-between rounded-[14px] border border-[var(--border-default)] bg-[rgba(8,14,24,0.45)] px-4 py-3">
+                <div className="mt-5 rounded-[14px] border border-[var(--border-default)] bg-[rgba(7,13,24,0.52)] px-4 py-3">
+                  <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--signal)]">
+                    <Clock3 className="h-3.5 w-3.5" strokeWidth={1.8} />
+                    Entrega estimada
+                  </div>
+                  <p className="mt-2 text-sm font-medium leading-5 text-[var(--text-primary)]">{value.timeline}</p>
+                </div>
+
+                <div className="mt-5 space-y-2 text-sm leading-6 text-[var(--text-secondary)]">
+                  {value.features.slice(0, 5).map((feature) => (
+                    <p key={feature}>• {feature}</p>
+                  ))}
+                </div>
+
+                <div className="mt-auto pt-6">
+                  <div className="flex items-center justify-between rounded-[14px] border border-[var(--border-default)] bg-[rgba(10,15,28,0.52)] px-4 py-3 transition-colors group-hover:border-[rgba(59,158,245,0.32)]">
                     <div>
                       <p className="text-sm font-medium text-[var(--text-primary)]">{value.cta}</p>
-                      <p className="mt-1 text-[11px] uppercase tracking-[0.12em] text-[var(--text-tertiary)]">
-                        Pago con Mercado Pago
-                      </p>
+                      <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-[var(--text-tertiary)]">Pago con Mercado Pago</p>
                     </div>
-                    <ArrowRight className="h-4 w-4 text-[var(--signal)]" strokeWidth={1.6} />
+                    <ArrowRight className="h-4 w-4 text-[var(--signal)]" strokeWidth={1.8} />
                   </div>
                 </div>
               </button>
             ))}
-          </div>
-
-          <div className="flex flex-col gap-4 border-t border-[var(--border-subtle)] pt-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm leading-6 text-[var(--text-secondary)]">
-              Cada pago queda registrado en tu historial para que puedas revisar estado, factura y seguimiento desde Pulse.
-            </p>
-            <Button
-              className="rounded-[10px] border border-[var(--border-default)] bg-transparent px-4 text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
-              onClick={onClose}
-              type="button"
-              variant="outline"
-            >
-              Cancelar
-            </Button>
           </div>
         </div>
       </DialogContent>
