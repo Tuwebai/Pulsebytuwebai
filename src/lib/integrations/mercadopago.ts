@@ -1,71 +1,73 @@
-// Configuración de Mercado Pago
+import config from '@/config/environment';
+
 export const MERCADOPAGO_CONFIG = {
-  // Configuración pública (frontend)
   PUBLIC_KEY: import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '',
   ENVIRONMENT: import.meta.env.VITE_MERCADOPAGO_ENVIRONMENT || 'production',
-  
-  // URLs de webhooks
   WEBHOOK_URL: `${config.app.publicUrl}/api/webhooks/mercadopago`,
   SUCCESS_URL: `${config.app.publicUrl}/dashboard/pagos?status=success`,
   PENDING_URL: `${config.app.publicUrl}/dashboard/pagos?status=pending`,
   FAILURE_URL: `${config.app.publicUrl}/dashboard/pagos?status=failure`,
-  
-  // Configuración de la aplicación
   APP_NAME: 'Pulse by TuWebAI',
-  APP_VERSION: '1.0.0'
-};
+  APP_VERSION: '1.0.0',
+} as const;
 
-// Tipos de pago disponibles
 export const PAYMENT_TYPES = {
   WEBSITE: {
     id: 'website',
-    name: 'Desarrollo de Sitio Web',
-    description: 'Sitio web profesional con diseño personalizado',
-    price: 99900, // $999.00 en centavos
+    name: 'Presencia Profesional',
+    description: 'Para el negocio que necesita presencia profesional en Google y empezar a recibir consultas.',
+    price: 42000000,
     currency: 'ARS',
     features: [
-      'Diseño responsive',
-      'SEO optimizado',
-      'Panel de administración',
-      'Hosting incluido (1 año)',
-      'Dominio incluido (1 año)',
-      'Soporte técnico (3 meses)'
-    ]
+      'Sitio institucional a medida',
+      'Diseño responsive para mobile y desktop',
+      'Formulario de contacto o WhatsApp',
+      'SEO base para aparecer en Google',
+      'Analytics configurado desde el día 1',
+    ],
+    timeline: '2 a 3 semanas',
+    cta: 'Quiero esta web',
+    badge: null,
+    pricePrefix: null,
   },
   ECOMMERCE: {
     id: 'ecommerce',
-    name: 'Tienda Online',
-    description: 'Tienda virtual completa con pasarela de pagos',
-    price: 199900, // $1,999.00 en centavos
+    name: 'Web Comercial',
+    description: 'Para el negocio que quiere que su web genere consultas de forma consistente.',
+    price: 78000000,
     currency: 'ARS',
     features: [
-      'Todo lo del sitio web',
-      'Catálogo de productos',
-      'Carrito de compras',
-      'Pasarela de pagos',
-      'Gestión de inventario',
-      'Reportes de ventas',
-      'Soporte técnico (6 meses)'
-    ]
+      'Arquitectura pensada para convertir',
+      'Formularios y automatizaciones',
+      'SEO técnico y estructura optimizada',
+      'Analytics y seguimiento de conversión',
+      'Hosting y dominio profesional por 1 año',
+    ],
+    timeline: '3 a 4 semanas',
+    cta: 'Lanzar mi web comercial',
+    badge: 'Más elegido por negocios',
+    pricePrefix: null,
   },
   CUSTOM: {
     id: 'custom',
-    name: 'Proyecto Personalizado',
-    description: 'Solución a medida según tus necesidades',
-    price: 299900, // $2,999.00 en centavos
+    name: 'Sistema a Medida',
+    description: 'Para el negocio que necesita algo que no existe todavía: paneles, flujos e integraciones propias.',
+    price: 140000000,
     currency: 'ARS',
     features: [
-      'Análisis de requerimientos',
-      'Diseño personalizado',
-      'Desarrollo a medida',
-      'Integraciones especiales',
-      'Capacitación del equipo',
-      'Soporte técnico (12 meses)'
-    ]
-  }
-};
+      'Paneles o módulos personalizados',
+      'Integraciones con sistemas externos',
+      'Arquitectura escalable',
+      'Desarrollo orientado al crecimiento',
+      'Diagnóstico técnico incluido antes de arrancar',
+    ],
+    timeline: 'Según alcance definido en la consulta inicial',
+    cta: 'Solicitar propuesta',
+    badge: null,
+    pricePrefix: 'Desde',
+  },
+} as const;
 
-// Estados de pago de Mercado Pago
 export const PAYMENT_STATUS = {
   PENDING: 'pending',
   APPROVED: 'approved',
@@ -75,24 +77,16 @@ export const PAYMENT_STATUS = {
   REJECTED: 'rejected',
   CANCELLED: 'cancelled',
   REFUNDED: 'refunded',
-  CHARGED_BACK: 'charged_back'
-};
+  CHARGED_BACK: 'charged_back',
+} as const;
 
-// Función para formatear moneda
-export const formatCurrency = (amount: number, currency: string = 'ARS') => {
-  return new Intl.NumberFormat('es-AR', {
+export const formatCurrency = (amount: number, currency = 'ARS') =>
+  new Intl.NumberFormat('es-AR', {
     style: 'currency',
-    currency: currency
-  }).format(amount / 100); // Convertir de centavos a pesos
-};
+    currency,
+    maximumFractionDigits: 0,
+  }).format(amount / 100);
 
-// Función para convertir pesos a centavos
-export const toCents = (amount: number) => {
-  return Math.round(amount * 100);
-};
+export const toCents = (amount: number) => Math.round(amount * 100);
 
-// Función para convertir centavos a pesos
-export const fromCents = (amount: number) => {
-  return amount / 100;
-}; 
-import config from '@/config/environment';
+export const fromCents = (amount: number) => amount / 100;
