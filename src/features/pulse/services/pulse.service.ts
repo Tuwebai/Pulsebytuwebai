@@ -169,9 +169,11 @@ export function getTopPages(rows: PulseMetricRow[]): TopPage[] {
     .slice(0, 5);
 }
 
-export function formatChartData(rows: PulseMetricRow[]): ChartDataPoint[] {
-  return rows.map((row) => ({
+export function formatChartData(rows: PulseMetricRow[], previousRows: PulseMetricRow[] = []): ChartDataPoint[] {
+  return rows.map((row, index) => ({
     date: new Intl.DateTimeFormat('es-AR', { day: '2-digit', month: 'short' }).format(new Date(`${row.date}T00:00:00`)),
+    previousContacts: previousRows[index]?.contacts ?? null,
+    previousVisits: previousRows[index]?.visits ?? null,
     visits: row.visits,
     contacts: row.contacts
   }));
@@ -215,7 +217,7 @@ export async function getPulseMetrics(projectId: string, period: Period): Promis
     consultationRate: calcConsultationRate(current.visits, current.contacts),
     avgSessionSec: current.avgSessionSec,
     topPages: getTopPages(currentRows),
-    chartData: formatChartData(currentRows),
+    chartData: formatChartData(currentRows, previousRows),
     period,
     dateRange,
     hasData: currentRows.length > 0,

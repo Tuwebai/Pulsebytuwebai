@@ -21,6 +21,8 @@ export interface TopPage {
 
 export interface ChartDataPoint {
   date: string;
+  previousContacts: number | null;
+  previousVisits: number | null;
   visits: number;
   contacts: number;
 }

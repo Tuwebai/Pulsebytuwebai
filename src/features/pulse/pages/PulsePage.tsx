@@ -72,10 +72,7 @@ export default function PulsePage() {
       {canViewMetrics ? <PulseRealtimeCard data={realtimeData} error={realtimeError} loading={realtimeLoading} /> : null}
 
       <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5" data-tour="pulse-chart">
-        <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">Visitas por día</p>
-        <div className="mt-4">
-          <PulseChart data={data?.chartData ?? []} height={180} loading={loading} />
-        </div>
+        <PulseChart data={data?.chartData ?? []} height={180} loading={loading} />
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
