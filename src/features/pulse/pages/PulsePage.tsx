@@ -1,5 +1,4 @@
-import PulseChart from '../components/PulseChart';
-import PulseConnectionBanner from '../components/PulseConnectionBanner';
+﻿import PulseChart from '../components/PulseChart';
 import PulseDomainRequestGate from '../components/PulseDomainRequestGate';
 import PulseMetricsGrid from '../components/PulseMetricsGrid';
 import PulsePageHeader from '../components/PulsePageHeader';
@@ -10,42 +9,41 @@ import { usePulsePageState } from '../hooks/usePulsePageState';
 export default function PulsePage() {
   const {
     averagePerDay,
+    canViewMetrics,
+    connectionState,
     data,
     domain,
     ga4PropertyId,
-    hasGa4,
     hasProject,
+    isBootstrapping,
     loading,
     onOpenSettings,
     onOpenSite,
+    onRefreshMetrics,
     period,
     setPeriod,
-    websiteApprovedWithoutData,
-    websitePendingReview,
   } = usePulsePageState();
+  const dateRangeLabel = data ? `${data.dateRange.from} -> ${data.dateRange.to}` : 'sin datos todavía';
 
   return (
     <div className="space-y-6">
       <PulsePageHeader
-        dateRangeLabel={data ? `${data.dateRange.from} -> ${data.dateRange.to}` : 'sin datos todavía'}
-        domain={hasProject ? domain : null}
-        hasProject={hasProject}
+        dateRangeLabel={dateRangeLabel}
+        domain={domain}
+        hasProject={canViewMetrics}
+        isRefreshing={isBootstrapping}
         onOpenSite={onOpenSite}
+        onRefreshMetrics={() => {
+          void onRefreshMetrics();
+        }}
         period={period}
         setPeriod={setPeriod}
       />
 
-      {!hasProject && !loading ? (
+      {connectionState !== 'connected_with_data' && (!loading || isBootstrapping) ? (
         <div className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)]">
-          <PulseDomainRequestGate ga4PropertyId={ga4PropertyId} hasProject={false} />
+          <PulseDomainRequestGate ga4PropertyId={ga4PropertyId} hasProject={hasProject} syncingMetrics={isBootstrapping} />
         </div>
-      ) : null}
-
-      {hasProject && !hasGa4 ? (
-        <PulseConnectionBanner
-          websiteApprovedWithoutData={websiteApprovedWithoutData}
-          websitePendingReview={websitePendingReview}
-        />
       ) : null}
 
       <PulseMetricsGrid averagePerDay={averagePerDay} data={data} loading={loading} />

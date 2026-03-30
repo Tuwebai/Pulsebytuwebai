@@ -318,6 +318,12 @@ verify_jwt = false
 [functions.verify-sso-token]
 verify_jwt = false
 
+[functions.pulse-preview]
+verify_jwt = false
+
+[functions.sync-ga4-metrics]
+verify_jwt = false
+
 [functions.sync-operational-events]
 verify_jwt = false
 
