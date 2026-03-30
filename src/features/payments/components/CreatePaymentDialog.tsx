@@ -1,6 +1,6 @@
 import { ArrowRight, Clock3, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PAYMENT_TYPES, formatCurrency } from '@/lib/mercadopago';
 
 interface CreatePaymentDialogProps {
@@ -42,10 +42,10 @@ export default function CreatePaymentDialog({
                 Sin sorpresas al final del proyecto.
               </span>
             </DialogTitle>
-            <p className="mt-4 max-w-[520px] text-sm leading-6 text-[var(--text-secondary)]">
+            <DialogDescription className="mt-4 max-w-[520px] text-sm leading-6 text-[var(--text-secondary)]">
               Elegí el punto de partida para tu negocio. La consulta inicial siempre es sin cargo y el pago se abre en un checkout
               seguro de Mercado Pago.
-            </p>
+            </DialogDescription>
           </DialogHeader>
 
           <div className="mx-auto grid max-w-[1040px] gap-5 md:grid-cols-2 xl:grid-cols-3">
