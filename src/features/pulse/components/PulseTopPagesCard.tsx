@@ -1,13 +1,61 @@
-import { Globe } from 'lucide-react';
+import { ExternalLink, Globe } from 'lucide-react';
 import { FadeIn, Skeleton } from '@/core/components';
 import type { TopPage } from '@/data/types/pulse';
 
 interface PulseTopPagesCardProps {
+  domain: string | null;
   loading: boolean;
   topPages: TopPage[];
 }
 
-export default function PulseTopPagesCard({ loading, topPages }: PulseTopPagesCardProps) {
+function getSafeDomain(domain: string | null) {
+  if (!domain) {
+    return null;
+  }
+
+  return domain.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+}
+
+function getPageUrl(domain: string | null, path: string) {
+  const safeDomain = getSafeDomain(domain);
+
+  if (!safeDomain) {
+    return path;
+  }
+
+  return `https://${safeDomain}${path === '/' ? '' : path}`;
+}
+
+function TopPageUrl({ domain, path }: { domain: string | null; path: string }) {
+  const pageUrl = getPageUrl(domain, path);
+
+  if (!domain) {
+    return (
+      <div className="min-w-0">
+        <p className="truncate text-[var(--text-primary)]" title={pageUrl}>
+          {pageUrl}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-w-0">
+      <a
+        className="inline-flex max-w-full items-center gap-1 truncate text-[var(--text-primary)] transition-opacity hover:opacity-80"
+        href={pageUrl}
+        rel="noreferrer"
+        target="_blank"
+        title={pageUrl}
+      >
+        <span className="truncate">{pageUrl}</span>
+        <ExternalLink className="h-3.5 w-3.5 shrink-0 text-[var(--text-tertiary)]" strokeWidth={1.5} />
+      </a>
+    </div>
+  );
+}
+
+export default function PulseTopPagesCard({ domain, loading, topPages }: PulseTopPagesCardProps) {
   return (
     <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)]" data-tour="pulse-top-pages">
       <div className="border-b border-[var(--border-subtle)] px-5 py-4">
@@ -41,10 +89,7 @@ export default function PulseTopPagesCard({ loading, topPages }: PulseTopPagesCa
                 <tr key={page.path} className={index === topPages.length - 1 ? '' : 'border-b border-[var(--border-subtle)]'}>
                   <td className="px-5 py-3 text-sm text-[var(--text-secondary)]">
                     <FadeIn>
-                      <div className="min-w-0">
-                        <p className="truncate text-[var(--text-primary)]">{page.label ?? page.path}</p>
-                        {page.label && page.label !== page.path ? <p className="mt-1 truncate text-[12px] text-[var(--text-tertiary)]">{page.path}</p> : null}
-                      </div>
+                      <TopPageUrl domain={domain} path={page.path} />
                     </FadeIn>
                   </td>
                   <td className="px-5 py-3 font-data text-sm text-[var(--text-primary)]">

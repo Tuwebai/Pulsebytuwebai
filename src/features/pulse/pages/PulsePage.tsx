@@ -76,7 +76,7 @@ export default function PulsePage() {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <PulseTopPagesCard loading={loading} topPages={data?.topPages ?? []} />
+        <PulseTopPagesCard domain={domain} loading={loading} topPages={data?.topPages ?? []} />
         <PulseSummaryCard
           actionLabel={getSummaryActionLabel(domainRequest.status, domainRequest.hasReachedLimit)}
           data={data}
