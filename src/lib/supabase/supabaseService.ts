@@ -1,13 +1,9 @@
 import { toast } from '@/hooks/use-toast';
 import type {
   Project,
-  SecurityLog,
   Task,
-  UserPresence,
 } from '@/lib/supabase/legacySupabase.types';
 import { supabase } from './supabase';
-
-type RealtimePayload = Record<string, unknown>;
 
 function describeError(error: unknown): string {
   if (error instanceof Error && error.message) {
@@ -74,46 +70,6 @@ export class SupabaseService {
     if (error) throw error;
   }
 
-  static async updateUserPresence(presence: Omit<UserPresence, 'id'>): Promise<void> {
-    const { error } = await supabase.from('user_presence').upsert([presence], { onConflict: 'user_id' });
-    if (error) throw error;
-  }
-
-  static async getUserPresence(): Promise<UserPresence[]> {
-    const { data, error } = await supabase.from('user_presence').select('*').order('last_seen', { ascending: false });
-    if (error) throw error;
-    return data || [];
-  }
-
-  static async createSecurityLog(log: Omit<SecurityLog, 'id'>): Promise<void> {
-    const { error } = await supabase.from('security_logs').insert([log]);
-    if (error) throw error;
-  }
-
-  static async getSecurityLogs(): Promise<SecurityLog[]> {
-    const { data, error } = await supabase.from('security_logs').select('*').order('timestamp', { ascending: false }).limit(100);
-    if (error) throw error;
-    return data || [];
-  }
-
-  static subscribeToTable(table: string, callback: (payload: RealtimePayload) => void) {
-    return supabase
-      .channel(`public:${table}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table }, (payload) =>
-        callback(payload as RealtimePayload),
-      )
-      .subscribe();
-  }
-
-  static subscribeToRow(table: string, id: string, callback: (payload: RealtimePayload) => void) {
-    return supabase
-      .channel(`public:${table}:${id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table, filter: `id=eq.${id}` }, (payload) =>
-        callback(payload as RealtimePayload),
-      )
-      .subscribe();
-  }
-
   static getCurrentTimestamp(): string {
     return new Date().toISOString();
   }
@@ -132,7 +88,5 @@ export const supabaseService = new SupabaseService();
 
 export type {
   Project,
-  SecurityLog,
   Task,
-  UserPresence,
 } from '@/lib/supabase/legacySupabase.types';

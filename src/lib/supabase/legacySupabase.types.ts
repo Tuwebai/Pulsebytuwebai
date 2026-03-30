@@ -28,28 +28,3 @@ export interface Task {
   tags?: string[];
   attachments?: string[];
 }
-
-export interface UserPresence {
-  id: string;
-  user_id: string;
-  user_name: string;
-  status: 'online' | 'away' | 'offline';
-  last_seen: string;
-  current_project?: string;
-  current_page?: string;
-}
-
-export interface SecurityLog {
-  id: string;
-  action: string;
-  user: string;
-  user_email: string;
-  ip_address: string;
-  user_agent: string;
-  timestamp: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  category: 'auth' | 'data' | 'system' | 'payment' | 'admin';
-  details: unknown;
-  location?: string;
-  success: boolean;
-}
