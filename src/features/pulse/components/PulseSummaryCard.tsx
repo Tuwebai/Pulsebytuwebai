@@ -1,8 +1,9 @@
 import type { PulseMetricsTotals } from '@/data/types/pulse';
 
 interface PulseSummaryCardProps {
+  actionLabel?: string | null;
   data: PulseMetricsTotals | undefined;
-  onOpenSettings: () => void;
+  onAction?: (() => void) | null;
 }
 
 function SummaryRow({
@@ -23,7 +24,7 @@ function SummaryRow({
   );
 }
 
-export default function PulseSummaryCard({ data, onOpenSettings }: PulseSummaryCardProps) {
+export default function PulseSummaryCard({ actionLabel, data, onAction }: PulseSummaryCardProps) {
   return (
     <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
       <div>
@@ -41,9 +42,11 @@ export default function PulseSummaryCard({ data, onOpenSettings }: PulseSummaryC
         />
       </div>
 
-      <button className="mt-4 text-sm text-[var(--signal)]" onClick={onOpenSettings} type="button">
-        Revisar configuración {'->'}
-      </button>
+      {actionLabel && onAction ? (
+        <button className="mt-4 text-sm text-[var(--signal)]" onClick={onAction} type="button">
+          {actionLabel} {'->'}
+        </button>
+      ) : null}
     </div>
   );
 }

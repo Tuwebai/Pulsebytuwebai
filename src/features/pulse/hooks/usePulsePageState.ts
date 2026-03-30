@@ -1,5 +1,4 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { useApp } from '@/contexts/AppContext';
 import { useUserProject } from '@/features/project/hooks/useUserProject';
@@ -44,7 +43,6 @@ function formatRelativeUpdate(updatedAt: string | null): string | null {
 
 export function usePulsePageState() {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const { authReady, isAuthenticated, user } = useApp();
   const { period, setPeriod } = usePulsePeriod();
   const { projectId, domain, ga4PropertyId, loading: projectLoading, projectsReady } = useUserProject();
@@ -123,7 +121,6 @@ export function usePulsePageState() {
         });
       }
     },
-    onOpenSettings: () => navigate('/dashboard/configuracion'),
     onOpenSite: () => {
       if (typeof window !== 'undefined' && resolvedDomain) {
         window.open(`https://${resolvedDomain}`, '_blank', 'noopener,noreferrer');

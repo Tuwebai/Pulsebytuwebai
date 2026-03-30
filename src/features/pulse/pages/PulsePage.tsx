@@ -1,13 +1,28 @@
-﻿import PulseChart from '../components/PulseChart';
+import PulseChart from '../components/PulseChart';
+import PulseDomainRequestDialog from '../components/PulseDomainRequestDialog';
 import PulseDomainRequestGate from '../components/PulseDomainRequestGate';
 import PulseMetricsGrid from '../components/PulseMetricsGrid';
 import PulsePageHeader from '../components/PulsePageHeader';
 import PulseRealtimeCard from '../components/PulseRealtimeCard';
 import PulseSummaryCard from '../components/PulseSummaryCard';
 import PulseTopPagesCard from '../components/PulseTopPagesCard';
+import { usePulseDomainRequest } from '../hooks/usePulseDomainRequest';
 import { usePulsePageState } from '../hooks/usePulsePageState';
 
+function getSummaryActionLabel(status: 'missing' | 'pending_review' | 'approved' | 'rejected', hasReachedLimit: boolean) {
+  if (status === 'missing') {
+    return 'Conectar mi web';
+  }
+
+  if (status === 'rejected') {
+    return hasReachedLimit ? 'Ver estado de la conexión' : 'Corregir dominio';
+  }
+
+  return 'Ver estado de la conexión';
+}
+
 export default function PulsePage() {
+  const domainRequest = usePulseDomainRequest();
   const {
     averagePerDay,
     canViewMetrics,
@@ -22,7 +37,6 @@ export default function PulsePage() {
     realtimeData,
     realtimeError,
     realtimeLoading,
-    onOpenSettings,
     onOpenSite,
     onRefreshMetrics,
     period,
@@ -65,8 +79,26 @@ export default function PulsePage() {
 
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <PulseTopPagesCard loading={loading} topPages={data?.topPages ?? []} />
-        <PulseSummaryCard data={data} onOpenSettings={onOpenSettings} />
+        <PulseSummaryCard
+          actionLabel={getSummaryActionLabel(domainRequest.status, domainRequest.hasReachedLimit)}
+          data={data}
+          onAction={domainRequest.openDialog}
+        />
       </section>
+
+      <PulseDomainRequestDialog
+        canSubmit={domainRequest.canSubmit}
+        domain={domainRequest.domain}
+        hasReachedLimit={domainRequest.hasReachedLimit}
+        onDomainChange={domainRequest.setDomain}
+        onOpenChange={domainRequest.setOpen}
+        onSubmit={domainRequest.submit}
+        open={domainRequest.open}
+        status={domainRequest.status}
+        submitting={domainRequest.submitting}
+        website={domainRequest.website}
+        websiteReviewNotes={domainRequest.websiteReviewNotes}
+      />
     </div>
   );
 }
