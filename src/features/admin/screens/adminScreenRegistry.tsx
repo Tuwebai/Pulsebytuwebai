@@ -33,10 +33,6 @@ export interface AdminScreenRegistryContext {
   enablingPulseUserId: string | null;
   reviewingDeletionUserId: string | null;
   payments: AdminPaymentRecord[];
-  isCalendarAuthenticated: boolean;
-  calendarLoading: boolean;
-  calendarUserLabel: string;
-  onAuthenticateCalendar: () => void;
   metrics: {
     usuariosActivos: number;
     usuariosNuevos: number;
@@ -77,10 +73,6 @@ export function createAdminScreenRegistry(
   return {
     dashboard: (
       <AdminOverviewScreen
-        isCalendarAuthenticated={context.isCalendarAuthenticated}
-        calendarLoading={context.calendarLoading}
-        calendarUserLabel={context.calendarUserLabel}
-        onAuthenticateCalendar={context.onAuthenticateCalendar}
         usuariosActivos={context.metrics.usuariosActivos}
         usuariosNuevos={context.metrics.usuariosNuevos}
         crecimientoUsuarios={context.metrics.crecimientoUsuarios}

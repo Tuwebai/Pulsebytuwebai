@@ -11,11 +11,6 @@ import type { AdminUsersFilterId } from '@/features/admin/users/constants/adminU
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 import { toast } from '@/hooks/use-toast';
 
-interface CalendarUserInfo {
-  email: string;
-  name: string;
-}
-
 interface UseAdminScreenRegistryParams {
   user: User | null;
   loading: boolean;
@@ -25,10 +20,6 @@ interface UseAdminScreenRegistryParams {
   reviewingDeletionUserId: string | null;
   payments: AdminPaymentRecord[];
   setPayments: Dispatch<SetStateAction<AdminPaymentRecord[]>>;
-  isCalendarAuthenticated: boolean;
-  calendarLoading: boolean;
-  calendarUserInfo: CalendarUserInfo | null;
-  onAuthenticateCalendar: () => Promise<boolean>;
   metrics: AdminScreenRegistryContext['metrics'];
   activeUsersFilter: AdminUsersFilterId;
   onSectionChange: AdminScreenRegistryContext['onSectionChange'];
@@ -52,10 +43,6 @@ export function useAdminScreenRegistry({
   reviewingDeletionUserId,
   payments,
   setPayments,
-  isCalendarAuthenticated,
-  calendarLoading,
-  calendarUserInfo,
-  onAuthenticateCalendar,
   metrics,
   activeUsersFilter,
   onSectionChange,
@@ -107,14 +94,6 @@ export function useAdminScreenRegistry({
     enablingPulseUserId,
     reviewingDeletionUserId,
     payments,
-    isCalendarAuthenticated,
-    calendarLoading,
-    calendarUserLabel: isCalendarAuthenticated
-      ? `Agenda conectada como ${calendarUserInfo?.name || calendarUserInfo?.email || 'Usuario'}`
-      : calendarLoading
-        ? 'Conectando...'
-        : 'Agenda no conectada',
-    onAuthenticateCalendar,
     metrics,
     activeUsersFilter,
     onSectionChange,

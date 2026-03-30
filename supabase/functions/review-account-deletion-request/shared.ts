@@ -180,8 +180,6 @@ export async function getDeletionBlockers(
     { code: 'APPROVAL_REQUESTS_REQUESTED', label: 'solicitudes de aprobación', table: 'project_approval_requests', column: 'requested_by' },
     { code: 'APPROVAL_REQUESTS_REVIEWED', label: 'revisiones de aprobación', table: 'project_approval_requests', column: 'reviewed_by' },
     { code: 'PROJECTS_APPROVED', label: 'proyectos aprobados', table: 'projects', column: 'approved_by' },
-    { code: 'REPORT_TEMPLATES_CREATED', label: 'plantillas de reportes creadas', table: 'report_templates', column: 'created_by' },
-    { code: 'REPORT_TEMPLATES_UPDATED', label: 'plantillas de reportes actualizadas', table: 'report_templates', column: 'updated_by' },
     { code: 'SATISFACTION_SURVEYS', label: 'encuestas', table: 'satisfaction_surveys', column: 'user_id' },
     { code: 'USER_INVITATIONS', label: 'invitaciones emitidas', table: 'user_invitations', column: 'invited_by' },
   ] as const;

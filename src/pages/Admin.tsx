@@ -11,7 +11,6 @@ import { useAdminSectionNavigation } from '@/features/admin/hooks/useAdminSectio
 import { AdminShell } from '@/features/admin/layout/AdminShell';
 import { AdminUsersDialogs } from '@/features/admin/users/components/AdminUsersDialogs';
 import { useAdminUsers } from '@/features/admin/users/hooks/useAdminUsers';
-import { useGoogleCalendar } from '@/hooks/useGoogleCalendar';
 
 const Admin = React.memo(() => {
   const { user } = useApp();
@@ -57,13 +56,6 @@ const Admin = React.memo(() => {
   });
 
   const { activeSection, activeUsersFilter, navigateToSection } = useAdminSectionNavigation();
-  const {
-    isAuthenticated: isCalendarAuthenticated,
-    userInfo: calendarUserInfo,
-    authenticate: authenticateCalendar,
-    isLoading: calendarLoading,
-  } = useGoogleCalendar(user);
-
   const { hasAdminAccess } = useAdminAccessGate({
     user,
     navigate,
@@ -86,10 +78,6 @@ const Admin = React.memo(() => {
     reviewingDeletionUserId,
     payments: pagos,
     setPayments: setPagos,
-    isCalendarAuthenticated,
-    calendarLoading,
-    calendarUserInfo,
-    onAuthenticateCalendar: authenticateCalendar,
     metrics,
     activeUsersFilter,
     onSectionChange: navigateToSection,

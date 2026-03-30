@@ -3,10 +3,6 @@ import { AdminOverviewStats } from '@/features/admin/components/AdminOverviewSta
 import type { AdminSectionChangeHandler } from '@/features/admin/types/adminNavigation';
 
 interface AdminOverviewScreenProps {
-  isCalendarAuthenticated: boolean;
-  calendarLoading: boolean;
-  calendarUserLabel: string;
-  onAuthenticateCalendar: () => void;
   usuariosActivos: number;
   usuariosNuevos: number;
   crecimientoUsuarios: number;
@@ -23,10 +19,6 @@ interface AdminOverviewScreenProps {
 }
 
 export function AdminOverviewScreen({
-  isCalendarAuthenticated,
-  calendarLoading,
-  calendarUserLabel,
-  onAuthenticateCalendar,
   usuariosActivos,
   usuariosNuevos,
   crecimientoUsuarios,
@@ -58,10 +50,6 @@ export function AdminOverviewScreen({
 
       <div className="grid grid-cols-1 gap-3">
         <AdminOperationalStatus
-          isCalendarAuthenticated={isCalendarAuthenticated}
-          calendarLoading={calendarLoading}
-          calendarUserLabel={calendarUserLabel}
-          onAuthenticateCalendar={onAuthenticateCalendar}
           usuariosActivos={usuariosActivos}
           usuariosNuevos={usuariosNuevos}
           proyectosEnCurso={proyectosEnCurso}

@@ -1,6 +1,5 @@
 import {
   BarChart3,
-  Calendar,
   CheckCircle,
   DollarSign,
   Eye,
@@ -10,14 +9,9 @@ import {
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import type { AdminSectionChangeHandler } from '@/features/admin/types/adminNavigation';
 
 interface AdminOperationalStatusProps {
-  isCalendarAuthenticated: boolean;
-  calendarLoading: boolean;
-  calendarUserLabel: string;
-  onAuthenticateCalendar: () => void;
   usuariosActivos: number;
   usuariosNuevos: number;
   proyectosEnCurso: number;
@@ -41,10 +35,6 @@ interface AdminOperationalStatusRow {
 }
 
 export function AdminOperationalStatus({
-  isCalendarAuthenticated,
-  calendarLoading,
-  calendarUserLabel,
-  onAuthenticateCalendar,
   usuariosActivos,
   usuariosNuevos,
   proyectosEnCurso,
@@ -108,7 +98,7 @@ export function AdminOperationalStatus({
       sectionId: 'pagos' as const,
     },
     {
-      icon: Calendar,
+      icon: DollarSign,
       label: 'Cobranza del mes',
       value: `$${ingresosEsteMes.toLocaleString()}`,
       toneClassName: 'bg-signal/15 text-signal',
@@ -147,43 +137,6 @@ export function AdminOperationalStatus({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-border/60 bg-[var(--bg-surface)] p-4 shadow-sm">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-3">
-            <div
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
-                isCalendarAuthenticated
-                  ? 'bg-emerald-500/15 text-emerald-400'
-                  : calendarLoading
-                    ? 'bg-signal/15 text-signal'
-                    : 'bg-muted text-muted-foreground'
-              }`}
-            >
-              <Calendar className="h-4 w-4" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-sm font-semibold text-foreground">Agenda operativa</h3>
-              <p className="text-xs text-muted-foreground">{calendarUserLabel}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            {isCalendarAuthenticated ? (
-              <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
-                Activa
-              </Badge>
-            ) : calendarLoading ? (
-              <Badge variant="outline" className="border-signal/40 bg-signal/10 text-signal">
-                <div className="mr-2 h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                Conectando
-              </Badge>
-            ) : (
-              <Button variant="outline" size="sm" onClick={onAuthenticateCalendar} className="w-full sm:w-auto">
-                Conectar agenda
-              </Button>
-            )}
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
