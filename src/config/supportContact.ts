@@ -1,8 +1,8 @@
 export const SUPPORT_CONTACT = {
-  publicEmail: 'hola@tuweb-ai.com',
-  inboxEmail: 'tuwebai@gmail.com',
-  adminEmail: 'admin@pulse.tuweb-ai.com',
-  systemEmail: 'noreply@pulse.tuweb-ai.com',
+  publicEmail: 'pulse@tuweb-ai.com',
+  inboxEmail: 'pulse@tuweb-ai.com',
+  adminEmail: 'pulse@tuweb-ai.com',
+  systemEmail: 'pulse@tuweb-ai.com',
   phoneDisplay: '+54 9 3571 417960',
   phoneE164: '+5493571417960',
   whatsappNumber: '543571417960',

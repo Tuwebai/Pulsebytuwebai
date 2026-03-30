@@ -1,6 +1,6 @@
 import type { ComponentType, LazyExoticComponent, ReactNode } from 'react';
 import { Navigate, Route } from 'react-router-dom';
-import DashboardLayout from '@/components/DashboardLayout';
+import LegacyDashboardLayout from '@/components/DashboardLayout';
 import ProtectedRoute from '@/features/auth/components/ProtectedRoute';
 
 type LazyPage = LazyExoticComponent<ComponentType>;
@@ -13,8 +13,6 @@ interface AdminRoutesComponents {
   AdminProjectPhaseDetailPage: LazyPage;
   AdminProjectPhasesPage: LazyPage;
   AdminProjectTrackingPage: LazyPage;
-  AdvancedAnalytics: LazyPage;
-  AdvancedUserManagement: LazyPage;
   ProjectsPage: LazyPage;
   UserProfileView: LazyPage;
 }
@@ -27,8 +25,6 @@ export function renderAdminRoutes({
   AdminProjectPhaseDetailPage,
   AdminProjectPhasesPage,
   AdminProjectTrackingPage,
-  AdvancedAnalytics,
-  AdvancedUserManagement,
   ProjectsPage,
   UserProfileView,
 }: AdminRoutesComponents): ReactNode {
@@ -38,9 +34,7 @@ export function renderAdminRoutes({
         path="/admin"
         element={
           <ProtectedRoute requiredRole="admin">
-            <DashboardLayout>
-              <Admin />
-            </DashboardLayout>
+            <Admin />
           </ProtectedRoute>
         }
       />
@@ -48,9 +42,7 @@ export function renderAdminRoutes({
         path="/admin/:sectionId"
         element={
           <ProtectedRoute requiredRole="admin">
-            <DashboardLayout>
-              <Admin />
-            </DashboardLayout>
+            <Admin />
           </ProtectedRoute>
         }
       />
@@ -114,9 +106,9 @@ export function renderAdminRoutes({
         path="/proyectos/:userId"
         element={
           <ProtectedRoute requiredRole="admin">
-            <DashboardLayout key="proyectos-user">
+            <LegacyDashboardLayout key="proyectos-user">
               <ProjectsPage key="proyectos-user-content" />
-            </DashboardLayout>
+            </LegacyDashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -124,9 +116,9 @@ export function renderAdminRoutes({
         path="/perfil/:userId"
         element={
           <ProtectedRoute requiredRole="admin">
-            <DashboardLayout key="user-profile">
+            <LegacyDashboardLayout key="user-profile">
               <UserProfileView key="user-profile-content" />
-            </DashboardLayout>
+            </LegacyDashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -134,9 +126,7 @@ export function renderAdminRoutes({
         path="/analytics"
         element={
           <ProtectedRoute requiredRole="admin">
-            <DashboardLayout>
-              <AdvancedAnalytics />
-            </DashboardLayout>
+            <Navigate replace to="/admin" />
           </ProtectedRoute>
         }
       />
@@ -144,9 +134,7 @@ export function renderAdminRoutes({
         path="/user-management"
         element={
           <ProtectedRoute requiredRole="admin">
-            <DashboardLayout>
-              <AdvancedUserManagement />
-            </DashboardLayout>
+            <Navigate replace to="/admin/usuarios" />
           </ProtectedRoute>
         }
       />

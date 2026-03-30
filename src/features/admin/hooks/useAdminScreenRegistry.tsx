@@ -139,6 +139,7 @@ export function useAdminScreenRegistry({
                 website_reviewed_at: result.website_reviewed_at,
                 website_reviewed_by: result.website_reviewed_by,
                 website_review_notes: result.website_review_notes,
+                project_ga4_property_id: result.project_ga4_property_id,
                 updated_at: new Date().toISOString(),
               }
             : currentUser,

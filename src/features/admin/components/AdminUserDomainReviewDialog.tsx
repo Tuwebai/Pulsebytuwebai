@@ -18,6 +18,7 @@ export interface AdminDomainUser {
   website?: string | null;
   website_status?: WebsiteReviewStatus | null;
   website_review_notes?: string | null;
+  project_ga4_property_id?: string | null;
 }
 
 interface AdminUserDomainReviewDialogProps {
@@ -54,6 +55,7 @@ export function AdminUserDomainReviewDialog({
 }: AdminUserDomainReviewDialogProps) {
   const [open, setOpen] = useState(false);
   const [domain, setDomain] = useState(user.website ?? '');
+  const [ga4PropertyId, setGa4PropertyId] = useState(user.project_ga4_property_id ?? '');
   const [notes, setNotes] = useState(user.website_review_notes ?? '');
   const [submittingAction, setSubmittingAction] = useState<'save_pending' | 'approve' | 'reject' | null>(null);
 
@@ -67,6 +69,7 @@ export function AdminUserDomainReviewDialog({
         userId: user.id,
         domain,
         action,
+        ga4PropertyId,
         notes,
       });
 
@@ -83,15 +86,19 @@ export function AdminUserDomainReviewDialog({
         description:
           action === 'approve'
             ? result.project_created
-              ? 'La URL quedo aprobada y tambien creamos el proyecto operativo del cliente en Pulse.'
-              : 'El dominio ya quedo listo para usarse en el proyecto del cliente.'
+              ? result.project_ga4_property_id
+                ? 'La URL quedó aprobada, creamos el proyecto operativo y también quedó cargado el Property ID de GA4.'
+                : 'La URL quedó aprobada y también creamos el proyecto operativo del cliente en Pulse.'
+              : result.project_ga4_property_id
+                ? 'El dominio quedó listo en el proyecto y también guardamos el Property ID de GA4.'
+                : 'El dominio ya quedó listo para usarse en el proyecto del cliente.'
             : action === 'reject'
-              ? 'La URL quedo marcada como rechazada para este cliente.'
-              : 'La URL quedo pendiente para revision del equipo.',
+              ? 'La URL quedó marcada como rechazada para este cliente.'
+              : 'La URL quedó pendiente para revisión del equipo.',
       });
     } catch (error) {
       toast({
-        title: 'No pudimos actualizar la URL',
+        title: 'No pudimos actualizar la configuración',
         description: error instanceof Error ? error.message : 'Intenta de nuevo en unos segundos.',
         variant: 'destructive',
       });
@@ -107,6 +114,7 @@ export function AdminUserDomainReviewDialog({
         size="sm"
         onClick={() => {
           setDomain(user.website ?? '');
+          setGa4PropertyId(user.project_ga4_property_id ?? '');
           setNotes(user.website_review_notes ?? '');
           setOpen(true);
         }}
@@ -120,7 +128,7 @@ export function AdminUserDomainReviewDialog({
         <DialogContent className="max-w-xl border-[var(--border-default)] bg-[var(--bg-surface)] p-6 text-[var(--text-primary)]">
           <DialogHeader>
             <div className="flex items-center gap-3">
-              <DialogTitle>Revision de URL del cliente</DialogTitle>
+              <DialogTitle>Revisión de URL del cliente</DialogTitle>
               <Badge variant={getStatusVariant(user.website_status)}>{statusLabel}</Badge>
             </div>
             <DialogDescription className="text-[var(--text-secondary)]">
@@ -143,6 +151,23 @@ export function AdminUserDomainReviewDialog({
             </div>
 
             <div className="space-y-2">
+              <label className="text-sm font-medium text-[var(--text-secondary)]" htmlFor={`admin-ga4-${user.id}`}>
+                Property ID de GA4
+              </label>
+              <Input
+                id={`admin-ga4-${user.id}`}
+                value={ga4PropertyId}
+                onChange={(event) => setGa4PropertyId(event.target.value)}
+                placeholder="123456789"
+                inputMode="numeric"
+                className="border-[var(--border-default)] bg-[var(--bg-subtle)] text-[var(--text-primary)]"
+              />
+              <p className="text-xs text-[var(--text-secondary)]">
+                Opcional. Si lo completás al aprobar, Pulse ya queda listo para la ingesta real de métricas.
+              </p>
+            </div>
+
+            <div className="space-y-2">
               <label className="text-sm font-medium text-[var(--text-secondary)]" htmlFor={`admin-domain-notes-${user.id}`}>
                 Notas internas
               </label>
@@ -150,13 +175,13 @@ export function AdminUserDomainReviewDialog({
                 id={`admin-domain-notes-${user.id}`}
                 value={notes}
                 onChange={(event) => setNotes(event.target.value)}
-                placeholder="Ejemplo: esperar confirmacion del cliente o corregir subdominio."
+                placeholder="Ejemplo: esperar confirmación del cliente o corregir subdominio."
                 className="min-h-[96px] border-[var(--border-default)] bg-[var(--bg-subtle)] text-[var(--text-primary)]"
               />
             </div>
 
             <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-secondary)]">
-              Si apruebas la URL, tambien se actualiza el dominio del proyecto mas reciente de ese cliente.
+              Si aprobás la URL, también se actualiza el dominio del proyecto más reciente del cliente. Si completás el Property ID, dejás listo el proyecto para la conexión real de GA4.
             </div>
 
             <div className="flex flex-wrap justify-end gap-3">

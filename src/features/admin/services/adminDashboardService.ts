@@ -41,26 +41,46 @@ function buildDeletionRequestMap(requests: AdminAccountDeletionRequestRecord[]) 
   return new Map(requests.map((request) => [request.user_id, request]));
 }
 
+function buildLatestProjectMap(projects: AdminProjectRecord[]) {
+  const latestProjectsByUser = new Map<string, AdminProjectRecord>();
+
+  projects.forEach((project) => {
+    if (!project.created_by || latestProjectsByUser.has(project.created_by)) {
+      return;
+    }
+
+    latestProjectsByUser.set(project.created_by, project);
+  });
+
+  return latestProjectsByUser;
+}
+
 function transformUsers(
   users: AdminUserRecord[],
+  projects: AdminProjectRecord[],
   requests: AdminAccountDeletionRequestRecord[],
 ): AdminUserRecord[] {
   const requestsMap = buildDeletionRequestMap(
     requests.filter((request): request is AdminAccountDeletionRequestRecord & { user_id: string } => Boolean(request.user_id)),
   );
+  const latestProjectsMap = buildLatestProjectMap(
+    projects.filter((project): project is AdminProjectRecord & { created_by: string } => Boolean(project.created_by)),
+  );
 
   return users.map((user) => {
     const request = requestsMap.get(user.id);
+    const latestProject = latestProjectsMap.get(user.id);
 
-    if (!request) {
+    if (!request && !latestProject) {
       return user;
     }
 
     return {
       ...user,
-      account_deletion_request_id: request.id,
-      account_deletion_requested_at: request.created_at,
-      account_deletion_reason: request.mensaje ?? null,
+      project_ga4_property_id: latestProject?.ga4_property_id ?? null,
+      account_deletion_request_id: request?.id ?? null,
+      account_deletion_requested_at: request?.created_at ?? null,
+      account_deletion_reason: request?.mensaje ?? null,
     };
   });
 }
@@ -126,7 +146,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const ticketUsers = await fetchAdminTicketUsers(ticketUserIds);
 
   return {
-    users: transformUsers(users, deletionRequests),
+    users: transformUsers(users, projects, deletionRequests),
     projects,
     tickets: transformTickets(rawTickets, ticketUsers),
     payments,

@@ -23,6 +23,7 @@ interface AdminDomainUpdateResult {
   website_reviewed_at?: string | null;
   website_reviewed_by?: string | null;
   website_review_notes?: string | null;
+  project_ga4_property_id?: string | null;
 }
 
 export interface AdminScreenRegistryContext {

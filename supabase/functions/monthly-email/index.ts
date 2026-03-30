@@ -68,7 +68,7 @@ async function sendMonthlyEmail(payload: MonthlyEmailPayload): Promise<void> {
   const zeptoMailApiUrl =
     Deno.env.get('ZEPTOMAIL_API_URL') || 'https://api.zeptomail.com/v1.1/email';
   const from = Deno.env.get('SMTP_FROM') || 'pulse@tuweb-ai.com';
-  const replyTo = Deno.env.get('EMAIL_REPLY_TO') || 'hola@tuweb-ai.com';
+  const replyTo = Deno.env.get('EMAIL_REPLY_TO') || 'pulse@tuweb-ai.com';
   const fromName = Deno.env.get('EMAIL_FROM_NAME') || 'Pulse by TuWebAI';
 
   if (!zeptoMailToken) {

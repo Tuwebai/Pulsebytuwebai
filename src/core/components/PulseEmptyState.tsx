@@ -8,6 +8,7 @@ export interface PulseEmptyStateProps {
   websiteStatus?: 'missing' | 'pending_review' | 'approved' | 'rejected' | null;
   ga4PropertyId?: string | null;
   connectLabel?: string;
+  syncingMetrics?: boolean;
 }
 
 const WHATSAPP_SUPPORT_URL = 'https://wa.me/5491130187377?text=Necesito%20ayuda%20con%20Pulse';
@@ -19,6 +20,7 @@ export default function PulseEmptyState({
   websiteStatus,
   ga4PropertyId,
   connectLabel,
+  syncingMetrics = false,
 }: PulseEmptyStateProps) {
   const isPendingReview = websiteStatus === 'pending_review' && Boolean(website);
   const isApprovedWebsite = websiteStatus === 'approved' && Boolean(website);
@@ -35,9 +37,11 @@ export default function PulseEmptyState({
         ? 'Tu URL ya está en revisión'
         : isApprovedWithoutTracking
           ? 'Tu dominio ya quedó aprobado'
-          : isApprovedWaitingForData
-            ? 'Estamos terminando de conectar tu web'
-            : 'Los datos de tu web aparecen acá';
+          : isApprovedWaitingForData && syncingMetrics
+            ? 'Estamos trayendo tus primeros datos'
+            : isApprovedWaitingForData
+              ? 'Estamos terminando de conectar tu web'
+              : 'Los datos de tu web aparecen acá';
 
   const description = isWebsiteReadyWithoutProject
     ? 'Ya confirmamos tu dominio. Ahora estamos terminando de preparar tu espacio Pulse para mostrarte datos reales apenas quede listo.'
@@ -47,9 +51,11 @@ export default function PulseEmptyState({
         ? 'Ya recibimos tu dominio y lo estamos revisando antes de conectar tus datos reales.'
         : isApprovedWithoutTracking
           ? 'Ya confirmamos tu dominio. El siguiente paso es terminar la conexión para que Pulse te muestre actividad real.'
-          : isApprovedWaitingForData
-            ? 'Tu dominio ya quedó aprobado. Apenas termine la conexión de datos, vas a empezar a ver movimiento acá.'
-            : 'Conectá tu dominio para ver cuántas personas te están visitando cada día.';
+          : isApprovedWaitingForData && syncingMetrics
+            ? 'La conexión ya está hecha. Ahora estamos sincronizando el historial reciente de tu web para poblar tu tablero de Pulse.'
+            : isApprovedWaitingForData
+              ? 'Tu dominio ya quedó aprobado. Apenas termine la conexión de datos, vas a empezar a ver movimiento acá.'
+              : 'Conectá tu dominio para ver cuántas personas te están visitando cada día.';
 
   const buttonLabel =
     connectLabel ??

@@ -12,6 +12,7 @@ export interface AdminUserRecord {
   website_reviewed_at?: string | null;
   website_reviewed_by?: string | null;
   website_review_notes?: string | null;
+  project_ga4_property_id?: string | null;
   pulse_access_status?: 'pending' | 'invited' | 'active' | 'disabled' | null;
   pulse_access_granted_at?: string | null;
   pulse_access_granted_by?: string | null;
@@ -23,7 +24,8 @@ export interface AdminUserRecord {
 
 export interface AdminProjectRecord {
   id: string;
-  user_id: string | null;
+  created_by: string | null;
+  ga4_property_id?: string | null;
   status: string | null;
   created_at: string;
   [key: string]: unknown;

@@ -1,4 +1,4 @@
-import { CreditCard, FolderOpen, LifeBuoy } from 'lucide-react';
+﻿import { CreditCard, FolderOpen, LifeBuoy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, Skeleton } from '@/core/components';
 import AnimatedList, { AnimatedReveal } from '@/core/components/AnimatedList';
@@ -7,6 +7,7 @@ import { useHomeOverviewCards } from '@/features/dashboard/hooks/useHomeOverview
 import { useUserProject } from '@/features/project/hooks/useUserProject';
 import PulseChart from '@/features/pulse/components/PulseChart';
 import PulseDomainRequestGate from '@/features/pulse/components/PulseDomainRequestGate';
+import { resolvePulseConnectionState } from '@/features/pulse/hooks/usePulseConnectionState';
 import { usePulseMetrics } from '@/features/pulse/hooks/usePulseMetrics';
 import { usePulsePeriod } from '@/features/pulse/hooks/usePulsePeriod';
 import { usePulseRealtime } from '@/features/pulse/hooks/usePulseRealtime';
@@ -92,11 +93,27 @@ export default function HomePage() {
   const projectHydrating = isAuthenticated && authReady && !projectsReady;
   const loading = projectHydrating || projectLoading || isLoading;
   const hasProject = Boolean(projectId);
-  const hasDomain = Boolean(domain);
-  const canOpenSite = Boolean(domain);
+  const resolvedDomain = domain ?? user?.website ?? null;
+  const canOpenSite = Boolean(resolvedDomain);
+  const connectionState = resolvePulseConnectionState({
+    domain,
+    ga4PropertyId,
+    hasMetricsData: Boolean(data?.hasData),
+    projectId,
+    website: user?.website,
+    websiteStatus: user?.website_status,
+  });
+  const visits = data?.visits ?? 0;
+  const visitsDelta = data?.visitsDelta ?? null;
+  const contacts = data?.contacts ?? 0;
+  const contactsDelta = data?.contactsDelta ?? null;
   const projectProgress = Math.max(0, Math.min(primaryProject?.completion_percentage ?? primaryProject?.progress ?? 0, 100));
   const projectSummary = !hasProject
-    ? 'Tu proyecto va a aparecer acá cuando quede asignado en Pulse.'
+    ? connectionState === 'pending_review'
+      ? 'Ya recibimos tu web. La estamos validando para dejar Pulse listo con tus datos reales.'
+      : connectionState === 'approved_pending_connection'
+        ? 'Tu dominio ya quedó aprobado. Ahora estamos terminando la conexión para mostrarte movimiento real.'
+        : 'Tu espacio Pulse se está preparando. Cuando la conexión esté lista, vas a empezar a ver resultados acá.'
     : remainingTasks === null
       ? 'Todavía no hay tareas visibles para mostrarte en este módulo.'
       : remainingTasks === 0
@@ -116,12 +133,10 @@ export default function HomePage() {
         className="rounded-[20px] border border-[var(--signal-border)] bg-[var(--bg-surface)] p-5 md:p-7"
         data-tour="home-hero"
         disabled={loading}
-        key={`${period}-${loading ? 'loading' : hasDomain && data?.hasData ? 'ready' : 'empty'}`}
+        key={`${period}-${loading ? 'loading' : connectionState === 'connected_with_data' ? 'ready' : connectionState}`}
       >
-        {!hasProject && !loading ? (
-          <PulseDomainRequestGate ga4PropertyId={ga4PropertyId} hasProject={false} />
-        ) : !hasDomain || !data?.hasData ? (
-          <PulseDomainRequestGate ga4PropertyId={ga4PropertyId} />
+        {connectionState !== 'connected_with_data' && !loading ? (
+          <PulseDomainRequestGate ga4PropertyId={ga4PropertyId} hasProject={hasProject} />
         ) : (
           <div className="space-y-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -140,21 +155,21 @@ export default function HomePage() {
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-2">
                 <div className="font-data text-[52px] font-light leading-none text-[var(--text-primary)] md:text-[64px]">
-                  {loading ? <Skeleton height="64px" rounded="sm" width="180px" /> : data.visits.toLocaleString('es-AR')}
+                  {loading ? <Skeleton height="64px" rounded="sm" width="180px" /> : visits.toLocaleString('es-AR')}
                 </div>
                 <p className="text-[13px] text-[var(--text-secondary)]">visitas</p>
                 <p className="text-[13px] font-medium text-[var(--success)]">
-                  {loading ? '...' : data.visitsDelta !== null ? `+${data.visitsDelta}% vs periodo anterior` : 'Sin comparativa disponible'}
+                  {loading ? '...' : visitsDelta !== null ? `+${visitsDelta}% vs periodo anterior` : 'Sin comparativa disponible'}
                 </p>
               </div>
 
               <div className="space-y-2">
                 <div className="font-data text-[52px] font-light leading-none text-[var(--text-primary)] md:text-[64px]">
-                  {loading ? <Skeleton height="64px" rounded="sm" width="180px" /> : data.contacts.toLocaleString('es-AR')}
+                  {loading ? <Skeleton height="64px" rounded="sm" width="180px" /> : contacts.toLocaleString('es-AR')}
                 </div>
                 <p className="text-[13px] text-[var(--text-secondary)]">consultas recibidas</p>
                 <p className="text-[13px] font-medium text-[var(--success)]">
-                  {loading ? '...' : data.contactsDelta !== null ? `+${data.contactsDelta}% vs periodo anterior` : 'Sin comparativa disponible'}
+                  {loading ? '...' : contactsDelta !== null ? `+${contactsDelta}% vs periodo anterior` : 'Sin comparativa disponible'}
                 </p>
               </div>
             </div>
@@ -167,8 +182,8 @@ export default function HomePage() {
                   className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={!canOpenSite}
                   onClick={() => {
-                    if (domain) {
-                      window.open(`https://${domain}`, '_blank', 'noopener,noreferrer');
+                    if (resolvedDomain) {
+                      window.open(`https://${resolvedDomain}`, '_blank', 'noopener,noreferrer');
                     } else {
                       navigate('/dashboard/configuracion');
                     }

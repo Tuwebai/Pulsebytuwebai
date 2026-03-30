@@ -49,9 +49,7 @@ const Configuracion = createLazyComponent(() => import('@/pages/Configuracion'))
 const Facturacion = createLazyComponent(() => import('@/pages/Facturacion'));
 const Soporte = createLazyComponent(() => import('@/pages/Soporte'));
 const NotFound = createLazyComponent(() => import('@/pages/NotFound'));
-const AdvancedAnalytics = createLazyComponent(() => import('@/components/AdvancedAnalytics'));
 const CustomizableDashboard = createLazyComponent(() => import('@/components/CustomizableDashboard'));
-const AdvancedUserManagement = createLazyComponent(() => import('@/components/AdvancedUserManagement'));
 const InvitationPage = createLazyComponent(() => import('@/pages/InvitationPage'));
 const AuthCallback = createLazyComponent(() => import('@/pages/AuthCallback'));
 const GitHubCallback = createLazyComponent(() => import('@/pages/GitHubCallback'));
@@ -193,8 +191,6 @@ function AppRoutes() {
         AdminProjectPhaseDetailPage,
         AdminProjectPhasesPage,
         AdminProjectTrackingPage,
-        AdvancedAnalytics,
-        AdvancedUserManagement,
         ProjectsPage,
         UserProfileView
       })}

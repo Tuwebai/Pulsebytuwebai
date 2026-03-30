@@ -9,6 +9,7 @@ export interface AdminManagedUser extends AdminUserRecord {
   website_reviewed_at?: string | null;
   website_reviewed_by?: string | null;
   website_review_notes?: string | null;
+  project_ga4_property_id?: string | null;
   pulse_access_status?: 'pending' | 'invited' | 'active' | 'disabled' | null;
   pulse_access_granted_at?: string | null;
   pulse_access_granted_by?: string | null;

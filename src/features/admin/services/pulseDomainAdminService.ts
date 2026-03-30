@@ -8,6 +8,7 @@ export interface AdminWebsiteReviewPayload {
   userId: string;
   domain: string;
   action: WebsiteReviewAction;
+  ga4PropertyId?: string | null;
   notes?: string | null;
 }
 
@@ -21,6 +22,7 @@ export interface AdminWebsiteReviewResult {
   website_review_notes: string | null;
   project_id: string | null;
   project_domain: string | null;
+  project_ga4_property_id: string | null;
   project_created: boolean;
 }
 
@@ -35,6 +37,7 @@ interface CurrentUserRecord {
 interface LatestProjectRecord {
   id: string;
   domain: string | null;
+  ga4_property_id: string | null;
 }
 
 interface UserWebsiteUpdate {
@@ -52,6 +55,20 @@ function normalizeOptionalNotes(notes?: string | null): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+function normalizeOptionalGa4PropertyId(value?: string | null): string | null {
+  const trimmed = value?.trim() ?? '';
+
+  if (!trimmed) {
+    return null;
+  }
+
+  if (!/^\d+$/.test(trimmed)) {
+    throw new Error('El Property ID de GA4 debe contener solo números.');
+  }
+
+  return trimmed;
+}
+
 function buildOperationalProjectName(user: Pick<CurrentUserRecord, 'full_name' | 'email'>) {
   const identity = user.full_name?.trim() || user.email?.split('@')[0]?.trim() || 'Cliente';
   return `Web de ${identity}`;
@@ -67,6 +84,7 @@ export async function reviewUserWebsite(payload: AdminWebsiteReviewPayload): Pro
   }
 
   const normalizedNotes = normalizeOptionalNotes(payload.notes);
+  const normalizedGa4PropertyId = normalizeOptionalGa4PropertyId(payload.ga4PropertyId);
   const shouldValidateDomain = payload.action !== 'reject' || payload.domain.trim().length > 0;
   const validatedDomain = shouldValidateDomain ? validateBusinessDomain(payload.domain) : null;
 
@@ -130,7 +148,7 @@ export async function reviewUserWebsite(payload: AdminWebsiteReviewPayload): Pro
 
   const { data: projectData, error: projectError } = await supabase
     .from('projects')
-    .select('id, domain')
+    .select('id, domain, ga4_property_id')
     .eq('created_by', payload.userId)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -148,6 +166,7 @@ export async function reviewUserWebsite(payload: AdminWebsiteReviewPayload): Pro
       .from('projects')
       .update({
         domain: normalizedDomain,
+        ...(normalizedGa4PropertyId ? { ga4_property_id: normalizedGa4PropertyId } : {}),
         updated_at: timestamp,
       })
       .eq('id', latestProject.id);
@@ -159,6 +178,7 @@ export async function reviewUserWebsite(payload: AdminWebsiteReviewPayload): Pro
     latestProject = {
       ...latestProject,
       domain: normalizedDomain,
+      ga4_property_id: normalizedGa4PropertyId ?? latestProject.ga4_property_id,
     };
   }
 
@@ -177,9 +197,10 @@ export async function reviewUserWebsite(payload: AdminWebsiteReviewPayload): Pro
         approved_by: authUser.id,
         approved_at: timestamp,
         domain: normalizedDomain,
+        ga4_property_id: normalizedGa4PropertyId,
         updated_at: timestamp,
       })
-      .select('id, domain')
+      .select('id, domain, ga4_property_id')
       .single();
 
     if (createProjectError) {
@@ -200,6 +221,7 @@ export async function reviewUserWebsite(payload: AdminWebsiteReviewPayload): Pro
     website_review_notes: userUpdate.website_review_notes,
     project_id: latestProject?.id ?? null,
     project_domain: latestProject?.domain ?? null,
+    project_ga4_property_id: latestProject?.ga4_property_id ?? null,
     project_created: projectCreated,
   };
 }
