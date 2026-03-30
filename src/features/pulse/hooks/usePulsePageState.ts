@@ -41,6 +41,23 @@ function formatRelativeUpdate(updatedAt: string | null): string | null {
   return `Actualizado hace ${diffDays} d`;
 }
 
+function formatRealtimeSample(sampledAt: string | null | undefined): string | null {
+  if (!sampledAt) {
+    return null;
+  }
+
+  const sampledDate = new Date(sampledAt);
+
+  if (Number.isNaN(sampledDate.getTime())) {
+    return null;
+  }
+
+  return `Muestra tomada ${sampledDate.toLocaleTimeString('es-AR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })}`;
+}
+
 export function usePulsePageState() {
   const queryClient = useQueryClient();
   const { authReady, isAuthenticated, user } = useApp();
@@ -99,6 +116,7 @@ export function usePulsePageState() {
     realtimeData,
     realtimeError: realtimeError instanceof Error ? realtimeError.message : null,
     realtimeLoading,
+    realtimeSampleLabel: formatRealtimeSample(realtimeData?.sampledAt),
     onRefreshMetrics: async () => {
       try {
         const result = await refreshPulseData('manual');

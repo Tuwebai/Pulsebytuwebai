@@ -11,6 +11,9 @@ interface PulseDomainRequestDialogProps {
   canSubmit: boolean;
   domain: string;
   hasReachedLimit: boolean;
+  historicalSyncLabel?: string | null;
+  isSyncingMetrics?: boolean;
+  liveSyncLabel?: string | null;
   open: boolean;
   onDomainChange: (value: string) => void;
   onOpenChange: (open: boolean) => void;
@@ -27,6 +30,9 @@ export default function PulseDomainRequestDialog({
   canSubmit,
   domain,
   hasReachedLimit,
+  historicalSyncLabel,
+  isSyncingMetrics = false,
+  liveSyncLabel,
   open,
   onDomainChange,
   onOpenChange,
@@ -39,6 +45,8 @@ export default function PulseDomainRequestDialog({
   const title = getPulseDomainRequestDialogTitle({ hasReachedLimit, status });
   const description = getPulseDomainRequestDialogDescription({ hasReachedLimit, status });
   const canEdit = canSubmit && (status === 'missing' || status === 'rejected');
+  const syncStatusLabel = isSyncingMetrics ? 'Actualizando ahora' : historicalSyncLabel ?? 'Todavía estamos trayendo el historial';
+  const liveStatusLabel = liveSyncLabel ?? 'La actividad en vivo aparece cuando Pulse detecta movimiento reciente';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -81,6 +89,22 @@ export default function PulseDomainRequestDialog({
               <p className="mt-2 text-sm leading-6 text-[var(--text-primary)]">{websiteReviewNotes}</p>
             </div>
           ) : null}
+
+          <div className="rounded-[16px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-4 py-3">
+            <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">Estado de Pulse</p>
+            <div className="mt-3 space-y-3 text-sm">
+              <div className="flex items-center gap-3">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)]" />
+                <span className="text-[var(--text-secondary)]">Historial del tablero</span>
+                <span className="ml-auto text-[var(--text-primary)]">{syncStatusLabel}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--success)]" />
+                <span className="text-[var(--text-secondary)]">Actividad en vivo</span>
+                <span className="ml-auto text-[var(--text-primary)]">{liveStatusLabel}</span>
+              </div>
+            </div>
+          </div>
 
           <div className="rounded-[16px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-4 py-3 text-sm text-[var(--text-secondary)]">
             <div className="flex items-center gap-2 text-[var(--text-primary)]">

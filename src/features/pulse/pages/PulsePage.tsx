@@ -37,6 +37,7 @@ export default function PulsePage() {
     realtimeData,
     realtimeError,
     realtimeLoading,
+    realtimeSampleLabel,
     onOpenSite,
     onRefreshMetrics,
     period,
@@ -90,6 +91,9 @@ export default function PulsePage() {
         canSubmit={domainRequest.canSubmit}
         domain={domainRequest.domain}
         hasReachedLimit={domainRequest.hasReachedLimit}
+        historicalSyncLabel={lastUpdatedLabel}
+        isSyncingMetrics={isBootstrapping}
+        liveSyncLabel={realtimeSampleLabel}
         onDomainChange={domainRequest.setDomain}
         onOpenChange={domainRequest.setOpen}
         onSubmit={domainRequest.submit}
