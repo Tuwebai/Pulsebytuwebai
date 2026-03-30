@@ -2,6 +2,7 @@ import { PRODUCT_TOUR_STEPS } from '@/features/product-tour/constants/productTou
 import type { ProductTourPersistenceState, ProductTourScope } from '@/features/product-tour/types/productTour.types';
 
 export const PRODUCT_TOUR_OPEN_EVENT = 'pulse:product-tour:open';
+export const PRODUCT_TOUR_CLOSE_EVENT = 'pulse:product-tour:close';
 export const PRODUCT_TOUR_STEP_CHANGE_EVENT = 'pulse:product-tour:step-change';
 export const DEFAULT_PRODUCT_TOUR_SCOPE: ProductTourScope = 'core';
 

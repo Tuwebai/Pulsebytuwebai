@@ -183,7 +183,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
 
   private handleReportBug = (): void => {
     const { error, errorId } = this.state;
-    const bugReportUrl = `mailto:support@tuwebai.com?subject=Bug Report - ${errorId}&body=Error: ${error?.message}\n\nStack: ${error?.stack}\n\nError ID: ${errorId}`;
+    const bugReportUrl = `mailto:pulse@tuweb-ai.com?subject=Bug Report - ${errorId}&body=Error: ${error?.message}\n\nStack: ${error?.stack}\n\nError ID: ${errorId}`;
     window.open(bugReportUrl);
   };
 

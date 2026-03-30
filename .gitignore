@@ -99,15 +99,15 @@ jspm_packages/
 *.tmp
 *.temp
 
-# Project documentation and governance are intentionally versioned in this repo.
+# Local-only documentation, planning and governance artifacts
 proyecto-template/*
 skills/*
-!README.md
 docs/*
 docsproyecto/*
+planes/*
 *.md
+!/README.md
 scripts/*
 *.sql
 SQL/*
-planes/*
 imagenes-presentation-pulse/*

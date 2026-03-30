@@ -51,14 +51,17 @@ function getTooltipStyle(rect: DOMRect | null, placement: ProductTourPlacement) 
   const canPlaceRight = rect.right + gap + panelWidth <= window.innerWidth - viewportPadding;
   const canPlaceLeft = rect.left - gap - panelWidth >= viewportPadding;
 
-  const placements: ProductTourPlacement[] = [
+  const placementCandidates: ProductTourPlacement[] = [
     placement,
     'bottom',
     'top',
     'right',
     'left',
     'center',
-  ].filter((candidate, index, array) => array.indexOf(candidate) === index);
+  ];
+  const placements = placementCandidates.filter(
+    (candidate, index) => placementCandidates.indexOf(candidate) === index,
+  );
 
   for (const candidate of placements) {
     if (candidate === 'bottom' && canPlaceBottom) {
@@ -267,7 +270,7 @@ export function ProductTourOverlay({
               </Button>
             ) : null}
 
-            <Button onClick={onNext} type="button" variant="signal">
+            <Button onClick={onNext} type="button" variant="primary">
               {currentStepNumber === stepCount ? 'Finalizar' : 'Siguiente'}
             </Button>
           </div>

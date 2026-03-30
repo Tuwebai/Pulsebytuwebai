@@ -88,7 +88,7 @@ export default function PulseDomainRequestDialog({
               <span>Qué pasa después</span>
             </div>
             <p className="mt-2 leading-6">
-              Cuando envíes tu dominio, el equipo lo revisa antes de conectarlo a Pulse. Si hace falta ajustar algo, te acompañamos para dejarlo listo.
+              Cuando compartís tu dominio, el equipo lo valida y termina la conexión para que Pulse te muestre datos reales de tu web.
             </p>
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function PulseDomainRequestDialog({
                 onClick={() => void onSubmit()}
                 type="button"
               >
-                {status === 'rejected' ? 'Reenviar dominio' : 'Enviar dominio'}
+                {status === 'rejected' ? 'Corregir dominio' : 'Compartir dominio'}
               </Button>
             ) : null}
           </div>

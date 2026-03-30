@@ -1,6 +1,7 @@
 import type { BadgeProps } from '@/core/components/Badge';
+import type { EmailPriority, SupportPriority } from './types';
 
-export function getPriorityLabel(priority: 'low' | 'medium' | 'high') {
+export function getPriorityLabel(priority: SupportPriority) {
   switch (priority) {
     case 'high':
       return 'Alta';
@@ -13,7 +14,7 @@ export function getPriorityLabel(priority: 'low' | 'medium' | 'high') {
   }
 }
 
-export function getPriorityVariant(priority: 'low' | 'medium' | 'high'): BadgeProps['variant'] {
+export function getPriorityVariant(priority: SupportPriority): BadgeProps['variant'] {
   switch (priority) {
     case 'high':
       return 'danger';
@@ -23,6 +24,19 @@ export function getPriorityVariant(priority: 'low' | 'medium' | 'high'): BadgePr
       return 'default';
     default:
       return 'default';
+  }
+}
+
+export function mapSupportPriorityToEmailPriority(priority: SupportPriority): EmailPriority {
+  switch (priority) {
+    case 'high':
+      return 'alta';
+    case 'medium':
+      return 'media';
+    case 'low':
+      return 'baja';
+    default:
+      return 'media';
   }
 }
 

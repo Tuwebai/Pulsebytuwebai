@@ -1,5 +1,6 @@
-import { Bell, Compass, LogOut, UserCircle2 } from 'lucide-react';
+import { Compass, LogOut, UserCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -11,7 +12,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import type { User } from '@/contexts/appContext.types';
 import { useProfile } from '@/features/profile/hooks/useProfile';
-import { DEFAULT_PRODUCT_TOUR_SCOPE, PRODUCT_TOUR_OPEN_EVENT } from '@/features/product-tour/services/productTour.service';
+import {
+  DEFAULT_PRODUCT_TOUR_SCOPE,
+  PRODUCT_TOUR_OPEN_EVENT,
+} from '@/features/product-tour/services/productTour.service';
 import {
   getDisplayAvatar,
   getDisplayEmail,
@@ -20,12 +24,11 @@ import {
 } from '@/lib/identity/userIdentity';
 
 interface AvatarMenuProps {
-  onOpenNotifications: () => void;
   onLogout: () => Promise<void>;
   user: User | null;
 }
 
-export default function AvatarMenu({ onOpenNotifications, onLogout, user }: AvatarMenuProps) {
+export default function AvatarMenu({ onLogout, user }: AvatarMenuProps) {
   const navigate = useNavigate();
   const { profile } = useProfile();
   const isAdmin = user?.role === 'admin';
@@ -80,21 +83,15 @@ export default function AvatarMenu({ onOpenNotifications, onLogout, user }: Avat
             className="cursor-pointer rounded-[10px] px-3 py-2 text-[13px] text-[var(--text-primary)] transition-colors duration-150 ease-out focus:bg-[var(--bg-subtle)] focus:text-[var(--text-primary)]"
             onSelect={() => {
               navigate(homeRoute);
-              window.dispatchEvent(new CustomEvent(PRODUCT_TOUR_OPEN_EVENT, { detail: DEFAULT_PRODUCT_TOUR_SCOPE }));
+              window.dispatchEvent(
+                new CustomEvent(PRODUCT_TOUR_OPEN_EVENT, { detail: DEFAULT_PRODUCT_TOUR_SCOPE }),
+              );
             }}
           >
             <Compass className="mr-2 h-4 w-4 text-[var(--signal)]" strokeWidth={1.5} />
             Ver recorrido de Pulse
           </DropdownMenuItem>
         ) : null}
-
-        <DropdownMenuItem
-          className="cursor-pointer rounded-[10px] px-3 py-2 text-[13px] text-[var(--text-primary)] transition-colors duration-150 ease-out focus:bg-[var(--bg-subtle)] focus:text-[var(--text-primary)]"
-          onSelect={() => onOpenNotifications()}
-        >
-          <Bell className="mr-2 h-4 w-4 text-[var(--text-secondary)]" strokeWidth={1.5} />
-          Notificaciones
-        </DropdownMenuItem>
 
         <DropdownMenuSeparator className="my-1 bg-[var(--border-subtle)]" />
 

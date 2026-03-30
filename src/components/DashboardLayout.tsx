@@ -10,7 +10,6 @@ import LiveRegion from './LiveRegion';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { userPreferencesService } from '@/lib/userPreferencesService';
 import TutorialOverlay from './tutorial/TutorialOverlay';
-import { FloatingHelpButton } from './tutorial/ContextualHelp';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -149,7 +148,6 @@ export default function DashboardLayout({ children, dashboardProps }: DashboardL
               onRefreshData={undefined}
               lastUpdate={isClientDashboardPage ? new Date() : undefined}
               isAdmin={false}
-              isClientDashboard={isClientDashboardPage}
               clientDashboardStats={
                 isClientDashboardPage && dashboardProps?.stats ? dashboardProps.stats : undefined
               }
@@ -172,7 +170,6 @@ export default function DashboardLayout({ children, dashboardProps }: DashboardL
         </div>
 
         {!isAdminPage ? <TutorialOverlay /> : null}
-        {!isAdminPage ? <FloatingHelpButton /> : null}
       </div>
     </>
   );

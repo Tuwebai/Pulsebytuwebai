@@ -9,6 +9,7 @@ import type { User } from '@/contexts/appContext.types';
 import { realAvatarService } from '@/lib/config/avatarProviders';
 import { onboardingApi } from '@/api/pulse/onboardingApi';
 import { hasPulseAccess } from '@/features/auth/utils/pulseAccess';
+import { createFallbackAppUser, mergeOnboardingSnapshot, normalizeAppUser } from '@/features/auth/hooks/useCurrentUser.utils';
 
 interface UserUpdatePayload {
   full_name?: string | null;
@@ -91,42 +92,30 @@ export function useCurrentUser({
       try {
         setLoading(true);
 
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('tuwebai_auth');
-        }
-
         const cacheKey = `user_${supabaseUser.id}`;
         let userData = getCachedData<User>(cacheKey);
 
         if (!userData) {
           try {
-            userData = await userService.getUserById(supabaseUser.id);
+            userData = normalizeAppUser(await userService.getUserById(supabaseUser.id));
           } catch {
-            const { email, user_metadata } = supabaseUser;
-
-            const avatar =
-              user_metadata?.avatar_url || user_metadata?.picture || user_metadata?.photoURL || user_metadata?.image;
-
-            userData = {
-              id: supabaseUser.id,
-              email: supabaseUser.email || '',
-              full_name: user_metadata?.full_name || user_metadata?.name || email?.split('@')[0] || '',
-              role: 'user',
-              pulse_access_status: 'pending',
-              avatar_url: avatar,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            };
+            userData = createFallbackAppUser(supabaseUser);
 
             await userService.upsertUser(userData);
           }
 
-          setCachedData(cacheKey, userData, 10 * 60 * 1000);
+          if (userData) {
+            setCachedData(cacheKey, userData, 10 * 60 * 1000);
+          }
+        }
+
+        if (!userData) {
+          throw new Error('No se pudo resolver el usuario autenticado.');
         }
 
         if (userData && supabaseUser.email) {
           try {
-            const updatedUserData = await userService.getUserById(supabaseUser.id);
+            const updatedUserData = normalizeAppUser(await userService.getUserById(supabaseUser.id));
             const onboardingSnapshot = await onboardingApi.getUserSnapshot(supabaseUser.id);
             const authAvatar = realAvatarService.getAuthMetadataAvatar(supabaseUser);
             const storedAvatar = updatedUserData?.avatar_url ?? userData.avatar_url ?? null;
@@ -146,7 +135,7 @@ export function useCurrentUser({
 
             const finalUserData =
               shouldUseAuthAvatar
-                ? await userService.getUserById(supabaseUser.id)
+                ? normalizeAppUser(await userService.getUserById(supabaseUser.id))
                 : updatedUserData;
 
             if (finalUserData) {
@@ -154,15 +143,7 @@ export function useCurrentUser({
             }
 
             if (onboardingSnapshot) {
-              userData = {
-                ...userData,
-                website: onboardingSnapshot.website ?? userData.website,
-                website_status: onboardingSnapshot.website_status ?? userData.website_status,
-                website_submitted_at: onboardingSnapshot.website_submitted_at ?? userData.website_submitted_at,
-                website_reviewed_at: onboardingSnapshot.website_reviewed_at ?? userData.website_reviewed_at,
-                website_reviewed_by: onboardingSnapshot.website_reviewed_by ?? userData.website_reviewed_by,
-                website_review_notes: onboardingSnapshot.website_review_notes ?? userData.website_review_notes,
-              };
+              userData = mergeOnboardingSnapshot(userData, onboardingSnapshot);
             }
 
             const resolvedAvatar =
@@ -222,6 +203,10 @@ export function useCurrentUser({
   useEffect(() => {
     void syncUser();
   }, [syncUser]);
+
+  useEffect(() => {
+    localStorage.removeItem('tuwebai_auth');
+  }, []);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -288,24 +273,6 @@ export function useCurrentUser({
       void channel.unsubscribe().catch(() => undefined);
     };
   }, [user]);
-
-  useEffect(() => {
-    localStorage.removeItem('tuwebai_auth');
-
-    if (isAuthenticated && user) {
-      localStorage.setItem(
-        'tuwebai_auth',
-        JSON.stringify({
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          timestamp: Date.now()
-        })
-      );
-    } else {
-      localStorage.removeItem('tuwebai_auth');
-    }
-  }, [isAuthenticated, user]);
 
   const updateUserSettings = useCallback(
     async (updates: Partial<User>) => {

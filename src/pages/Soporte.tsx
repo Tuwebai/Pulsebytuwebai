@@ -14,6 +14,7 @@ import {
   type SupportDraftState,
   type Ticket
 } from '@/features/support';
+import { mapSupportPriorityToEmailPriority } from '@/features/support/support.utils';
 
 const SUPPORT_DRAFT_INITIAL_STATE: SupportDraftState = {
   title: '',
@@ -111,7 +112,7 @@ export default function Soporte() {
           ticketId: ticketData.id,
           asunto: formData.title,
           mensaje: formData.description,
-          prioridad: formData.priority,
+          prioridad: mapSupportPriorityToEmailPriority(formData.priority),
           fecha: new Date().toISOString()
         });
 
@@ -119,7 +120,7 @@ export default function Soporte() {
           asunto: formData.title,
           mensaje: formData.description,
           email: user.email,
-          prioridad: formData.priority,
+          prioridad: mapSupportPriorityToEmailPriority(formData.priority),
           fecha: new Date().toISOString()
         });
 

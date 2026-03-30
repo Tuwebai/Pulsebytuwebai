@@ -4,7 +4,7 @@ import { handleSupabaseError } from './errorHandler';
 export interface UserPreferences {
   id?: string;
   user_id: string;
-  preference_type: 'theme' | 'dashboard_widgets' | 'dashboard_layouts' | 'language' | 'welcome_back' | 'auth_state';
+  preference_type: 'theme' | 'dashboard_widgets' | 'dashboard_layouts' | 'language' | 'welcome_back';
   preference_key: string;
   preference_value: JsonValue;
   created_at?: string;
@@ -365,11 +365,6 @@ export class UserPreferencesService {
           key: 'tuwebai_welcome_back',
           getValue: () => localStorage.getItem('tuwebai_welcome_back')
         },
-        {
-          type: 'auth_state',
-          key: 'tuwebai_auth',
-          getValue: () => localStorage.getItem('tuwebai_auth')
-        }
       ];
 
       for (const migration of migrations) {
@@ -394,8 +389,7 @@ export class UserPreferencesService {
       'dashboard_widgets',
       'dashboardLayouts',
       'i18nextLng',
-      'tuwebai_welcome_back',
-      'tuwebai_auth'
+      'tuwebai_welcome_back'
     ];
 
     keysToRemove.forEach(key => {
@@ -525,9 +519,6 @@ export class UserPreferencesService {
             break;
           case 'welcome_back':
             localStorage.setItem('tuwebai_welcome_back', value);
-            break;
-          case 'auth_state':
-            localStorage.setItem('tuwebai_auth', JSON.stringify(value));
             break;
         }
       });

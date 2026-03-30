@@ -5,6 +5,7 @@ import PulseDomainRequestDialog from './PulseDomainRequestDialog';
 interface PulseDomainRequestGateProps {
   ga4PropertyId?: string | null;
   hasProject?: boolean;
+  syncingMetrics?: boolean;
 }
 
 function getConnectLabel(status: 'missing' | 'pending_review' | 'approved' | 'rejected', hasReachedLimit: boolean) {
@@ -15,7 +16,11 @@ function getConnectLabel(status: 'missing' | 'pending_review' | 'approved' | 're
   return status === 'rejected' ? 'Reenviar dominio ->' : 'Enviar dominio ->';
 }
 
-export default function PulseDomainRequestGate({ ga4PropertyId, hasProject = true }: PulseDomainRequestGateProps) {
+export default function PulseDomainRequestGate({
+  ga4PropertyId,
+  hasProject = true,
+  syncingMetrics = false,
+}: PulseDomainRequestGateProps) {
   const domainRequest = usePulseDomainRequest();
 
   return (
@@ -25,6 +30,7 @@ export default function PulseDomainRequestGate({ ga4PropertyId, hasProject = tru
         ga4PropertyId={ga4PropertyId}
         hasProject={hasProject}
         onConnect={domainRequest.openDialog}
+        syncingMetrics={syncingMetrics}
         website={domainRequest.website}
         websiteStatus={domainRequest.status}
       />

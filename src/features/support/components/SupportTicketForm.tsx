@@ -1,10 +1,12 @@
 import type { FormEvent } from 'react';
 import { Plus, Send } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import type { SupportDraftState } from '../types';
+
+import type { SupportDraftState, SupportPriority } from '../types';
 
 interface SupportTicketFormProps {
   formData: SupportDraftState;
@@ -65,7 +67,10 @@ export default function SupportTicketForm({ formData, onChange, onSubmit }: Supp
           <label className="text-[13px] font-medium text-[var(--text-secondary)]" htmlFor="support-priority">
             Prioridad
           </label>
-          <Select value={formData.priority} onValueChange={(value: 'low' | 'medium' | 'high') => onChange({ ...formData, priority: value })}>
+          <Select
+            value={formData.priority}
+            onValueChange={(value: SupportPriority) => onChange({ ...formData, priority: value })}
+          >
             <SelectTrigger
               ariaLabel="Prioridad del ticket"
               className={`${fieldClassName} h-11`}

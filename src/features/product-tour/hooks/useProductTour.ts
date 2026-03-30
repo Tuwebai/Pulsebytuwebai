@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   completeProductTour,
+  PRODUCT_TOUR_CLOSE_EVENT,
   DEFAULT_PRODUCT_TOUR_SCOPE,
   dismissProductTour,
   getProductTourScopeFromPath,
@@ -85,6 +86,18 @@ export function useProductTour({ userId }: UseProductTourOptions) {
       window.removeEventListener(PRODUCT_TOUR_OPEN_EVENT, handleManualOpen);
     };
   }, [navigate]);
+
+  useEffect(() => {
+    const handleManualClose = () => {
+      setIsOpen(false);
+    };
+
+    window.addEventListener(PRODUCT_TOUR_CLOSE_EVENT, handleManualClose);
+
+    return () => {
+      window.removeEventListener(PRODUCT_TOUR_CLOSE_EVENT, handleManualClose);
+    };
+  }, []);
 
   const close = () => {
     setIsOpen(false);

@@ -1,6 +1,6 @@
+import AnimatedList from '@/core/components/AnimatedList';
 import { MetricCard } from '@/core/components';
 import type { PulseMetricsTotals } from '@/data/types/pulse';
-import AnimatedList from '@/core/components/AnimatedList';
 
 interface PulseMetricsGridProps {
   averagePerDay: number | null;

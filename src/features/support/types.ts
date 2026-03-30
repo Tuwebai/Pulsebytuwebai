@@ -1,9 +1,12 @@
+export type SupportPriority = 'low' | 'medium' | 'high';
+export type EmailPriority = 'baja' | 'media' | 'alta';
+
 export interface Ticket {
   id: string;
   title: string;
   description: string;
   status: 'open' | 'responded' | 'closed' | 'in_conversation';
-  priority: 'low' | 'medium' | 'high';
+  priority: SupportPriority;
   user_id: string;
   assigned_to?: string;
   created_at: string;
@@ -18,5 +21,5 @@ export interface Ticket {
 export interface SupportDraftState {
   title: string;
   description: string;
-  priority: 'low' | 'medium' | 'high';
+  priority: SupportPriority;
 }

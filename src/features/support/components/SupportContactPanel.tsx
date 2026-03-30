@@ -81,13 +81,13 @@ export default function SupportContactPanel({ projectsCount }: SupportContactPan
         <ContactRow
           icon={<WhatsAppIcon />}
           tone="success"
-          title="Telefono"
+          title="Teléfono"
           value={SUPPORT_CONTACT.phoneDisplay}
         />
         <ContactRow
           icon={<Clock3 className="h-[18px] w-[18px] text-[#FBBF24]" strokeWidth={1.85} />}
           tone="warning"
-          title="Horario de atencion"
+          title="Horario de atención"
           value={SUPPORT_CONTACT.hoursDisplay}
         />
       </div>

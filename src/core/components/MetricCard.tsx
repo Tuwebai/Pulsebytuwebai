@@ -39,7 +39,7 @@ function renderDelta(delta?: number) {
     return <span className="text-[13px] font-medium text-[var(--danger)]">▼ {Math.abs(delta)}%</span>;
   }
 
-  return <span className="text-[13px] font-medium text-[var(--text-tertiary)]">— sin cambios</span>;
+  return <span className="text-[13px] font-medium text-[var(--text-tertiary)]">Sin cambios</span>;
 }
 
 export default function MetricCard({
@@ -50,11 +50,11 @@ export default function MetricCard({
   unit,
   loading = false,
   onClick,
-  className
+  className,
 }: MetricCardProps) {
   const prefersReducedMotion = useReducedMotionPreference();
   const isEmpty = value === null && !loading;
-  const displayPeriod = isEmpty ? 'sin datos disponibles' : period;
+  const displayPeriod = isEmpty ? 'Todavía no hay datos para mostrar' : period;
   const clickable = typeof onClick === 'function';
   const numericTarget = typeof value === 'number' && !loading ? value : 0;
   const animatedValue = useCountUp({
@@ -68,11 +68,9 @@ export default function MetricCard({
       className={cn(
         'min-h-[152px] rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 transition-[border-color,transform] duration-150',
         clickable && 'cursor-pointer hover:border-[var(--border-strong)]',
-        className
+        className,
       )}
       onClick={onClick}
-      role={clickable ? 'button' : undefined}
-      tabIndex={clickable ? 0 : undefined}
       onKeyDown={
         clickable
           ? (event) => {
@@ -83,10 +81,10 @@ export default function MetricCard({
             }
           : undefined
       }
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
     >
-      <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">
-        {label}
-      </p>
+      <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">{label}</p>
 
       <div className="mt-5 flex items-start justify-between gap-4">
         {loading ? (
@@ -98,11 +96,11 @@ export default function MetricCard({
             <p
               className={cn(
                 'font-data text-[40px] font-light leading-none text-[var(--text-primary)]',
-                isEmpty && 'text-[var(--text-tertiary)]'
+                isEmpty && 'text-[var(--text-tertiary)]',
               )}
               style={{ fontFamily: 'var(--font-data)' }}
             >
-              {isEmpty ? '—' : formatValue(displayValue, unit)}
+              {isEmpty || displayValue === null ? '—' : formatValue(displayValue, unit)}
             </p>
           </FadeIn>
         )}

@@ -59,10 +59,10 @@ export default function PulseTopPagesCard({ loading, topPages }: PulseTopPagesCa
                         <Globe className="h-8 w-8 text-[var(--text-tertiary)]" strokeWidth={1.5} />
                       </div>
                       <p className="mt-4 text-[14px] font-medium text-[var(--text-primary)]">
-                        Las páginas aparecen cuando tu web tenga visitas
+                        Acá vas a ver qué páginas miran más tus clientes
                       </p>
                       <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
-                        Este estado se completa solo a medida que llegan datos reales.
+                        Cuando tu web empiece a recibir visitas, Pulse te va a mostrar cuáles son las secciones más consultadas.
                       </p>
                     </div>
                   </FadeIn>

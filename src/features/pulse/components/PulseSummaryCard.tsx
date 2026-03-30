@@ -28,7 +28,7 @@ export default function PulseSummaryCard({ data, onOpenSettings }: PulseSummaryC
     <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
       <div>
         <h2 className="text-sm font-medium text-[var(--text-primary)]">Resumen del período</h2>
-        <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">Lectura rápida de tus métricas</p>
+        <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">Una lectura simple para entender cómo viene tu web</p>
       </div>
 
       <div className="mt-5 space-y-3">

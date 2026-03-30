@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { toast } from '@/hooks/use-toast';
 import { useApp } from '@/contexts/AppContext';
+import { toast } from '@/hooks/use-toast';
 import {
   canSubmitDomainRequest,
   getDomainRequestAttemptCount,
@@ -53,7 +53,7 @@ export function usePulseDomainRequest() {
 
       toast({
         title: 'Dominio enviado',
-        description: 'Tu solicitud quedó en revisión. El equipo la va a validar antes de activarla en Pulse.',
+        description: 'Ya recibimos tu dominio. Nuestro equipo lo va a revisar para dejar Pulse listo con tus datos reales.',
       });
 
       setOpen(false);

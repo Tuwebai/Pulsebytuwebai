@@ -1,7 +1,7 @@
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { FadeIn, Skeleton } from '@/core/components';
-import { useBreakpoint } from '@/lib/config/breakpoints';
 import type { ChartDataPoint } from '@/data/types/pulse';
+import { useBreakpoint } from '@/lib/config/breakpoints';
 
 interface PulseChartProps {
   data: ChartDataPoint[];
@@ -50,7 +50,7 @@ export default function PulseChart({ data, loading = false, height = 180 }: Puls
     return (
       <FadeIn>
         <div className="flex items-center justify-center text-[12px] italic text-[var(--text-tertiary)]" style={{ height }}>
-          No hay suficientes datos para mostrar el gráfico.
+          Todavía no hay suficiente movimiento para mostrar este gráfico.
         </div>
       </FadeIn>
     );

@@ -4,6 +4,7 @@ import { useApp } from '@/contexts/AppContext';
 import { NotificationsPanel } from '@/core/notifications/components/NotificationsPanel';
 import { useNotifications } from '@/core/notifications/hooks/useNotifications';
 import { useNotificationsPanelState } from '@/core/notifications/hooks/useNotificationsPanelState';
+import HelpButton from '@/features/help/components/HelpButton';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 
 function getGreeting(date = new Date()) {
@@ -26,19 +27,22 @@ export default function Header() {
   const { unreadCount } = useNotifications();
   const { panelOpen, openPanel, closePanel } = useNotificationsPanelState(
     `pulse:header:${user?.id ?? 'anon'}:notifications-open`,
-    user?.id ?? null
+    user?.id ?? null,
   );
   const greeting = getGreeting();
   const dateLabel = new Intl.DateTimeFormat('es-AR', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   }).format(new Date());
 
   return (
     <>
-      <header className="flex h-16 items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-base)] px-4 md:px-8" data-tour="shell-header">
+      <header
+        className="flex h-16 items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-base)] px-4 md:px-8"
+        data-tour="shell-header"
+      >
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 md:hidden">
             <PulseLogo size={24} variant="night" />
@@ -55,9 +59,10 @@ export default function Header() {
 
         <div className="flex items-center gap-3">
           <NotificationsBellTrigger dataTour="shell-notifications" onClick={openPanel} unreadCount={unreadCount} />
+          <HelpButton variant="minimal" />
 
           <div data-tour="shell-avatar-menu">
-            <AvatarMenu onLogout={logout} onOpenNotifications={openPanel} user={user} />
+            <AvatarMenu onLogout={logout} user={user} />
           </div>
         </div>
       </header>
