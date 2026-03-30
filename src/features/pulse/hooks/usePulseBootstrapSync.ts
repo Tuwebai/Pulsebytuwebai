@@ -111,6 +111,35 @@ export function usePulseBootstrapSync({
     void refreshPulseData('auto').catch(() => null);
   }, [connectionState, isPending, period, projectId, refreshPulseData, shouldAutoSync]);
 
+  useEffect(() => {
+    const canSyncConnectedRange =
+      connectionState === 'connected_no_data' || connectionState === 'connected_with_data';
+
+    if (!projectId || !shouldAutoSync || !canSyncConnectedRange) {
+      return;
+    }
+
+    const handleVisibilityRefresh = () => {
+      if (document.visibilityState !== 'visible') {
+        return;
+      }
+
+      void refreshPulseData('auto').catch(() => null);
+    };
+
+    const handleWindowFocus = () => {
+      void refreshPulseData('auto').catch(() => null);
+    };
+
+    window.addEventListener('focus', handleWindowFocus);
+    document.addEventListener('visibilitychange', handleVisibilityRefresh);
+
+    return () => {
+      window.removeEventListener('focus', handleWindowFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityRefresh);
+    };
+  }, [connectionState, projectId, refreshPulseData, shouldAutoSync]);
+
   return {
     isBootstrapping: isPending,
     refreshPulseData,

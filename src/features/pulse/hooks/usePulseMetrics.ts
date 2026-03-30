@@ -7,7 +7,9 @@ export function usePulseMetrics(projectId: string | null, period: Period) {
     queryKey: ['pulse-metrics', projectId, period],
     queryFn: () => getPulseMetrics(projectId!, period),
     enabled: !!projectId,
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
     retry: 2
   });
 }
