@@ -25,7 +25,7 @@ export interface Ga4Metrics {
   avgSessionSec: number;
   topPage: string | null;
   topPageViews: number;
-  topPages: Array<{ path: string; visits: number }>;
+  topPages: Array<{ label?: string | null; path: string; visits: number }>;
   raw: unknown;
 }
 

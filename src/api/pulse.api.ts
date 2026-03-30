@@ -10,7 +10,7 @@ interface PulseMetricApiRow {
   top_page: string | null;
   top_page_visits: number | null;
   avg_session_sec: number | null;
-  top_pages: Array<{ path?: string | null; visits?: number | null }> | null;
+  top_pages: Array<{ label?: string | null; path?: string | null; visits?: number | null }> | null;
   updated_at: string | null;
 }
 
@@ -39,6 +39,7 @@ export async function fetchMetricsByRange(projectId: string, from: string, to: s
     top_pages: (row.top_pages || [])
       .filter((page) => typeof page?.path === 'string' && page.path.length > 0)
       .map((page) => ({
+        label: typeof page.label === 'string' && page.label.length > 0 ? page.label : null,
         path: page.path as string,
         visits: page.visits || 0,
         percentage: 0,

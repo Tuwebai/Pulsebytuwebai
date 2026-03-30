@@ -14,6 +14,7 @@ export interface PulseMetricRow {
 }
 
 export interface TopPage {
+  label?: string | null;
   path: string;
   visits: number;
   percentage: number;

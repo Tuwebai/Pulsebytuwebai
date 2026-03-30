@@ -91,6 +91,7 @@ function parseGa4Response(raw: unknown): Ga4Metrics {
 
   const rows = response.rows || [];
   const topPages = rows.slice(0, 5).map((row) => ({
+    label: row.dimensionValues?.[1]?.value || null,
     path: row.dimensionValues?.[0]?.value || '/',
     visits: parseInt(row.metricValues?.[3]?.value || '0', 10),
   }));
@@ -126,7 +127,7 @@ export async function fetchGa4Metrics(propertyId: string, date: string, accessTo
         { name: 'averageSessionDuration' },
         { name: 'screenPageViews' },
       ],
-      dimensions: [{ name: 'pagePath' }],
+      dimensions: [{ name: 'pagePath' }, { name: 'pageTitle' }],
       orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
       limit: 10,
     }),

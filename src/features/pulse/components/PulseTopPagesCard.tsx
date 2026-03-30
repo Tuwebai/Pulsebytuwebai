@@ -40,7 +40,12 @@ export default function PulseTopPagesCard({ loading, topPages }: PulseTopPagesCa
               topPages.map((page, index) => (
                 <tr key={page.path} className={index === topPages.length - 1 ? '' : 'border-b border-[var(--border-subtle)]'}>
                   <td className="px-5 py-3 text-sm text-[var(--text-secondary)]">
-                    <FadeIn>{page.path}</FadeIn>
+                    <FadeIn>
+                      <div className="min-w-0">
+                        <p className="truncate text-[var(--text-primary)]">{page.label ?? page.path}</p>
+                        {page.label && page.label !== page.path ? <p className="mt-1 truncate text-[12px] text-[var(--text-tertiary)]">{page.path}</p> : null}
+                      </div>
+                    </FadeIn>
                   </td>
                   <td className="px-5 py-3 font-data text-sm text-[var(--text-primary)]">
                     <FadeIn>{page.visits}</FadeIn>
