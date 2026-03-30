@@ -30,6 +30,7 @@ function RealtimeStat({
 
 export default function PulseRealtimeCard({ data, error, loading }: PulseRealtimeCardProps) {
   const hasRelevantEvents = Boolean(data && data.topEvents.length > 0);
+  const hasRelevantPages = Boolean(data && data.topPages.length > 0);
 
   return (
     <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
@@ -39,7 +40,9 @@ export default function PulseRealtimeCard({ data, error, loading }: PulseRealtim
           <h2 className="mt-1 text-lg font-medium text-[var(--text-primary)]">Qué está pasando ahora en tu web</h2>
         </div>
         <p className="text-[13px] text-[var(--text-secondary)]">
-          {data ? `Muestra tomada ${new Date(data.sampledAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}` : 'Últimos 30 minutos'}
+          {data
+            ? `Muestra tomada ${new Date(data.sampledAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`
+            : 'Últimos 30 minutos'}
         </p>
       </div>
 
@@ -67,14 +70,20 @@ export default function PulseRealtimeCard({ data, error, loading }: PulseRealtim
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)]/50 p-4">
               <h3 className="text-sm font-medium text-[var(--text-primary)]">Páginas con más movimiento</h3>
-              <div className="mt-4 space-y-3">
-                {data.topPages.map((page) => (
-                  <div key={page.label} className="flex items-center gap-3 text-sm">
-                    <span className="min-w-0 flex-1 truncate text-[var(--text-secondary)]">{page.label}</span>
-                    <span className="font-data text-[var(--text-primary)]">{page.activeUsers} activos</span>
-                  </div>
-                ))}
-              </div>
+              {hasRelevantPages ? (
+                <div className="mt-4 space-y-3">
+                  {data.topPages.map((page) => (
+                    <div key={page.label} className="flex items-center gap-3 text-sm">
+                      <span className="min-w-0 flex-1 truncate text-[var(--text-secondary)]">{page.label}</span>
+                      <span className="font-data text-[var(--text-primary)]">{page.activeUsers} activos</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-[var(--text-secondary)]">
+                  Todavía no vemos páginas con movimiento claro en esta muestra en vivo.
+                </p>
+              )}
             </div>
 
             <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)]/50 p-4">

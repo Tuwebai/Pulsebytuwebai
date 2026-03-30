@@ -24,11 +24,11 @@ const EVENT_COPY: Record<string, { label: string; priority: number }> = {
   submit_form: { label: 'Consultas enviadas', priority: 1 },
   form_submit: { label: 'Consultas enviadas', priority: 1 },
   contact_form_submit: { label: 'Consultas enviadas', priority: 1 },
-  page_view: { label: 'Paginas vistas', priority: 2 },
+  page_view: { label: 'Páginas vistas', priority: 2 },
   section_view: { label: 'Secciones vistas', priority: 2 },
   session_start: { label: 'Nuevas sesiones', priority: 2 },
   first_visit: { label: 'Primeras visitas', priority: 3 },
-  user_engagement: { label: 'Interaccion activa', priority: 3 },
+  user_engagement: { label: 'Interacción activa', priority: 3 },
   file_download: { label: 'Descargas', priority: 3 },
 };
 

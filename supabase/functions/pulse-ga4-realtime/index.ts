@@ -5,6 +5,7 @@ import { getGoogleAccessToken } from '../sync-ga4-metrics/ga4.ts';
 import { createSupabaseAdminClient } from '../sync-ga4-metrics/request.ts';
 import { corsHeaders, jsonResponse, SyncGa4MetricsError } from '../sync-ga4-metrics/types.ts';
 import { buildRealtimeEvents, getEventCount } from './events.ts';
+import { buildRealtimePages } from './pages.ts';
 
 interface RealtimeRow {
   dimensionValues?: Array<{ value?: string }>;
@@ -149,23 +150,19 @@ serve(async (req) => {
     ]);
 
     const totalRow = parseRealtimeRows((totalsRaw as { rows?: RealtimeRow[] }).rows)[0];
-    const pageRows = parseRealtimeRows((pagesRaw as { rows?: RealtimeRow[] }).rows);
+    const pageRows = buildRealtimePages(parseRealtimeRows((pagesRaw as { rows?: RealtimeRow[] }).rows));
     const eventRows = buildRealtimeEvents(parseRealtimeRows((eventsRaw as { rows?: RealtimeRow[] }).rows));
 
     return jsonResponse(200, {
       activeUsers: parseInt(totalRow?.metricValues?.[0]?.value || '0', 10),
-      pageViews: getEventCount(eventRows, ['Paginas vistas']),
+      pageViews: getEventCount(eventRows, ['Páginas vistas']),
       ctaClicks: getEventCount(eventRows, [
         'Clics en contacto',
         'Clics en WhatsApp',
         'Clics en llamada',
         'Clics en email',
       ]),
-      topPages: pageRows.map((row) => ({
-        label: row.dimensionValues?.[0]?.value || 'Página sin nombre',
-        activeUsers: parseInt(row.metricValues?.[0]?.value || '0', 10),
-        views: parseInt(row.metricValues?.[1]?.value || '0', 10),
-      })),
+      topPages: pageRows,
       topEvents: eventRows.slice(0, 5),
       sampledAt: new Date().toISOString(),
     });
