@@ -137,11 +137,13 @@ export function getPaymentTypeConfig(paymentType: PaymentTypeKey) {
 }
 
 export function getMercadoPagoConfig() {
-  const accessToken = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || '';
-  const environment = Deno.env.get('MERCADOPAGO_ENVIRONMENT') || 'production';
+  const accessToken = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || Deno.env.get('VITE_MERCADOPAGO_ACCESS_TOKEN') || '';
+  const environment = Deno.env.get('MERCADOPAGO_ENVIRONMENT') || Deno.env.get('VITE_MERCADOPAGO_ENVIRONMENT') || 'production';
   const appUrl = Deno.env.get('PULSE_PUBLIC_URL') || Deno.env.get('VITE_PUBLIC_URL') || 'http://127.0.0.1:8083';
   const webhookUrl =
-    Deno.env.get('MERCADOPAGO_WEBHOOK_URL') || `${appUrl.replace(/\/$/, '')}/api/webhooks/mercadopago`;
+    Deno.env.get('MERCADOPAGO_WEBHOOK_URL') ||
+    Deno.env.get('VITE_MERCADOPAGO_WEBHOOK_URL') ||
+    `${appUrl.replace(/\/$/, '')}/api/webhooks/mercadopago`;
 
   if (!accessToken) {
     throw new Error('MERCADOPAGO_CONFIG_MISSING');
