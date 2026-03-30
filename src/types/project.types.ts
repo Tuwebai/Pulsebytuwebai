@@ -16,6 +16,7 @@ export interface Project {
   
   // Campos adicionales de la DB real (auditados via SSOT)
   type?: string;
+  funcionalidades?: string[];
   fases?: Array<{
     key: string;
     estado: 'Pendiente' | 'En Progreso' | 'Terminado';
@@ -64,10 +65,24 @@ export interface CreateProjectData {
   github_repository_url?: string;
   customicon?: string;
   screenshot_url?: string;
+  funcionalidades?: string[];
+  fases?: Project['fases'];
+  tareas?: Project['tareas'];
+  type?: string;
+  priority?: Project['priority'];
+  start_date?: string;
+  end_date?: string;
 }
 
 export interface UpdateProjectData extends Partial<CreateProjectData> {
   is_active?: boolean;
+  progress?: number;
+  completion_percentage?: number;
+  approval_status?: Project['approval_status'];
+  approved_by?: string;
+  approved_at?: string;
+  approval_notes?: string;
+  approval_deadline?: string;
 }
 
 export interface ProjectFilters {

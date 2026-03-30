@@ -447,7 +447,7 @@ export const projectService = {
       
       data.forEach(project => {
         if (project.technologies) {
-          project.technologies.forEach(tech => {
+          project.technologies.forEach((tech: string) => {
             technologyCount[tech] = (technologyCount[tech] || 0) + 1;
           });
         }

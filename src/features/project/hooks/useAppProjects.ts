@@ -4,9 +4,59 @@ import { deleteCachedData, getCachedData, setCachedData } from '@/contexts/appCo
 import type { Project, ProjectLog, User } from '@/contexts/appContext.types';
 import { supabase } from '@/lib/supabase';
 import { projectService } from '@/lib/services/projectService';
+import type { CreateProjectData, UpdateProjectData } from '@/types/project.types';
 
 type ProjectPhase = NonNullable<Project['fases']>[number];
-type ProjectProgressSnapshot = NonNullable<Project['progressHistory']>[number];
+
+function toCreateProjectPayload(
+  projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt' | 'ownerEmail'>,
+  userId: string,
+): CreateProjectData & { created_by: string } {
+  return {
+    name: projectData.name,
+    description: projectData.description,
+    technologies: Array.isArray(projectData.technologies) ? projectData.technologies : [],
+    environment_variables: projectData.environment_variables,
+    status: 'development',
+    github_repository_url: projectData.github_repository_url,
+    customicon: projectData.customicon,
+    screenshot_url: undefined,
+    funcionalidades: Array.isArray(projectData.funcionalidades)
+      ? projectData.funcionalidades.filter((item): item is string => typeof item === 'string')
+      : undefined,
+    fases: Array.isArray(projectData.fases) ? projectData.fases : undefined,
+    type: projectData.type,
+    priority: undefined,
+    start_date: undefined,
+    end_date: undefined,
+    created_by: userId,
+  };
+}
+
+function toUpdateProjectPayload(updates: Partial<Project>): UpdateProjectData {
+  return {
+    name: updates.name,
+    description: updates.description,
+    technologies: Array.isArray(updates.technologies) ? updates.technologies : undefined,
+    environment_variables: updates.environment_variables,
+    status: updates.status,
+    github_repository_url: updates.github_repository_url,
+    customicon: updates.customicon,
+    screenshot_url: undefined,
+    funcionalidades: Array.isArray(updates.funcionalidades)
+      ? updates.funcionalidades.filter((item): item is string => typeof item === 'string')
+      : undefined,
+    fases: Array.isArray(updates.fases) ? updates.fases : undefined,
+    type: updates.type,
+    priority: undefined,
+    start_date: undefined,
+    end_date: undefined,
+    is_active: updates.is_active,
+    progress: typeof updates.progress === 'number' ? updates.progress : undefined,
+    completion_percentage:
+      typeof updates.completion_percentage === 'number' ? updates.completion_percentage : undefined,
+  };
+}
 
 interface UseAppProjectsParams {
   logs: ProjectLog[];
@@ -157,14 +207,7 @@ export function useAppProjects({
           throw new Error('ID de usuario inválido. No se puede crear el proyecto.');
         }
 
-        const newProject = {
-          ...projectData,
-          created_by: user.id,
-          status: 'development' as const,
-          technologies: projectData.technologies || []
-        };
-
-        const createdProject = await projectService.createProject(newProject);
+        const createdProject = await projectService.createProject(toCreateProjectPayload(projectData, user.id));
 
         if (createdProject) {
           setProjects((previousProjects) => [...previousProjects, createdProject as Project]);
@@ -186,37 +229,7 @@ export function useAppProjects({
         setLoading(true);
         setError(null);
 
-        const currentProject = (await projectService.getProjectById(id)) as Project;
-        const progressHistory: ProjectProgressSnapshot[] = [...(currentProject.progressHistory || [])];
-        let prevProgress = 0;
-
-        const currentPhases = currentProject.fases || [];
-        if (currentPhases.length > 0) {
-          const completed = currentPhases.filter((phase) => phase.estado === 'Terminado').length;
-          prevProgress = Math.round((completed / currentPhases.length) * 100);
-        }
-
-        let newProgress = prevProgress;
-        const updatedPhases = updates.fases || [];
-        if (updatedPhases.length > 0) {
-          const completed = updatedPhases.filter((phase) => phase.estado === 'Terminado').length;
-          newProgress = Math.round((completed / updatedPhases.length) * 100);
-        }
-
-        const today = new Date().toISOString().slice(0, 10);
-        if (newProgress !== prevProgress) {
-          const snapshotIndex = progressHistory.findIndex((historyItem) => historyItem.date === today);
-          if (snapshotIndex >= 0) {
-            progressHistory[snapshotIndex] = { date: today, progress: newProgress };
-          } else {
-            progressHistory.push({ date: today, progress: newProgress });
-          }
-        }
-
-        await projectService.updateProject(id, {
-          ...updates,
-          progressHistory
-        });
+        await projectService.updateProject(id, toUpdateProjectPayload(updates));
 
         if (user) {
           deleteCachedData(`projects_${user.email}`);

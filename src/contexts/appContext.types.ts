@@ -32,7 +32,6 @@ export interface Project {
       tipo: 'admin' | 'cliente';
     }>;
   }>;
-  progressHistory?: Array<{ date: string; progress: number }>;
 }
 
 export interface User {
