@@ -9,9 +9,40 @@ interface PulseRealtimePage {
   views: number;
 }
 
+interface PulsePageRule {
+  label: string;
+  patterns: RegExp[];
+}
+
 const HIDDEN_PAGE_LABELS = new Set(['', '(not set)', '(other)']);
 const BRAND_SEGMENTS = ['tuweb.ai', 'tuwebai'];
 const INTERNAL_PAGE_PATTERNS = [/panel de usuario/i, /dashboard/i, /login/i];
+const PULSE_PAGE_RULES: PulsePageRule[] = [
+  {
+    label: 'Inicio',
+    patterns: [/desarrollo web profesional para negocios argentinos/i, /^inicio$/i, /^home$/i],
+  },
+  {
+    label: 'Nosotros',
+    patterns: [/nosotros/i, /quienes somos/i, /sobre nosotros/i],
+  },
+  {
+    label: 'Soluciones corporativas',
+    patterns: [/corporativos/i, /empresas/i, /soluciones corporativas/i],
+  },
+  {
+    label: 'Blog',
+    patterns: [/^blog$/i, /blog tuweb/i, /articulos/i],
+  },
+  {
+    label: 'Contacto',
+    patterns: [/contacto/i, /consulta/i, /propuesta inicial/i],
+  },
+  {
+    label: 'Política de cookies',
+    patterns: [/politica de cookies/i, /política de cookies/i],
+  },
+];
 
 function cleanPageSegment(segment: string) {
   return segment.trim();
@@ -37,6 +68,13 @@ function normalizePageLabel(rawLabel: string) {
     .map(cleanPageSegment)
     .filter(Boolean)
     .filter((segment) => !isBrandSegment(segment));
+
+  const candidate = segments[0] || trimmed;
+  const mappedRule = PULSE_PAGE_RULES.find((rule) => rule.patterns.some((pattern) => pattern.test(candidate)));
+
+  if (mappedRule) {
+    return mappedRule.label;
+  }
 
   if (segments.length === 0) {
     return 'Inicio';
