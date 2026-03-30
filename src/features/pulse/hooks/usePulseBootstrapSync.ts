@@ -6,6 +6,7 @@ import type { PulseConnectionState } from './usePulseConnectionState';
 
 interface UsePulseBootstrapSyncParams {
   connectionState: PulseConnectionState;
+  manualSyncDays: number;
   period: Period;
   projectId: string | null;
   shouldAutoSync: boolean;
@@ -59,6 +60,7 @@ function canAutoSync(syncKey: string) {
 
 export function usePulseBootstrapSync({
   connectionState,
+  manualSyncDays,
   period,
   projectId,
   shouldAutoSync,
@@ -71,6 +73,7 @@ export function usePulseBootstrapSync({
     onSuccess: async (_, variables) => {
       await queryClient.invalidateQueries({
         queryKey: ['pulse-metrics', variables.nextProjectId],
+        refetchType: 'active',
       });
     },
   });
@@ -91,10 +94,10 @@ export function usePulseBootstrapSync({
 
       return mutateAsync({
         nextProjectId: projectId,
-        nextSyncDays: syncDays,
+        nextSyncDays: mode === 'manual' ? manualSyncDays : syncDays,
       });
     },
-    [mutateAsync, period, projectId, syncDays],
+    [manualSyncDays, mutateAsync, period, projectId, syncDays],
   );
 
   useEffect(() => {

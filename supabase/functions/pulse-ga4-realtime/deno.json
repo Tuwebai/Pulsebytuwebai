@@ -1,0 +1,14 @@
+{
+  "name": "pulse-ga4-realtime",
+  "version": "1.0.0",
+  "description": "Edge Function para consultar snapshot realtime de GA4 para Pulse",
+  "main": "index.ts",
+  "imports": {
+    "supabase": "https://esm.sh/@supabase/supabase-js@2"
+  },
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["deno.window", "deno.ns"],
+    "strict": true
+  }
+}

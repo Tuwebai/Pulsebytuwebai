@@ -30,10 +30,11 @@ export default function PulseMetricsGrid({ averagePerDay, data, loading }: Pulse
         value={data?.contacts ?? null}
       />
       <MetricCard
-        label="Página más visitada"
+        label="Tasa de consulta"
         loading={loading}
-        period={data?.topPages[0] ? `${data.topPages[0].visits} visitas` : undefined}
-        value={data?.topPages[0]?.path ?? null}
+        period="Qué parte de las visitas terminó en contacto"
+        unit="%"
+        value={data?.consultationRate ?? null}
       />
       <MetricCard label="Promedio por día" loading={loading} unit="visitas/día" value={averagePerDay} />
     </AnimatedList>

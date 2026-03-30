@@ -9,6 +9,8 @@ export interface PulseMetricRow {
   top_page: string | null;
   top_page_visits: number;
   avg_session_sec: number;
+  top_pages: TopPage[];
+  updated_at: string | null;
 }
 
 export interface TopPage {
@@ -28,6 +30,7 @@ export interface PulseMetricsTotals {
   contacts: number;
   visitsDelta: number | null;
   contactsDelta: number | null;
+  consultationRate: number | null;
   avgSessionSec: number;
   topPages: TopPage[];
   chartData: ChartDataPoint[];
@@ -37,4 +40,26 @@ export interface PulseMetricsTotals {
     to: string;
   };
   hasData: boolean;
+  lastUpdatedAt: string | null;
+}
+
+export interface PulseRealtimePage {
+  label: string;
+  activeUsers: number;
+  views: number;
+}
+
+export interface PulseRealtimeEvent {
+  name: string;
+  count: number;
+  keyEvents: number;
+}
+
+export interface PulseRealtimeSnapshot {
+  activeUsers: number;
+  eventCount: number;
+  keyEvents: number;
+  topPages: PulseRealtimePage[];
+  topEvents: PulseRealtimeEvent[];
+  sampledAt: string;
 }

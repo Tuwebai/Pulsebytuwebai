@@ -15,7 +15,7 @@ export function usePulseRealtime(projectId: string | null) {
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*',
           schema: 'public',
           table: 'pulse_metrics',
           filter: `project_id=eq.${projectId}`

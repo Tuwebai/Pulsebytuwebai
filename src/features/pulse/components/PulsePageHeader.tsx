@@ -7,6 +7,7 @@ interface PulsePageHeaderProps {
   domain: string | null;
   hasProject: boolean;
   isRefreshing: boolean;
+  lastUpdatedLabel: string | null;
   onOpenSite: () => void;
   onRefreshMetrics: () => void;
   period: Period;
@@ -18,6 +19,7 @@ export default function PulsePageHeader({
   domain,
   hasProject,
   isRefreshing,
+  lastUpdatedLabel,
   onOpenSite,
   onRefreshMetrics,
   period,
@@ -28,6 +30,7 @@ export default function PulsePageHeader({
       <div>
         <h1 className="text-[22px] font-medium text-[var(--text-primary)]">Tu web este mes</h1>
         <p className="text-[14px] leading-5 text-[var(--text-secondary)]">{dateRangeLabel}</p>
+        {lastUpdatedLabel ? <p className="mt-1 text-[13px] text-[var(--text-tertiary)]">{lastUpdatedLabel}</p> : null}
       </div>
 
       <div className="flex flex-col gap-3 md:flex-row md:items-center" data-tour="pulse-period-selector">

@@ -2,6 +2,7 @@
 import PulseDomainRequestGate from '../components/PulseDomainRequestGate';
 import PulseMetricsGrid from '../components/PulseMetricsGrid';
 import PulsePageHeader from '../components/PulsePageHeader';
+import PulseRealtimeCard from '../components/PulseRealtimeCard';
 import PulseSummaryCard from '../components/PulseSummaryCard';
 import PulseTopPagesCard from '../components/PulseTopPagesCard';
 import { usePulsePageState } from '../hooks/usePulsePageState';
@@ -16,7 +17,11 @@ export default function PulsePage() {
     ga4PropertyId,
     hasProject,
     isBootstrapping,
+    lastUpdatedLabel,
     loading,
+    realtimeData,
+    realtimeError,
+    realtimeLoading,
     onOpenSettings,
     onOpenSite,
     onRefreshMetrics,
@@ -32,6 +37,7 @@ export default function PulsePage() {
         domain={domain}
         hasProject={canViewMetrics}
         isRefreshing={isBootstrapping}
+        lastUpdatedLabel={lastUpdatedLabel}
         onOpenSite={onOpenSite}
         onRefreshMetrics={() => {
           void onRefreshMetrics();
@@ -47,6 +53,8 @@ export default function PulsePage() {
       ) : null}
 
       <PulseMetricsGrid averagePerDay={averagePerDay} data={data} loading={loading} />
+
+      {canViewMetrics ? <PulseRealtimeCard data={realtimeData} error={realtimeError} loading={realtimeLoading} /> : null}
 
       <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5" data-tour="pulse-chart">
         <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">Visitas por día</p>

@@ -10,12 +10,14 @@ interface PulseMetricApiRow {
   top_page: string | null;
   top_page_visits: number | null;
   avg_session_sec: number | null;
+  top_pages: Array<{ path?: string | null; visits?: number | null }> | null;
+  updated_at: string | null;
 }
 
 export async function fetchMetricsByRange(projectId: string, from: string, to: string): Promise<PulseMetricRow[]> {
   const { data, error } = await supabase
     .from('pulse_metrics')
-    .select('id, project_id, metric_date, visits, contacts, top_page, top_page_visits, avg_session_sec')
+    .select('id, project_id, metric_date, visits, contacts, top_page, top_page_visits, avg_session_sec, top_pages, updated_at')
     .eq('project_id', projectId)
     .gte('metric_date', from)
     .lte('metric_date', to)
@@ -33,6 +35,14 @@ export async function fetchMetricsByRange(projectId: string, from: string, to: s
     contacts: row.contacts || 0,
     top_page: row.top_page,
     top_page_visits: row.top_page_visits || 0,
-    avg_session_sec: row.avg_session_sec || 0
+    avg_session_sec: row.avg_session_sec || 0,
+    top_pages: (row.top_pages || [])
+      .filter((page) => typeof page?.path === 'string' && page.path.length > 0)
+      .map((page) => ({
+        path: page.path as string,
+        visits: page.visits || 0,
+        percentage: 0,
+      })),
+    updated_at: row.updated_at,
   }));
 }

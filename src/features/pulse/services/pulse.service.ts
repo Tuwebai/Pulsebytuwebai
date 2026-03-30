@@ -131,10 +131,25 @@ export function calcDelta(current: number, previous: number): number | null {
   return Number.isFinite(value) ? value : null;
 }
 
+export function calcConsultationRate(visits: number, contacts: number): number | null {
+  if (visits <= 0 || contacts <= 0) {
+    return null;
+  }
+
+  return Math.round((contacts / visits) * 1000) / 10;
+}
+
 export function getTopPages(rows: PulseMetricRow[]): TopPage[] {
   const pages = new Map<string, number>();
 
   rows.forEach((row) => {
+    if (row.top_pages.length > 0) {
+      row.top_pages.forEach((page) => {
+        pages.set(page.path, (pages.get(page.path) || 0) + page.visits);
+      });
+      return;
+    }
+
     if (!row.top_page) {
       return;
     }
@@ -162,6 +177,20 @@ export function formatChartData(rows: PulseMetricRow[]): ChartDataPoint[] {
   }));
 }
 
+function getLastUpdatedAt(rows: PulseMetricRow[]): string | null {
+  return rows.reduce<string | null>((latest, row) => {
+    if (!row.updated_at) {
+      return latest;
+    }
+
+    if (!latest) {
+      return row.updated_at;
+    }
+
+    return new Date(row.updated_at).getTime() > new Date(latest).getTime() ? row.updated_at : latest;
+  }, null);
+}
+
 export function getDaysInRange(period: Period): number {
   return getRangeDays(getDateRange(period));
 }
@@ -183,11 +212,13 @@ export async function getPulseMetrics(projectId: string, period: Period): Promis
     contacts: current.contacts,
     visitsDelta: calcDelta(current.visits, previous.visits),
     contactsDelta: calcDelta(current.contacts, previous.contacts),
+    consultationRate: calcConsultationRate(current.visits, current.contacts),
     avgSessionSec: current.avgSessionSec,
     topPages: getTopPages(currentRows),
     chartData: formatChartData(currentRows),
     period,
     dateRange,
-    hasData: currentRows.length > 0
+    hasData: currentRows.length > 0,
+    lastUpdatedAt: getLastUpdatedAt(currentRows),
   };
 }
