@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
+import { userService } from '@/features/auth/services/user.service';
 import { supabase } from '@/lib/supabase';
-import { userService } from '@/lib/supabaseService';
 
 export default function AuthCallback() {
   const navigate = useNavigate();

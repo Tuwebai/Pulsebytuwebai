@@ -1,4 +1,4 @@
-import { userService } from '@/lib/supabase/supabaseService';
+import { userService } from '@/features/auth/services/user.service';
 import type { User } from '@/contexts/appContext.types';
 
 type ClientSettingsUpdates = Pick<

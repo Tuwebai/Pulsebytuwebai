@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Session, User as SupabaseUser } from '@supabase/supabase-js';
+import { userService } from '@/features/auth/services/user.service';
 import { supabase } from '@/lib/supabase/supabase';
-import { userService } from '@/lib/supabase/supabaseService';
 import { toast as toastGlobal } from '@/hooks/use-toast';
 import { userPreferencesService } from '@/lib/services/userPreferencesService';
 import { clearCache, getCachedData, setCachedData } from '@/contexts/appContext.cache';

@@ -1,7 +1,7 @@
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import type { PulseOnboardingSnapshot } from '@/api/pulse/onboardingApi';
 import type { User as AppUser } from '@/contexts/appContext.types';
-import type { User as ServiceUser } from '@/lib/supabase/supabaseService';
+import type { UserRecord as ServiceUser } from '@/features/auth/services/user.service';
 
 function normalizeUserRole(role: string | null | undefined): AppUser['role'] {
   return role === 'admin' ? 'admin' : 'user';

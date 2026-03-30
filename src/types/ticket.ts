@@ -1,5 +1,4 @@
-// Tipos de Ticket para el Dashboard TuWebAI
-// Centralizados desde: lib/services/ticketService.ts
+// Tipos de Ticket para superficies legacy de soporte/admin.
 
 export interface Ticket {
   id: string;

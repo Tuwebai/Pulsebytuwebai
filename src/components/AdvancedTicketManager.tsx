@@ -9,8 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from '@/hooks/use-toast';
 import { useApp } from '@/contexts/AppContext';
-import { SupabaseService, type Ticket } from '@/lib/supabaseService';
-import { ticketService } from '@/lib/supabaseService';
+import {
+  ticketService,
+  type SupportAdminTicketRecord as Ticket,
+} from '@/features/support/services/ticket.service';
 import { 
   Ticket as TicketIcon, 
   Plus, 
@@ -223,7 +225,7 @@ export default function AdvancedTicketManager({
   const loadTickets = async () => {
     try {
       setLoading(true);
-      const ticketsData = await SupabaseService.getTickets();
+      const ticketsData = await ticketService.getTickets();
       setTickets(ticketsData || []);
       setFilteredTickets(ticketsData || []);
       updateStats(ticketsData || []);
@@ -369,7 +371,7 @@ export default function AdvancedTicketManager({
     try {
       if (editingTicket) {
         // Update existing ticket
-        await SupabaseService.updateTicket(editingTicket.id, {
+        await ticketService.updateTicket(editingTicket.id, {
           title: formData.title,
           description: formData.description,
           priority: formData.priority,
@@ -384,7 +386,7 @@ export default function AdvancedTicketManager({
         });
       } else {
         // Create new ticket
-        await SupabaseService.createTicket({
+        await ticketService.createTicket({
           title: formData.title,
           description: formData.description,
           priority: formData.priority,
