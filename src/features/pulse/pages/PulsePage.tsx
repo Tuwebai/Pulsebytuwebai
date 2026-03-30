@@ -69,7 +69,7 @@ export default function PulsePage() {
 
       <PulseMetricsGrid averagePerDay={averagePerDay} data={data} loading={loading} />
 
-      {canViewMetrics ? <PulseRealtimeCard data={realtimeData} error={realtimeError} loading={realtimeLoading} /> : null}
+      {canViewMetrics ? <PulseRealtimeCard data={realtimeData} domain={domain} error={realtimeError} loading={realtimeLoading} /> : null}
 
       <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5" data-tour="pulse-chart">
         <PulseChart data={data?.chartData ?? []} height={180} loading={loading} />

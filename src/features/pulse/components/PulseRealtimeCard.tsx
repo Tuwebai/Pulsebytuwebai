@@ -1,9 +1,10 @@
-import { Activity, Radio, Zap } from 'lucide-react';
+import { Activity, ExternalLink, Radio, Zap } from 'lucide-react';
 import { Skeleton } from '@/core/components';
 import type { PulseRealtimeSnapshot } from '@/data/types/pulse';
 
 interface PulseRealtimeCardProps {
   data: PulseRealtimeSnapshot | undefined;
+  domain: string | null;
   error: string | null;
   loading: boolean;
 }
@@ -28,7 +29,11 @@ function RealtimeStat({
   );
 }
 
-export default function PulseRealtimeCard({ data, error, loading }: PulseRealtimeCardProps) {
+function buildPageUrl(domain: string, path: string) {
+  return `https://${domain}${path === '/' ? '' : path}`;
+}
+
+export default function PulseRealtimeCard({ data, domain, error, loading }: PulseRealtimeCardProps) {
   const hasRelevantEvents = Boolean(data && data.topEvents.length > 0);
   const hasRelevantPages = Boolean(data && data.topPages.length > 0);
 
@@ -75,6 +80,16 @@ export default function PulseRealtimeCard({ data, error, loading }: PulseRealtim
                   {data.topPages.map((page) => (
                     <div key={page.label} className="flex items-center gap-3 text-sm">
                       <span className="min-w-0 flex-1 truncate text-[var(--text-secondary)]">{page.label}</span>
+                      {domain && page.path ? (
+                        <a
+                          className="inline-flex items-center gap-1 text-[12px] text-[var(--signal)] transition-opacity hover:opacity-80"
+                          href={buildPageUrl(domain, page.path)}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          Abrir <ExternalLink size={12} strokeWidth={1.5} />
+                        </a>
+                      ) : null}
                       <span className="font-data text-[var(--text-primary)]">{page.activeUsers} activos</span>
                     </div>
                   ))}

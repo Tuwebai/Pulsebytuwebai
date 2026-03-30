@@ -48,6 +48,7 @@ export interface PulseMetricsTotals {
 
 export interface PulseRealtimePage {
   label: string;
+  path?: string;
   activeUsers: number;
   views: number;
 }
