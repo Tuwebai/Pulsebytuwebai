@@ -1,4 +1,3 @@
-import React from 'react';
 import { useState, useEffect } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
@@ -6,8 +5,6 @@ import { config } from '@/config/environment';
 import { SUPPORT_CONTACT } from '@/config/supportContact';
 
 // Función para obtener la URL base correcta según el entorno
-const getBaseUrl = () => config.getBaseUrl();
-
 function getFriendlyAuthErrorMessage(error: AuthError | Error) {
   const normalizedMessage = error.message.toLowerCase();
 
@@ -26,10 +23,10 @@ export function useSupabaseAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authLoading, setAuthLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let unsubscribe = () => {};
     // Obtener sesión inicial
     const getInitialSession = async () => {
       try {
@@ -60,19 +57,23 @@ export function useSupabaseAuth() {
     // Listener para cambios de autenticación
     try {
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, session) => {
-          setSession(session);
-          setUser(session?.user ?? null);
+        async (_event, nextSession) => {
+          setSession(nextSession);
+          setUser(nextSession?.user ?? null);
           setLoading(false);
         }
       );
 
-      return () => subscription.unsubscribe();
+      unsubscribe = () => subscription.unsubscribe();
     } catch (error: any) {
       console.warn('Error al configurar listener de autenticación:', error);
       setError('Error al configurar autenticación');
       setLoading(false);
     }
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const signInWithGoogle = async (): Promise<boolean> => {
@@ -192,7 +193,11 @@ export function useSupabaseAuth() {
     }
   };
 
-  const signUpWithEmail = async (email: string, password: string, metadata?: any) => {
+  const signUpWithEmail = async (
+    email: string,
+    password: string,
+    metadata?: { full_name?: string }
+  ): Promise<boolean> => {
     try {
       setError(null);
       setLoading(true);
@@ -209,11 +214,16 @@ export function useSupabaseAuth() {
         console.warn('Error en registro con email:', error);
         setError(error.message);
         setLoading(false);
+        return false;
       }
+
+      setLoading(false);
+      return true;
     } catch (error: any) {
       console.warn('Error en signUpWithEmail:', error);
       setError(error.message);
       setLoading(false);
+      return false;
     }
   };
 
