@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { toast } from '@/hooks/use-toast';
-import { notificationService } from '@/lib/notificationService';
+import { notificationService } from '@/lib/services/notificationService';
 import { enablePulseAccess } from '@/features/admin/services/pulseAccessAdminService';
 import {
   updateAdminUserRole,

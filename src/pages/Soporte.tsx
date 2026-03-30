@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
 import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 import { useApp } from '@/contexts/AppContext';
-import { sendSupportTicketEmail, sendTicketConfirmationEmail } from '@/lib/emailService';
+import { sendSupportTicketEmail, sendTicketConfirmationEmail } from '@/lib/services/emailService';
 import {
   SupportContactPanel,
   SupportResponseModal,

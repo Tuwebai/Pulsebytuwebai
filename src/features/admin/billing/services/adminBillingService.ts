@@ -1,5 +1,5 @@
 import { updateAdminPaymentRecordStatus } from '@/api/admin/adminBilling.api';
-import { notificationService } from '@/lib/notificationService';
+import { notificationService } from '@/lib/services/notificationService';
 
 export async function updateAdminPaymentStatus(
   paymentId: string,

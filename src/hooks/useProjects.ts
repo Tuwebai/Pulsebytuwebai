@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { projectService } from '@/lib/projectService';
+import { projectService } from '@/lib/services/projectService';
 import { Project, CreateProjectData, UpdateProjectData, ProjectFilters, ProjectSort } from '@/types/project.types';
 import { toast } from '@/hooks/use-toast';
 

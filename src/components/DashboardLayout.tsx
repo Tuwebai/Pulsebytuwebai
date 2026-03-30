@@ -8,7 +8,7 @@ import { useAvatarSync } from '@/hooks/useAvatarSync';
 import SkipLink from './SkipLink';
 import LiveRegion from './LiveRegion';
 import { useAccessibility } from '@/hooks/useAccessibility';
-import { userPreferencesService } from '@/lib/userPreferencesService';
+import { userPreferencesService } from '@/lib/services/userPreferencesService';
 import TutorialOverlay from './tutorial/TutorialOverlay';
 
 interface DashboardLayoutProps {

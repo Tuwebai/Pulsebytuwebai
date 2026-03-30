@@ -8,7 +8,7 @@ import { useApp } from '@/contexts/AppContext';
 import { PaymentsSummaryRow, PaymentsTable } from '@/features/payments';
 import { getPaymentStatusLabel, getPaymentStatusVariant } from '@/features/payments/payments.utils';
 import { PAYMENT_TYPES, formatCurrency } from '@/lib/mercadopago';
-import { createMercadoPagoPreference, getUserPayments } from '@/lib/paymentService';
+import { createMercadoPagoPreference, getUserPayments } from '@/lib/services/paymentService';
 import { toast } from '@/hooks/use-toast';
 import type { Payment } from '@/types';
 
