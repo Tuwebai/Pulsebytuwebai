@@ -44,13 +44,10 @@ const AdminProjectPhasesPage = createLazyComponent(() => import('@/features/admi
 const AdminProjectTrackingPage = createLazyComponent(() => import('@/features/admin/projects-tracking/pages/AdminProjectTrackingPage'));
 const ProjectsPage = createLazyComponent(() => import('@/pages/ProjectsPage'));
 const ProfilePage = createLazyComponent(() => import('@/features/profile/pages/ProfilePage'));
-const UserProfileView = createLazyComponent(() => import('@/pages/UserProfileView'));
 const Configuracion = createLazyComponent(() => import('@/pages/Configuracion'));
 const Facturacion = createLazyComponent(() => import('@/pages/Facturacion'));
 const Soporte = createLazyComponent(() => import('@/pages/Soporte'));
 const NotFound = createLazyComponent(() => import('@/pages/NotFound'));
-const CustomizableDashboard = createLazyComponent(() => import('@/components/CustomizableDashboard'));
-const InvitationPage = createLazyComponent(() => import('@/pages/InvitationPage'));
 const AuthCallback = createLazyComponent(() => import('@/pages/AuthCallback'));
 const GitHubCallback = createLazyComponent(() => import('@/pages/GitHubCallback'));
 const SSOPage = createLazyComponent(() => import('@/features/auth/pages/SSOPage'));
@@ -90,7 +87,6 @@ function AppRoutes() {
       {renderAuthRoutes({
         AuthCallback,
         GitHubCallback,
-        InvitationPage,
         Login,
         Onboarding,
         PulseAccessPendingPage,
@@ -190,9 +186,7 @@ function AppRoutes() {
         AdminProjectCriticalTasksPage,
         AdminProjectPhaseDetailPage,
         AdminProjectPhasesPage,
-        AdminProjectTrackingPage,
-        ProjectsPage,
-        UserProfileView
+        AdminProjectTrackingPage
       })}
       <Route
         path="/proyectos"
@@ -255,16 +249,6 @@ function AppRoutes() {
         element={
           <ProtectedRoute clientOnly>
             <Navigate replace to="/dashboard/proyecto" />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/dashboard-custom"
-        element={
-          <ProtectedRoute clientOnly>
-            <DashboardShell>
-              <CustomizableDashboard />
-            </DashboardShell>
           </ProtectedRoute>
         }
       />

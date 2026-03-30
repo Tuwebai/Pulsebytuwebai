@@ -1,6 +1,5 @@
 import type { ComponentType, LazyExoticComponent, ReactNode } from 'react';
 import { Navigate, Route } from 'react-router-dom';
-import LegacyDashboardLayout from '@/components/DashboardLayout';
 import ProtectedRoute from '@/features/auth/components/ProtectedRoute';
 
 type LazyPage = LazyExoticComponent<ComponentType>;
@@ -13,8 +12,6 @@ interface AdminRoutesComponents {
   AdminProjectPhaseDetailPage: LazyPage;
   AdminProjectPhasesPage: LazyPage;
   AdminProjectTrackingPage: LazyPage;
-  ProjectsPage: LazyPage;
-  UserProfileView: LazyPage;
 }
 
 export function renderAdminRoutes({
@@ -25,8 +22,6 @@ export function renderAdminRoutes({
   AdminProjectPhaseDetailPage,
   AdminProjectPhasesPage,
   AdminProjectTrackingPage,
-  ProjectsPage,
-  UserProfileView,
 }: AdminRoutesComponents): ReactNode {
   return (
     <>
@@ -99,42 +94,6 @@ export function renderAdminRoutes({
         element={
           <ProtectedRoute requiredRole="admin">
             <Navigate replace to="/admin/settings" />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/proyectos/:userId"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <LegacyDashboardLayout key="proyectos-user">
-              <ProjectsPage key="proyectos-user-content" />
-            </LegacyDashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/perfil/:userId"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <LegacyDashboardLayout key="user-profile">
-              <UserProfileView key="user-profile-content" />
-            </LegacyDashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/analytics"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <Navigate replace to="/admin" />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/user-management"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <Navigate replace to="/admin/usuarios" />
           </ProtectedRoute>
         }
       />
