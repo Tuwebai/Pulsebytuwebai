@@ -10,6 +10,12 @@ interface RealtimeRow {
   metricValues?: Array<{ value?: string }>;
 }
 
+interface RealtimeEventSummary {
+  name: string;
+  count: number;
+  keyEvents: number;
+}
+
 function extractBearerToken(authorization: string): string {
   const [scheme, token] = authorization.trim().split(/\s+/, 2);
 
@@ -22,6 +28,40 @@ function extractBearerToken(authorization: string): string {
 
 function parseRealtimeRows(rows: RealtimeRow[] | undefined) {
   return rows || [];
+}
+
+function normalizeEventName(name: string): string {
+  switch (name) {
+    case 'click_cta':
+      return 'Clics en contacto';
+    case 'page_view':
+      return 'Páginas vistas';
+    case 'section_view':
+      return 'Secciones vistas';
+    case 'session_start':
+      return 'Nuevas sesiones';
+    case 'first_visit':
+      return 'Primeras visitas';
+    case 'user_engagement':
+      return 'Interacción activa';
+    case 'web_vitals':
+      return 'Chequeos de rendimiento';
+    default:
+      return name === '(other)' ? 'Otros eventos' : name;
+  }
+}
+
+function buildRealtimeEvents(rows: RealtimeRow[]): RealtimeEventSummary[] {
+  return rows.map((row) => ({
+    name: normalizeEventName(row.dimensionValues?.[0]?.value || 'evento'),
+    count: parseInt(row.metricValues?.[0]?.value || '0', 10),
+    keyEvents: parseInt(row.metricValues?.[1]?.value || '0', 10),
+  }));
+}
+
+function getEventCount(events: RealtimeEventSummary[], targetName: string): number {
+  const target = normalizeEventName(targetName);
+  return events.find((event) => event.name === target)?.count || 0;
 }
 
 serve(async (req) => {
@@ -88,7 +128,11 @@ serve(async (req) => {
     const credentialsJson = Deno.env.get('GOOGLE_ANALYTICS_CREDENTIALS') || '';
 
     if (!credentialsJson) {
-      throw new SyncGa4MetricsError(500, 'Falta configurar la conexión real con Google Analytics en el backend.', 'GA4_CREDENTIALS_MISSING');
+      throw new SyncGa4MetricsError(
+        500,
+        'Falta configurar la conexión real con Google Analytics en el backend.',
+        'GA4_CREDENTIALS_MISSING',
+      );
     }
 
     const accessToken = await getGoogleAccessToken(credentialsJson);
@@ -128,7 +172,7 @@ serve(async (req) => {
           dimensions: [{ name: 'eventName' }],
           metrics: [{ name: 'eventCount' }, { name: 'keyEvents' }],
           orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }],
-          limit: 5,
+          limit: 10,
         }),
       }),
     ]);
@@ -147,22 +191,21 @@ serve(async (req) => {
 
     const totalRow = parseRealtimeRows((totalsRaw as { rows?: RealtimeRow[] }).rows)[0];
     const pageRows = parseRealtimeRows((pagesRaw as { rows?: RealtimeRow[] }).rows);
-    const eventRows = parseRealtimeRows((eventsRaw as { rows?: RealtimeRow[] }).rows);
+    const eventRows = buildRealtimeEvents(parseRealtimeRows((eventsRaw as { rows?: RealtimeRow[] }).rows));
 
     return jsonResponse(200, {
       activeUsers: parseInt(totalRow?.metricValues?.[0]?.value || '0', 10),
-      eventCount: parseInt(totalRow?.metricValues?.[1]?.value || '0', 10),
-      keyEvents: parseInt(totalRow?.metricValues?.[2]?.value || '0', 10),
+      pageViews: getEventCount(eventRows, 'page_view'),
+      ctaClicks: getEventCount(eventRows, 'click_cta'),
       topPages: pageRows.map((row) => ({
         label: row.dimensionValues?.[0]?.value || 'Página sin nombre',
         activeUsers: parseInt(row.metricValues?.[0]?.value || '0', 10),
         views: parseInt(row.metricValues?.[1]?.value || '0', 10),
       })),
-      topEvents: eventRows.map((row) => ({
-        name: row.dimensionValues?.[0]?.value || 'evento',
-        count: parseInt(row.metricValues?.[0]?.value || '0', 10),
-        keyEvents: parseInt(row.metricValues?.[1]?.value || '0', 10),
-      })),
+      topEvents: eventRows
+        .filter((event) => event.count > 0)
+        .sort((left, right) => right.count - left.count)
+        .slice(0, 5),
       sampledAt: new Date().toISOString(),
     });
   } catch (error) {

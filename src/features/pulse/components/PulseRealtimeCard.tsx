@@ -58,8 +58,8 @@ export default function PulseRealtimeCard({ data, error, loading }: PulseRealtim
         <div className="mt-5 space-y-5">
           <div className="grid gap-3 md:grid-cols-3">
             <RealtimeStat icon={Radio} label="Usuarios activos" value={data.activeUsers} />
-            <RealtimeStat icon={Activity} label="Eventos" value={data.eventCount} />
-            <RealtimeStat icon={Zap} label="Eventos clave" value={data.keyEvents} />
+            <RealtimeStat icon={Activity} label="Páginas vistas" value={data.pageViews} />
+            <RealtimeStat icon={Zap} label="Clics en contacto" value={data.ctaClicks} />
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">

@@ -324,6 +324,9 @@ verify_jwt = false
 [functions.sync-ga4-metrics]
 verify_jwt = false
 
+[functions.pulse-ga4-realtime]
+verify_jwt = false
+
 [functions.sync-operational-events]
 verify_jwt = false
 

@@ -57,8 +57,8 @@ export interface PulseRealtimeEvent {
 
 export interface PulseRealtimeSnapshot {
   activeUsers: number;
-  eventCount: number;
-  keyEvents: number;
+  pageViews: number;
+  ctaClicks: number;
   topPages: PulseRealtimePage[];
   topEvents: PulseRealtimeEvent[];
   sampledAt: string;

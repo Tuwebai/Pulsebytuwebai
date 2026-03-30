@@ -157,13 +157,13 @@ export function getTopPages(rows: PulseMetricRow[]): TopPage[] {
     pages.set(row.top_page, (pages.get(row.top_page) || 0) + row.top_page_visits);
   });
 
-  const totalVisits = rows.reduce((total, row) => total + row.visits, 0);
+  const totalPageViews = Array.from(pages.values()).reduce((total, visits) => total + visits, 0);
 
   return Array.from(pages.entries())
     .map(([path, visits]) => ({
       path,
       visits,
-      percentage: totalVisits > 0 ? Math.round((visits / totalVisits) * 1000) / 10 : 0
+      percentage: totalPageViews > 0 ? Math.round((visits / totalPageViews) * 1000) / 10 : 0
     }))
     .sort((left, right) => right.visits - left.visits)
     .slice(0, 5);

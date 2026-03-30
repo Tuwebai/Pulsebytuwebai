@@ -112,7 +112,7 @@ export function usePulsePageState() {
         if (result) {
           toast({
             title: 'Datos actualizados',
-            description: 'Pulse volvió a consultar la actividad reciente y la vista en vivo de tu web.',
+            description: 'Pulse volvió a consultar la actividad reciente de tu web.',
           });
         }
       } catch (error) {
