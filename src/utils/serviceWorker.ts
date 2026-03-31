@@ -123,7 +123,12 @@ class ServiceWorkerManager {
       throw new Error('Service Worker no está activo');
     }
 
-    this.registration.active.postMessage(message, transfer);
+    if (transfer && transfer.length > 0) {
+      this.registration.active.postMessage(message, transfer);
+      return;
+    }
+
+    this.registration.active.postMessage(message);
   }
 
   // Mostrar notificación de actualización
