@@ -36,6 +36,8 @@ export interface AdminPaymentRecord {
   amount: number | string | null;
   description: string | null;
   payment_type?: string | null;
+  user_email?: string | null;
+  user_name?: string | null;
   status: string | null;
   created_at: string;
   [key: string]: unknown;

@@ -2,7 +2,11 @@ import { CreditCard } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { AdminPaymentRecord } from '@/api/admin/adminDashboard.api';
 import { Badge, MetricCard, PulseFeedbackState } from '@/core/components';
-import { getAdminPaymentDisplayName } from '../adminPayments.helpers';
+import {
+  getAdminPaymentCustomerEmail,
+  getAdminPaymentCustomerLabel,
+  getAdminPaymentDisplayName,
+} from '../adminPayments.helpers';
 import {
   formatAdminPaymentAmount,
   getAdminPaymentStatusLabel,
@@ -72,6 +76,10 @@ export function AdminPaymentsSection({
                 <p className="mt-1 text-sm text-[var(--text-secondary)]">
                   {formatAdminPaymentAmount(payment.amount)} · {new Date(payment.created_at).toLocaleDateString('es-AR')}
                 </p>
+                <p className="mt-1 text-xs text-[var(--text-tertiary)]">{getAdminPaymentCustomerLabel(payment)}</p>
+                {getAdminPaymentCustomerEmail(payment) ? (
+                  <p className="text-xs text-[var(--text-tertiary)]">{getAdminPaymentCustomerEmail(payment)}</p>
+                ) : null}
               </div>
 
               <div className="flex items-center">

@@ -3,6 +3,21 @@ import type { User } from '@/contexts/appContext.types';
 import type { Payment } from '@/types';
 import { getPaymentPlanName, getPaymentStatusLabel } from '../payments.utils';
 
+function sanitizeSegment(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function getInvoiceFileName(payment: Payment): string {
+  const planSegment = sanitizeSegment(getPaymentPlanName(payment)) || 'plan';
+  const dateSegment = new Date(payment.createdAt).toLocaleDateString('sv-SE');
+  return `factura-pulse-${planSegment}-${dateSegment}.pdf`;
+}
+
 function buildInvoiceHtml(payment: Payment, user: User) {
   const paymentType = PAYMENT_TYPES[payment.paymentType as keyof typeof PAYMENT_TYPES];
   const features = payment.features.length > 0 ? payment.features : paymentType?.features ?? [];
@@ -95,6 +110,15 @@ export async function downloadPaymentInvoicePdf(payment: Payment, user: User) {
       orientation: 'portrait',
       unit: 'px',
     });
+    const fileName = getInvoiceFileName(payment);
+
+    doc.setDocumentProperties({
+      title: `Factura Pulse - ${getPaymentPlanName(payment)}`,
+      subject: `Comprobante de ${getPaymentPlanName(payment)}`,
+      author: 'Pulse by TuWebAI',
+      creator: 'Pulse by TuWebAI',
+      keywords: 'Pulse, factura, pago, TuWebAI',
+    });
 
     await new Promise<void>((resolve) => {
       doc.html(container, {
@@ -110,7 +134,14 @@ export async function downloadPaymentInvoicePdf(payment: Payment, user: User) {
       });
     });
 
-    doc.save(`factura-pulse-FAC-${payment.id.slice(-6).toUpperCase()}.pdf`);
+    const pdfBlob = doc.output('blob');
+    const downloadUrl = URL.createObjectURL(pdfBlob);
+    const anchor = document.createElement('a');
+    anchor.href = downloadUrl;
+    anchor.download = fileName;
+    anchor.rel = 'noopener';
+    anchor.click();
+    URL.revokeObjectURL(downloadUrl);
   } finally {
     document.body.removeChild(container);
   }
