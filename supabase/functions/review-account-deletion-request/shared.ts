@@ -1,4 +1,4 @@
-// @ts-expect-error - Deno runtime
+﻿// @ts-expect-error - Deno runtime
 /// <reference lib="deno.window" />
 // @ts-expect-error - Deno import for Supabase
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -177,8 +177,6 @@ export async function getDeletionBlockers(
     { code: 'PROJECTS_CREATED', label: 'proyectos creados', table: 'projects', column: 'created_by' },
     { code: 'SUPPORT_TICKETS', label: 'tickets activos', table: 'tickets', column: 'user_id', subjectToExclude: 'Solicitud de baja de cuenta' },
     { code: 'OPERATIONAL_EVENTS_OWNER', label: 'eventos operativos asignados', table: 'operational_events', column: 'owner_id' },
-    { code: 'APPROVAL_REQUESTS_REQUESTED', label: 'solicitudes de aprobación', table: 'project_approval_requests', column: 'requested_by' },
-    { code: 'APPROVAL_REQUESTS_REVIEWED', label: 'revisiones de aprobación', table: 'project_approval_requests', column: 'reviewed_by' },
     { code: 'PROJECTS_APPROVED', label: 'proyectos aprobados', table: 'projects', column: 'approved_by' },
     { code: 'SATISFACTION_SURVEYS', label: 'encuestas', table: 'satisfaction_surveys', column: 'user_id' },
     { code: 'USER_INVITATIONS', label: 'invitaciones emitidas', table: 'user_invitations', column: 'invited_by' },
