@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { CheckCircle2, Globe, XCircle } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { AdminUserDomainReviewFields } from '@/features/admin/components/AdminUserDomainReviewFields';
+import { AdminUserDialogShell } from '@/features/admin/users/components/AdminUserDialogShell';
 import {
   reviewUserWebsite,
   type AdminWebsiteReviewResult,
@@ -40,12 +40,17 @@ function getStatusLabel(status?: WebsiteReviewStatus | null) {
   }
 }
 
-function getStatusVariant(status?: WebsiteReviewStatus | null): 'default' | 'secondary' {
-  if (status === 'approved') {
-    return 'default';
+function getStatusClassName(status?: WebsiteReviewStatus | null) {
+  switch (status) {
+    case 'approved':
+      return 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300';
+    case 'rejected':
+      return 'border-red-500/25 bg-red-500/10 text-red-300';
+    case 'pending_review':
+      return 'border-amber-500/30 bg-amber-500/10 text-amber-300';
+    default:
+      return 'border-white/10 bg-white/[0.04] text-slate-400';
   }
-
-  return 'secondary';
 }
 
 export function AdminUserDomainReviewDialog({
@@ -59,12 +64,9 @@ export function AdminUserDomainReviewDialog({
   const [notes, setNotes] = useState(user.website_review_notes ?? '');
   const [submittingAction, setSubmittingAction] = useState<'save_pending' | 'approve' | 'reject' | null>(null);
 
-  const statusLabel = useMemo(() => getStatusLabel(user.website_status), [user.website_status]);
-
   const handleSubmit = async (action: 'save_pending' | 'approve' | 'reject') => {
     try {
       setSubmittingAction(action);
-
       const result = await reviewUserWebsite({
         userId: user.id,
         domain,
@@ -82,24 +84,18 @@ export function AdminUserDomainReviewDialog({
             ? 'URL aprobada'
             : action === 'reject'
               ? 'URL rechazada'
-              : 'URL guardada para revision',
+              : 'URL guardada para revisión',
         description:
           action === 'approve'
-            ? result.project_created
-              ? result.project_ga4_property_id
-                ? 'La URL quedó aprobada, creamos el proyecto operativo y también quedó cargado el Property ID de GA4.'
-                : 'La URL quedó aprobada y también creamos el proyecto operativo del cliente en Pulse.'
-              : result.project_ga4_property_id
-                ? 'El dominio quedó listo en el proyecto y también guardamos el Property ID de GA4.'
-                : 'El dominio ya quedó listo para usarse en el proyecto del cliente.'
+            ? 'El dominio del cliente quedó listo para Pulse.'
             : action === 'reject'
               ? 'La URL quedó marcada como rechazada para este cliente.'
-              : 'La URL quedó pendiente para revisión del equipo.',
+              : 'La URL quedó pendiente de revisión del equipo.',
       });
     } catch (error) {
       toast({
         title: 'No pudimos actualizar la configuración',
-        description: error instanceof Error ? error.message : 'Intenta de nuevo en unos segundos.',
+        description: error instanceof Error ? error.message : 'Intentá de nuevo en unos segundos.',
         variant: 'destructive',
       });
     } finally {
@@ -118,99 +114,84 @@ export function AdminUserDomainReviewDialog({
           setNotes(user.website_review_notes ?? '');
           setOpen(true);
         }}
-        className="bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 dark:bg-slate-900/30 dark:border-slate-700 dark:text-slate-200"
+        className="border-white/10 bg-[var(--bg-base)] text-slate-200 hover:border-white/15 hover:bg-[var(--bg-elevated)]"
       >
-        <Globe size={14} className="mr-1" />
+        <Globe size={14} className="mr-1.5" />
         {triggerLabel}
       </Button>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-xl border-[var(--border-default)] bg-[var(--bg-surface)] p-6 text-[var(--text-primary)]">
-          <DialogHeader>
-            <div className="flex items-center gap-3">
-              <DialogTitle>Revisión de URL del cliente</DialogTitle>
-              <Badge variant={getStatusVariant(user.website_status)}>{statusLabel}</Badge>
-            </div>
-            <DialogDescription className="text-[var(--text-secondary)]">
-              Cliente: {user.email ?? 'Sin email'}
-            </DialogDescription>
-          </DialogHeader>
+      <AdminUserDialogShell
+        open={open}
+        onOpenChange={setOpen}
+        kicker="Pulse admin · dominio"
+        title="Revisar URL del cliente"
+        description={`Validá la URL de ${user.email ?? 'este cliente'} y dejá listo el dominio para Pulse.`}
+        icon={Globe}
+        ariaDescribedBy="domain-review-description"
+        footer={
+          <>
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="border-white/10 bg-[var(--bg-elevated)] text-slate-100 hover:border-white/15 hover:bg-[var(--bg-elevated)]"
+            >
+              Cerrar
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => void handleSubmit('save_pending')}
+              disabled={submittingAction !== null}
+              className="border-white/10 bg-[var(--bg-base)] text-slate-100 hover:border-white/15 hover:bg-[var(--bg-elevated)]"
+            >
+              {submittingAction === 'save_pending' ? 'Guardando...' : 'Guardar pendiente'}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => void handleSubmit('reject')}
+              disabled={submittingAction !== null}
+              className="border-red-500/25 bg-red-500/10 text-red-200 hover:bg-red-500/15"
+            >
+              <XCircle size={14} className="mr-1.5" />
+              {submittingAction === 'reject' ? 'Procesando...' : 'Rechazar'}
+            </Button>
+            <Button
+              onClick={() => void handleSubmit('approve')}
+              disabled={submittingAction !== null}
+              className="bg-signal text-white hover:bg-signal/90"
+            >
+              <CheckCircle2 size={14} className="mr-1.5" />
+              {submittingAction === 'approve' ? 'Procesando...' : 'Aprobar URL'}
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline" className={getStatusClassName(user.website_status)}>
+            {getStatusLabel(user.website_status)}
+          </Badge>
+          {user.project_ga4_property_id ? (
+            <Badge variant="outline" className="border-white/10 bg-white/[0.04] text-slate-300">
+              GA4 configurado
+            </Badge>
+          ) : null}
+        </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[var(--text-secondary)]" htmlFor={`admin-domain-${user.id}`}>
-                URL propuesta
-              </label>
-              <Input
-                id={`admin-domain-${user.id}`}
-                value={domain}
-                onChange={(event) => setDomain(event.target.value)}
-                placeholder="tuempresa.com"
-                className="border-[var(--border-default)] bg-[var(--bg-subtle)] text-[var(--text-primary)]"
-              />
-            </div>
+        <AdminUserDomainReviewFields
+          userId={user.id}
+          domain={domain}
+          ga4PropertyId={ga4PropertyId}
+          notes={notes}
+          onDomainChange={setDomain}
+          onGa4PropertyIdChange={setGa4PropertyId}
+          onNotesChange={setNotes}
+        />
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[var(--text-secondary)]" htmlFor={`admin-ga4-${user.id}`}>
-                Property ID de GA4
-              </label>
-              <Input
-                id={`admin-ga4-${user.id}`}
-                value={ga4PropertyId}
-                onChange={(event) => setGa4PropertyId(event.target.value)}
-                placeholder="123456789"
-                inputMode="numeric"
-                className="border-[var(--border-default)] bg-[var(--bg-subtle)] text-[var(--text-primary)]"
-              />
-              <p className="text-xs text-[var(--text-secondary)]">
-                Opcional. Si lo completás al aprobar, Pulse ya queda listo para la ingesta real de métricas.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[var(--text-secondary)]" htmlFor={`admin-domain-notes-${user.id}`}>
-                Notas internas
-              </label>
-              <Textarea
-                id={`admin-domain-notes-${user.id}`}
-                value={notes}
-                onChange={(event) => setNotes(event.target.value)}
-                placeholder="Ejemplo: esperar confirmación del cliente o corregir subdominio."
-                className="min-h-[96px] border-[var(--border-default)] bg-[var(--bg-subtle)] text-[var(--text-primary)]"
-              />
-            </div>
-
-            <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-secondary)]">
-              Si aprobás la URL, también se actualiza el dominio del proyecto más reciente del cliente. Si completás el Property ID, dejás listo el proyecto para la conexión real de GA4.
-            </div>
-
-            <div className="flex flex-wrap justify-end gap-3">
-              <Button
-                variant="secondary"
-                onClick={() => void handleSubmit('save_pending')}
-                loading={submittingAction === 'save_pending'}
-              >
-                Guardar pendiente
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => void handleSubmit('reject')}
-                loading={submittingAction === 'reject'}
-                leftIcon={<XCircle size={14} />}
-              >
-                Rechazar
-              </Button>
-              <Button
-                onClick={() => void handleSubmit('approve')}
-                loading={submittingAction === 'approve'}
-                leftIcon={<CheckCircle2 size={14} />}
-              >
-                Aprobar URL
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+        <div className="rounded-2xl border border-white/10 bg-[var(--bg-base)] px-4 py-3">
+          <p className="text-sm leading-6 text-slate-400">
+            Si aprobás la URL, Pulse actualiza el dominio del proyecto más reciente. Si además cargás el Property ID, la conexión con métricas queda lista.
+          </p>
+        </div>
+      </AdminUserDialogShell>
     </>
   );
 }
