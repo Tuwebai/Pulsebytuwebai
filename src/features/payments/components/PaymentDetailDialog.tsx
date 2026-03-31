@@ -34,7 +34,7 @@ export default function PaymentDetailDialog({
     return null;
   }
 
-  const features = getPaymentPlanFeatures(payment).slice(0, 5);
+  const features = getPaymentPlanFeatures(payment);
   const retryable = isPaymentRetryable(payment.status);
 
   return (

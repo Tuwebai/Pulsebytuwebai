@@ -54,7 +54,10 @@ export function getPaymentPlanName(payment: Pick<Payment, 'paymentType' | 'descr
 
 export function getPaymentPlanFeatures(payment: Pick<Payment, 'paymentType' | 'features'>): string[] {
   const paymentType = PAYMENT_TYPES[payment.paymentType as keyof typeof PAYMENT_TYPES];
-  return payment.features.length > 0 ? payment.features : [...(paymentType?.features ?? [])];
+  const baseFeatures = [...(paymentType?.features ?? [])] as string[];
+  const extraFeatures = payment.features.filter((feature) => !baseFeatures.includes(feature));
+
+  return [...baseFeatures, ...extraFeatures];
 }
 
 export function isPaymentRetryable(status: string): boolean {
