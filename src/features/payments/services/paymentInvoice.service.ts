@@ -18,26 +18,6 @@ function getInvoiceFileName(payment: Payment): string {
   return `factura-pulse-${planSegment}-${dateSegment}.pdf`;
 }
 
-function triggerPdfDownload(blob: Blob, fileName: string) {
-  const pdfFile = new File([blob], fileName, { type: 'application/pdf' });
-  const downloadUrl = URL.createObjectURL(pdfFile);
-  const anchor = document.createElement('a');
-
-  anchor.href = downloadUrl;
-  anchor.download = fileName;
-  anchor.type = 'application/pdf';
-  anchor.rel = 'noopener';
-  anchor.style.display = 'none';
-
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-
-  window.setTimeout(() => {
-    URL.revokeObjectURL(downloadUrl);
-  }, 2000);
-}
-
 function buildInvoiceHtml(payment: Payment, user: User) {
   const paymentType = PAYMENT_TYPES[payment.paymentType as keyof typeof PAYMENT_TYPES];
   const features = payment.features.length > 0 ? payment.features : paymentType?.features ?? [];
@@ -154,8 +134,7 @@ export async function downloadPaymentInvoicePdf(payment: Payment, user: User) {
       });
     });
 
-    const pdfBlob = doc.output('blob');
-    triggerPdfDownload(pdfBlob, fileName);
+    await doc.save(fileName, { returnPromise: true });
   } finally {
     document.body.removeChild(container);
   }
