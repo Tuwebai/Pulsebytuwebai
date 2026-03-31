@@ -1,7 +1,7 @@
 import { Download, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge, PulseFeedbackState } from '@/core/components';
-import { formatCurrency } from '@/lib/mercadopago';
+import { formatCurrency, PAYMENT_TYPES } from '@/lib/mercadopago';
 import type { Payment } from '@/types';
 import { getPaymentStatusLabel, getPaymentStatusVariant } from '../payments.utils';
 
@@ -24,6 +24,11 @@ export default function PaymentsTable({
   onSelectPayment,
   payments,
 }: PaymentsTableProps) {
+  const getPaymentPlanName = (payment: Payment) => {
+    const paymentType = PAYMENT_TYPES[payment.paymentType as keyof typeof PAYMENT_TYPES];
+    return paymentType?.name || payment.description;
+  };
+
   if (loading) {
     return (
       <PulseFeedbackState
@@ -105,7 +110,7 @@ export default function PaymentsTable({
                       <FileText className="h-4 w-4 text-[var(--signal)]" strokeWidth={1.5} />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-[var(--text-primary)]">{payment.description}</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)]">{getPaymentPlanName(payment)}</p>
                       <p className="text-xs text-[var(--text-tertiary)]">ID {payment.id.slice(0, 8)}</p>
                     </div>
                   </div>
