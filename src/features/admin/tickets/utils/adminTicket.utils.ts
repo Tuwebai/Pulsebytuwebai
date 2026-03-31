@@ -159,3 +159,29 @@ export function getStatusTone(status: string) {
       return 'border-violet-500/20 bg-violet-500/10 text-violet-200';
   }
 }
+
+export function getPriorityLabel(priority?: string | null) {
+  switch (priority) {
+    case 'low':
+      return 'Baja';
+    case 'high':
+      return 'Alta';
+    case 'urgent':
+      return 'Urgente';
+    default:
+      return 'Media';
+  }
+}
+
+export function getPriorityTone(priority?: string | null) {
+  switch (priority) {
+    case 'low':
+      return 'border-emerald-500/20 bg-emerald-500/10 text-emerald-200';
+    case 'high':
+      return 'border-orange-500/20 bg-orange-500/10 text-orange-200';
+    case 'urgent':
+      return 'border-rose-500/20 bg-rose-500/10 text-rose-200';
+    default:
+      return 'border-sky-500/20 bg-sky-500/10 text-sky-200';
+  }
+}

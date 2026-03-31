@@ -35,12 +35,13 @@ export function AdminTicketFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-w-3xl border-white/10 bg-slate-950 p-0 text-slate-100">
-        <div className="rounded-[inherit] border border-white/10 bg-[linear-gradient(180deg,rgba(59,158,245,0.10),rgba(8,15,30,0.96)_22%)] p-6">
+      <DialogContent className="max-w-3xl border-white/10 bg-[var(--bg-surface)] p-0 text-slate-100">
+        <div className="rounded-[inherit] border border-white/10 bg-[linear-gradient(180deg,rgba(59,158,245,0.12),rgba(8,15,30,0.97)_28%)] p-6">
           <DialogHeader className="mb-6 space-y-2 text-left">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-300">Pulse admin · edición</p>
             <DialogTitle className="text-2xl text-slate-50">{editing ? 'Editar ticket' : 'Nuevo ticket'}</DialogTitle>
-            <DialogDescription className="text-slate-400">
-              Dejá el contexto claro para que el seguimiento quede ordenado desde Pulse Admin.
+            <DialogDescription className="text-sm leading-6 text-slate-400">
+              Dejá el contexto completo para que el seguimiento del equipo quede claro desde el primer mensaje.
             </DialogDescription>
           </DialogHeader>
 
@@ -53,15 +54,15 @@ export function AdminTicketFormDialog({
                   required
                   value={formData.title}
                   onChange={(event) => onChange({ title: event.target.value })}
-                  className="border-white/10 bg-slate-900 text-slate-100"
+                  className="border-white/10 bg-[var(--bg-base)] text-slate-100"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label className="text-slate-200">Prioridad</Label>
                 <Select value={formData.priority} onValueChange={(value: TicketPriority) => onChange({ priority: value })}>
-                  <SelectTrigger className="border-white/10 bg-slate-900 text-slate-100"><SelectValue /></SelectTrigger>
-                  <SelectContent>
+                  <SelectTrigger className="border-white/10 bg-[var(--bg-base)] text-slate-100"><SelectValue /></SelectTrigger>
+                  <SelectContent className="border-white/10 bg-[var(--bg-elevated)] text-slate-100">
                     <SelectItem value="low">Baja</SelectItem>
                     <SelectItem value="medium">Media</SelectItem>
                     <SelectItem value="high">Alta</SelectItem>
@@ -73,8 +74,8 @@ export function AdminTicketFormDialog({
               <div className="space-y-2">
                 <Label className="text-slate-200">Estado</Label>
                 <Select value={formData.status} onValueChange={(value: TicketStatus) => onChange({ status: value })}>
-                  <SelectTrigger className="border-white/10 bg-slate-900 text-slate-100"><SelectValue /></SelectTrigger>
-                  <SelectContent>
+                  <SelectTrigger className="border-white/10 bg-[var(--bg-base)] text-slate-100"><SelectValue /></SelectTrigger>
+                  <SelectContent className="border-white/10 bg-[var(--bg-elevated)] text-slate-100">
                     <SelectItem value="open">Abierto</SelectItem>
                     <SelectItem value="in_progress">En progreso</SelectItem>
                     <SelectItem value="resolved">Resuelto</SelectItem>
@@ -89,7 +90,7 @@ export function AdminTicketFormDialog({
                   id="ticket-category"
                   value={formData.category}
                   onChange={(event) => onChange({ category: event.target.value })}
-                  className="border-white/10 bg-slate-900 text-slate-100"
+                  className="border-white/10 bg-[var(--bg-base)] text-slate-100"
                 />
               </div>
 
@@ -99,7 +100,7 @@ export function AdminTicketFormDialog({
                   id="ticket-assigned"
                   value={formData.assignedTo}
                   onChange={(event) => onChange({ assignedTo: event.target.value })}
-                  className="border-white/10 bg-slate-900 text-slate-100"
+                  className="border-white/10 bg-[var(--bg-base)] text-slate-100"
                 />
               </div>
 
@@ -111,7 +112,7 @@ export function AdminTicketFormDialog({
                   rows={6}
                   value={formData.description}
                   onChange={(event) => onChange({ description: event.target.value })}
-                  className="border-white/10 bg-slate-900 text-slate-100"
+                  className="border-white/10 bg-[var(--bg-base)] text-slate-100"
                 />
               </div>
             </div>

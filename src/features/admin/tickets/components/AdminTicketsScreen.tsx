@@ -14,7 +14,7 @@ export default function AdminTicketsScreen(props: AdminTicketsScreenProps) {
   const screen = useAdminTicketsScreen(props);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-slate-100">
       <AdminTicketsHeader
         lastUpdate={props.lastUpdate}
         onCreate={screen.openCreateForm}
@@ -29,18 +29,18 @@ export default function AdminTicketsScreen(props: AdminTicketsScreenProps) {
       />
 
       {screen.loading ? (
-        <section className="rounded-3xl border border-white/10 bg-slate-900/50 px-6 py-16 text-center">
+        <section className="rounded-[28px] border border-white/10 bg-[var(--bg-surface)]/90 px-6 py-16 text-center shadow-[0_18px_40px_rgba(2,6,23,0.24)]">
           <div className="mx-auto mb-5 h-12 w-12 animate-spin rounded-full border-2 border-slate-700 border-t-sky-400" />
           <p className="text-sm text-slate-400">Cargando tickets del equipo...</p>
         </section>
       ) : screen.isEmpty ? (
-        <section className="rounded-3xl border border-dashed border-white/10 bg-slate-900/50 px-6 py-16 text-center">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-slate-950/70">
+        <section className="rounded-[28px] border border-dashed border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(8,15,30,0.86))] px-6 py-16 text-center shadow-[0_18px_40px_rgba(2,6,23,0.24)]">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--bg-base)]/70">
             <Ticket className="h-8 w-8 text-slate-500" />
           </div>
           <h2 className="text-xl font-semibold text-slate-50">Todavía no hay tickets en la bandeja</h2>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-400">
-            Cuando un cliente abra una consulta, la vas a ver acá con su estado, prioridad y seguimiento.
+            Cuando un cliente abra una consulta, la vas a ver acá con estado, prioridad y seguimiento del equipo.
           </p>
           <Button onClick={screen.openCreateForm} className="mt-6 bg-sky-500 text-slate-950 hover:bg-sky-400">
             Crear primer ticket

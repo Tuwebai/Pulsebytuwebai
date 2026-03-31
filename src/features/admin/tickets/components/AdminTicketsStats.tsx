@@ -7,10 +7,10 @@ interface AdminTicketsStatsProps {
 }
 
 const CARDS = [
-  { key: 'total', label: 'Total', icon: Ticket, tone: 'text-slate-50 bg-sky-500/15' },
-  { key: 'open', label: 'Abiertos', icon: AlertCircle, tone: 'text-sky-200 bg-sky-500/12' },
-  { key: 'inProgress', label: 'En progreso', icon: Clock, tone: 'text-amber-200 bg-amber-500/12' },
-  { key: 'resolved', label: 'Resueltos', icon: CheckCircle, tone: 'text-emerald-200 bg-emerald-500/12' },
+  { key: 'total', label: 'Total abierto', detail: 'conversaciones visibles', icon: Ticket, tone: 'text-sky-100 bg-sky-500/12 border-sky-400/15' },
+  { key: 'open', label: 'Sin responder', detail: 'requieren primer contacto', icon: AlertCircle, tone: 'text-sky-100 bg-sky-500/12 border-sky-400/15' },
+  { key: 'inProgress', label: 'En curso', detail: 'con seguimiento activo', icon: Clock, tone: 'text-amber-100 bg-amber-500/12 border-amber-400/15' },
+  { key: 'resolved', label: 'Resueltos', detail: 'listos para cerrar', icon: CheckCircle, tone: 'text-emerald-100 bg-emerald-500/12 border-emerald-400/15' },
 ] as const;
 
 export function AdminTicketsStats({ stats }: AdminTicketsStatsProps) {
@@ -23,14 +23,16 @@ export function AdminTicketsStats({ stats }: AdminTicketsStatsProps) {
         return (
           <section
             key={card.key}
-            className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 shadow-[0_12px_30px_rgba(2,6,23,0.28)]"
+            className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(8,15,30,0.92))] p-5 shadow-[0_16px_36px_rgba(2,6,23,0.25)]"
           >
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-sky-400/70 via-violet-400/30 to-transparent" />
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{card.label}</p>
-                <p className="font-data text-4xl font-semibold text-slate-50">{value}</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{card.label}</p>
+                <p className="font-data text-4xl font-semibold leading-none text-slate-50">{value}</p>
+                <p className="text-xs text-slate-500">{card.detail}</p>
               </div>
-              <div className={`rounded-2xl p-3 ${card.tone}`}>
+              <div className={`rounded-2xl border p-3 ${card.tone}`}>
                 <Icon className="h-5 w-5" />
               </div>
             </div>
