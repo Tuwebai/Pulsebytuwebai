@@ -178,7 +178,6 @@ export async function getDeletionBlockers(
     { code: 'SUPPORT_TICKETS', label: 'tickets activos', table: 'tickets', column: 'user_id', subjectToExclude: 'Solicitud de baja de cuenta' },
     { code: 'OPERATIONAL_EVENTS_OWNER', label: 'eventos operativos asignados', table: 'operational_events', column: 'owner_id' },
     { code: 'PROJECTS_APPROVED', label: 'proyectos aprobados', table: 'projects', column: 'approved_by' },
-    { code: 'SATISFACTION_SURVEYS', label: 'encuestas', table: 'satisfaction_surveys', column: 'user_id' },
   ] as const;
 
   const counts = await Promise.all(

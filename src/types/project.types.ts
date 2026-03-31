@@ -41,7 +41,6 @@ export interface Project {
   }>;
   progress?: number;
   completion_percentage?: number;
-  satisfaction?: number;
   originality?: number;
   extras?: string[];
   priority?: 'low' | 'medium' | 'high' | 'urgent';

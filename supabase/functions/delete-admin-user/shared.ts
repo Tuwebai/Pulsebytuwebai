@@ -205,7 +205,6 @@ export async function getDeletionBlockers(
     { code: 'TICKETS', label: 'tickets', table: 'tickets', column: 'user_id' },
     { code: 'OPERATIONAL_EVENTS_OWNER', label: 'eventos operativos asignados', table: 'operational_events', column: 'owner_id' },
     { code: 'PROJECTS_APPROVED', label: 'proyectos aprobados', table: 'projects', column: 'approved_by' },
-    { code: 'SATISFACTION_SURVEYS', label: 'encuestas', table: 'satisfaction_surveys', column: 'user_id' },
   ] as const;
 
   const counts = await Promise.all(
