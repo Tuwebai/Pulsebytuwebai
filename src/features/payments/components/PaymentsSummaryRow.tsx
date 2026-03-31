@@ -22,7 +22,7 @@ export default function PaymentsSummaryRow({ payments }: PaymentsSummaryRowProps
       <div className="relative">
         <MetricCard
           className="pr-16"
-          label="Total gastado"
+          label="Total invertido"
           period={`${completedPayments} pago${completedPayments === 1 ? '' : 's'} acreditado${completedPayments === 1 ? '' : 's'}`}
           value={formatCurrency(totalSpent, 'ARS')}
         />

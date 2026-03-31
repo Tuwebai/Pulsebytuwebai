@@ -222,13 +222,8 @@ export const getUserPayments = (userId: string, userEmail: string, callback: (pa
     .on(
       'postgres_changes',
       { event: '*', schema: 'public', table: 'payments' },
-      (payload) => {
-        const nextRow = (payload.new ?? payload.old ?? {}) as Partial<PaymentRow>;
-        const isOwnPayment = nextRow.user_id === userId || nextRow.user_email === userEmail;
-
-        if (isOwnPayment) {
-          void loadPayments();
-        }
+      () => {
+        void loadPayments();
       }
     )
     .subscribe();

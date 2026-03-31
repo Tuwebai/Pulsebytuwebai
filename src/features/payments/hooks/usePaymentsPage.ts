@@ -80,6 +80,15 @@ export function usePaymentsPage(user: User | null): UsePaymentsPageReturn {
     return clearSyncState;
   }, [clearSyncState, syncPayments]);
 
+  useEffect(() => {
+    if (!selectedPago) {
+      return;
+    }
+
+    const nextSelectedPayment = pagos.find((payment) => payment.id === selectedPago.id) ?? null;
+    setSelectedPago(nextSelectedPayment);
+  }, [pagos, selectedPago]);
+
   const handleDownloadInvoice = useCallback(async (payment: Payment) => {
     if (!user) {
       return;
