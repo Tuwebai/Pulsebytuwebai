@@ -71,8 +71,8 @@ export function AdminUserCard({
   const displayAvatar = getDisplayAvatar({}, user);
 
   return (
-    <div className="rounded-[var(--radius-xl)] border border-border/60 bg-[var(--bg-elevated)] p-4 shadow-sm transition-colors duration-150 hover:border-border hover:bg-[var(--bg-elevated)]/90 sm:p-5">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <div className="rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(8,15,30,0.88))] px-4 py-4 shadow-[0_12px_26px_rgba(2,6,23,0.18)] transition hover:border-sky-400/20">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <AdminUserCardIdentity
           user={user}
           isAdmin={isAdmin}

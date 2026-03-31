@@ -57,53 +57,45 @@ export function AdminUserCardActions({
   onDomainUpdated,
 }: AdminUserCardActionsProps) {
   return (
-    <div className="flex w-full flex-col gap-3 border-t border-[var(--border-subtle)] pt-4 lg:w-auto lg:min-w-[360px] lg:border-t-0 lg:pt-0">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-        <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-          Rol operativo
-        </span>
+    <div className="flex flex-col gap-3 xl:items-end">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Rol</span>
         <Select value={role} onValueChange={(value) => onRoleChange(user.id, value)}>
-          <SelectTrigger className="w-full border-border/60 bg-background/30 text-foreground sm:w-[180px]">
+          <SelectTrigger className="h-9 w-[148px] border-white/10 bg-[var(--bg-base)] text-slate-100">
             <SelectValue>{isAdmin ? 'Admin' : 'Cliente'}</SelectValue>
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="admin" className="text-card-foreground">
-              Admin
-            </SelectItem>
-            <SelectItem value="cliente" className="text-card-foreground">
-              Cliente
-            </SelectItem>
+          <SelectContent className="border-white/10 bg-[var(--bg-elevated)] text-slate-100">
+            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="cliente">Cliente</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+      <div className="flex flex-wrap gap-2 xl:justify-end">
         {!isAdmin && !pulseAccessEnabled ? (
           <Button
             variant="outline"
             size="sm"
             disabled={pulseAccessBusy}
             onClick={() => onPulseAccessAction(user.id, 'enable')}
-            className="justify-center rounded-xl border-emerald-500/25 bg-emerald-500/10 text-emerald-300 shadow-sm hover:bg-emerald-500/15"
+            className="h-9 justify-center border-emerald-500/25 bg-emerald-500/10 text-emerald-100 hover:bg-emerald-500/20"
           >
             <UserCheck size={14} className="mr-2" />
-            {pulseAccessBusy ? 'Habilitando acceso...' : 'Habilitar acceso Pulse'}
+            {pulseAccessBusy ? 'Habilitando...' : 'Habilitar acceso'}
           </Button>
         ) : null}
 
         {!isAdmin && pulseAccessEnabled ? (
-          <div className="flex w-full overflow-hidden rounded-xl border border-signal/25 bg-signal/10 shadow-sm sm:w-auto">
+          <div className="flex overflow-hidden rounded-xl border border-sky-400/20 bg-sky-500/10">
             <Button
               variant="ghost"
               size="sm"
               disabled={pulseAccessBusy}
               onClick={onOpenPulseAccessDialog}
-              className="h-9 flex-1 justify-between rounded-none bg-transparent px-3 text-signal hover:bg-signal/15 sm:min-w-[190px]"
+              className="h-9 rounded-none bg-transparent px-3 text-sky-100 hover:bg-sky-500/15"
             >
-              <span className="inline-flex items-center gap-2">
-                <UserCheck size={14} />
-                {pulseAccessBusy ? 'Actualizando acceso...' : 'Gestionar acceso'}
-              </span>
+              <UserCheck size={14} className="mr-2" />
+              {pulseAccessBusy ? 'Actualizando...' : 'Gestionar acceso'}
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -111,18 +103,15 @@ export function AdminUserCardActions({
                   variant="ghost"
                   size="sm"
                   disabled={pulseAccessBusy}
-                  className="h-9 rounded-none border-l border-signal/20 bg-transparent px-3 text-signal hover:bg-signal/15"
+                  className="h-9 rounded-none border-l border-sky-400/20 bg-transparent px-2 text-sky-100 hover:bg-sky-500/15"
                 >
                   <ChevronDown size={14} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="min-w-[220px] rounded-xl border-border/60 bg-[var(--bg-elevated)] p-1 text-foreground shadow-[var(--shadow-elevated)]"
-              >
+              <DropdownMenuContent align="end" className="min-w-[200px] rounded-xl border-white/10 bg-[var(--bg-elevated)] p-1 text-slate-100 shadow-[0_18px_40px_rgba(2,6,23,0.32)]">
                 <DropdownMenuItem
                   onClick={() => onPulseAccessAction(user.id, 'resend')}
-                  className="rounded-lg px-3 py-2 text-sm focus:bg-signal/10 focus:text-signal"
+                  className="rounded-lg px-3 py-2 text-sm focus:bg-sky-500/10 focus:text-sky-100"
                 >
                   Reenviar acceso
                 </DropdownMenuItem>
@@ -146,7 +135,7 @@ export function AdminUserCardActions({
             variant="outline"
             size="sm"
             onClick={onOpenDeletionDialog}
-            className="justify-center border-red-500/25 bg-red-500/10 text-red-300 hover:bg-red-500/15"
+            className="h-9 justify-center border-red-500/25 bg-red-500/10 text-red-100 hover:bg-red-500/20"
           >
             Revisar baja
           </Button>
@@ -156,7 +145,7 @@ export function AdminUserCardActions({
           variant="outline"
           size="sm"
           onClick={() => onEdit(user)}
-          className="justify-center border-border/60 bg-[var(--bg-elevated)] text-foreground hover:border-signal/40"
+          className="h-9 justify-center border-white/10 bg-transparent text-slate-200 hover:bg-slate-900"
         >
           <Edit size={14} className="mr-2" />
           Editar
@@ -165,7 +154,7 @@ export function AdminUserCardActions({
           variant="outline"
           size="sm"
           onClick={() => onDelete(user)}
-          className="justify-center border-red-500/25 bg-red-500/10 text-red-300 hover:bg-red-500/15"
+          className="h-9 justify-center border-red-500/25 bg-red-500/10 text-red-100 hover:bg-red-500/20"
         >
           <Trash2 size={14} className="mr-2" />
           Eliminar

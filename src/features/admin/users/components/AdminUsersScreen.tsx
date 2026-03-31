@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { AdminUserCard } from '@/features/admin/users/components/AdminUserCard';
 import { AdminUsersHeader } from '@/features/admin/users/components/AdminUsersHeader';
 import {
@@ -65,107 +64,85 @@ export function AdminUsersScreen({
   const visibleUsers = filterAdminUsers(users, activeFilter);
 
   return (
-    <div className="flex h-full flex-col">
-      <Card className="flex-1 rounded-2xl border border-border/60 bg-[var(--bg-surface)] shadow-sm">
-        <CardContent className="flex-1 p-4 sm:p-5 lg:p-6">
-          <AdminUsersHeader
-            clientUsers={clientUsers}
-            adminUsers={adminUsers}
-            activeFilter={activeFilter}
-            filterCounts={filterCounts}
-            onFilterChange={onFilterChange}
-            onAddUser={onAddUser}
-            onRefresh={onRefresh}
-          />
+    <div className="space-y-6 text-slate-100">
+      <AdminUsersHeader
+        clientUsers={clientUsers}
+        adminUsers={adminUsers}
+        activeFilter={activeFilter}
+        filterCounts={filterCounts}
+        onFilterChange={onFilterChange}
+        onAddUser={onAddUser}
+        onRefresh={onRefresh}
+      />
 
-          {loading ? (
-            <div className="py-12 text-center">
-              <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-b-2 border-signal" />
-              <p className="text-lg font-medium text-foreground">Cargando clientes y accesos...</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Trayendo el estado operativo del panel admin.
-              </p>
-            </div>
-          ) : users.length === 0 ? (
-            <div className="py-12 text-center">
-              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-muted-foreground">
-                <div className="text-3xl font-semibold">0</div>
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-foreground">
-                Todavía no hay clientes cargados
-              </h3>
-              <p className="mb-6 text-muted-foreground">
-                Los accesos Pulse van a aparecer acá cuando la operación tenga usuarios reales.
-              </p>
-              <div className="flex flex-col justify-center gap-3 sm:flex-row">
-                <Button
-                  onClick={onAddUser}
-                  className="bg-signal text-white shadow-none hover:bg-signal/90"
-                >
-                  Crear primer acceso
-                </Button>
-                <Button
-                  onClick={onRefresh}
-                  variant="outline"
-                  className="border-border/60 bg-[var(--bg-elevated)] text-foreground hover:border-signal/40 hover:bg-[var(--bg-elevated)]"
-                >
-                  Reintentar carga
-                </Button>
-              </div>
-            </div>
-          ) : visibleUsers.length === 0 ? (
-            <div className="py-12 text-center">
-              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-muted-foreground">
-                <div className="text-3xl font-semibold">0</div>
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-foreground">
-                No encontramos resultados para {getAdminUsersFilterLabel(activeFilter).toLowerCase()}
-              </h3>
-              <p className="mb-6 text-muted-foreground">
-                Ajustá el filtro o actualizá la operación para revisar nuevos movimientos del panel.
-              </p>
-              <div className="flex flex-col justify-center gap-3 sm:flex-row">
-                <Button
-                  onClick={onRefresh}
-                  variant="outline"
-                  className="border-border/60 bg-[var(--bg-elevated)] text-foreground hover:border-signal/40 hover:bg-[var(--bg-elevated)]"
-                >
-                  Reintentar carga
-                </Button>
-                {activeFilter !== 'all' ? (
-                  <Button
-                    onClick={() => onFilterChange('all')}
-                    className="bg-signal text-white shadow-none hover:bg-signal/90"
-                  >
-                    Ver todos los usuarios
-                  </Button>
-                ) : null}
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {visibleUsers.map((user) => (
-                <AdminUserCard
-                  key={user.id}
-                  user={user}
-                  enablingPulseUserId={enablingPulseUserId}
-                  reviewingDeletionUserId={reviewingDeletionUserId}
-                  onRoleChange={onRoleChange}
-                  onPulseAccessAction={(userId, mode) => {
-                    void onPulseAccessAction(userId, mode);
-                  }}
-                  onEdit={onEdit}
-                  onReviewAccountDeletion={onReviewAccountDeletion}
-                  onDelete={onDelete}
-                  onDomainUpdated={(userId, result) => {
-                    onDomainUpdated(userId, result);
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {loading ? (
+        <section className="rounded-[28px] border border-white/10 bg-[var(--bg-surface)]/90 px-6 py-16 text-center shadow-[0_18px_40px_rgba(2,6,23,0.24)]">
+          <div className="mx-auto mb-5 h-12 w-12 animate-spin rounded-full border-2 border-slate-700 border-t-sky-400" />
+          <p className="text-sm text-slate-400">Cargando clientes y accesos...</p>
+        </section>
+      ) : users.length === 0 ? (
+        <section className="rounded-[28px] border border-dashed border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(8,15,30,0.86))] px-6 py-16 text-center shadow-[0_18px_40px_rgba(2,6,23,0.24)]">
+          <h2 className="text-xl font-semibold text-slate-50">Todavía no hay usuarios cargados</h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-400">
+            Los accesos Pulse van a aparecer acá cuando la operación tenga usuarios reales.
+          </p>
+          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+            <Button onClick={onAddUser} className="bg-sky-500 text-slate-950 hover:bg-sky-400">
+              Crear primer acceso
+            </Button>
+            <Button onClick={onRefresh} variant="outline" className="border-white/10 bg-transparent text-slate-200 hover:bg-slate-900">
+              Reintentar carga
+            </Button>
+          </div>
+        </section>
+      ) : visibleUsers.length === 0 ? (
+        <section className="rounded-[28px] border border-dashed border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(8,15,30,0.86))] px-6 py-16 text-center shadow-[0_18px_40px_rgba(2,6,23,0.24)]">
+          <h2 className="text-xl font-semibold text-slate-50">
+            No encontramos resultados para {getAdminUsersFilterLabel(activeFilter).toLowerCase()}
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-400">
+            Ajustá el filtro o actualizá la operación para revisar nuevos movimientos del panel.
+          </p>
+          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+            <Button onClick={onRefresh} variant="outline" className="border-white/10 bg-transparent text-slate-200 hover:bg-slate-900">
+              Reintentar carga
+            </Button>
+            {activeFilter !== 'all' ? (
+              <Button onClick={() => onFilterChange('all')} className="bg-sky-500 text-slate-950 hover:bg-sky-400">
+                Ver todos los usuarios
+              </Button>
+            ) : null}
+          </div>
+        </section>
+      ) : (
+        <section className="overflow-hidden rounded-[28px] border border-white/10 bg-[var(--bg-surface)]/92 shadow-[0_18px_40px_rgba(2,6,23,0.24)]">
+          <div className="border-b border-white/10 px-5 py-4 sm:px-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Bandeja activa</p>
+            <h2 className="mt-1 text-xl font-semibold text-slate-50">Usuarios visibles ({visibleUsers.length})</h2>
+          </div>
+
+          <div className="space-y-4 p-4 sm:p-5">
+            {visibleUsers.map((user) => (
+              <AdminUserCard
+                key={user.id}
+                user={user}
+                enablingPulseUserId={enablingPulseUserId}
+                reviewingDeletionUserId={reviewingDeletionUserId}
+                onRoleChange={onRoleChange}
+                onPulseAccessAction={(userId, mode) => {
+                  void onPulseAccessAction(userId, mode);
+                }}
+                onEdit={onEdit}
+                onReviewAccountDeletion={onReviewAccountDeletion}
+                onDelete={onDelete}
+                onDomainUpdated={(userId, result) => {
+                  onDomainUpdated(userId, result);
+                }}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { Plus, RefreshCw, Users } from 'lucide-react';
+import { Plus, RefreshCw } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -28,78 +28,68 @@ export function AdminUsersHeader({
   onRefresh,
 }: AdminUsersHeaderProps) {
   return (
-    <div className="mb-6 space-y-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-signal/15 text-signal sm:h-11 sm:w-11">
-            <Users size={20} className="sm:h-5 sm:w-5" />
-          </div>
-          <div className="space-y-1">
-            <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
-              Clientes y accesos
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Revisa accesos Pulse, roles y estado operativo de cada cliente.
-            </p>
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <Badge variant="outline" className="border-white/10 bg-white/[0.06] text-slate-100">
-                {clientUsers} clientes
+    <div className="space-y-4">
+      <section className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(135deg,rgba(59,158,245,0.12),rgba(123,76,212,0.08)_48%,rgba(17,24,39,0.96)_100%)] p-6 shadow-[0_24px_60px_rgba(2,6,23,0.35)]">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-sky-400 via-violet-400/70 to-transparent" />
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">Pulse admin · usuarios</p>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">Clientes y accesos</h1>
+              <p className="max-w-2xl text-sm leading-6 text-slate-300">
+                Ordená accesos Pulse, roles y estados de activación con una vista más clara para la operación.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline" className="border-white/10 bg-white/[0.05] text-slate-100">
+                {clientUsers} clientes activos
               </Badge>
-              <Badge variant="outline" className="border-amber-400/30 bg-amber-500/15 text-amber-100">
+              <Badge variant="outline" className="border-sky-400/20 bg-sky-500/10 text-sky-100">
                 {adminUsers} admins
               </Badge>
             </div>
           </div>
+
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button onClick={onRefresh} variant="outline" className="border-white/10 bg-slate-950/55 text-slate-100 hover:border-sky-400/25 hover:bg-slate-900">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Actualizar
+            </Button>
+            <Button onClick={onAddUser} className="bg-sky-500 text-slate-950 hover:bg-sky-400">
+              <Plus className="mr-2 h-4 w-4" />
+              Agregar usuario
+            </Button>
+          </div>
         </div>
+      </section>
 
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-          <Button
-            onClick={onAddUser}
-            size="sm"
-            className="w-full bg-signal text-white shadow-none hover:bg-signal/90 sm:w-auto"
-          >
-            <Plus className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            Agregar cliente
-          </Button>
-          <Button
-            onClick={onRefresh}
-            variant="outline"
-            size="sm"
-            className="w-full border-border/60 bg-[var(--bg-elevated)] text-foreground hover:border-signal/40 hover:bg-[var(--bg-elevated)] sm:w-auto"
-          >
-            <RefreshCw className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            Actualizar
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        {ADMIN_USERS_FILTER_IDS.map((filterId) => {
-          const isActive = filterId === activeFilter;
-
-          return (
-            <button
-              key={filterId}
-              type="button"
-              onClick={() => onFilterChange(filterId)}
-              className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium transition-colors ${
-                isActive
-                  ? 'border-signal/40 bg-signal/15 text-signal'
-                  : 'border-white/10 bg-[var(--bg-elevated)]/70 text-muted-foreground hover:border-white/15 hover:text-foreground'
-              }`}
-            >
-              <span>{getAdminUsersFilterLabel(filterId)}</span>
-              <span
-                className={`rounded-full px-2 py-0.5 text-xs ${
-                  isActive ? 'bg-signal/20 text-signal' : 'bg-white/5 text-slate-300'
+      <section className="rounded-[22px] border border-white/10 bg-[var(--bg-surface)]/90 px-4 py-4 shadow-[0_14px_30px_rgba(2,6,23,0.22)]">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Vista de trabajo</p>
+        <p className="mt-1 text-sm text-slate-300">Filtrá rápido los accesos que necesitan revisión del equipo.</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {ADMIN_USERS_FILTER_IDS.map((filterId) => {
+            const isActive = filterId === activeFilter;
+            return (
+              <button
+                key={filterId}
+                type="button"
+                onClick={() => onFilterChange(filterId)}
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'border-sky-400/30 bg-sky-500/10 text-sky-100'
+                    : 'border-white/10 bg-[var(--bg-base)] text-slate-300 hover:border-white/15 hover:text-slate-100'
                 }`}
               >
-                {filterCounts[filterId]}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+                <span>{getAdminUsersFilterLabel(filterId)}</span>
+                <span className={`rounded-full px-2 py-0.5 text-xs ${isActive ? 'bg-sky-500/15 text-sky-100' : 'bg-white/5 text-slate-400'}`}>
+                  {filterCounts[filterId]}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }
