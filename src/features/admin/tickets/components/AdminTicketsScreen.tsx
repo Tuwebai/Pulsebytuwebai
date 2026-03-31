@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -17,7 +16,6 @@ import {
   Ticket as TicketIcon, 
   Plus, 
   Search, 
-  Filter, 
   SortAsc, 
   SortDesc,
   Calendar,
@@ -30,7 +28,6 @@ import {
   XCircle,
   Trash2,
   Edit,
-  Eye,
   RefreshCw,
   X
 } from 'lucide-react';
@@ -57,20 +54,17 @@ interface TicketStats {
 type TicketPriority = TicketFormData['priority'];
 type TicketStatus = TicketFormData['status'];
 
-interface AdvancedTicketManagerProps {
+interface AdminTicketsScreenProps {
   tickets?: Ticket[];
-  updateTicketStatus?: (ticketId: string, status: string) => void;
-  updateUserRole?: (userId: string, role: string) => void;
   refreshData?: () => void;
   lastUpdate?: Date;
 }
 
-export default function AdvancedTicketManager({ 
+export default function AdminTicketsScreen({ 
   tickets: externalTickets,
-  updateTicketStatus,
   refreshData,
   lastUpdate
-}: AdvancedTicketManagerProps) {
+}: AdminTicketsScreenProps) {
   const { user } = useApp();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
@@ -90,8 +84,8 @@ export default function AdvancedTicketManager({
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('created_at');
+  const [categoryFilter] = useState<string>('all');
+  const [sortBy] = useState<string>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // Stats

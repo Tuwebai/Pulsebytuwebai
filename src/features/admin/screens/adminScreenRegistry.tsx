@@ -8,14 +8,13 @@ import { AdminOverviewScreen } from '@/features/admin/overview/components/AdminO
 import { AdminNotificationsInboxScreen } from '@/features/admin/notifications/pages/AdminNotificationsInboxScreen';
 import { AdminProjectsScreen } from '@/features/admin/projects/components/AdminProjectsScreen';
 import { AdminSettingsScreen } from '@/features/admin/settings/components/AdminSettingsScreen';
+import AdminTicketsScreen from '@/features/admin/tickets/components/AdminTicketsScreen';
 import { AdminUsersScreen } from '@/features/admin/users/components/AdminUsersScreen';
 import type { AdminUsersFilterId } from '@/features/admin/users/constants/adminUsersFilters';
 import type { PulseAccessActionMode } from '@/features/admin/users/hooks/useAdminUsers';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 import type { WebsiteReviewStatus } from '@/features/admin/services/pulseDomainAdminService';
 import type { AdminSectionChangeHandler } from '@/features/admin/types/adminNavigation';
-import AdvancedTicketManager from '@/components/AdvancedTicketManager';
-
 interface AdminDomainUpdateResult {
   website?: string | null;
   website_status?: WebsiteReviewStatus | null;
@@ -107,7 +106,7 @@ export function createAdminScreenRegistry(
       />
     ),
     proyectos: <AdminProjectsScreen />,
-    tickets: <AdvancedTicketManager />,
+    tickets: <AdminTicketsScreen />,
     pagos: (
       <AdminPaymentsSection
         payments={context.payments}

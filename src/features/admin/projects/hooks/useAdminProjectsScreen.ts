@@ -2,16 +2,16 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useApp } from '@/contexts/AppContext';
-import { useProjects } from '@/hooks/useProjects';
 import type { CreateProjectData, Project, UpdateProjectData } from '@/types/project.types';
 
 import { getAdminProjectStats } from '@/features/admin/projects/hooks/adminProjectsScreen.utils';
 import { useAdminProjectActions } from '@/features/admin/projects/hooks/useAdminProjectActions';
+import { useAdminProjectsData } from '@/features/admin/projects/hooks/useAdminProjectsData';
 
 export function useAdminProjectsScreen() {
   const navigate = useNavigate();
   const { user } = useApp();
-  const projectsState = useProjects();
+  const projectsState = useAdminProjectsData();
 
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
