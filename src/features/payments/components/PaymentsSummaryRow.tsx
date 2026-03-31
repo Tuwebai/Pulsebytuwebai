@@ -51,7 +51,7 @@ export default function PaymentsSummaryRow({ payments }: PaymentsSummaryRowProps
         <MetricCard
           className="pr-16"
           label="Pagos pendientes"
-          period="pendientes de confirmacion"
+          period="pendientes de confirmación"
           value={pendingPayments}
         />
         <div className="pointer-events-none absolute right-5 top-5">

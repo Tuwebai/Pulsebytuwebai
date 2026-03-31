@@ -7,6 +7,7 @@ export function getPaymentStatusLabel(status: string): string {
     case 'approved':
       return 'Completado';
     case 'pending':
+    case 'in_process':
       return 'Pendiente';
     case 'rejected':
       return 'Fallido';
@@ -22,6 +23,7 @@ export function getPaymentStatusVariant(status: string): BadgeProps['variant'] {
     case 'approved':
       return 'success';
     case 'pending':
+    case 'in_process':
       return 'warning';
     case 'rejected':
       return 'danger';
@@ -42,7 +44,7 @@ export function getCompletedPaymentsCount(payments: Payment[]): number {
 }
 
 export function getPendingPaymentsCount(payments: Payment[]): number {
-  return payments.filter((payment) => payment.status === 'pending').length;
+  return payments.filter((payment) => payment.status === 'pending' || payment.status === 'in_process').length;
 }
 
 export function getPaymentPlanName(payment: Pick<Payment, 'paymentType' | 'description'>): string {
@@ -56,7 +58,7 @@ export function getPaymentPlanFeatures(payment: Pick<Payment, 'paymentType' | 'f
 }
 
 export function isPaymentRetryable(status: string): boolean {
-  return status === 'pending' || status === 'rejected' || status === 'cancelled';
+  return status === 'pending' || status === 'in_process' || status === 'rejected' || status === 'cancelled';
 }
 
 export function getPaymentStatusMessage(status: string): string {
@@ -64,6 +66,7 @@ export function getPaymentStatusMessage(status: string): string {
     case 'approved':
       return 'Tu pago ya quedó acreditado y el comprobante está listo para descargar.';
     case 'pending':
+    case 'in_process':
       return 'Estamos esperando la confirmación del cobro. Si lo necesitas, puedes volver a intentarlo.';
     case 'rejected':
       return 'El intento de cobro no se pudo confirmar. Puedes abrir un nuevo checkout cuando quieras.';
