@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createMercadoPagoPreference, getUserPayments } from '@/lib/services/paymentService';
-import { formatCurrency } from '@/lib/mercadopago';
 import { toast } from '@/hooks/use-toast';
 import type { User } from '@/contexts/appContext.types';
 import type { Payment } from '@/types';
+import { downloadPaymentInvoicePdf } from '../services/paymentInvoice.service';
 
 interface UsePaymentsPageReturn {
   error: string | null;
@@ -16,7 +16,8 @@ interface UsePaymentsPageReturn {
   closeDetailModal: () => void;
   closePaymentModal: () => void;
   handleCreatePayment: (paymentType: string) => Promise<void>;
-  handleDownloadInvoice: (payment: Payment) => void;
+  handleDownloadInvoice: (payment: Payment) => Promise<void>;
+  handleRetryPayment: (payment: Payment) => Promise<void>;
   handleRetryLoad: () => void;
   openDetailModal: (payment: Payment) => void;
   openPaymentModal: () => void;
@@ -79,33 +80,21 @@ export function usePaymentsPage(user: User | null): UsePaymentsPageReturn {
     return clearSyncState;
   }, [clearSyncState, syncPayments]);
 
-  const handleDownloadInvoice = useCallback((payment: Payment) => {
+  const handleDownloadInvoice = useCallback(async (payment: Payment) => {
     if (!user) {
       return;
     }
 
-    if (payment.invoiceUrl) {
-      window.open(payment.invoiceUrl, '_blank', 'noopener,noreferrer');
-      return;
+    try {
+      await downloadPaymentInvoicePdf(payment, user);
+    } catch (error) {
+      console.error('Error al generar la factura PDF:', error);
+      toast({
+        title: 'No pudimos descargar la factura',
+        description: 'Inténtalo de nuevo en unos segundos.',
+        variant: 'destructive',
+      });
     }
-
-    const invoiceText = [
-      `FACTURA FAC-${payment.id.slice(-6)}`,
-      '',
-      `Fecha: ${new Date(payment.createdAt).toLocaleDateString('es-AR')}`,
-      `Cliente: ${user.full_name || user.email}`,
-      `Concepto: ${payment.description}`,
-      `Monto: ${formatCurrency(payment.amount, payment.currency)}`,
-      `Estado: ${payment.status}`,
-    ].join('\n');
-
-    const blob = new Blob([invoiceText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `factura-FAC-${payment.id.slice(-6)}.txt`;
-    anchor.click();
-    URL.revokeObjectURL(url);
   }, [user]);
 
   const handleCreatePayment = useCallback(async (paymentType: string) => {
@@ -141,6 +130,19 @@ export function usePaymentsPage(user: User | null): UsePaymentsPageReturn {
     }
   }, [user]);
 
+  const handleRetryPayment = useCallback(async (payment: Payment) => {
+    if (!payment.paymentType) {
+      toast({
+        title: 'No pudimos reabrir este pago',
+        description: 'Este movimiento no tiene un plan asociado para volver a intentarlo.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    await handleCreatePayment(payment.paymentType);
+  }, [handleCreatePayment]);
+
   return {
     error,
     isDetailModalOpen,
@@ -153,6 +155,7 @@ export function usePaymentsPage(user: User | null): UsePaymentsPageReturn {
     closePaymentModal: () => setIsPaymentModalOpen(false),
     handleCreatePayment,
     handleDownloadInvoice,
+    handleRetryPayment,
     handleRetryLoad: syncPayments,
     openDetailModal: (payment) => {
       setSelectedPago(payment);

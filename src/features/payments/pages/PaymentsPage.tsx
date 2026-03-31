@@ -22,6 +22,7 @@ export default function PaymentsPage() {
     closePaymentModal,
     handleCreatePayment,
     handleDownloadInvoice,
+    handleRetryPayment,
     handleRetryLoad,
     openDetailModal,
     openPaymentModal,
@@ -66,8 +67,10 @@ export default function PaymentsPage() {
       <PaymentDetailDialog
         onClose={closeDetailModal}
         onDownloadInvoice={handleDownloadInvoice}
+        onRetryPayment={handleRetryPayment}
         open={isDetailModalOpen}
         payment={selectedPago}
+        processingPayment={processingPayment}
       />
 
       <CreatePaymentDialog

@@ -2,6 +2,7 @@ import { CreditCard } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { AdminPaymentRecord } from '@/api/admin/adminDashboard.api';
 import { Badge, MetricCard, PulseFeedbackState } from '@/core/components';
+import { getAdminPaymentDisplayName } from '../adminPayments.helpers';
 import {
   formatAdminPaymentAmount,
   getAdminPaymentStatusLabel,
@@ -42,7 +43,7 @@ export function AdminPaymentsSection({
         <div>
           <h2 className="text-xl font-semibold text-[var(--text-primary)]">Pagos del sistema</h2>
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            Revisá el estado real de los cobros y actualizá el seguimiento cuando haga falta.
+            Revisa el estado real de los cobros y actualiza el seguimiento cuando haga falta.
           </p>
         </div>
       </div>
@@ -62,9 +63,12 @@ export function AdminPaymentsSection({
 
         <div className="divide-y divide-[var(--border-subtle)]">
           {payments.map((payment) => (
-            <div className="grid grid-cols-1 gap-4 px-5 py-4 md:grid-cols-[minmax(0,1.6fr)_minmax(120px,0.8fr)_minmax(120px,0.9fr)]" key={payment.id}>
+            <div
+              className="grid grid-cols-1 gap-4 px-5 py-4 md:grid-cols-[minmax(0,1.6fr)_minmax(120px,0.8fr)_minmax(120px,0.9fr)]"
+              key={payment.id}
+            >
               <div>
-                <p className="text-sm font-medium text-[var(--text-primary)]">{payment.description || 'Pago sin descripción'}</p>
+                <p className="text-sm font-medium text-[var(--text-primary)]">{getAdminPaymentDisplayName(payment)}</p>
                 <p className="mt-1 text-sm text-[var(--text-secondary)]">
                   {formatAdminPaymentAmount(payment.amount)} · {new Date(payment.created_at).toLocaleDateString('es-AR')}
                 </p>

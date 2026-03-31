@@ -1,9 +1,13 @@
 import { Download, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge, PulseFeedbackState } from '@/core/components';
-import { formatCurrency, PAYMENT_TYPES } from '@/lib/mercadopago';
+import { formatCurrency } from '@/lib/mercadopago';
 import type { Payment } from '@/types';
-import { getPaymentStatusLabel, getPaymentStatusVariant } from '../payments.utils';
+import {
+  getPaymentPlanName,
+  getPaymentStatusLabel,
+  getPaymentStatusVariant,
+} from '../payments.utils';
 
 interface PaymentsTableProps {
   error: string | null;
@@ -24,11 +28,6 @@ export default function PaymentsTable({
   onSelectPayment,
   payments,
 }: PaymentsTableProps) {
-  const getPaymentPlanName = (payment: Payment) => {
-    const paymentType = PAYMENT_TYPES[payment.paymentType as keyof typeof PAYMENT_TYPES];
-    return paymentType?.name || payment.description;
-  };
-
   if (loading) {
     return (
       <PulseFeedbackState
