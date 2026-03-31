@@ -50,6 +50,20 @@ class ServiceWorkerManager {
     }
   }
 
+  async unregisterInDevelopment(): Promise<void> {
+    if (!this.isSupported || !import.meta.env.DEV) {
+      return;
+    }
+
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map((registration) => registration.unregister()));
+
+    const cacheKeys = await caches.keys();
+    await Promise.all(cacheKeys.map((cacheKey) => caches.delete(cacheKey)));
+
+    this.registration = null;
+  }
+
   // Verificar si hay actualizaciones disponibles
   async checkForUpdates(): Promise<boolean> {
     if (!this.registration) {
