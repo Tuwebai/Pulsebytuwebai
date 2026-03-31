@@ -7,6 +7,7 @@ import { PulseFeedbackState } from '@/core/components';
 import { PRODUCT_TOUR_STEP_CHANGE_EVENT } from '@/features/product-tour/services/productTour.service';
 import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 import type { ProductTourStep } from '@/features/product-tour/types/productTour.types';
+import { useClientSettings } from '@/features/settings/hooks/useClientSettings';
 import {
   GeneralSettingsTab,
   PerformanceSettingsTab,
@@ -15,48 +16,25 @@ import {
   SettingsPageHeader,
   SettingsTabsNav,
 } from '@/features/settings/components';
-import { useClientSettings } from '@/features/settings/hooks/useClientSettings';
 
-const Configuracion = React.memo(() => {
+const SettingsPage = React.memo(() => {
   const { user, getUserProjects } = useApp() as AppContextType;
-  const [activeTab, setActiveTab] = useSessionStorageState(
-    `pulse:configuracion:${user?.id ?? 'anon'}:active-tab`,
-    'general',
-  );
-  const {
-    loading,
-    performanceDirty,
-    performanceSettings,
-    securityDirty,
-    securitySettings,
-    setPerformanceSettings,
-    setSecuritySettings,
-    handleSavePerformanceSettings,
-    handleSaveSecuritySettings,
-  } = useClientSettings();
+  const [activeTab, setActiveTab] = useSessionStorageState(`pulse:configuracion:${user?.id ?? 'anon'}:active-tab`, 'general');
+  const settings = useClientSettings();
 
   useEffect(() => {
-    if (activeTab === 'privacidad' || activeTab === 'admin') {
-      setActiveTab('seguridad');
-    }
+    if (activeTab === 'privacidad' || activeTab === 'admin') setActiveTab('seguridad');
   }, [activeTab, setActiveTab]);
 
   useEffect(() => {
     const handleTourStepChange = (event: Event) => {
       const step = (event as CustomEvent<ProductTourStep | null>).detail;
-
-      if (!step || step.scope !== 'settings' || !step.tabValue) {
-        return;
-      }
-
+      if (!step || step.scope !== 'settings' || !step.tabValue) return;
       setActiveTab(step.tabValue);
     };
 
     window.addEventListener(PRODUCT_TOUR_STEP_CHANGE_EVENT, handleTourStepChange);
-
-    return () => {
-      window.removeEventListener(PRODUCT_TOUR_STEP_CHANGE_EVENT, handleTourStepChange);
-    };
+    return () => window.removeEventListener(PRODUCT_TOUR_STEP_CHANGE_EVENT, handleTourStepChange);
   }, [setActiveTab]);
 
   if (!user) {
@@ -78,32 +56,24 @@ const Configuracion = React.memo(() => {
           <SettingsPageHeader projectsCount={getUserProjects().length} />
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.08 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.08 }}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6" data-tour="settings-tabs">
             <SettingsTabsNav />
-
             <GeneralSettingsTab user={user} projectsCount={getUserProjects().length} />
-
             <PerformanceSettingsTab
-              dirty={performanceDirty}
-              loading={loading}
-              settings={performanceSettings}
-              setSettings={setPerformanceSettings}
-              onSave={handleSavePerformanceSettings}
+              dirty={settings.performanceDirty}
+              loading={settings.loading}
+              settings={settings.performanceSettings}
+              setSettings={settings.setPerformanceSettings}
+              onSave={settings.handleSavePerformanceSettings}
             />
-
             <SettingsNotificationsTab />
-
             <SecuritySettingsTab
-              dirty={securityDirty}
-              loading={loading}
-              settings={securitySettings}
-              setSettings={setSecuritySettings}
-              onSave={handleSaveSecuritySettings}
+              dirty={settings.securityDirty}
+              loading={settings.loading}
+              settings={settings.securitySettings}
+              setSettings={settings.setSecuritySettings}
+              onSave={settings.handleSaveSecuritySettings}
             />
           </Tabs>
         </motion.div>
@@ -112,6 +82,6 @@ const Configuracion = React.memo(() => {
   );
 });
 
-Configuracion.displayName = 'Configuracion';
+SettingsPage.displayName = 'SettingsPage';
 
-export default Configuracion;
+export default SettingsPage;
