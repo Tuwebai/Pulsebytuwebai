@@ -17,6 +17,7 @@ export default function AdminTicketsScreen(props: AdminTicketsScreenProps) {
     <div className="space-y-6 text-slate-100">
       <AdminTicketsHeader
         lastUpdate={props.lastUpdate}
+        stats={screen.stats}
         onCreate={screen.openCreateForm}
         onRefresh={props.refreshData}
       />

@@ -6,35 +6,75 @@ interface AdminTicketsStatsProps {
   stats: TicketStats;
 }
 
-const CARDS = [
-  { key: 'total', label: 'Total abierto', detail: 'conversaciones visibles', icon: Ticket, tone: 'text-sky-100 bg-sky-500/12 border-sky-400/15' },
-  { key: 'open', label: 'Sin responder', detail: 'requieren primer contacto', icon: AlertCircle, tone: 'text-sky-100 bg-sky-500/12 border-sky-400/15' },
-  { key: 'inProgress', label: 'En curso', detail: 'con seguimiento activo', icon: Clock, tone: 'text-amber-100 bg-amber-500/12 border-amber-400/15' },
-  { key: 'resolved', label: 'Resueltos', detail: 'listos para cerrar', icon: CheckCircle, tone: 'text-emerald-100 bg-emerald-500/12 border-emerald-400/15' },
-] as const;
-
 export function AdminTicketsStats({ stats }: AdminTicketsStatsProps) {
+  const cards = [
+    {
+      icon: Ticket,
+      value: stats.total.toLocaleString('es-AR'),
+      label: 'Tickets visibles',
+      detail: 'base de trabajo',
+      iconClassName: 'bg-signal/15 text-signal',
+      detailClassName: 'text-slate-400',
+      valueClassName: 'text-[clamp(2.4rem,4vw,3.4rem)]',
+    },
+    {
+      icon: AlertCircle,
+      value: stats.open.toLocaleString('es-AR'),
+      label: 'Sin responder',
+      detail: 'requieren primer contacto',
+      iconClassName: 'bg-sky-500/15 text-sky-100',
+      detailClassName: 'text-slate-400',
+      valueClassName: 'text-[clamp(2.4rem,4vw,3.4rem)]',
+    },
+    {
+      icon: Clock,
+      value: stats.inProgress.toLocaleString('es-AR'),
+      label: 'En curso',
+      detail: 'seguimiento activo',
+      iconClassName: 'bg-amber-500/15 text-amber-200',
+      detailClassName: 'text-slate-400',
+      valueClassName: 'text-[clamp(2.4rem,4vw,3.4rem)]',
+    },
+    {
+      icon: CheckCircle,
+      value: stats.resolved.toLocaleString('es-AR'),
+      label: 'Resueltos',
+      detail: 'listos para cerrar',
+      iconClassName: 'bg-emerald-500/15 text-emerald-200',
+      detailClassName: 'text-slate-400',
+      valueClassName: 'text-[clamp(2.4rem,4vw,3.4rem)]',
+    },
+  ] as const;
+
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      {CARDS.map((card) => {
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      {cards.map((card) => {
         const Icon = card.icon;
-        const value = stats[card.key];
 
         return (
           <section
-            key={card.key}
-            className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(8,15,30,0.92))] p-5 shadow-[0_16px_36px_rgba(2,6,23,0.25)]"
+            key={card.label}
+            className="min-w-0 rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/92 p-4 shadow-[0_18px_40px_rgba(2,6,23,0.24)] transition-colors hover:border-white/15 sm:p-5"
           >
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-sky-400/70 via-violet-400/30 to-transparent" />
-            <div className="flex items-start justify-between gap-4">
-              <div className="space-y-2">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{card.label}</p>
-                <p className="font-data text-4xl font-semibold leading-none text-slate-50">{value}</p>
-                <p className="text-xs text-slate-500">{card.detail}</p>
+            <div className="flex items-start justify-between gap-3">
+              <div
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl ${card.iconClassName}`}
+              >
+                <Icon className="h-4 w-4" />
               </div>
-              <div className={`rounded-2xl border p-3 ${card.tone}`}>
-                <Icon className="h-5 w-5" />
-              </div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Resumen
+              </p>
+            </div>
+
+            <div className="mt-4 min-w-0 space-y-1.5">
+              <p className="text-sm font-medium text-slate-100">{card.label}</p>
+              <p
+                className={`min-w-0 overflow-hidden text-ellipsis font-data font-light leading-none tracking-tight text-slate-50 ${card.valueClassName}`}
+              >
+                {card.value}
+              </p>
+              <p className={`text-xs leading-5 ${card.detailClassName}`}>{card.detail}</p>
             </div>
           </section>
         );
