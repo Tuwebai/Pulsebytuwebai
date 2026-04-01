@@ -1,17 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Area, AreaChart, CartesianGrid, Line, ReferenceDot, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { FadeIn, Skeleton } from '@/core/components';
-import type { ChartDataPoint } from '@/data/types/pulse';
-import { PulseChartModeToggle, PulseChartTooltip, type ChartMode } from './pulseChart.utils';
+import type { ChartDataPoint, PulseChartMode } from '@/data/types/pulse';
+import { PulseChartModeToggle, PulseChartTooltip } from './pulseChart.utils';
 
 interface PulseChartProps {
   data: ChartDataPoint[];
+  defaultMode?: PulseChartMode;
   loading?: boolean;
   height?: number;
 }
 
-export default function PulseChart({ data, loading = false, height = 180 }: PulseChartProps) {
-  const [mode, setMode] = useState<ChartMode>('visits');
+export default function PulseChart({ data, defaultMode = 'visits', loading = false, height = 180 }: PulseChartProps) {
+  const [mode, setMode] = useState<PulseChartMode>(defaultMode);
+
+  useEffect(() => {
+    setMode(defaultMode);
+  }, [defaultMode]);
 
   if (loading) {
     return (

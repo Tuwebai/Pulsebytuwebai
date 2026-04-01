@@ -9,6 +9,8 @@ import { getDaysInRange } from '../services/pulse.service';
 import { resolvePulseConnectionState } from './usePulseConnectionState';
 import { usePulseRealtime } from './usePulseRealtime';
 import { usePulseRealtimeSnapshot } from './usePulseRealtimeSnapshot';
+import { usePulseExperienceSettings } from './usePulseExperienceSettings';
+import { usePulseExperienceSettingsRealtime } from './usePulseExperienceSettingsRealtime';
 
 function formatRelativeUpdate(updatedAt: string | null): string | null {
   if (!updatedAt) {
@@ -61,7 +63,9 @@ function formatRealtimeSample(sampledAt: string | null | undefined): string | nu
 export function usePulsePageState() {
   const queryClient = useQueryClient();
   const { authReady, isAuthenticated, user } = useApp();
-  const { period, setPeriod } = usePulsePeriod();
+  const { data: settings, isLoading: settingsLoading } = usePulseExperienceSettings();
+  usePulseExperienceSettingsRealtime();
+  const { period, setPeriod } = usePulsePeriod(settings?.defaultPeriod ?? 'this_month');
   const { projectId, domain, ga4PropertyId, loading: projectLoading, projectsReady } = useUserProject();
   const { data, isLoading } = usePulseMetrics(projectId, period);
 
@@ -99,13 +103,14 @@ export function usePulsePageState() {
     canViewMetrics,
   );
   const resolvedDomain = domain ?? user?.website ?? null;
-  const loading = projectHydrating || projectLoading || isLoading;
+  const loading = projectHydrating || projectLoading || isLoading || settingsLoading;
 
   return {
     averagePerDay,
     canViewMetrics,
     connectionState,
     data,
+    defaultChartMode: settings?.defaultChartMode ?? 'visits',
     domain: resolvedDomain,
     ga4PropertyId,
     hasGa4,
@@ -117,6 +122,7 @@ export function usePulsePageState() {
     realtimeError: realtimeError instanceof Error ? realtimeError.message : null,
     realtimeLoading,
     realtimeSampleLabel: formatRealtimeSample(realtimeData?.sampledAt),
+    settings,
     onRefreshMetrics: async () => {
       try {
         const result = await refreshPulseData('manual');

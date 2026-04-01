@@ -1,20 +1,18 @@
-import type { ChartDataPoint } from '@/data/types/pulse';
-
-export type ChartMode = 'visits' | 'contacts';
+import type { ChartDataPoint, PulseChartMode } from '@/data/types/pulse';
 
 interface TooltipProps {
   active?: boolean;
-  mode: ChartMode;
+  mode: PulseChartMode;
   payload?: Array<{
     payload: ChartDataPoint;
   }>;
 }
 
-export function formatMetricLabel(mode: ChartMode, value: number) {
+export function formatMetricLabel(mode: PulseChartMode, value: number) {
   return mode === 'contacts' ? `${value.toLocaleString('es-AR')} consultas` : `${value.toLocaleString('es-AR')} visitas`;
 }
 
-function getExecutiveInsight(mode: ChartMode, point: ChartDataPoint) {
+function getExecutiveInsight(mode: PulseChartMode, point: ChartDataPoint) {
   const currentValue = mode === 'contacts' ? point.contacts : point.visits;
   const previousValue = mode === 'contacts' ? point.previousContacts : point.previousVisits;
 
@@ -66,8 +64,8 @@ export function PulseChartModeToggle({
   mode,
   onChange,
 }: {
-  mode: ChartMode;
-  onChange: (mode: ChartMode) => void;
+  mode: PulseChartMode;
+  onChange: (mode: PulseChartMode) => void;
 }) {
   const baseClassName = 'rounded-full border px-3 py-1.5 text-[12px] font-medium transition-colors';
 

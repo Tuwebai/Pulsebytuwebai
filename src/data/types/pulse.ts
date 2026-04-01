@@ -1,4 +1,5 @@
 export type Period = 'this_month' | 'last_month' | 'last_7_days' | 'last_30_days' | 'this_year';
+export type PulseChartMode = 'visits' | 'contacts';
 
 export interface PulseMetricRow {
   id: string;
@@ -66,4 +67,13 @@ export interface PulseRealtimeSnapshot {
   topPages: PulseRealtimePage[];
   topEvents: PulseRealtimeEvent[];
   sampledAt: string;
+}
+
+export interface PulseExperienceSettings {
+  defaultPeriod: Period;
+  defaultChartMode: PulseChartMode;
+  showRealtimeModule: boolean;
+  showTopPagesModule: boolean;
+  showSummaryModule: boolean;
+  updatedAt: string | null;
 }

@@ -28,6 +28,7 @@ export default function PulsePage() {
     canViewMetrics,
     connectionState,
     data,
+    defaultChartMode,
     domain,
     ga4PropertyId,
     hasProject,
@@ -38,11 +39,14 @@ export default function PulsePage() {
     realtimeError,
     realtimeLoading,
     realtimeSampleLabel,
+    settings,
     onOpenSite,
     onRefreshMetrics,
     period,
     setPeriod,
   } = usePulsePageState();
+  const showTopPages = settings?.showTopPagesModule !== false;
+  const showSummary = settings?.showSummaryModule !== false;
   const dateRangeLabel = data ? `${data.dateRange.from} -> ${data.dateRange.to}` : 'sin datos todavía';
 
   return (
@@ -69,20 +73,26 @@ export default function PulsePage() {
 
       <PulseMetricsGrid averagePerDay={averagePerDay} data={data} loading={loading} />
 
-      {canViewMetrics ? <PulseRealtimeCard data={realtimeData} domain={domain} error={realtimeError} loading={realtimeLoading} /> : null}
+      {canViewMetrics && settings?.showRealtimeModule !== false ? (
+        <PulseRealtimeCard data={realtimeData} domain={domain} error={realtimeError} loading={realtimeLoading} />
+      ) : null}
 
       <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5" data-tour="pulse-chart">
-        <PulseChart data={data?.chartData ?? []} height={180} loading={loading} />
+        <PulseChart data={data?.chartData ?? []} defaultMode={defaultChartMode} height={180} loading={loading} />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <PulseTopPagesCard domain={domain} loading={loading} topPages={data?.topPages ?? []} />
-        <PulseSummaryCard
-          actionLabel={getSummaryActionLabel(domainRequest.status, domainRequest.hasReachedLimit)}
-          data={data}
-          onAction={domainRequest.openDialog}
-        />
-      </section>
+      {showTopPages || showSummary ? (
+        <section className={`grid gap-6 ${showTopPages && showSummary ? 'xl:grid-cols-[1.2fr_0.8fr]' : ''}`}>
+          {showTopPages ? <PulseTopPagesCard domain={domain} loading={loading} topPages={data?.topPages ?? []} /> : null}
+          {showSummary ? (
+            <PulseSummaryCard
+              actionLabel={getSummaryActionLabel(domainRequest.status, domainRequest.hasReachedLimit)}
+              data={data}
+              onAction={domainRequest.openDialog}
+            />
+          ) : null}
+        </section>
+      ) : null}
 
       <PulseDomainRequestDialog
         canSubmit={domainRequest.canSubmit}

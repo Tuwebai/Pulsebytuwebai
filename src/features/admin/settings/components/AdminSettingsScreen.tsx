@@ -1,13 +1,11 @@
 import { RotateCcw } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { AdminPageActionsBar } from '@/features/admin/components/AdminPageActionsBar';
-import { AdminSettingsAccountCard } from '@/features/admin/settings/components/AdminSettingsAccountCard';
-import { AdminSettingsGuardrailsCard } from '@/features/admin/settings/components/AdminSettingsGuardrailsCard';
+import { AdminSettingsImpactCard } from '@/features/admin/settings/components/AdminSettingsImpactCard';
 import { AdminSettingsMetrics } from '@/features/admin/settings/components/AdminSettingsMetrics';
-import { AdminSettingsPanelCard } from '@/features/admin/settings/components/AdminSettingsPanelCard';
-import { AdminSettingsReferenceCard } from '@/features/admin/settings/components/AdminSettingsReferenceCard';
-import { useAdminSettingsPreferences } from '@/features/admin/settings/hooks/useAdminSettingsPreferences';
+import { AdminSettingsModulesCard } from '@/features/admin/settings/components/AdminSettingsModulesCard';
+import { AdminSettingsViewCard } from '@/features/admin/settings/components/AdminSettingsViewCard';
+import { useAdminPulseSettings } from '@/features/admin/settings/hooks/useAdminPulseSettings';
 import { toast } from '@/hooks/use-toast';
 
 interface AdminSettingsScreenProps {
@@ -17,24 +15,32 @@ interface AdminSettingsScreenProps {
 export function AdminSettingsScreen({ onSaveReference }: AdminSettingsScreenProps) {
   const {
     hasUnsavedChanges,
-    preferences,
+    isSaving,
     resetToSaved,
     restoreDefaults,
-    savePreferences,
-    summary,
-    updatePreference,
-  } = useAdminSettingsPreferences();
+    saveSettings,
+    settings,
+    updateSetting,
+  } = useAdminPulseSettings();
 
-  const handleSave = () => {
-    savePreferences();
-    onSaveReference();
+  const handleSave = async () => {
+    try {
+      await saveSettings();
+      onSaveReference();
+    } catch (error) {
+      toast({
+        title: 'No pudimos guardar la configuración',
+        description: error instanceof Error ? error.message : 'Probá de nuevo en unos minutos.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleRestoreDefaults = () => {
     restoreDefaults();
     toast({
-      title: 'Valores base listos',
-      description: 'Restauramos la configuración sugerida para el panel admin.',
+      title: 'Base Pulse restaurada',
+      description: 'Volvimos a la configuración recomendada para la portada de Pulse.',
     });
   };
 
@@ -58,38 +64,35 @@ export function AdminSettingsScreen({ onSaveReference }: AdminSettingsScreenProp
               variant="outline"
             >
               <RotateCcw className="mr-2 h-4 w-4" />
-              Restaurar base
+              Restaurar base Pulse
             </Button>
             <Button
               className="bg-sky-500 text-slate-950 hover:bg-sky-400"
-              disabled={!hasUnsavedChanges}
-              onClick={handleSave}
+              disabled={!hasUnsavedChanges || isSaving}
+              onClick={() => {
+                void handleSave();
+              }}
               type="button"
             >
-              Guardar preferencias
+              {isSaving ? 'Guardando...' : 'Guardar configuración'}
             </Button>
           </>
         )}
       >
         <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Ajustes del panel</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Configuración global de Pulse</p>
           <p className="text-sm text-slate-300">
-            Ordená cómo responde el admin, qué señales prioriza y qué referencia usa el equipo al operar Pulse.
+            Definí cómo abre Pulse para todos los clientes y qué módulos secundarios siguen visibles en la portada.
           </p>
         </div>
       </AdminPageActionsBar>
 
-      <AdminSettingsMetrics
-        guardrails={summary.guardrails}
-        liveSignals={summary.liveSignals}
-        productLabel={summary.productLabel}
-      />
+      <AdminSettingsMetrics settings={settings} />
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <AdminSettingsPanelCard onPreferenceChange={updatePreference} preferences={preferences} />
-        <AdminSettingsGuardrailsCard onPreferenceChange={updatePreference} preferences={preferences} />
-        <AdminSettingsAccountCard />
-        <AdminSettingsReferenceCard onPreferenceChange={updatePreference} preferences={preferences} />
+        <AdminSettingsViewCard onSettingChange={updateSetting} settings={settings} />
+        <AdminSettingsModulesCard onSettingChange={updateSetting} settings={settings} />
+        <AdminSettingsImpactCard settings={settings} />
       </div>
     </div>
   );
