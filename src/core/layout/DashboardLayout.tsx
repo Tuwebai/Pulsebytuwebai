@@ -41,7 +41,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg-base)]">
+    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-background via-background/95 to-background/90 transition-all duration-300 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <Sidebar />
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
@@ -53,7 +53,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           key={location.pathname}
           transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          {children}
+          <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-3 sm:gap-4 lg:gap-6">
+            {children}
+          </div>
         </motion.main>
         <footer className="hidden border-t border-[var(--border-subtle)] px-8 py-4 md:block">
           <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">

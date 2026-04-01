@@ -33,6 +33,36 @@
     rgba(224, 64, 160, 0.04) 100%
   );
 
+  --admin-hero-bg: linear-gradient(135deg, rgba(59, 158, 245, 0.12), rgba(123, 76, 212, 0.08) 48%, rgba(17, 24, 39, 0.96) 100%);
+  --admin-hero-border: rgba(255, 255, 255, 0.10);
+  --admin-hero-line: linear-gradient(90deg, #38bdf8 0%, rgba(167, 139, 250, 0.7) 45%, transparent 100%);
+  --admin-card-radius: 24px;
+  --admin-card-padding: 20px;
+  --admin-card-padding-mobile: 16px;
+  --admin-card-shadow: 0 18px 40px rgba(2, 6, 23, 0.24);
+  --admin-badge-height: 28px;
+  --admin-badge-padding-x: 12px;
+  --admin-avatar-size: 48px;
+  --admin-avatar-size-compact: 32px;
+  --admin-filter-gap: 8px;
+  --admin-grid-gap: 16px;
+  --admin-grid-gap-mobile: 12px;
+
+  --cliente-hero-bg: var(--admin-hero-bg);
+  --cliente-hero-border: var(--admin-hero-border);
+  --cliente-hero-line: var(--admin-hero-line);
+  --cliente-card-radius: var(--admin-card-radius);
+  --cliente-card-padding: var(--admin-card-padding);
+  --cliente-card-padding-mobile: var(--admin-card-padding-mobile);
+  --cliente-card-shadow: var(--admin-card-shadow);
+  --cliente-badge-height: var(--admin-badge-height);
+  --cliente-badge-padding-x: var(--admin-badge-padding-x);
+  --cliente-avatar-size: var(--admin-avatar-size);
+  --cliente-avatar-size-compact: var(--admin-avatar-size-compact);
+  --cliente-filter-gap: var(--admin-filter-gap);
+  --cliente-grid-gap: var(--admin-grid-gap);
+  --cliente-grid-gap-mobile: var(--admin-grid-gap-mobile);
+
   --font-display: 'DM Sans', system-ui, sans-serif;
   --font-body: 'DM Sans', system-ui, sans-serif;
   --font-data: 'JetBrains Mono', 'Fira Code', monospace;

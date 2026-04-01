@@ -66,7 +66,7 @@ export default function PulsePage() {
       />
 
       {connectionState !== 'connected_with_data' && (!loading || isBootstrapping) ? (
-        <div className="rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)]">
+        <div className="rounded-[var(--cliente-card-radius)] border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-[var(--cliente-card-shadow)]">
           <PulseDomainRequestGate ga4PropertyId={ga4PropertyId} hasProject={hasProject} syncingMetrics={isBootstrapping} />
         </div>
       ) : null}
@@ -77,12 +77,15 @@ export default function PulsePage() {
         <PulseRealtimeCard data={realtimeData} domain={domain} error={realtimeError} loading={realtimeLoading} />
       ) : null}
 
-      <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5" data-tour="pulse-chart">
+      <section
+        className="rounded-[var(--cliente-card-radius)] border border-[var(--border-default)] bg-[var(--bg-surface)] px-[var(--cliente-card-padding-mobile)] py-[var(--cliente-card-padding-mobile)] shadow-[var(--cliente-card-shadow)] md:px-[var(--cliente-card-padding)] md:py-[var(--cliente-card-padding)]"
+        data-tour="pulse-chart"
+      >
         <PulseChart data={data?.chartData ?? []} defaultMode={defaultChartMode} height={180} loading={loading} />
       </section>
 
       {showTopPages || showSummary ? (
-        <section className={`grid gap-6 ${showTopPages && showSummary ? 'xl:grid-cols-[1.2fr_0.8fr]' : ''}`}>
+        <section className={`grid gap-[var(--cliente-grid-gap-mobile)] md:gap-[var(--cliente-grid-gap)] ${showTopPages && showSummary ? 'xl:grid-cols-[1.2fr_0.8fr]' : ''}`}>
           {showTopPages ? <PulseTopPagesCard domain={domain} loading={loading} topPages={data?.topPages ?? []} /> : null}
           {showSummary ? (
             <PulseSummaryCard

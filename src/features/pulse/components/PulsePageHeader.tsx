@@ -26,32 +26,41 @@ export default function PulsePageHeader({
   setPeriod,
 }: PulsePageHeaderProps) {
   return (
-    <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div>
-        <h1 className="text-[22px] font-medium text-[var(--text-primary)]">Tu web este mes</h1>
+    <section
+      className="overflow-hidden rounded-[var(--cliente-card-radius)] border px-[var(--cliente-card-padding-mobile)] py-[var(--cliente-card-padding-mobile)] shadow-[var(--cliente-card-shadow)] md:px-[var(--cliente-card-padding)] md:py-[var(--cliente-card-padding)]"
+      style={{
+        background: 'var(--cliente-hero-bg)',
+        borderColor: 'var(--cliente-hero-border)',
+      }}
+    >
+      <div className="mb-4 h-px w-full" style={{ background: 'var(--cliente-hero-line)' }} />
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-[22px] font-medium text-[var(--text-primary)]">Tu web este mes</h1>
         <p className="text-[14px] leading-5 text-[var(--text-secondary)]">{dateRangeLabel}</p>
         {lastUpdatedLabel ? <p className="mt-1 text-[13px] text-[var(--text-tertiary)]">{lastUpdatedLabel}</p> : null}
-      </div>
+        </div>
 
-      <div className="flex flex-col gap-3 md:flex-row md:items-center" data-tour="pulse-period-selector">
-        <PeriodSelector disabled={!hasProject} onChange={setPeriod} value={period} />
-        <button
-          className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-2 text-sm text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={!hasProject || isRefreshing}
-          onClick={onRefreshMetrics}
-          type="button"
-        >
-          <RefreshCw className={isRefreshing ? 'animate-spin' : ''} size={14} strokeWidth={1.5} />
-          {isRefreshing ? 'Actualizando...' : 'Actualizar datos'}
-        </button>
-        <button
-          className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-2 text-sm text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={!domain}
-          onClick={onOpenSite}
-          type="button"
-        >
-          Ver mi sitio <ExternalLink size={14} strokeWidth={1.5} />
-        </button>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center" data-tour="pulse-period-selector">
+          <PeriodSelector disabled={!hasProject} onChange={setPeriod} value={period} />
+          <button
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-2 text-sm text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={!hasProject || isRefreshing}
+            onClick={onRefreshMetrics}
+            type="button"
+          >
+            <RefreshCw className={isRefreshing ? 'animate-spin' : ''} size={14} strokeWidth={1.5} />
+            {isRefreshing ? 'Actualizando...' : 'Actualizar datos'}
+          </button>
+          <button
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-2 text-sm text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={!domain}
+            onClick={onOpenSite}
+            type="button"
+          >
+            Ver mi sitio <ExternalLink size={14} strokeWidth={1.5} />
+          </button>
+        </div>
       </div>
     </section>
   );

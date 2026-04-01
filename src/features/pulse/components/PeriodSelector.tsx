@@ -16,14 +16,14 @@ const periods = [
 
 export default function PeriodSelector({ value, onChange, disabled = false }: PeriodSelectorProps) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-[var(--cliente-filter-gap)]">
       {periods.map((period) => {
         const isActive = value === period.value;
         return (
           <button
             key={period.value}
             className={cn(
-              'rounded-full border px-3 py-1.5 text-xs transition-colors',
+              'rounded-full border px-[var(--cliente-badge-padding-x)] text-xs transition-colors',
               isActive
                 ? 'border-[var(--signal-border)] bg-[var(--signal-glow)] text-[var(--signal)]'
                 : 'border-[var(--border-default)] bg-transparent text-[var(--text-tertiary)]',
@@ -31,6 +31,7 @@ export default function PeriodSelector({ value, onChange, disabled = false }: Pe
             )}
             disabled={disabled}
             onClick={() => onChange(period.value)}
+            style={{ height: 'var(--cliente-badge-height)' }}
             type="button"
           >
             <span className="md:hidden">{period.mobile ?? period.desktop}</span>
