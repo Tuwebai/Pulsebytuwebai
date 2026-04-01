@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button';
+import { AdminPageActionsBar } from '@/features/admin/components/AdminPageActionsBar';
 import { AdminUserCard } from '@/features/admin/users/components/AdminUserCard';
-import { AdminUsersHeader } from '@/features/admin/users/components/AdminUsersHeader';
+import { AdminUsersFilters } from '@/features/admin/users/components/AdminUsersFilters';
+import { AdminUsersStats } from '@/features/admin/users/components/AdminUsersStats';
 import {
   countAdminUsersByFilter,
   filterAdminUsers,
@@ -65,15 +67,21 @@ export function AdminUsersScreen({
 
   return (
     <div className="space-y-6 text-slate-100">
-      <AdminUsersHeader
-        clientUsers={clientUsers}
-        adminUsers={adminUsers}
-        activeFilter={activeFilter}
-        filterCounts={filterCounts}
-        onFilterChange={onFilterChange}
-        onAddUser={onAddUser}
-        onRefresh={onRefresh}
-      />
+      <AdminPageActionsBar
+        actions={(
+          <Button onClick={onAddUser} className="bg-sky-500 text-slate-950 hover:bg-sky-400">
+            Agregar usuario
+          </Button>
+        )}
+      >
+        <AdminUsersFilters
+          activeFilter={activeFilter}
+          filterCounts={filterCounts}
+          onFilterChange={onFilterChange}
+        />
+      </AdminPageActionsBar>
+
+      <AdminUsersStats clientUsers={clientUsers} adminUsers={adminUsers} filterCounts={filterCounts} />
 
       {loading ? (
         <section className="rounded-[28px] border border-white/10 bg-[var(--bg-surface)]/90 px-6 py-16 text-center shadow-[0_18px_40px_rgba(2,6,23,0.24)]">

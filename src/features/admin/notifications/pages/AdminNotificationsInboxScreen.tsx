@@ -1,7 +1,8 @@
 import { useDeferredValue, useEffect, useMemo, useState } from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useApp } from '@/contexts/AppContext';
 import {
@@ -11,6 +12,7 @@ import {
   openInboxPrimaryAction,
   type CounterFilterId,
 } from '@/features/admin/notifications/adminInbox.utils';
+import { AdminPageActionsBar } from '@/features/admin/components/AdminPageActionsBar';
 import { AdminInboxCounters } from '@/features/admin/notifications/components/AdminInboxCounters';
 import { AdminInboxEventDetail } from '@/features/admin/notifications/components/AdminInboxEventDetail';
 import { AdminInboxEventRow } from '@/features/admin/notifications/components/AdminInboxEventRow';
@@ -18,7 +20,6 @@ import {
   AdminInboxFilters,
   type InboxSegmentId,
 } from '@/features/admin/notifications/components/AdminInboxFilters';
-import { AdminNotificationsHeader } from '@/features/admin/notifications/components/AdminNotificationsHeader';
 import { useAdminNotificationsInbox } from '@/features/admin/notifications/hooks/useAdminNotificationsInbox';
 import { useInboxRealtime } from '@/features/admin/notifications/hooks/useInboxRealtime';
 
@@ -67,31 +68,27 @@ export function AdminNotificationsInboxScreen() {
     }
   }, [events, selectedEventId]);
 
-  const selectedEvent = useMemo(
-    () => events.find((event) => event.id === selectedEventId) ?? null,
-    [events, selectedEventId],
-  );
-
+  const selectedEvent = useMemo(() => events.find((event) => event.id === selectedEventId) ?? null, [events, selectedEventId]);
   const safeCounts = counts ?? EMPTY_COUNTS;
 
   return (
     <div className="space-y-4 sm:space-y-5">
-      <AdminNotificationsHeader
-        openTotal={safeCounts.open_total}
-        criticalTotal={safeCounts.critical_open}
-        inProgressTotal={safeCounts.in_progress}
-        onSync={() => syncSources()}
-        isSyncing={isSyncingSources}
+      <AdminPageActionsBar
+        actions={(
+          <Button
+            variant="outline"
+            onClick={() => syncSources()}
+            disabled={isSyncingSources}
+            className="border-white/10 bg-slate-950/55 text-slate-100 hover:border-sky-400/25 hover:bg-slate-900 disabled:opacity-60"
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isSyncingSources ? 'animate-spin' : ''}`} />
+            {isSyncingSources ? 'Actualizando eventos' : 'Actualizar eventos'}
+          </Button>
+        )}
       />
 
       <AdminInboxCounters counts={safeCounts} activeCounter={activeCounter} onSelect={setActiveCounter} />
-
-      <AdminInboxFilters
-        activeSegment={activeSegment}
-        search={search}
-        onSearchChange={setSearch}
-        onSelectSegment={setActiveSegment}
-      />
+      <AdminInboxFilters activeSegment={activeSegment} search={search} onSearchChange={setSearch} onSelectSegment={setActiveSegment} />
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,55%)_minmax(0,45%)]">
         <section className="space-y-3 rounded-[22px] border border-white/10 bg-[var(--bg-surface)]/92 px-4 py-4 shadow-[0_14px_30px_rgba(2,6,23,0.22)]">

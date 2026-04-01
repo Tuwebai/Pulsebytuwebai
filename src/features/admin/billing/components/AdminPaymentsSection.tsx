@@ -1,20 +1,12 @@
-import { CreditCard } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { AdminPaymentRecord } from '@/api/admin/adminDashboard.api';
-import { Badge, MetricCard, PulseFeedbackState } from '@/core/components';
-import {
-  getAdminPaymentCustomerEmail,
-  getAdminPaymentCustomerLabel,
-  getAdminPaymentDisplayName,
-} from '../adminPayments.helpers';
+import { PulseFeedbackState } from '@/core/components';
+import { AdminPaymentRow } from '@/features/admin/billing/components/AdminPaymentRow';
+import { AdminPaymentsStats } from '@/features/admin/billing/components/AdminPaymentsStats';
 import {
   formatAdminPaymentAmount,
-  getAdminPaymentStatusLabel,
-  getAdminPaymentStatusVariant,
   getApprovedAdminPaymentsTotal,
   getPendingAdminPaymentsCount,
-  normalizeAdminPaymentStatus,
-} from '../adminPayments.utils';
+} from '@/features/admin/billing/adminPayments.utils';
 
 interface AdminPaymentsSectionProps {
   payments: AdminPaymentRecord[];
@@ -27,6 +19,7 @@ export function AdminPaymentsSection({
 }: AdminPaymentsSectionProps) {
   const pendingPayments = getPendingAdminPaymentsCount(payments);
   const approvedTotal = getApprovedAdminPaymentsTotal(payments);
+  const approvedTotalLabel = formatAdminPaymentAmount(approvedTotal);
 
   if (payments.length === 0) {
     return (
@@ -39,72 +32,34 @@ export function AdminPaymentsSection({
   }
 
   return (
-    <section className="space-y-5">
-      <div className="flex items-start gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[var(--bg-elevated)]">
-          <CreditCard className="h-5 w-5 text-[var(--signal)]" strokeWidth={1.5} />
-        </div>
-        <div>
-          <h2 className="text-xl font-semibold text-[var(--text-primary)]">Pagos del sistema</h2>
-          <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            Revisa el estado real de los cobros y actualiza el seguimiento cuando haga falta.
-          </p>
-        </div>
-      </div>
+    <div className="space-y-4 sm:space-y-5">
+      <AdminPaymentsStats
+        totalPayments={payments.length}
+        approvedTotalLabel={approvedTotalLabel}
+        pendingPayments={pendingPayments}
+      />
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <MetricCard label="Pagos registrados" period="base total" value={payments.length} />
-        <MetricCard label="Monto acreditado" period="solo pagos aprobados" value={formatAdminPaymentAmount(approvedTotal)} />
-        <MetricCard label="Pendientes" period="requieren seguimiento" value={pendingPayments} />
-      </div>
+      <section className="rounded-[22px] border border-white/10 bg-[var(--bg-surface)]/92 px-4 py-4 shadow-[0_14px_30px_rgba(2,6,23,0.22)]">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+          Bandeja activa
+        </p>
+        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-50">
+          Cobros visibles ({payments.length})
+        </h2>
+        <p className="mt-1 text-sm text-slate-300">
+          Actualizá el estado de cada cobro sin salir del flujo operativo.
+        </p>
 
-      <div className="overflow-hidden rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)]">
-        <div className="grid grid-cols-[minmax(0,1.6fr)_minmax(120px,0.8fr)_minmax(120px,0.9fr)] gap-4 border-b border-[var(--border-subtle)] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
-          <span>Movimiento</span>
-          <span>Estado</span>
-          <span>Actualizar</span>
-        </div>
-
-        <div className="divide-y divide-[var(--border-subtle)]">
+        <div className="mt-4 space-y-3">
           {payments.map((payment) => (
-            <div
-              className="grid grid-cols-1 gap-4 px-5 py-4 md:grid-cols-[minmax(0,1.6fr)_minmax(120px,0.8fr)_minmax(120px,0.9fr)]"
+            <AdminPaymentRow
               key={payment.id}
-            >
-              <div>
-                <p className="text-sm font-medium text-[var(--text-primary)]">{getAdminPaymentDisplayName(payment)}</p>
-                <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                  {formatAdminPaymentAmount(payment.amount)} · {new Date(payment.created_at).toLocaleDateString('es-AR')}
-                </p>
-                <p className="mt-1 text-xs text-[var(--text-tertiary)]">{getAdminPaymentCustomerLabel(payment)}</p>
-                {getAdminPaymentCustomerEmail(payment) ? (
-                  <p className="text-xs text-[var(--text-tertiary)]">{getAdminPaymentCustomerEmail(payment)}</p>
-                ) : null}
-              </div>
-
-              <div className="flex items-center">
-                <Badge variant={getAdminPaymentStatusVariant(payment.status)}>{getAdminPaymentStatusLabel(payment.status)}</Badge>
-              </div>
-
-              <Select
-                value={normalizeAdminPaymentStatus(payment.status)}
-                onValueChange={(value) => void onUpdatePaymentStatus(payment.id, value)}
-              >
-                <SelectTrigger className="w-full text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pendiente</SelectItem>
-                  <SelectItem value="approved">Acreditado</SelectItem>
-                  <SelectItem value="in_process">En revisión</SelectItem>
-                  <SelectItem value="rejected">Rechazado</SelectItem>
-                  <SelectItem value="cancelled">Cancelado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              payment={payment}
+              onUpdatePaymentStatus={onUpdatePaymentStatus}
+            />
           ))}
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

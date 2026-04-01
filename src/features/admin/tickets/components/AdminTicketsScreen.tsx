@@ -1,10 +1,10 @@
 import { Ticket } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { AdminPageActionsBar } from '@/features/admin/components/AdminPageActionsBar';
 import { AdminTicketFormDialog } from '@/features/admin/tickets/components/AdminTicketFormDialog';
 import { AdminTicketResponseDialog } from '@/features/admin/tickets/components/AdminTicketResponseDialog';
 import { AdminTicketsFilters } from '@/features/admin/tickets/components/AdminTicketsFilters';
-import { AdminTicketsHeader } from '@/features/admin/tickets/components/AdminTicketsHeader';
 import { AdminTicketsList } from '@/features/admin/tickets/components/AdminTicketsList';
 import { AdminTicketsStats } from '@/features/admin/tickets/components/AdminTicketsStats';
 import { useAdminTicketsScreen } from '@/features/admin/tickets/hooks/useAdminTicketsScreen';
@@ -15,11 +15,12 @@ export default function AdminTicketsScreen(props: AdminTicketsScreenProps) {
 
   return (
     <div className="space-y-6 text-slate-100">
-      <AdminTicketsHeader
-        lastUpdate={props.lastUpdate}
-        stats={screen.stats}
-        onCreate={screen.openCreateForm}
-        onRefresh={props.refreshData}
+      <AdminPageActionsBar
+        actions={(
+          <Button onClick={screen.openCreateForm} className="bg-sky-500 text-slate-950 hover:bg-sky-400">
+            Nuevo ticket
+          </Button>
+        )}
       />
 
       <AdminTicketsStats stats={screen.stats} />

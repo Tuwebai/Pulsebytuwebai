@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-
 import { AlertCircle } from 'lucide-react';
 
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { ProjectPagination } from '@/components/admin/ProjectPagination';
+import { AdminPageActionsBar } from '@/features/admin/components/AdminPageActionsBar';
 import { AdminProjectsEmptyState } from '@/features/admin/projects/components/AdminProjectsEmptyState';
 import { AdminProjectsGrid } from '@/features/admin/projects/components/AdminProjectsGrid';
-import { AdminProjectsHeader } from '@/features/admin/projects/components/AdminProjectsHeader';
 import { AdminProjectsOverlays } from '@/features/admin/projects/components/AdminProjectsOverlays';
+import { AdminProjectsStats } from '@/features/admin/projects/components/AdminProjectsStats';
 import { useAdminProjectsScreen } from '@/features/admin/projects/hooks/useAdminProjectsScreen';
 
 export function AdminProjectsScreen() {
@@ -69,15 +69,26 @@ export function AdminProjectsScreen() {
 
   return (
     <div className="space-y-6">
-      <AdminProjectsHeader
+      <AdminPageActionsBar
+        actions={(
+          <button
+            type="button"
+            onClick={openCreateForm}
+            className="rounded-xl bg-sky-500 px-4 py-2.5 text-sm font-medium text-slate-950 transition-colors hover:bg-sky-400"
+          >
+            Nuevo proyecto
+          </button>
+        )}
+      />
+
+      <AdminProjectsStats
         total={stats.total}
         inProgress={stats.inProgress}
         inProduction={stats.inProduction}
         paused={stats.paused}
-        onCreate={openCreateForm}
       />
 
-      {error && (
+      {error ? (
         <section className="rounded-[24px] border border-danger/20 bg-danger/10 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-danger/20 text-danger">
@@ -89,7 +100,7 @@ export function AdminProjectsScreen() {
             </div>
           </div>
         </section>
-      )}
+      ) : null}
 
       {projects.length === 0 ? (
         <AdminProjectsEmptyState onCreate={openCreateForm} />
