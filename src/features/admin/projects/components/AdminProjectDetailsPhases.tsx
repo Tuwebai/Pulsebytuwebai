@@ -21,7 +21,7 @@ export function AdminProjectDetailsPhases({ project }: AdminProjectDetailsPhases
 
   if (phases.length === 0) {
     return (
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <h3 className="text-sm font-semibold text-[var(--text-primary)]">Fases operativas</h3>
         <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
           Este proyecto todavía no tiene fases cargadas en la base operativa.
@@ -31,15 +31,15 @@ export function AdminProjectDetailsPhases({ project }: AdminProjectDetailsPhases
   }
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+    <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold text-[var(--text-primary)]">Fases operativas</h3>
         <span className="text-xs font-medium text-[var(--text-tertiary)]">{phases.length} registradas</span>
       </div>
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-3 space-y-2.5">
         {phases.map((phase) => (
-          <article key={phase.key} className="rounded-2xl border border-white/10 bg-[var(--bg-surface)]/70 p-4">
+          <article key={phase.key} className="rounded-2xl border border-white/10 bg-[var(--bg-surface)]/70 p-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-[var(--text-primary)]">{phase.key}</p>

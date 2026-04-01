@@ -17,7 +17,7 @@ export function AdminProjectCardMetrics({ project }: AdminProjectCardMetricsProp
   const tasks = project.tareas?.length ?? 0;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="space-y-2">
         <div className="flex items-center justify-between text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
           <span>Avance operativo</span>
@@ -32,13 +32,13 @@ export function AdminProjectCardMetrics({ project }: AdminProjectCardMetricsProp
         </div>
       </div>
 
-      <dl className="grid grid-cols-2 gap-3">
+      <dl className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
           <dt className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
             <Wrench className="h-3.5 w-3.5" />
             Tecnologías
           </dt>
-          <dd className="mt-2 text-sm font-medium text-[var(--text-primary)]">{technologies} activas</dd>
+          <dd className="mt-1.5 text-sm font-medium text-[var(--text-primary)]">{technologies} activas</dd>
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
@@ -46,7 +46,7 @@ export function AdminProjectCardMetrics({ project }: AdminProjectCardMetricsProp
             <Layers2 className="h-3.5 w-3.5" />
             Tareas
           </dt>
-          <dd className="mt-2 text-sm font-medium text-[var(--text-primary)]">{tasks} registradas</dd>
+          <dd className="mt-1.5 text-sm font-medium text-[var(--text-primary)]">{tasks} registradas</dd>
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
@@ -54,7 +54,7 @@ export function AdminProjectCardMetrics({ project }: AdminProjectCardMetricsProp
             <CalendarDays className="h-3.5 w-3.5" />
             Última actualización
           </dt>
-          <dd className="mt-2 text-sm font-medium text-[var(--text-primary)]">
+          <dd className="mt-1.5 text-sm font-medium text-[var(--text-primary)]">
             {formatOperationalDate(project.updated_at)}
           </dd>
         </div>
@@ -64,7 +64,7 @@ export function AdminProjectCardMetrics({ project }: AdminProjectCardMetricsProp
             <Gauge className="h-3.5 w-3.5" />
             Prioridad
           </dt>
-          <dd className="mt-2 text-sm font-medium text-[var(--text-primary)]">
+          <dd className="mt-1.5 text-sm font-medium text-[var(--text-primary)]">
             {project.priority ? project.priority.toUpperCase() : 'Normal'}
           </dd>
         </div>

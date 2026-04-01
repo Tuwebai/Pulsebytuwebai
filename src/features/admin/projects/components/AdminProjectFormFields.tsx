@@ -24,8 +24,8 @@ export function AdminProjectFormFields({
   onRemoveTechnology,
 }: AdminProjectFormFieldsProps) {
   return (
-    <div className="space-y-5">
-      <div className="grid gap-5 md:grid-cols-2">
+    <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label className="text-sm font-medium text-[var(--text-primary)]">Nombre del proyecto</Label>
           <Input
@@ -59,7 +59,7 @@ export function AdminProjectFormFields({
           value={formData.description || ''}
           onChange={(event) => onChange('description', event.target.value)}
           placeholder="Contexto, entregable y foco del proyecto."
-          className="min-h-[120px] border-white/10 bg-white/[0.03] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
+          className="min-h-[104px] border-white/10 bg-white/[0.03] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
         />
       </div>
 

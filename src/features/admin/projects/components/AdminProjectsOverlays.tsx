@@ -1,6 +1,6 @@
-import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import type { CreateProjectData, Project, UpdateProjectData } from '@/types/project.types';
 
+import { AdminProjectDeleteDialog } from '@/features/admin/projects/components/AdminProjectDeleteDialog';
 import { AdminProjectDetailsDialog } from '@/features/admin/projects/components/AdminProjectDetailsDialog';
 import { AdminProjectFormDialog } from '@/features/admin/projects/components/AdminProjectFormDialog';
 
@@ -50,16 +50,11 @@ export function AdminProjectsOverlays({
         onClose={onCloseDetails}
       />
 
-      <ConfirmationDialog
-        isOpen={showConfirmDelete}
+      <AdminProjectDeleteDialog
+        open={showConfirmDelete}
+        project={projectToDelete}
         onClose={onCancelDelete}
         onConfirm={onConfirmDelete}
-        title="Confirmar eliminacion"
-        description={`Estas seguro de que quieres eliminar el proyecto "${projectToDelete?.name}"? Esta accion no se puede deshacer.`}
-        confirmText="Eliminar"
-        cancelText="Cancelar"
-        variant="destructive"
-        loading={false}
       />
     </>
   );

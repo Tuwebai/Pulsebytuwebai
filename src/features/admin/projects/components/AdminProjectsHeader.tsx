@@ -18,25 +18,30 @@ export function AdminProjectsHeader({
   onCreate,
 }: AdminProjectsHeaderProps) {
   return (
-    <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur sm:p-6">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <section className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(135deg,rgba(59,158,245,0.12),rgba(123,76,212,0.08)_48%,rgba(17,24,39,0.96)_100%)] p-5 shadow-[0_24px_60px_rgba(2,6,23,0.35)] sm:p-6">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-sky-400 via-violet-400/70 to-transparent" />
+
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-4">
           <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-signal/20 bg-signal/12 text-signal shadow-[0_0_0_1px_rgba(59,158,245,0.12)]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-signal/15 text-signal">
               <FolderOpen className="h-5 w-5" />
             </div>
-            <div className="space-y-1">
-              <h1 className="text-2xl font-semibold tracking-tight text-[var(--text-primary)] sm:text-3xl">
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
+                Pulse admin · proyectos
+              </p>
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">
                 Proyectos
               </h1>
-              <p className="max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
+              <p className="max-w-2xl text-sm leading-6 text-slate-300">
                 Seguimiento operativo de entregas, bloqueos y estado real de cada proyecto.
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-slate-100">
               <Sparkles className="h-3.5 w-3.5 text-signal" />
               {total} proyectos registrados
             </div>
@@ -46,7 +51,7 @@ export function AdminProjectsHeader({
             </div>
             <div className="inline-flex items-center gap-2 rounded-full border border-sky-400/15 bg-sky-500/10 px-3 py-1.5 text-xs font-medium text-sky-300">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              {inProduction} en produccion
+              {inProduction} en producción
             </div>
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/15 bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-300">
               <PauseCircle className="h-3.5 w-3.5" />
@@ -57,7 +62,7 @@ export function AdminProjectsHeader({
 
         <Button
           onClick={onCreate}
-          className="w-full rounded-xl border border-signal/20 bg-signal text-white shadow-[0_12px_30px_rgba(59,158,245,0.2)] hover:bg-signal/90 sm:w-auto"
+          className="w-full rounded-xl bg-sky-500 text-slate-950 hover:bg-sky-400 sm:w-auto"
         >
           <Plus className="mr-2 h-4 w-4" />
           Nuevo proyecto

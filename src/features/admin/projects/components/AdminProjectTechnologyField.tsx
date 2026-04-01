@@ -19,7 +19,7 @@ export function AdminProjectTechnologyField({
   onRemove,
 }: AdminProjectTechnologyFieldProps) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       <div className="flex gap-2">
         <Input
           value={draft}
@@ -36,7 +36,8 @@ export function AdminProjectTechnologyField({
         <Button
           type="button"
           variant="outline"
-          className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:bg-white/[0.06]"
+          size="sm"
+          className="rounded-xl border-white/10 bg-white/[0.03] px-3 text-[var(--text-primary)] hover:bg-white/[0.06]"
           onClick={onAdd}
         >
           <Plus className="h-4 w-4" />
