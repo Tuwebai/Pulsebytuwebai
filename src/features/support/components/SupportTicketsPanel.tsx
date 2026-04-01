@@ -1,179 +1,89 @@
 import { MessageSquareText, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Badge from '@/core/components/Badge';
 import Skeleton from '@/core/components/Skeleton';
-import { formatDateSafe } from '@/utils/formatDateSafe';
-import { getPriorityLabel, getPriorityVariant, getStatusLabel, getStatusVariant } from '../support.utils';
 import type { Ticket } from '../types';
+import SupportTicketCard from './SupportTicketCard';
 
 interface SupportTicketsPanelProps {
-  loading: boolean;
   error: string | null;
-  tickets: Ticket[];
-  userEmail: string;
+  loading: boolean;
   onReply: (ticketId: string) => void;
   onRetry: () => void;
-}
-
-function TicketResponseBlock({
-  title,
-  content,
-  meta,
-  color,
-  icon
-}: {
-  title: string;
-  content: string;
-  meta?: string;
-  color: 'signal' | 'success';
-  icon: React.ReactNode;
-}) {
-  const colors =
-    color === 'signal'
-      ? 'border-[color:rgba(59,158,245,0.28)] bg-[color:rgba(59,158,245,0.10)]'
-      : 'border-[color:rgba(34,197,94,0.28)] bg-[color:rgba(34,197,94,0.10)]';
-
-  return (
-    <div className={`rounded-[16px] border px-4 py-3 ${colors}`}>
-      <div className="flex items-center gap-2">
-        {icon}
-        <p className="text-[13px] font-medium text-[var(--text-primary)]">{title}</p>
-      </div>
-      <p className="mt-2 text-[13px] leading-5 text-[var(--text-secondary)]">{content}</p>
-      {meta ? <p className="mt-2 text-[12px] text-[var(--text-tertiary)]">{meta}</p> : null}
-    </div>
-  );
+  tickets: Ticket[];
+  userEmail: string;
 }
 
 export default function SupportTicketsPanel({
-  loading,
   error,
+  loading,
+  onReply,
+  onRetry,
   tickets,
   userEmail,
-  onReply,
-  onRetry
 }: SupportTicketsPanelProps) {
   return (
-    <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)]">
-      <div className="border-b border-[var(--border-subtle)] px-5 py-4">
-        <h2 className="text-[16px] font-medium text-[var(--text-primary)]">Historial de tickets</h2>
-        <p className="mt-1 text-[13px] text-[var(--text-secondary)]">Seguí el estado y la conversación con el equipo.</p>
+    <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/92 p-4 shadow-[0_18px_40px_rgba(2,6,23,0.24)] sm:p-5">
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Bandeja activa</p>
+        <h2 className="mt-2 text-xl font-medium text-slate-50">Historial de tickets</h2>
+        <p className="mt-1 text-sm text-slate-400">Seguimiento de tus consultas y respuestas del equipo.</p>
       </div>
 
-      <div className="px-5 py-4">
-        {loading ? (
-          <div className="space-y-4">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="rounded-[18px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4">
-                <Skeleton height="16px" rounded="sm" width="180px" />
-                <div className="mt-3 space-y-2">
-                  <Skeleton height="14px" rounded="sm" width="100%" />
-                  <Skeleton height="14px" rounded="sm" width="85%" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : null}
-
-        {!loading && error ? (
-          <div className="rounded-[18px] border border-[color:rgba(239,68,68,0.28)] bg-[color:rgba(239,68,68,0.10)] px-4 py-5">
-            <p className="text-[14px] font-medium text-[var(--text-primary)]">No pudimos cargar tus tickets</p>
-            <p className="mt-1 text-[13px] text-[var(--text-secondary)]">{error}</p>
-            <Button
-              className="mt-4 rounded-[10px] bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]"
-              type="button"
-              onClick={onRetry}
-            >
-              <RefreshCcw className="mr-2 h-4 w-4" strokeWidth={1.5} />
-              Reintentar
-            </Button>
-          </div>
-        ) : null}
-
-        {!loading && !error && tickets.length === 0 ? (
-          <div className="flex min-h-[260px] flex-col items-center justify-center px-6 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-elevated)]">
-              <MessageSquareText className="h-7 w-7 text-[var(--text-tertiary)]" strokeWidth={1.5} />
-            </div>
-            <p className="mt-4 text-[16px] font-medium text-[var(--text-primary)]">No tenés tickets de soporte</p>
-            <p className="mt-1 max-w-[320px] text-[13px] leading-5 text-[var(--text-secondary)]">
-              Cuando envíes tu primera consulta, la vas a ver acá con su estado y respuestas.
-            </p>
-          </div>
-        ) : null}
-
+      <div className="mt-5">
+        {loading ? <SupportTicketsSkeleton /> : null}
+        {!loading && error ? <SupportTicketsError error={error} onRetry={onRetry} /> : null}
+        {!loading && !error && tickets.length === 0 ? <SupportTicketsEmptyState /> : null}
         {!loading && !error && tickets.length > 0 ? (
-          <div className="divide-y divide-[var(--border-subtle)]">
+          <div className="space-y-3">
             {tickets.map((ticket) => (
-              <article className="py-4 first:pt-0 last:pb-0" key={ticket.id}>
-                <div className="rounded-[18px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-4 py-4 transition-colors hover:bg-[var(--bg-subtle)]">
-                  <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-[15px] font-medium text-[var(--text-primary)]">{ticket.title}</h3>
-                      <p className="mt-2 text-[13px] leading-5 text-[var(--text-secondary)]">{ticket.description}</p>
-                      <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px] text-[var(--text-tertiary)]">
-                        <span>{formatDateSafe(ticket.created_at)}</span>
-                        <span className="h-1 w-1 rounded-full bg-[var(--text-tertiary)]" />
-                        <span>{userEmail}</span>
-                        <span className="h-1 w-1 rounded-full bg-[var(--text-tertiary)]" />
-                        <span className="font-data">#{ticket.id.slice(-6).toUpperCase()}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge size="sm" variant={getPriorityVariant(ticket.priority)}>
-                        {getPriorityLabel(ticket.priority)}
-                      </Badge>
-                      <Badge size="sm" variant={getStatusVariant(ticket.status)}>
-                        {getStatusLabel(ticket.status)}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 space-y-3">
-                    {ticket.respuesta ? (
-                      <TicketResponseBlock
-                        color="signal"
-                        content={ticket.respuesta}
-                        icon={<MessageSquareText className="h-4 w-4 text-[var(--signal)]" strokeWidth={1.5} />}
-                        meta={
-                          ticket.respondido_por
-                            ? `Respondido por ${ticket.respondido_por}${ticket.fecha_respuesta ? ` · ${formatDateSafe(ticket.fecha_respuesta)}` : ''}`
-                            : ticket.fecha_respuesta
-                              ? formatDateSafe(ticket.fecha_respuesta)
-                              : undefined
-                        }
-                        title="Respuesta del equipo"
-                      />
-                    ) : null}
-
-                    {ticket.respuesta_cliente ? (
-                      <TicketResponseBlock
-                        color="success"
-                        content={ticket.respuesta_cliente}
-                        icon={<MessageSquareText className="h-4 w-4 text-[var(--success)]" strokeWidth={1.5} />}
-                        meta={ticket.fecha_respuesta_cliente ? formatDateSafe(ticket.fecha_respuesta_cliente) : undefined}
-                        title="Tu respuesta"
-                      />
-                    ) : null}
-                  </div>
-
-                  {ticket.respuesta && ticket.status !== 'closed' ? (
-                    <Button
-                      className="mt-4 rounded-[10px] bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]"
-                      type="button"
-                      onClick={() => onReply(ticket.id)}
-                    >
-                      <MessageSquareText className="mr-2 h-4 w-4" strokeWidth={1.5} />
-                      Responder
-                    </Button>
-                  ) : null}
-                </div>
-              </article>
+              <SupportTicketCard key={ticket.id} onReply={onReply} ticket={ticket} userEmail={userEmail} />
             ))}
           </div>
         ) : null}
       </div>
     </section>
+  );
+}
+
+function SupportTicketsSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div className="rounded-[22px] border border-white/10 bg-[var(--bg-surface)]/92 p-4 shadow-[0_14px_30px_rgba(2,6,23,0.22)]" key={index}>
+          <Skeleton height="16px" rounded="sm" width="180px" />
+          <div className="mt-3 space-y-2">
+            <Skeleton height="14px" rounded="sm" width="100%" />
+            <Skeleton height="14px" rounded="sm" width="85%" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SupportTicketsError({ error, onRetry }: { error: string; onRetry: () => void }) {
+  return (
+    <div className="rounded-[22px] border border-rose-500/20 bg-rose-500/10 px-4 py-5">
+      <p className="text-[14px] font-medium text-slate-100">No pudimos cargar tus tickets</p>
+      <p className="mt-1 text-[13px] text-slate-400">{error}</p>
+      <Button className="mt-4 h-10 rounded-full bg-signal text-white hover:bg-[var(--signal-dim)]" onClick={onRetry} type="button">
+        <RefreshCcw className="mr-2 h-4 w-4" strokeWidth={1.5} />
+        Reintentar
+      </Button>
+    </div>
+  );
+}
+
+function SupportTicketsEmptyState() {
+  return (
+    <div className="flex min-h-[260px] flex-col items-center justify-center px-6 text-center">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-elevated)]">
+        <MessageSquareText className="h-7 w-7 text-slate-500" strokeWidth={1.5} />
+      </div>
+      <p className="mt-4 text-[16px] font-medium text-slate-100">Todavía no tienes tickets</p>
+      <p className="mt-1 max-w-[320px] text-[13px] leading-5 text-slate-400">
+        Cuando envíes tu primera consulta, la vas a ver acá con su estado y las respuestas del equipo.
+      </p>
+    </div>
   );
 }

@@ -1,47 +1,12 @@
+import type { ReactNode } from 'react';
 import { Clock3, Mail, MessageCircleHeart } from 'lucide-react';
 import { SUPPORT_CONTACT } from '@/config/supportContact';
-import { AccentIcon } from '@/core/components';
-
-const contactToneGlowMap = {
-  danger:
-    'shadow-[0_0_0_1px_var(--danger-dim),0_0_18px_color-mix(in_srgb,var(--danger)_34%,transparent),0_10px_28px_rgba(0,0,0,0.24)]',
-  success:
-    'shadow-[0_0_0_1px_var(--success-dim),0_0_20px_color-mix(in_srgb,var(--success)_38%,transparent),0_10px_28px_rgba(0,0,0,0.24)]',
-  warning:
-    'shadow-[0_0_0_1px_var(--warning-dim),0_0_18px_color-mix(in_srgb,var(--warning)_36%,transparent),0_10px_28px_rgba(0,0,0,0.24)]',
-  signal:
-    'shadow-[0_0_0_1px_var(--signal-glow),0_0_18px_color-mix(in_srgb,var(--signal)_34%,transparent),0_10px_28px_rgba(0,0,0,0.24)]',
-} as const;
-
-function ContactRow({
-  icon,
-  title,
-  value,
-  tone,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  value: string;
-  tone: 'signal' | 'success' | 'warning' | 'danger';
-}) {
-  return (
-    <div className="flex items-center gap-3 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-4 py-3">
-      <AccentIcon className={contactToneGlowMap[tone]} tone={tone}>
-        {icon}
-      </AccentIcon>
-      <div>
-        <p className="text-[13px] font-medium text-[var(--text-primary)]">{title}</p>
-        <p className="text-[13px] text-[var(--text-secondary)]">{value}</p>
-      </div>
-    </div>
-  );
-}
 
 function WhatsAppIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-[18px] w-[18px] drop-shadow-[0_0_10px_rgba(34,197,94,0.42)]"
+      className="h-[18px] w-[18px]"
       style={{ color: '#22C55E' }}
       viewBox="0 0 24 24"
       fill="currentColor"
@@ -57,40 +22,68 @@ interface SupportContactPanelProps {
 
 export default function SupportContactPanel({ projectsCount }: SupportContactPanelProps) {
   return (
-    <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
+    <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/92 p-4 shadow-[0_18px_40px_rgba(2,6,23,0.24)] sm:p-5">
       <div className="flex items-start gap-3">
-        <AccentIcon size="md" tone="signal">
-          <MessageCircleHeart className="h-5 w-5 text-[var(--signal)]" strokeWidth={1.5} />
-        </AccentIcon>
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-signal/15 text-signal">
+          <MessageCircleHeart className="h-4 w-4" strokeWidth={1.6} />
+        </div>
         <div>
-          <h2 className="text-[16px] font-medium text-[var(--text-primary)]">Canales de soporte</h2>
-          <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">
-            Estamos disponibles para ayudarte con dudas de tu web, pagos o seguimiento del proyecto.
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Canales activos</p>
+          <h2 className="mt-2 text-lg font-medium text-slate-100">Cómo hablar con el equipo</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-400">
+            Si necesitas ayuda con tu web, pagos o seguimiento, acá tienes los canales disponibles.
           </p>
-          <p className="mt-2 text-[13px] leading-5 text-[var(--text-secondary)]">Proyectos asociados: {projectsCount}</p>
         </div>
       </div>
 
-      <div className="mt-5 space-y-3">
+      <div className="mt-5 grid gap-3">
         <ContactRow
-          icon={<Mail className="h-4 w-4 text-white" strokeWidth={1.8} />}
-          tone="danger"
-          title="Email"
+          icon={<Mail className="h-4 w-4 text-white" strokeWidth={1.7} />}
+          title="Email principal"
+          toneClassName="bg-rose-500/15 text-rose-300"
           value={SUPPORT_CONTACT.publicEmail}
         />
         <ContactRow
           icon={<WhatsAppIcon />}
-          tone="success"
-          title="Teléfono"
+          title="WhatsApp"
+          toneClassName="bg-emerald-500/15 text-emerald-300"
           value={SUPPORT_CONTACT.phoneDisplay}
         />
         <ContactRow
-          icon={<Clock3 className="h-[18px] w-[18px] text-[#FBBF24]" strokeWidth={1.85} />}
-          tone="warning"
+          icon={<Clock3 className="h-4 w-4 text-amber-300" strokeWidth={1.7} />}
           title="Horario de atención"
+          toneClassName="bg-amber-500/15 text-amber-300"
           value={SUPPORT_CONTACT.hoursDisplay}
         />
       </div>
+
+      <div className="mt-5 rounded-[18px] border border-white/10 bg-[var(--bg-elevated)]/55 px-4 py-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">Contexto actual</p>
+        <p className="mt-2 text-sm font-medium text-slate-100">Proyectos asociados: {projectsCount}</p>
+        <p className="mt-1 text-xs text-slate-400">Esto nos ayuda a responder con más contexto cuando abras una consulta.</p>
+      </div>
     </section>
+  );
+}
+
+function ContactRow({
+  icon,
+  title,
+  toneClassName,
+  value,
+}: {
+  icon: ReactNode;
+  title: string;
+  toneClassName: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 rounded-[18px] border border-white/10 bg-[var(--bg-elevated)]/55 px-4 py-3">
+      <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${toneClassName}`}>{icon}</div>
+      <div>
+        <p className="text-sm font-medium text-slate-100">{title}</p>
+        <p className="mt-1 text-sm text-slate-400">{value}</p>
+      </div>
+    </div>
   );
 }

@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import {
   SupportContactPanel,
+  SupportHeader,
   SupportResponseModal,
   SupportSummaryRow,
   SupportTicketForm,
@@ -18,14 +19,9 @@ export default function SupportPage() {
   return (
     <>
       <div className="space-y-6">
-        <section className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between" data-tour="support-header">
-          <div>
-            <h1 className="text-[22px] font-semibold text-[var(--text-primary)]">Soporte</h1>
-            <p className="mt-1 text-sm text-[var(--text-secondary)]">
-              Hacé seguimiento de tus consultas y mantené la conversación con el equipo en un solo lugar.
-            </p>
-          </div>
-        </section>
+        <div data-tour="support-header">
+          <SupportHeader />
+        </div>
 
         <div data-tour="support-summary">
           <SupportSummaryRow
@@ -35,7 +31,7 @@ export default function SupportPage() {
           />
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+        <div className="grid gap-4 xl:grid-cols-[0.92fr_1.08fr]">
           <div data-tour="support-contact">
             <SupportContactPanel projectsCount={support.projectsCount} />
           </div>

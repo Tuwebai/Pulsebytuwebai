@@ -1,41 +1,74 @@
+import type { ReactNode } from 'react';
 import { CheckCircle2, Clock3, MessageSquareMore } from 'lucide-react';
-import { AccentIcon, MetricCard } from '@/core/components';
 
 interface SupportSummaryRowProps {
+  closedCount: number;
   openCount: number;
   progressCount: number;
-  closedCount: number;
 }
 
-export default function SupportSummaryRow({ openCount, progressCount, closedCount }: SupportSummaryRowProps) {
+export default function SupportSummaryRow({
+  closedCount,
+  openCount,
+  progressCount,
+}: SupportSummaryRowProps) {
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      <div className="relative">
-        <MetricCard className="pr-16" label="Tickets abiertos" period="esperando respuesta" value={openCount} />
-        <div className="pointer-events-none absolute right-5 top-5">
-          <AccentIcon tone="signal">
-            <Clock3 size={18} strokeWidth={1.75} />
-          </AccentIcon>
-        </div>
-      </div>
-
-      <div className="relative">
-        <MetricCard className="pr-16" label="En progreso" period="con intercambio activo" value={progressCount} />
-        <div className="pointer-events-none absolute right-5 top-5">
-          <AccentIcon tone="warning">
-            <MessageSquareMore size={18} strokeWidth={1.75} />
-          </AccentIcon>
-        </div>
-      </div>
-
-      <div className="relative">
-        <MetricCard className="pr-16" label="Resueltos" period="tickets cerrados" value={closedCount} />
-        <div className="pointer-events-none absolute right-5 top-5">
-          <AccentIcon tone="success">
-            <CheckCircle2 size={18} strokeWidth={1.75} />
-          </AccentIcon>
-        </div>
-      </div>
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <SummaryCard
+        detail="esperando respuesta"
+        icon={<Clock3 className="h-4 w-4" strokeWidth={1.7} />}
+        iconClassName="bg-signal/15 text-signal"
+        label="Resumen"
+        title="Tickets abiertos"
+        value={openCount}
+      />
+      <SummaryCard
+        detail="con intercambio activo"
+        icon={<MessageSquareMore className="h-4 w-4" strokeWidth={1.7} />}
+        iconClassName="bg-amber-500/15 text-amber-300"
+        label="Resumen"
+        title="En progreso"
+        value={progressCount}
+      />
+      <SummaryCard
+        detail="tickets cerrados"
+        icon={<CheckCircle2 className="h-4 w-4" strokeWidth={1.7} />}
+        iconClassName="bg-emerald-500/15 text-emerald-300"
+        label="Resumen"
+        title="Resueltos"
+        value={closedCount}
+      />
     </div>
+  );
+}
+
+function SummaryCard({
+  detail,
+  icon,
+  iconClassName,
+  label,
+  title,
+  value,
+}: {
+  detail: string;
+  icon: ReactNode;
+  iconClassName: string;
+  label: string;
+  title: string;
+  value: number;
+}) {
+  return (
+    <article className="rounded-[22px] border border-white/10 bg-[var(--bg-surface)]/92 px-4 py-4 shadow-[0_14px_30px_rgba(2,6,23,0.22)]">
+      <div className="flex items-start justify-between gap-3">
+        <div className={`flex h-9 w-9 items-center justify-center rounded-2xl ${iconClassName}`}>{icon}</div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
+      </div>
+
+      <p className="mt-4 text-sm font-medium text-slate-100">{title}</p>
+      <p className="mt-1 font-data text-[clamp(2.2rem,3vw,2.8rem)] font-light leading-none tracking-tight text-slate-50">
+        {value.toLocaleString('es-AR')}
+      </p>
+      <p className="mt-2 text-xs text-slate-400">{detail}</p>
+    </article>
   );
 }
