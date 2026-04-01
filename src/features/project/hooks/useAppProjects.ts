@@ -1,62 +1,12 @@
 import type { Dispatch, SetStateAction } from 'react';
-import { useCallback, useEffect } from 'react';
-import { deleteCachedData, getCachedData, setCachedData } from '@/contexts/appContext.cache';
+
 import type { Project, ProjectLog, User } from '@/contexts/appContext.types';
-import { supabase } from '@/lib/supabase';
-import { projectService } from '@/lib/services/projectService';
-import type { CreateProjectData, UpdateProjectData } from '@/types/project.types';
 
-type ProjectPhase = NonNullable<Project['fases']>[number];
-
-function toCreateProjectPayload(
-  projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt' | 'ownerEmail'>,
-  userId: string,
-): CreateProjectData & { created_by: string } {
-  return {
-    name: projectData.name,
-    description: projectData.description,
-    technologies: Array.isArray(projectData.technologies) ? projectData.technologies : [],
-    environment_variables: projectData.environment_variables,
-    status: 'development',
-    github_repository_url: projectData.github_repository_url,
-    customicon: projectData.customicon,
-    screenshot_url: undefined,
-    funcionalidades: Array.isArray(projectData.funcionalidades)
-      ? projectData.funcionalidades.filter((item): item is string => typeof item === 'string')
-      : undefined,
-    fases: Array.isArray(projectData.fases) ? projectData.fases : undefined,
-    type: projectData.type,
-    priority: undefined,
-    start_date: undefined,
-    end_date: undefined,
-    created_by: userId,
-  };
-}
-
-function toUpdateProjectPayload(updates: Partial<Project>): UpdateProjectData {
-  return {
-    name: updates.name,
-    description: updates.description,
-    technologies: Array.isArray(updates.technologies) ? updates.technologies : undefined,
-    environment_variables: updates.environment_variables,
-    status: updates.status,
-    github_repository_url: updates.github_repository_url,
-    customicon: updates.customicon,
-    screenshot_url: undefined,
-    funcionalidades: Array.isArray(updates.funcionalidades)
-      ? updates.funcionalidades.filter((item): item is string => typeof item === 'string')
-      : undefined,
-    fases: Array.isArray(updates.fases) ? updates.fases : undefined,
-    type: updates.type,
-    priority: undefined,
-    start_date: undefined,
-    end_date: undefined,
-    is_active: updates.is_active,
-    progress: typeof updates.progress === 'number' ? updates.progress : undefined,
-    completion_percentage:
-      typeof updates.completion_percentage === 'number' ? updates.completion_percentage : undefined,
-  };
-}
+import type { AppProjectInput } from '@/features/project/hooks/appProjects.payloads';
+import { useProjectCollection } from '@/features/project/hooks/useProjectCollection';
+import { useProjectLogs } from '@/features/project/hooks/useProjectLogs';
+import { useProjectMutations } from '@/features/project/hooks/useProjectMutations';
+import { useProjectPhaseMutations } from '@/features/project/hooks/useProjectPhaseMutations';
 
 interface UseAppProjectsParams {
   logs: ProjectLog[];
@@ -77,313 +27,43 @@ export function useAppProjects({
   setLogs,
   setProjects,
   setProjectsReady,
-  user
+  user,
 }: UseAppProjectsParams) {
-  const refreshData = useCallback(async () => {
-    if (!user) return;
-
-    try {
-      setLoading(true);
-      setProjectsReady(false);
-
-      let projectData: Project[] = [];
-
-      if (user.role === 'admin') {
-        const response = await projectService.getProjects();
-        projectData = (response?.projects || []) as Project[];
-      } else {
-        projectData = (await projectService.getProjectsByUser(user.id)) as Project[];
-      }
-
-      setProjects(projectData);
-    } catch {
-      setError('Error al recargar los datos');
-    } finally {
-      setProjectsReady(true);
-      setLoading(false);
-    }
-  }, [setError, setLoading, setProjects, setProjectsReady, user]);
-
-  const getUserProjects = useCallback(() => {
-    if (!user) return [];
-
-    if (user.role === 'admin') {
-      return projects;
-    }
-
-    return projects.filter((project) => project.created_by === user.id);
-  }, [projects, user]);
-
-  const setupProjects = useCallback(async () => {
-    if (!user) {
-      setProjectsReady(false);
-      setProjects([]);
-      setLogs([]);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setProjectsReady(false);
-
-      let projectData: Project[] = [];
-
-      if (user.role === 'admin') {
-        const response = await projectService.getProjects();
-        projectData = (response?.projects || []) as Project[];
-      } else {
-        projectData = (await projectService.getProjectsByUser(user.id)) as Project[];
-      }
-
-      setProjects(projectData);
-      setCachedData(`projects_${user.email}`, projectData, 2 * 60 * 1000);
-    } catch {
-      setError('Error de conexión');
-      setProjects([]);
-      setLogs([]);
-    } finally {
-      setProjectsReady(true);
-      setLoading(false);
-    }
-  }, [setError, setLoading, setLogs, setProjects, setProjectsReady, user]);
-
-  useEffect(() => {
-    if (user) {
-      void setupProjects();
-    }
-  }, [setupProjects, user]);
-
-  useEffect(() => {
-    if (!user || user.role === 'admin') {
-      return;
-    }
-
-    const channel = supabase
-      .channel(`projects-user-${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'projects',
-          filter: `created_by=eq.${user.id}`,
-        },
-        (payload) => {
-          if (payload.eventType === 'DELETE') {
-            const deletedProject = payload.old as Pick<Project, 'id'>;
-            setProjects((currentProjects) => currentProjects.filter((project) => project.id !== deletedProject.id));
-            return;
-          }
-
-          const nextProject = payload.new as Project;
-
-          setProjects((currentProjects) => {
-            const currentIndex = currentProjects.findIndex((project) => project.id === nextProject.id);
-
-            if (currentIndex === -1) {
-              return [nextProject, ...currentProjects];
-            }
-
-            return currentProjects.map((project) => (project.id === nextProject.id ? { ...project, ...nextProject } : project));
-          });
-        },
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [setProjects, user]);
-
-  const createProject = useCallback(
-    async (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt' | 'ownerEmail'>) => {
-      if (!user) return;
-
-      try {
-        setLoading(true);
-        setError(null);
-
-        if (!user.id || user.id.trim() === '') {
-          throw new Error('ID de usuario inválido. No se puede crear el proyecto.');
-        }
-
-        const createdProject = await projectService.createProject(toCreateProjectPayload(projectData, user.id));
-
-        if (createdProject) {
-          setProjects((previousProjects) => [...previousProjects, createdProject as Project]);
-        }
-
-        deleteCachedData(`projects_${user.email}`);
-      } catch {
-        setError('Error al crear el proyecto');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [setError, setLoading, setProjects, user]
-  );
-
-  const updateProject = useCallback(
-    async (id: string, updates: Partial<Project>) => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        await projectService.updateProject(id, toUpdateProjectPayload(updates));
-
-        if (user) {
-          deleteCachedData(`projects_${user.email}`);
-        }
-      } catch {
-        setError('Error al actualizar el proyecto');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [setError, setLoading, user]
-  );
-
-  const deleteProject = useCallback(
-    async (id: string) => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        if (!user?.id) {
-          throw new Error('ID de usuario inválido. No se puede eliminar el proyecto.');
-        }
-
-        await projectService.deleteProject(id, user.id, user.role);
-        setProjects((previousProjects) => previousProjects.filter((project) => project.id !== id));
-
-        deleteCachedData(`projects_${user.email}`);
-      } catch (deleteError) {
-        setError('Error al eliminar el proyecto');
-        throw deleteError;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [setError, setLoading, setProjects, user]
-  );
-
-  const addFunctionalities = useCallback(
-    async (projectId: string, functionalities: string[]) => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const currentProject = (await projectService.getProjectById(projectId)) as Project;
-        const currentFunctionalities = currentProject.funcionalidades || [];
-        const updatedFunctionalities = [...currentFunctionalities, ...functionalities];
-
-        await projectService.updateProject(projectId, {
-          funcionalidades: updatedFunctionalities
-        });
-
-        if (user) {
-          deleteCachedData(`projects_${user.email}`);
-        }
-      } catch {
-        setError('Error al agregar funcionalidades');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [setError, setLoading, user]
-  );
-
-  const addCommentToPhase = useCallback(
-    async (
-      projectId: string,
-      faseKey: string,
-      comment: {
-        texto: string;
-        autor: string;
-        tipo: 'admin' | 'cliente';
-      }
-    ) => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const currentProject = (await projectService.getProjectById(projectId)) as Project;
-        const phases: ProjectPhase[] = currentProject.fases || [];
-
-        const updatedPhases = phases.map((phase) => {
-          if (phase.key === faseKey) {
-            const comments = phase.comentarios || [];
-            const newComment = {
-              id: Date.now().toString(),
-              ...comment,
-              fecha: new Date().toISOString()
-            };
-
-            return {
-              ...phase,
-              comentarios: [...comments, newComment]
-            };
-          }
-
-          return phase;
-        });
-
-        await projectService.updateProject(projectId, {
-          fases: updatedPhases
-        });
-
-        if (user) {
-          deleteCachedData(`projects_${user.email}`);
-        }
-      } catch {
-        setError('Error al agregar comentario');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [setError, setLoading, user]
-  );
-
-  const addLog = useCallback(async () => {
-    try {
-      if (user) {
-        deleteCachedData(`logs_${user.email}`);
-      }
-    } catch {
-      // Los logs no son críticos para bloquear la UI.
-    }
-  }, [user]);
-
-  const getProjectLogs = useCallback(
-    (projectId: string) => {
-      const cacheKey = `project_logs_${projectId}`;
-      const cachedLogs = getCachedData<ProjectLog[]>(cacheKey);
-
-      if (cachedLogs) {
-        return cachedLogs;
-      }
-
-      const projectLogs = logs.filter((log) => log.projectId === projectId);
-      setCachedData(cacheKey, projectLogs, 5 * 60 * 1000);
-
-      return projectLogs;
-    },
-    [logs]
-  );
-
-  return {
-    addCommentToPhase,
-    addFunctionalities,
-    addLog,
-    createProject,
-    deleteProject,
-    getProjectLogs,
-    getUserProjects,
-    logs,
-    projects,
-    refreshData,
+  const collection = useProjectCollection({
+    setError,
+    setLoading,
     setLogs,
     setProjects,
-    updateProject
+    setProjectsReady,
+    user,
+    projects,
+  });
+
+  const mutations = useProjectMutations({
+    setError,
+    setLoading,
+    setProjects,
+    user,
+    invalidateProjectsCache: collection.invalidateProjectsCache,
+  });
+  const phaseMutations = useProjectPhaseMutations({
+    setError,
+    setLoading,
+    invalidateProjectsCache: collection.invalidateProjectsCache,
+  });
+
+  const projectLogs = useProjectLogs(logs, user);
+
+  return {
+    ...mutations,
+    ...phaseMutations,
+    ...projectLogs,
+    createProject: (projectData: AppProjectInput) => mutations.createProject(projectData),
+    getUserProjects: collection.getUserProjects,
+    logs,
+    projects,
+    refreshData: collection.refreshData,
+    setLogs,
+    setProjects,
   };
 }
