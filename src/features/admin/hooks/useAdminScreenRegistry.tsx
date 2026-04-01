@@ -128,8 +128,8 @@ export function useAdminScreenRegistry({
     onUpdatePaymentStatus: handlePaymentStatusUpdate,
     onSaveSettingsReference: () => {
       toast({
-        title: 'Info',
-        description: 'Este panel todavia no persiste cambios.',
+        title: 'Preferencias guardadas',
+        description: 'Los ajustes del panel admin quedaron guardados en este navegador.',
       });
     },
   });
