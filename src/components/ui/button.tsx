@@ -14,13 +14,13 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const buttonVariantStyles = {
-  default: "bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary shadow-sm hover:shadow-md active:scale-95",
-  primary: "bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary shadow-sm hover:shadow-md active:scale-95",
-  secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-secondary shadow-sm hover:shadow-md active:scale-95",
-  destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive shadow-sm hover:shadow-md active:scale-95",
-  outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground focus:ring-ring shadow-sm hover:shadow-md active:scale-95",
-  ghost: "hover:bg-accent hover:text-accent-foreground focus:ring-ring active:scale-95",
-  link: "text-primary underline-offset-4 hover:underline focus:ring-primary"
+  default: "bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-primary shadow-sm hover:shadow-md active:scale-95",
+  primary: "bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-primary shadow-sm hover:shadow-md active:scale-95",
+  secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 focus-visible:ring-secondary shadow-sm hover:shadow-md active:scale-95",
+  destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive shadow-sm hover:shadow-md active:scale-95",
+  outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring shadow-sm hover:shadow-md active:scale-95",
+  ghost: "hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring active:scale-95",
+  link: "text-primary underline-offset-4 hover:underline focus-visible:ring-primary"
 } as const;
 
 const buttonSizeStyles = {
@@ -46,7 +46,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }, ref) => {
     const prefersReducedMotion = useReducedMotionPreference();
     const Comp = asChild ? Slot : 'button';
-    const baseStyles = "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 relative overflow-hidden";
+    const baseStyles = "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 relative overflow-hidden";
     
     const widthStyles = fullWidth ? "w-full" : "";
 
