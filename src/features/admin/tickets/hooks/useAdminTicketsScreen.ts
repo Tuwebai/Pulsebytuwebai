@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-
 import type { AdminTicket, AdminTicketsScreenProps, TicketFormData } from '@/features/admin/tickets/types/adminTicket.types';
 import { useAdminTicketMutations } from '@/features/admin/tickets/hooks/useAdminTicketMutations';
+import { useAdminTicketsRealtime } from '@/features/admin/tickets/hooks/useAdminTicketsRealtime';
 import {
   INITIAL_TICKET_FILTERS,
   INITIAL_TICKET_FORM,
@@ -32,6 +32,8 @@ export function useAdminTicketsScreen({ tickets: externalTickets, refreshData }:
 
     void loadTickets();
   }, [externalTickets]);
+
+  useAdminTicketsRealtime({ enabled: !externalTickets, onRefresh: () => void loadTickets() });
 
   const filteredTickets = useMemo(() => filterAndSortTickets(tickets, filters), [tickets, filters]);
   const stats = useMemo(() => calculateTicketStats(tickets), [tickets]);
@@ -98,13 +100,8 @@ export function useAdminTicketsScreen({ tickets: externalTickets, refreshData }:
     }
   }
 
-  async function handleDelete(ticketId: string) {
-    await mutations.deleteTicket(ticketId);
-  }
-
-  async function handleStatusChange(ticketId: string, newStatus: string) {
-    await mutations.updateTicketStatus(ticketId, newStatus);
-  }
+  async function handleDelete(ticketId: string) { await mutations.deleteTicket(ticketId); }
+  async function handleStatusChange(ticketId: string, newStatus: string) { await mutations.updateTicketStatus(ticketId, newStatus); }
 
   return {
     editingTicket,

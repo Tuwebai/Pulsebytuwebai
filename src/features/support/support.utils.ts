@@ -40,7 +40,7 @@ export function mapSupportPriorityToEmailPriority(priority: SupportPriority): Em
   }
 }
 
-export function getStatusLabel(status: 'open' | 'responded' | 'closed' | 'in_conversation') {
+export function getStatusLabel(status: 'open' | 'responded' | 'resolved' | 'closed' | 'in_conversation') {
   switch (status) {
     case 'open':
       return 'Abierto';
@@ -48,6 +48,8 @@ export function getStatusLabel(status: 'open' | 'responded' | 'closed' | 'in_con
       return 'En progreso';
     case 'in_conversation':
       return 'En progreso';
+    case 'resolved':
+      return 'Resuelto';
     case 'closed':
       return 'Cerrado';
     default:
@@ -55,7 +57,7 @@ export function getStatusLabel(status: 'open' | 'responded' | 'closed' | 'in_con
   }
 }
 
-export function getStatusVariant(status: 'open' | 'responded' | 'closed' | 'in_conversation'): BadgeProps['variant'] {
+export function getStatusVariant(status: 'open' | 'responded' | 'resolved' | 'closed' | 'in_conversation'): BadgeProps['variant'] {
   switch (status) {
     case 'open':
       return 'signal';
@@ -63,6 +65,8 @@ export function getStatusVariant(status: 'open' | 'responded' | 'closed' | 'in_c
       return 'warning';
     case 'in_conversation':
       return 'warning';
+    case 'resolved':
+      return 'success';
     case 'closed':
       return 'success';
     default:

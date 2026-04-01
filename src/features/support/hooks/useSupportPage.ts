@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
 import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 import { useApp } from '@/contexts/AppContext';
-import { sendSupportTicketEmail, sendTicketConfirmationEmail } from '@/lib/services/emailService';
+import { ticketService } from '@/features/support/services/ticket.service';
+import { useSupportTicketsRealtime } from '@/features/support/hooks/useSupportTicketsRealtime';
+import {
+  submitSupportTicket,
+  submitSupportTicketReply,
+} from '@/features/support/hooks/supportTicketMutations';
 import type { SupportDraftState, Ticket } from '@/features/support';
-import { mapSupportPriorityToEmailPriority } from '@/features/support/support.utils';
 
 const SUPPORT_DRAFT_INITIAL_STATE: SupportDraftState = {
   title: '',
@@ -38,9 +41,8 @@ export function useSupportPage() {
     setLoading(true);
 
     try {
-      const { data, error: ticketsError } = await supabase.from('tickets').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-      if (ticketsError) throw ticketsError;
-      setTickets((data ?? []) as Ticket[]);
+      const data = await ticketService.getTicketsByClient(user.id);
+      setTickets(data as Ticket[]);
       setError(null);
     } catch (fetchError) {
       console.error('Error cargando tickets:', fetchError);
@@ -53,6 +55,14 @@ export function useSupportPage() {
   useEffect(() => {
     void loadTickets();
   }, [loadTickets]);
+
+  useSupportTicketsRealtime({
+    enabled: Boolean(user?.id),
+    onRefresh: () => {
+      void loadTickets();
+    },
+    userId: user?.id ?? null,
+  });
 
   const handleSubmitTicket = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -68,38 +78,8 @@ export function useSupportPage() {
 
     void (async () => {
       try {
-        const timestamp = new Date().toISOString();
-        const newTicket = {
-          title: formData.title,
-          description: formData.description,
-          status: 'open' as const,
-          priority: formData.priority,
-          user_id: user.id,
-          created_at: timestamp,
-          updated_at: timestamp,
-        };
-
-        const { data: ticketData, error: ticketError } = await supabase.from('tickets').insert(newTicket).select().single();
-        if (ticketError) throw ticketError;
-
-        await sendTicketConfirmationEmail({
-          email: user.email,
-          ticketId: ticketData.id,
-          asunto: formData.title,
-          mensaje: formData.description,
-          prioridad: mapSupportPriorityToEmailPriority(formData.priority),
-          fecha: timestamp,
-        });
-
-        await sendSupportTicketEmail({
-          asunto: formData.title,
-          mensaje: formData.description,
-          email: user.email,
-          prioridad: mapSupportPriorityToEmailPriority(formData.priority),
-          fecha: timestamp,
-        });
-
-        setTickets((previous) => [ticketData as Ticket, ...previous]);
+        const ticketData = await submitSupportTicket({ draft: formData, user });
+        setTickets((previous) => [ticketData, ...previous]);
         setError(null);
         toast({ title: 'Ticket procesado', description: 'Tu ticket ha sido procesado correctamente.' });
       } catch (submitError) {
@@ -113,17 +93,10 @@ export function useSupportPage() {
     if (!respondingTicket || !responseText.trim()) return;
 
     try {
-      const responseDate = new Date().toISOString();
-      const patch = {
-        respuesta_cliente: responseText,
-        fecha_respuesta_cliente: responseDate,
-        status: 'in_conversation' as const,
-        updated_at: responseDate,
-      };
-
-      const { error: responseError } = await supabase.from('tickets').update(patch).eq('id', respondingTicket.id);
-      if (responseError) throw responseError;
-
+      const patch = await submitSupportTicketReply({
+        responseText,
+        ticketId: respondingTicket.id,
+      });
       setTickets((previous) => previous.map((ticket) => (ticket.id === respondingTicket.id ? { ...ticket, ...patch } : ticket)));
       toast({ title: 'Respuesta enviada', description: 'Tu respuesta se envió correctamente.', variant: 'default' });
       setRespondingTicketId(null);
@@ -145,7 +118,7 @@ export function useSupportPage() {
     responseText,
     openTickets: tickets.filter((ticket) => ticket.status === 'open').length,
     progressTickets: tickets.filter((ticket) => ticket.status === 'responded' || ticket.status === 'in_conversation').length,
-    closedTickets: tickets.filter((ticket) => ticket.status === 'closed').length,
+    closedTickets: tickets.filter((ticket) => ticket.status === 'closed' || ticket.status === 'resolved').length,
     setFormData,
     setRespondingTicketId,
     setResponseText,

@@ -5,7 +5,7 @@ export interface Ticket {
   id: string;
   title: string;
   description: string;
-  status: 'open' | 'responded' | 'closed' | 'in_conversation';
+  status: 'open' | 'responded' | 'resolved' | 'closed' | 'in_conversation';
   priority: SupportPriority;
   user_id: string;
   assigned_to?: string;

@@ -1,8 +1,13 @@
 import type { Dispatch, SetStateAction } from 'react';
 
 import { useApp } from '@/contexts/AppContext';
+import {
+  changeAdminTicketStatus,
+  removeAdminTicket,
+  saveAdminTicket,
+  sendAdminTicketResponse,
+} from '@/features/admin/tickets/hooks/adminTicketMutationActions';
 import type { AdminTicket, TicketFormData } from '@/features/admin/tickets/types/adminTicket.types';
-import { ticketService } from '@/features/support/services/ticket.service';
 import { toast } from '@/hooks/use-toast';
 
 interface UseAdminTicketMutationsParams {
@@ -35,26 +40,11 @@ export function useAdminTicketMutations({
     }
 
     try {
-      if (editingTicket) {
-        await ticketService.updateTicket(editingTicket.id, {
-          title: formData.title,
-          description: formData.description,
-          priority: formData.priority,
-          status: formData.status,
-          category: formData.category,
-          assigned_to: formData.assignedTo,
-        });
-      } else {
-        await ticketService.createTicket({
-          title: formData.title,
-          description: formData.description,
-          priority: formData.priority,
-          status: formData.status,
-          user_id: user?.email || '',
-          assigned_to: formData.assignedTo,
-          category: formData.category,
-        });
-      }
+      await saveAdminTicket({
+        currentUserEmail: user?.email ?? null,
+        editingTicket,
+        formData,
+      });
 
       toast({
         title: editingTicket ? 'Ticket actualizado' : 'Ticket creado',
@@ -81,13 +71,10 @@ export function useAdminTicketMutations({
 
     try {
       const responder = user?.full_name || user?.email || 'Admin';
-      const responseDate = new Date().toISOString();
-
-      await ticketService.updateTicket(respondingTicket.id, {
-        respuesta: responseText,
-        respondido_por: responder,
-        fecha_respuesta: responseDate,
-        estado: 'respondido',
+      const responseDate = await sendAdminTicketResponse({
+        responder,
+        responseText,
+        ticketId: respondingTicket.id,
       });
 
       setTickets((currentTickets) =>
@@ -98,6 +85,7 @@ export function useAdminTicketMutations({
                 respuesta: responseText,
                 respondido_por: responder,
                 fecha_respuesta: responseDate,
+                status: 'in_conversation',
                 estado: 'respondido',
               }
             : ticket,
@@ -119,7 +107,7 @@ export function useAdminTicketMutations({
 
   async function deleteTicket(ticketId: string) {
     try {
-      await ticketService.deleteTicket(ticketId);
+      await removeAdminTicket(ticketId);
       setTickets((currentTickets) => currentTickets.filter((ticket) => ticket.id !== ticketId));
       toast({ title: 'Ticket eliminado', description: 'El registro salió de la bandeja.' });
     } catch (error) {
@@ -134,10 +122,10 @@ export function useAdminTicketMutations({
 
   async function updateTicketStatus(ticketId: string, newStatus: string) {
     try {
-      await ticketService.updateTicket(ticketId, { estado: newStatus });
+      await changeAdminTicketStatus(ticketId, newStatus);
       setTickets((currentTickets) =>
         currentTickets.map((ticket) =>
-          ticket.id === ticketId ? { ...ticket, estado: newStatus } : ticket,
+          ticket.id === ticketId ? { ...ticket, status: newStatus } : ticket,
         ),
       );
       toast({ title: 'Estado actualizado', description: 'La bandeja ya quedó sincronizada.' });

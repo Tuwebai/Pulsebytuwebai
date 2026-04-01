@@ -44,7 +44,7 @@ export function getTicketDate(ticket: AdminTicket) {
 }
 
 export function getTicketStatusValue(ticket: AdminTicket): string {
-  return ticket.estado || ticket.status || 'open';
+  return normalizeTicketStatus(ticket.status || ticket.estado || 'open');
 }
 
 export function normalizeTicketStatus(status: string): string {
@@ -111,7 +111,7 @@ export function filterAndSortTickets(tickets: AdminTicket[], filters: TicketFilt
         getTicketContact(ticket).toLowerCase().includes(searchTerm);
 
       const matchesStatus =
-        filters.status === 'all' || getTicketStatusValue(ticket) === filters.status;
+        filters.status === 'all' || normalizeTicketStatus(getTicketStatusValue(ticket)) === filters.status;
       const matchesPriority =
         filters.priority === 'all' || ticket.priority === filters.priority;
 
@@ -131,6 +131,8 @@ export function getStatusLabel(status: string) {
       return 'Abierto';
     case 'in_progress':
     case 'en_progreso':
+    case 'in_conversation':
+    case 'respondido':
       return 'En progreso';
     case 'resolved':
     case 'resuelto':
@@ -138,8 +140,6 @@ export function getStatusLabel(status: string) {
     case 'closed':
     case 'cerrado':
       return 'Cerrado';
-    case 'respondido':
-      return 'Respondido';
     default:
       return 'Pendiente';
   }
