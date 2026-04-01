@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
+
 import { useApp } from '@/contexts/AppContext';
+import { projectService } from '@/features/project/services/project.service';
 import { toast } from '@/hooks/use-toast';
-import { projectService } from '@/lib/services/projectService';
 import type { CreateProjectData, Project, ProjectFilters, ProjectSort, UpdateProjectData } from '@/types/project.types';
 
 export function useAdminProjectsData() {
@@ -14,7 +15,9 @@ export function useAdminProjectsData() {
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 0 });
 
   const loadProjects = useCallback(async () => {
-    if (!user || user.role !== 'admin') return;
+    if (!user || user.role !== 'admin') {
+      return;
+    }
 
     try {
       setLoading(true);
