@@ -1,38 +1,6 @@
-export interface Project {
-  id: string;
-  name: string;
-  description?: string;
-  technologies: string[];
-  environment_variables?: Record<string, unknown>;
-  status: 'development' | 'production' | 'paused' | 'maintenance';
-  github_repository_url?: string;
-  customicon?: string;
-  created_at: string;
-  updated_at: string;
-  created_by?: string;
-  is_active: boolean;
-  domain?: string | null;
-  ga4_property_id?: string | null;
-  progress?: number | null;
-  completion_percentage?: number | null;
-  tareas?: Array<Record<string, unknown>>;
-  type?: 'Web' | 'App' | 'Landing' | 'Ecommerce' | string;
-  funcionalidades?: string[];
-  fases?: Array<{
-    key: string;
-    estado: 'Pendiente' | 'En Progreso' | 'Terminado';
-    descripcion?: string;
-    fechaEntrega?: string;
-    archivos?: Array<{ url: string; name: string }>;
-    comentarios?: Array<{
-      id: string;
-      texto: string;
-      autor: string;
-      fecha: string;
-      tipo: 'admin' | 'cliente';
-    }>;
-  }>;
-}
+import type { Project } from '@/types/project.types';
+
+export type { Project } from '@/types/project.types';
 
 export interface User {
   id: string;
@@ -110,7 +78,7 @@ export interface AppContextType {
   loginWithGoogle: () => Promise<boolean>;
   loginWithGithub: () => Promise<boolean>;
   logout: () => Promise<void>;
-  createProject: (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt' | 'ownerEmail'>) => Promise<void>;
+  createProject: (projectData: Omit<Project, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   updateProject: (id: string, updates: Partial<Project>) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
   addFunctionalities: (projectId: string, functionalities: string[]) => Promise<void>;

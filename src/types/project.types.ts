@@ -44,6 +44,8 @@ export interface Project {
   updated_at: string;
   created_by?: string;
   is_active: boolean;
+  domain?: string | null;
+  ga4_property_id?: string | null;
   type?: string;
   funcionalidades?: string[];
   fases?: ProjectPhase[];
