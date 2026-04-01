@@ -51,93 +51,91 @@ export function AdminOperationalStatus({
       label: 'Clientes con acceso',
       value: usuariosActivos,
       toneClassName: 'bg-signal/15 text-signal',
-      sectionId: 'usuarios' as const,
-      options: { usersFilter: 'with-access' as const },
+      sectionId: 'usuarios',
+      options: { usersFilter: 'with-access' },
     },
     {
       icon: Users,
       label: 'Altas del mes',
       value: `+${usuariosNuevos}`,
       toneClassName: 'bg-emerald-500/15 text-emerald-400',
-      sectionId: 'usuarios' as const,
-      options: { usersFilter: 'new-this-month' as const },
+      sectionId: 'usuarios',
+      options: { usersFilter: 'new-this-month' },
     },
     {
       icon: FolderOpen,
       label: 'Proyectos en seguimiento',
       value: proyectosEnCurso,
       toneClassName: 'bg-emerald-500/15 text-emerald-400',
-      sectionId: 'proyectos' as const,
+      sectionId: 'proyectos',
     },
     {
       icon: CheckCircle,
       label: 'Entrega completada',
       value: `${tasaCompletacionProyectos}%`,
       toneClassName: 'bg-sky-500/15 text-sky-300',
-      sectionId: 'proyectos' as const,
+      sectionId: 'proyectos',
     },
     {
       icon: Ticket,
       label: 'Tickets abiertos',
       value: ticketsAbiertos,
       toneClassName: 'bg-amber-500/15 text-amber-300',
-      sectionId: 'tickets' as const,
+      sectionId: 'tickets',
     },
     {
       icon: Eye,
       label: 'Casos urgentes',
       value: ticketsUrgentes,
       toneClassName: 'bg-red-500/15 text-red-300',
-      sectionId: 'tickets' as const,
+      sectionId: 'tickets',
     },
     {
       icon: DollarSign,
       label: 'Cobranza acumulada',
-      value: `$${ingresosTotales.toLocaleString()}`,
+      value: `$${ingresosTotales.toLocaleString('es-AR')}`,
       toneClassName: 'bg-violet-500/15 text-violet-300',
-      sectionId: 'pagos' as const,
+      sectionId: 'pagos',
     },
     {
       icon: DollarSign,
       label: 'Cobranza del mes',
-      value: `$${ingresosEsteMes.toLocaleString()}`,
+      value: `$${ingresosEsteMes.toLocaleString('es-AR')}`,
       toneClassName: 'bg-signal/15 text-signal',
-      sectionId: 'pagos' as const,
+      sectionId: 'pagos',
     },
   ];
 
   return (
-    <div className="space-y-3 sm:space-y-4">
-      <section className="rounded-2xl border border-border/60 bg-[var(--bg-surface)] p-4 shadow-sm sm:p-5">
-        <div className="mb-4 flex items-start gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-signal/15 text-signal">
-            <BarChart3 className="h-5 w-5" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-lg font-semibold leading-tight text-foreground">
-              Estado operativo Pulse
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Lectura rapida de clientes, soporte, proyectos y cobranza.
-            </p>
-          </div>
+    <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/92 p-4 shadow-[0_18px_40px_rgba(2,6,23,0.24)] sm:p-5">
+      <div className="mb-4 flex items-start gap-3">
+        <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-signal/15 text-signal">
+          <BarChart3 className="h-4 w-4" />
         </div>
-
-        <div className="space-y-2">
-          {statusRows.map((row) => (
-            <OperationalRow
-              key={row.label}
-              icon={row.icon}
-              label={row.label}
-              value={row.value}
-              toneClassName={row.toneClassName}
-              onClick={() => onSectionChange(row.sectionId, row.options)}
-            />
-          ))}
+        <div className="space-y-1">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+            Estado operativo
+          </p>
+          <h3 className="text-lg font-semibold text-slate-50">Lectura rápida del panel</h3>
+          <p className="text-sm text-slate-400">
+            Entrá directo al módulo que necesita atención del equipo.
+          </p>
         </div>
-      </section>
+      </div>
 
-    </div>
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+        {statusRows.map((row) => (
+          <OperationalRow
+            key={row.label}
+            icon={row.icon}
+            label={row.label}
+            value={row.value}
+            toneClassName={row.toneClassName}
+            onClick={() => onSectionChange(row.sectionId, row.options)}
+          />
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -154,15 +152,15 @@ function OperationalRow({ icon: Icon, label, value, toneClassName, onClick }: Op
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center justify-between gap-3 rounded-2xl border border-border/50 bg-background/30 px-3 py-3 text-left transition-colors duration-150 hover:border-border hover:bg-background/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal/50"
+      className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[var(--bg-base)]/70 px-3 py-3 text-left transition-colors hover:border-white/15 hover:bg-[var(--bg-elevated)]/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal/50"
     >
-      <span className="flex min-w-0 items-center gap-3 text-sm text-muted-foreground">
+      <span className="flex min-w-0 items-center gap-3">
         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${toneClassName}`}>
           <Icon className="h-4 w-4" />
         </span>
-        <span className="truncate">{label}</span>
+        <span className="truncate text-sm text-slate-300">{label}</span>
       </span>
-      <Badge className="shrink-0 rounded-full border border-border/50 bg-[var(--bg-elevated)] px-3 py-1.5 text-sm font-semibold text-foreground shadow-none">
+      <Badge className="shrink-0 rounded-full border-white/10 bg-white/[0.05] px-3 py-1 text-sm font-semibold text-slate-100 shadow-none">
         {value}
       </Badge>
     </button>
