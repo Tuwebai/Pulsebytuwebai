@@ -2,7 +2,6 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
 
 interface ProjectPaginationProps {
   currentPage: number;
@@ -21,7 +20,6 @@ export const ProjectPagination: React.FC<ProjectPaginationProps> = ({
   onPageChange,
   onItemsPerPageChange
 }) => {
-  const { theme } = useTheme();
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 

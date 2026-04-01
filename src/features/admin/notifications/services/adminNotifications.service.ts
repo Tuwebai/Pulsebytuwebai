@@ -5,11 +5,11 @@ import {
   fetchOperationalEventAdmins,
   resolveEvent,
   snoozeEvent,
-  type EventFilters,
   type EventCounts,
+  type EventFilters,
   type EventType,
-  type OperationalEventAdminRecord,
   type OperationalEvent,
+  type OperationalEventAdminRecord,
   type OperationalEventSeverity,
   updateEventStatus,
 } from '@/api/admin/operationalEvents.api';
@@ -67,10 +67,7 @@ export async function getInboxEvents(filters: EventFilters = {}): Promise<Operat
     return events;
   }
 
-  await Promise.all(
-    expiredSnoozedEvents.map((event) => updateEventStatus(event.id, 'open')),
-  );
-
+  await Promise.all(expiredSnoozedEvents.map((event) => updateEventStatus(event.id, 'open')));
   return fetchEvents(filters);
 }
 

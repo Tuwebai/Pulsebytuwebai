@@ -3,7 +3,6 @@ import type { ReactNode } from 'react';
 import { RefreshCw } from 'lucide-react';
 
 import Sidebar from '@/components/Sidebar';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
 import { AvatarMenu } from '@/core/components';
@@ -72,7 +71,6 @@ export function AdminShell({
                         </Button>
 
                         <div className="flex items-center justify-end gap-2 rounded-full border border-white/10 bg-[var(--bg-elevated)]/80 p-1">
-                          <ThemeToggle size="sm" variant="ghost" className="shrink-0" />
                           <NotificationsBellTrigger
                             className="h-9 w-9 shrink-0 border border-white/10 bg-[var(--bg-base)]/70 p-0"
                             onClick={openPanel}

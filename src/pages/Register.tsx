@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
 import PulseLogo from '@/core/components/PulseLogo';
-import { useTheme } from '@/contexts/ThemeContext';
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -19,7 +18,6 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useApp();
-  const { theme } = useTheme();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,7 +67,7 @@ export default function Register() {
       <div className="w-full max-w-sm sm:max-w-md space-y-6 sm:space-y-8">
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
-            <PulseLogo size={40} variant={theme === 'light' ? 'day' : 'night'} animated />
+            <PulseLogo size={40} variant="night" animated />
             <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
               <span className="hidden sm:inline">Pulse by TuWebAI</span>
               <span className="sm:hidden">Pulse</span>

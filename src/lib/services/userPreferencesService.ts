@@ -44,8 +44,8 @@ const parseStoredPreferenceValue = (value: string): JsonValue => {
   }
 };
 
-const isThemeValue = (value: JsonValue): value is 'light' | 'dark' => {
-  return value === 'light' || value === 'dark';
+const isThemeValue = (value: JsonValue): value is 'dark' => {
+  return value === 'dark';
 };
 
 const isStringArray = (value: JsonValue): value is string[] => {
@@ -270,7 +270,7 @@ export class UserPreferencesService {
   }
 
   // Obtener tema del usuario
-  async getUserTheme(userId: string): Promise<'light' | 'dark'> {
+  async getUserTheme(userId: string): Promise<'dark'> {
     try {
       const preferences = await this.getUserPreferences(userId, 'theme');
       const themePreference = preferences.find(p => p.preference_key === 'theme');
@@ -279,15 +279,15 @@ export class UserPreferencesService {
         return themePreference.preference_value;
       }
       
-      return 'light'; // Tema por defecto
+      return 'dark';
     } catch (error) {
       handleSupabaseError(error, 'Obtener tema del usuario');
-      return 'light';
+      return 'dark';
     }
   }
 
   // Guardar tema del usuario
-  async saveUserTheme(userId: string, theme: 'light' | 'dark'): Promise<void> {
+  async saveUserTheme(userId: string, theme: 'dark'): Promise<void> {
     await this.saveUserPreference(userId, 'theme', 'theme', theme);
   }
 

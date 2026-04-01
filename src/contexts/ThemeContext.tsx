@@ -1,11 +1,12 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+
 import { useApp } from './AppContext';
 import { userPreferencesService } from '@/lib/services/userPreferencesService';
 
 interface ThemeContextType {
-  theme: 'light' | 'dark';
+  theme: 'dark';
   toggleTheme: () => void;
-  setTheme: (theme: 'light' | 'dark') => void;
+  setTheme: (theme: 'dark') => void;
   loading: boolean;
 }
 
@@ -15,99 +16,56 @@ interface ThemeProviderProps {
   children: ReactNode;
 }
 
-function getInitialTheme(): 'light' | 'dark' {
-  if (typeof window === 'undefined') {
-    return 'dark';
-  }
-
+function applyDarkTheme() {
   const root = document.documentElement;
-
-  if (root.classList.contains('dark')) {
-    return 'dark';
-  }
-
-  if (root.classList.contains('light')) {
-    return 'light';
-  }
-
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'dark' || savedTheme === 'light') {
-    return savedTheme;
-  }
-
-  return 'dark';
+  root.classList.remove('light');
+  root.classList.add('dark');
+  root.style.colorScheme = 'dark';
+  localStorage.setItem('theme', 'dark');
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setThemeState] = useState<'light' | 'dark'>(getInitialTheme);
   const [loading, setLoading] = useState(true);
   const { user, isAuthenticated } = useApp();
 
   useEffect(() => {
-    const loadUserTheme = async () => {
-      try {
-        let userTheme: 'light' | 'dark' = getInitialTheme();
-
-        if (isAuthenticated && user) {
-          const savedTheme = await userPreferencesService.getUserTheme(user.id);
-          userTheme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark';
-        } else {
-          userTheme = getInitialTheme();
-        }
-
-        setThemeState(userTheme);
-
-        if (isAuthenticated && user) {
-          await userPreferencesService.saveUserTheme(user.id, userTheme);
-          await userPreferencesService.saveUserPreference(user.id, 'theme', 'hasSetTheme', true);
-        } else {
-          localStorage.setItem('theme', userTheme);
-        }
-      } catch (error) {
-        console.error('Error loading user theme:', error);
-        setThemeState('dark');
-      }
-
-      setLoading(false);
-    };
-
-    loadUserTheme();
-  }, [isAuthenticated, user]);
+    applyDarkTheme();
+  }, []);
 
   useEffect(() => {
-    const root = document.documentElement;
+    const syncDarkPreference = async () => {
+      try {
+        applyDarkTheme();
 
-    root.classList.remove('light', 'dark');
-    root.style.transition = 'background-color 0.2s ease, color 0.2s ease';
-    root.style.colorScheme = theme;
-    root.classList.add(theme);
+        if (isAuthenticated && user) {
+          await userPreferencesService.saveUserTheme(user.id, 'dark');
+          await userPreferencesService.saveUserPreference(user.id, 'theme', 'hasSetTheme', true);
+        }
+      } catch (error) {
+        console.error('Error enforcing dark theme:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    localStorage.setItem('theme', theme);
+    void syncDarkPreference();
+  }, [isAuthenticated, user]);
 
-    if (isAuthenticated && user && !loading) {
-      userPreferencesService.saveUserTheme(user.id, theme).catch((error) => {
-        console.error('Error saving user theme:', error);
-      });
-    }
-
-    window.setTimeout(() => {
-      root.style.transition = '';
-    }, 200);
-  }, [theme, isAuthenticated, user, loading]);
-
-  const toggleTheme = () => {
-    setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'));
-  };
-
-  const setTheme = (newTheme: 'light' | 'dark') => {
-    setThemeState(newTheme);
-  };
-
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme, loading }}>
-      {children}
-    </ThemeContext.Provider>
+  const value = useMemo<ThemeContextType>(
+    () => ({
+      theme: 'dark',
+      toggleTheme: () => {
+        applyDarkTheme();
+      },
+      setTheme: () => {
+        applyDarkTheme();
+      },
+      loading,
+    }),
+    [loading],
   );
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };
 
 export const useTheme = (): ThemeContextType => {

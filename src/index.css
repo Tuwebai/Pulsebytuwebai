@@ -709,25 +709,16 @@ h1, h2, h3, h4, h5, h6 {
     width: 100% !important;
   }
 
-  /* FORZAR SIEMPRE MODO CLARO - SOBRESCRIBIR DETECCIÓN DEL SISTEMA */
+  /* Forzar siempre modo oscuro: identidad definitiva de Pulse */
   html {
-    color-scheme: light;
-  }
-
-  .dark html {
     color-scheme: dark;
   }
 
   body {
-    background: linear-gradient(135deg, hsl(195 100% 98%), hsl(270 100% 99%));
+    background: linear-gradient(135deg, hsl(222 84% 5%), hsl(222 84% 8%));
     background-attachment: fixed;
     min-height: 100vh;
     @apply text-foreground;
-    color-scheme: light;
-  }
-
-  .dark body {
-    background: linear-gradient(135deg, hsl(222 84% 5%), hsl(222 84% 8%));
     color-scheme: dark;
   }
 }

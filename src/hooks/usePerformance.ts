@@ -137,11 +137,10 @@ export function useOnlineStatus() {
 
 // Hook para detectar el tema del sistema
 export function useSystemTheme() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<'dark'>('dark');
 
   useEffect(() => {
-    // Siempre usar tema claro por defecto
-    setTheme('light');
+    setTheme('dark');
   }, []);
 
   return theme;
