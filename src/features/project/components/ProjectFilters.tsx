@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
-
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDebounce } from '@/hooks/usePerformance';
-
 import ProjectFilterActions from './ProjectFilterActions';
 import type { ProjectsPageProject } from './projectPage.types';
 import { getProjectProgress, getProjectStateLabel } from './projectPage.utils';
@@ -73,32 +71,37 @@ export default function ProjectFilters({ projects, onFilteredProjects, onRefresh
   const hasFilters = searchTerm.trim().length > 0 || status !== 'all' || sortBy !== 'updated_at';
 
   return (
-    <section className="rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
+    <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/90 p-5 shadow-[0_16px_36px_rgba(2,6,23,0.22)]">
+      <div className="mb-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Vista de trabajo</p>
+        <p className="mt-2 text-sm text-slate-100">Filtrá rápido el proyecto que necesitás revisar.</p>
+      </div>
+
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div className="grid flex-1 gap-4 md:grid-cols-[minmax(0,1.5fr)_220px_220px]">
           <div>
-            <label className="mb-2 block text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Buscar</label>
+            <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Buscar</label>
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-tertiary)]" strokeWidth={1.5} />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" strokeWidth={1.5} />
               <Input
                 ariaLabel="Buscar proyectos"
-                className="h-11 rounded-[10px] border-[var(--border-default)] bg-[var(--bg-subtle)] pl-10 text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus-visible:ring-[var(--signal-glow)]"
+                className="h-11 rounded-xl border-white/10 bg-[var(--bg-base)] pl-10 text-slate-100 placeholder:text-slate-500"
                 onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Buscar por nombre o descripción"
+                placeholder="Nombre, descripción o estado"
                 value={searchTerm}
               />
             </div>
           </div>
 
           <div>
-            <label className="mb-2 block text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Estado</label>
+            <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Estado</label>
             <Select onValueChange={setStatus} value={status}>
-              <SelectTrigger ariaLabel="Filtrar por estado" className="h-11 rounded-[10px] border-[var(--border-default)] bg-[var(--bg-subtle)] text-[var(--text-primary)] focus:ring-[var(--signal-glow)]">
+              <SelectTrigger ariaLabel="Filtrar por estado" className="h-11 rounded-xl border-white/10 bg-[var(--bg-base)] text-slate-100">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-primary)]">
+              <SelectContent className="border-white/10 bg-[var(--bg-surface)] text-slate-100">
                 {statusOptions.map((option) => (
-                  <SelectItem className="focus:bg-[var(--bg-elevated)] focus:text-[var(--text-primary)]" key={option.value} value={option.value}>
+                  <SelectItem className="focus:bg-[var(--bg-elevated)] focus:text-slate-100" key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
                 ))}
@@ -107,14 +110,14 @@ export default function ProjectFilters({ projects, onFilteredProjects, onRefresh
           </div>
 
           <div>
-            <label className="mb-2 block text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Ordenar por</label>
+            <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Orden</label>
             <Select onValueChange={(value) => setSortBy(value as SortByOption)} value={sortBy}>
-              <SelectTrigger ariaLabel="Ordenar proyectos" className="h-11 rounded-[10px] border-[var(--border-default)] bg-[var(--bg-subtle)] text-[var(--text-primary)] focus:ring-[var(--signal-glow)]">
+              <SelectTrigger ariaLabel="Ordenar proyectos" className="h-11 rounded-xl border-white/10 bg-[var(--bg-base)] text-slate-100">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-primary)]">
+              <SelectContent className="border-white/10 bg-[var(--bg-surface)] text-slate-100">
                 {sortOptions.map((option) => (
-                  <SelectItem className="focus:bg-[var(--bg-elevated)] focus:text-[var(--text-primary)]" key={option.value} value={option.value}>
+                  <SelectItem className="focus:bg-[var(--bg-elevated)] focus:text-slate-100" key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
                 ))}

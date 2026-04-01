@@ -1,5 +1,6 @@
 import { ErrorMessage } from '@/components/ErrorBoundary';
 import { SectionSpinner } from '@/components/LoadingSpinner';
+import ProjectFilters from '@/features/project/components/ProjectFilters';
 import { ProjectCard, ProjectStatsRow } from '@/features/project/components';
 import ProjectOverviewDialogs from '@/features/project/components/ProjectOverviewDialogs';
 import ProjectOverviewEmptyState from '@/features/project/components/ProjectOverviewEmptyState';
@@ -11,6 +12,7 @@ export default function ProjectOverviewScreen() {
     cancelDeleteProject,
     confirmDeleteProject,
     error,
+    filteredProjects,
     handleDeleteProject,
     handleViewProject,
     isAdminContext,
@@ -21,6 +23,7 @@ export default function ProjectOverviewScreen() {
     projects,
     refreshData,
     selectedProject,
+    setFilteredProjects,
     setSelectedProject,
     showDeleteConfirm,
     targetUserName,
@@ -47,11 +50,13 @@ export default function ProjectOverviewScreen() {
         <ProjectStatsRow loading={loading} projects={visibleProjects} />
       </div>
 
-      {visibleProjects.length === 0 ? (
+      <ProjectFilters onFilteredProjects={setFilteredProjects} onRefresh={refreshData} projects={visibleProjects} />
+
+      {filteredProjects.length === 0 ? (
         <ProjectOverviewEmptyState />
       ) : (
         <section className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3" data-tour="project-list">
-          {visibleProjects.map((project) => (
+          {filteredProjects.map((project) => (
             <ProjectCard
               key={project.id}
               onDeleteProject={handleDeleteProject}

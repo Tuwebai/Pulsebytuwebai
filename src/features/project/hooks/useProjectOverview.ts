@@ -22,6 +22,7 @@ export function useProjectOverview() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<ProjectsPageProject | null>(null);
+  const [filteredProjects, setFilteredProjects] = useState<ProjectsPageProject[]>([]);
   const [projectCreators, setProjectCreators] = useState<Record<string, ProjectCreatorInfo>>({});
   const [targetUserName, setTargetUserName] = useState('');
 
@@ -56,6 +57,10 @@ export function useProjectOverview() {
 
     void loadTargetUserInfo();
   }, [user, userId]);
+
+  useEffect(() => {
+    setFilteredProjects(visibleProjects);
+  }, [visibleProjects]);
 
   useEffect(() => {
     const loadProjectCreators = async () => {
@@ -146,6 +151,7 @@ export function useProjectOverview() {
     cancelDeleteProject,
     confirmDeleteProject,
     error,
+    filteredProjects,
     handleDeleteProject,
     handleViewProject,
     isAdminContext,
@@ -156,6 +162,7 @@ export function useProjectOverview() {
     projects,
     refreshData,
     selectedProject,
+    setFilteredProjects,
     setSelectedProject,
     setShowDeleteConfirm,
     showDeleteConfirm,
