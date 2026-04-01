@@ -1,4 +1,5 @@
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+
 import ProjectDetailModal from '@/features/project/components/ProjectDetailModal';
 import type { ProjectsPageProject } from '@/features/project/components/projectPage.types';
 import { toProjectDetailProject } from '@/features/project/components/projectOverview.utils';

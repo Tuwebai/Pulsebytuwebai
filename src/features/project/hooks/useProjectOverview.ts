@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
+
 import { useApp } from '@/contexts/AppContext';
+import { toast } from '@/hooks/use-toast';
+
 import type { ProjectsPageProject } from '@/features/project/components/projectPage.types';
 import {
   deleteProjectById,
@@ -27,9 +29,18 @@ export function useProjectOverview() {
   const isAdminContext = user?.role === 'admin' && !isDashboardProjectRoute;
 
   const visibleProjects = useMemo(() => {
-    if (!user) return [];
-    if (userId) return projects.filter((project) => project.created_by === userId);
-    if (user.role === 'admin' && !isDashboardProjectRoute) return projects;
+    if (!user) {
+      return [];
+    }
+
+    if (userId) {
+      return projects.filter((project) => project.created_by === userId);
+    }
+
+    if (user.role === 'admin' && !isDashboardProjectRoute) {
+      return projects;
+    }
+
     return projects.filter((project) => project.created_by === user.id);
   }, [isDashboardProjectRoute, projects, user, userId]);
 
@@ -57,8 +68,8 @@ export function useProjectOverview() {
         new Set(
           visibleProjects
             .map((project) => project.created_by)
-            .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
-        )
+            .filter((value): value is string => typeof value === 'string' && value.trim().length > 0),
+        ),
       );
 
       if (creatorIds.length === 0) {
@@ -78,10 +89,14 @@ export function useProjectOverview() {
 
   const handleDeleteProject = useCallback(
     (projectId: string) => {
-      if (!user) return;
+      if (!user) {
+        return;
+      }
 
       const project = projects.find((projectItem) => projectItem.id === projectId);
-      if (!project) return;
+      if (!project) {
+        return;
+      }
 
       if (user.role !== 'admin' && project.created_by !== user.id) {
         toast({
@@ -95,18 +110,27 @@ export function useProjectOverview() {
       setProjectToDelete(projectId);
       setShowDeleteConfirm(true);
     },
-    [projects, user]
+    [projects, user],
   );
 
   const confirmDeleteProject = useCallback(async () => {
-    if (!projectToDelete) return;
+    if (!projectToDelete) {
+      return;
+    }
 
     try {
       await deleteProjectById(projectToDelete);
-      toast({ title: 'Proyecto eliminado', description: 'El proyecto se eliminó correctamente.' });
+      toast({
+        title: 'Proyecto eliminado',
+        description: 'El proyecto se eliminó correctamente.',
+      });
       await refreshData();
     } catch {
-      toast({ title: 'Error', description: 'No se pudo eliminar el proyecto.', variant: 'destructive' });
+      toast({
+        title: 'Error',
+        description: 'No se pudo eliminar el proyecto.',
+        variant: 'destructive',
+      });
     } finally {
       setShowDeleteConfirm(false);
       setProjectToDelete(null);
@@ -120,6 +144,7 @@ export function useProjectOverview() {
 
   return {
     cancelDeleteProject,
+    confirmDeleteProject,
     error,
     handleDeleteProject,
     handleViewProject,
@@ -138,6 +163,5 @@ export function useProjectOverview() {
     user,
     userId,
     visibleProjects,
-    confirmDeleteProject,
   };
 }

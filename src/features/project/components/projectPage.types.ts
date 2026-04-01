@@ -1,4 +1,4 @@
-import type { Project } from '@/contexts/appContext.types';
+import type { Project } from '@/types/project.types';
 
 export interface ProjectPhaseTask {
   id?: string;
@@ -25,21 +25,9 @@ export interface ProjectsPagePhase {
   descripcion?: string;
   tasks?: ProjectPhaseTask[];
   tareas?: ProjectPhaseTask[];
-  comments?: unknown[];
-  comentarios?: unknown[];
 }
 
 export interface ProjectsPageProject extends Omit<Project, 'fases' | 'tareas'> {
-  phases?: Array<{
-    tasks?: ProjectPhaseTask[];
-    tareas?: ProjectPhaseTask[];
-    comments?: unknown[];
-  }>;
-  collaborators?: unknown[];
-  notifications?: unknown[];
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
   fases?: ProjectsPagePhase[];
   tareas?: ProjectPhaseTask[];
 }

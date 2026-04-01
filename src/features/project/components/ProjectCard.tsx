@@ -1,7 +1,10 @@
 import { CalendarDays, ChevronRight, PenSquare, Trash2 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import Badge from '@/core/components/Badge';
 import { formatDateSafe } from '@/utils/formatDateSafe';
+
+import ProjectCardSummaryItem from './ProjectCardSummaryItem';
 import type { ProjectsPageProject } from './projectPage.types';
 import {
   getProjectClientPendingTasks,
@@ -17,21 +20,6 @@ interface ProjectCardProps {
   onViewProject?: (project: ProjectsPageProject) => void;
   onNavigateToEdit?: (projectId: string) => void;
   onDeleteProject?: (projectId: string) => void;
-}
-
-function SummaryItem({
-  label,
-  value
-}: {
-  label: string;
-  value: string | number;
-}) {
-  return (
-    <div className="rounded-[14px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-3 py-3">
-      <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">{label}</p>
-      <p className="mt-2 font-data text-[18px] font-light text-[var(--text-primary)]">{value}</p>
-    </div>
-  );
 }
 
 export default function ProjectCard({
@@ -73,17 +61,14 @@ export default function ProjectCard({
           <span className="font-data text-[var(--text-primary)]">{progress}%</span>
         </div>
         <div className="mt-2 h-1 rounded-full bg-[var(--bg-subtle)]">
-          <div
-            className="h-1 rounded-full bg-[var(--signal)] transition-[width] duration-300"
-            style={{ width: `${progress}%` }}
-          />
+          <div className="h-1 rounded-full bg-[var(--signal)] transition-[width] duration-300" style={{ width: `${progress}%` }} />
         </div>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <SummaryItem label="Progreso" value={`${progress}%`} />
-        <SummaryItem label="Fases" value={totalPhases} />
-        <SummaryItem label="Tu parte" value={clientPendingTasks > 0 ? clientPendingTasks : 'Al dia'} />
+        <ProjectCardSummaryItem label="Progreso" value={`${progress}%`} />
+        <ProjectCardSummaryItem label="Fases" value={totalPhases} />
+        <ProjectCardSummaryItem label="Tu parte" value={clientPendingTasks > 0 ? clientPendingTasks : 'Al día'} />
       </div>
 
       <div className="mt-5 space-y-2 text-[13px] text-[var(--text-secondary)]">
@@ -99,11 +84,7 @@ export default function ProjectCard({
       </div>
 
       <div className="mt-6 flex flex-wrap gap-2">
-        <Button
-          className="h-10 rounded-[10px] bg-[var(--signal)] px-4 text-white hover:bg-[var(--signal-dim)]"
-          onClick={() => onViewProject?.(project)}
-          type="button"
-        >
+        <Button className="h-10 rounded-[10px] bg-[var(--signal)] px-4 text-white hover:bg-[var(--signal-dim)]" onClick={() => onViewProject?.(project)} type="button">
           Ver detalles
         </Button>
 

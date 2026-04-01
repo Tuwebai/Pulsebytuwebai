@@ -1,5 +1,6 @@
 import type { BadgeProps } from '@/core/components/Badge';
 import { buildWhatsAppUrl } from '@/config/supportContact';
+
 import type { ProjectDetailPhase, ProjectDetailProject, ProjectDetailTask } from './projectDetail.types';
 
 const ACTIVE_PHASE_STATES = new Set(['en progreso', 'en revisión', 'en revision', 'bloqueada', 'pendiente']);
@@ -22,7 +23,7 @@ export function getProjectProgress(project: ProjectDetailProject): number {
   }
 
   const completedPhases = phases.filter((phase) =>
-    COMPLETED_PHASE_STATES.has((phase.estado ?? '').toLowerCase())
+    COMPLETED_PHASE_STATES.has((phase.estado ?? '').toLowerCase()),
   ).length;
 
   return Math.round((completedPhases / phases.length) * 100);
@@ -61,7 +62,7 @@ export function getCurrentPhase(project: ProjectDetailProject): ProjectDetailPha
   const phases = project.fases ?? [];
 
   const activePhase = phases.find((phase) =>
-    ACTIVE_PHASE_STATES.has((phase.estado ?? '').toLowerCase())
+    ACTIVE_PHASE_STATES.has((phase.estado ?? '').toLowerCase()),
   );
 
   if (activePhase) {
@@ -69,7 +70,7 @@ export function getCurrentPhase(project: ProjectDetailProject): ProjectDetailPha
   }
 
   const firstIncompletePhase = phases.find(
-    (phase) => !COMPLETED_PHASE_STATES.has((phase.estado ?? '').toLowerCase())
+    (phase) => !COMPLETED_PHASE_STATES.has((phase.estado ?? '').toLowerCase()),
   );
 
   return firstIncompletePhase ?? phases[0] ?? null;
