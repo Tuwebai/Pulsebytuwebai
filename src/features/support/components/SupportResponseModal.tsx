@@ -1,8 +1,11 @@
-import { X } from 'lucide-react';
+import { MessageSquareMore } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { getStatusLabel } from '../support.utils';
+import { getPriorityLabel, getStatusLabel } from '../support.utils';
 import type { Ticket } from '../types';
+import SupportDialogShell from './SupportDialogShell';
+import SupportResponseDetailBlock from './SupportResponseDetailBlock';
+import SupportTicketResponseBlock from './SupportTicketResponseBlock';
 
 interface SupportResponseModalProps {
   onChange: (value: string) => void;
@@ -19,59 +22,76 @@ export default function SupportResponseModal({
   responseText,
   ticket,
 }: SupportResponseModalProps) {
-  if (!ticket) {
-    return null;
-  }
+  if (!ticket) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6">
-      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_24px_64px_rgba(0,0,0,0.6)] sm:p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Responder ticket</p>
-            <h2 className="mt-2 text-xl font-medium text-slate-50">Seguimos la conversación</h2>
-            <p className="mt-1 text-sm text-slate-400">Tu mensaje se suma al mismo hilo para que no se pierda contexto.</p>
-          </div>
+    <SupportDialogShell
+      ariaDescribedBy="support-response-description"
+      description="Tu mensaje se suma al mismo ticket para que el equipo responda con contexto y sin perder el hilo."
+      icon={MessageSquareMore}
+      kicker="Pulse · soporte"
+      open={Boolean(ticket)}
+      title="Seguimos la conversación"
+      onOpenChange={(open) => !open && onClose()}
+      footer={
+        <>
+          <Button className="border-white/10 bg-transparent text-slate-300 hover:bg-white/[0.04]" type="button" variant="outline" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button className="bg-signal text-white hover:bg-[var(--signal-dim)]" disabled={!responseText.trim()} type="button" onClick={onSubmit}>
+            Enviar respuesta
+          </Button>
+        </>
+      }
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-full border border-signal/20 bg-signal/10 px-3 py-1 text-[12px] font-medium text-signal">
+          {getStatusLabel(ticket.status)}
+        </span>
+        <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[12px] font-medium text-slate-300">
+          Prioridad {getPriorityLabel(ticket.priority)}
+        </span>
+      </div>
 
-          <button
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-[var(--bg-elevated)] text-slate-400 transition-colors hover:border-white/15 hover:text-slate-100"
-            onClick={onClose}
-            type="button"
-          >
-            <X className="h-4 w-4" strokeWidth={1.75} />
-          </button>
-        </div>
-
-        <div className="mt-5 rounded-[18px] border border-white/10 bg-[var(--bg-elevated)]/55 px-4 py-4">
-          <p className="text-[15px] font-medium text-slate-100">{ticket.title}</p>
-          <p className="mt-2 text-[13px] leading-5 text-slate-400">{ticket.description}</p>
-          <p className="mt-3 text-[12px] text-slate-500">Estado actual: {getStatusLabel(ticket.status)}</p>
-        </div>
-
-        <div className="mt-5 space-y-2">
-          <label className="text-[13px] font-medium text-slate-400" htmlFor="support-response">
-            Tu respuesta
-          </label>
+      <div className="grid gap-4 md:grid-cols-2">
+        <SupportResponseDetailBlock
+          title="Ticket"
+          value={<p className="text-lg font-semibold">{ticket.title}</p>}
+          description="Esta es la consulta que abriste y que hoy sigue en conversación con el equipo."
+        />
+        <SupportResponseDetailBlock
+          title="Qué sigue"
+          value={<p className="text-base font-semibold text-slate-100">Respondé lo que falte aclarar</p>}
+          description="Si necesitás sumar contexto o confirmar algo, este mensaje queda dentro del mismo hilo."
+        />
+        <SupportResponseDetailBlock
+          className="md:col-span-2"
+          title="Consulta original"
+          value={<p className="text-sm leading-6 text-slate-100">{ticket.description}</p>}
+        />
+        {ticket.respuesta ? (
+          <SupportResponseDetailBlock className="md:col-span-2" title="Última respuesta del equipo">
+            <SupportTicketResponseBlock
+              content={ticket.respuesta}
+              icon={<MessageSquareMore className="h-4 w-4 text-signal" strokeWidth={1.5} />}
+              meta={ticket.respondido_por || undefined}
+              title="Respuesta del equipo"
+              tone="signal"
+            />
+          </SupportResponseDetailBlock>
+        ) : null}
+        <SupportResponseDetailBlock className="md:col-span-2" title="Tu respuesta">
           <Textarea
-            className="min-h-[160px] resize-none border-white/10 bg-[var(--bg-elevated)]/55 text-slate-100 placeholder:text-slate-500 focus-visible:border-signal focus-visible:ring-2 focus-visible:ring-[var(--signal-glow)] focus-visible:ring-offset-0"
+            className="min-h-[150px] resize-none border-white/10 bg-[var(--cliente-bg-surface)] text-slate-100 placeholder:text-slate-500 focus-visible:border-signal focus-visible:ring-2 focus-visible:ring-[var(--signal-glow)] focus-visible:ring-offset-0"
             id="support-response"
-            placeholder="Escribe tu respuesta o una aclaración adicional"
+            placeholder="Escribí la aclaración o el dato que querés sumar al ticket."
             required
-            rows={6}
+            rows={5}
             value={responseText}
             onChange={(event) => onChange(event.target.value)}
           />
-        </div>
-
-        <div className="mt-6 flex flex-wrap justify-end gap-3">
-          <Button className="h-10 rounded-full border border-white/10 bg-transparent text-slate-400 hover:border-white/15 hover:bg-[var(--bg-elevated)] hover:text-slate-100" onClick={onClose} type="button" variant="outline">
-            Cancelar
-          </Button>
-          <Button className="h-10 rounded-full bg-signal text-white hover:bg-[var(--signal-dim)]" disabled={!responseText.trim()} onClick={onSubmit} type="button">
-            Enviar respuesta
-          </Button>
-        </div>
+        </SupportResponseDetailBlock>
       </div>
-    </div>
+    </SupportDialogShell>
   );
 }

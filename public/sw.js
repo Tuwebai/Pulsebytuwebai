@@ -92,6 +92,10 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
+
+  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+    return;
+  }
   
   // Solo interceptar requests HTTP/HTTPS
   if (!request.url.startsWith('http')) {
@@ -327,13 +331,14 @@ self.addEventListener('push', (event) => {
   if (event.data) {
     const data = event.data.json();
     const options = {
-      body: data.body,
+      body: data.body || data.message,
       icon: '/favicon.ico',
       badge: '/favicon.ico',
       vibrate: [100, 50, 100],
       data: {
         dateOfArrival: Date.now(),
-        primaryKey: data.primaryKey
+        primaryKey: data.primaryKey,
+        url: data.url || '/dashboard',
       },
       actions: [
         {
@@ -357,12 +362,24 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  
-  if (event.action === 'explore') {
-    event.waitUntil(
-      clients.openWindow('/')
-    );
-  }
+
+  const targetUrl = event.notification.data?.url || '/dashboard';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ('focus' in client && client.url.includes(new URL(targetUrl, self.location.origin).pathname)) {
+          return client.focus();
+        }
+      }
+
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+
+      return undefined;
+    })
+  );
 });
 
 // Service Worker cargado y listo

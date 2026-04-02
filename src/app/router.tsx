@@ -53,12 +53,7 @@ const SSOPage = createLazyComponent(() => import('@/features/auth/pages/SSOPage'
 
 const ServiceWorkerInitializer = () => {
   React.useEffect(() => {
-    if (import.meta.env.PROD) {
-      void serviceWorkerManager.register();
-      return;
-    }
-
-    void serviceWorkerManager.unregisterInDevelopment();
+    void serviceWorkerManager.register();
   }, []);
 
   return null;

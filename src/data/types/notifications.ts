@@ -23,6 +23,13 @@ export interface NotificationPreferences {
   notif_project_update: boolean;
 }
 
+export interface PushSubscriptionStatus {
+  endpoint: string | null;
+  isSubscribed: boolean;
+  isSupported: boolean;
+  permission: NotificationPermission | 'unsupported';
+}
+
 export interface GroupedNotifications {
   today: Notification[];
   thisWeek: Notification[];
