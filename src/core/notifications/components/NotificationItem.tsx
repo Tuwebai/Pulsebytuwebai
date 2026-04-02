@@ -6,7 +6,7 @@ import { formatNotificationTime } from '../services/notifications.service';
 
 interface NotificationItemProps {
   notification: Notification;
-  onRead: (id: string) => void;
+  onSelect: (notification: Notification) => void;
 }
 
 type NotificationVisual = {
@@ -95,7 +95,7 @@ function getNotificationIcon(notification: Notification): NotificationVisual {
   return notificationIconMap[getDisplayType(notification)];
 }
 
-export function NotificationItem({ notification, onRead }: NotificationItemProps) {
+export function NotificationItem({ notification, onSelect }: NotificationItemProps) {
   const { icon: Icon, color, backgroundColor, borderColor } = getNotificationIcon(notification);
 
   return (
@@ -105,7 +105,7 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
         notification.is_read ? 'bg-transparent' : 'bg-[color:rgba(59,158,245,0.08)]'
       )}
       type="button"
-      onClick={() => onRead(notification.id)}
+      onClick={() => onSelect(notification)}
     >
       <div
         className="relative mt-0.5 flex h-8 w-8 items-center justify-center rounded-full border"

@@ -1,40 +1,62 @@
 :root {
-  --bg-base: #0b0f1e;
-  --bg-surface: #111827;
-  --bg-elevated: #1a2234;
-  --bg-subtle: #222d42;
-
-  --signal: #3b9ef5;
-  --signal-dim: #1e6bb8;
-  --signal-glow: rgba(59, 158, 245, 0.15);
-  --signal-border: rgba(59, 158, 245, 0.25);
-
-  --text-primary: #f0f4ff;
-  --text-secondary: #8b9ac0;
-  --text-tertiary: #4a5580;
-  --text-disabled: #2d3a55;
-
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.1);
-  --border-strong: rgba(255, 255, 255, 0.18);
-
-  --success: #22c55e;
-  --success-dim: rgba(34, 197, 94, 0.15);
-  --warning: #f59e0b;
-  --warning-dim: rgba(245, 158, 11, 0.15);
-  --danger: #ef4444;
-  --danger-dim: rgba(239, 68, 68, 0.15);
-
-  --gradient-brand: linear-gradient(135deg, #3b9ef5 0%, #7b4cd4 40%, #e040a0 75%, #ff9d00 100%);
-  --gradient-subtle: linear-gradient(
+  --admin-bg-base: #0b0f1e;
+  --admin-bg-surface: #111827;
+  --admin-bg-elevated: #1a2234;
+  --admin-bg-subtle: #222d42;
+  --admin-signal: #3b9ef5;
+  --admin-signal-dim: #1e6bb8;
+  --admin-signal-glow: rgba(59, 158, 245, 0.15);
+  --admin-signal-border: rgba(59, 158, 245, 0.25);
+  --admin-text-primary: #f0f4ff;
+  --admin-text-secondary: #8b9ac0;
+  --admin-text-tertiary: #4a5580;
+  --admin-text-disabled: #2d3a55;
+  --admin-border-subtle: rgba(255, 255, 255, 0.06);
+  --admin-border-default: rgba(255, 255, 255, 0.1);
+  --admin-border-strong: rgba(255, 255, 255, 0.18);
+  --admin-success: #22c55e;
+  --admin-success-dim: rgba(34, 197, 94, 0.15);
+  --admin-warning: #f59e0b;
+  --admin-warning-dim: rgba(245, 158, 11, 0.15);
+  --admin-danger: #ef4444;
+  --admin-danger-dim: rgba(239, 68, 68, 0.15);
+  --admin-gradient-brand: linear-gradient(135deg, #3b9ef5 0%, #7b4cd4 40%, #e040a0 75%, #ff9d00 100%);
+  --admin-gradient-subtle: linear-gradient(
     135deg,
     rgba(59, 158, 245, 0.08) 0%,
     rgba(123, 76, 212, 0.06) 50%,
     rgba(224, 64, 160, 0.04) 100%
   );
-
+  --admin-font-display: 'DM Sans', system-ui, sans-serif;
+  --admin-font-body: 'DM Sans', system-ui, sans-serif;
+  --admin-font-data: 'JetBrains Mono', 'Fira Code', monospace;
+  --admin-radius-sm: 6px;
+  --admin-radius-md: 10px;
+  --admin-radius-lg: 14px;
+  --admin-radius-xl: 20px;
+  --admin-radius-2xl: 28px;
+  --admin-radius-full: 9999px;
+  --admin-space-1: 4px;
+  --admin-space-2: 8px;
+  --admin-space-3: 12px;
+  --admin-space-4: 16px;
+  --admin-space-5: 20px;
+  --admin-space-6: 24px;
+  --admin-space-8: 32px;
+  --admin-space-10: 40px;
+  --admin-space-12: 48px;
+  --admin-space-16: 64px;
+  --admin-space-20: 80px;
+  --admin-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  --admin-shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.18);
+  --admin-shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.6);
+  --admin-glow-signal: 0 0 24px rgba(59, 158, 245, 0.3);
+  --admin-glow-success: 0 0 16px rgba(34, 197, 94, 0.25);
+  --admin-transition-fast: 150ms ease;
+  --admin-transition-base: 200ms ease;
+  --admin-transition-slow: 350ms ease;
   --admin-hero-bg: linear-gradient(135deg, rgba(59, 158, 245, 0.12), rgba(123, 76, 212, 0.08) 48%, rgba(17, 24, 39, 0.96) 100%);
-  --admin-hero-border: rgba(255, 255, 255, 0.10);
+  --admin-hero-border: rgba(255, 255, 255, 0.1);
   --admin-hero-line: linear-gradient(90deg, #38bdf8 0%, rgba(167, 139, 250, 0.7) 45%, transparent 100%);
   --admin-card-radius: 24px;
   --admin-card-padding: 20px;
@@ -48,22 +70,132 @@
   --admin-grid-gap: 16px;
   --admin-grid-gap-mobile: 12px;
 
-  --cliente-hero-bg: var(--admin-hero-bg);
-  --cliente-hero-border: var(--admin-hero-border);
-  --cliente-hero-line: var(--admin-hero-line);
-  --cliente-card-radius: var(--admin-card-radius);
-  --cliente-card-padding: var(--admin-card-padding);
-  --cliente-card-padding-mobile: var(--admin-card-padding-mobile);
-  --cliente-card-shadow: var(--admin-card-shadow);
-  --cliente-badge-height: var(--admin-badge-height);
-  --cliente-badge-padding-x: var(--admin-badge-padding-x);
-  --cliente-avatar-size: var(--admin-avatar-size);
-  --cliente-avatar-size-compact: var(--admin-avatar-size-compact);
-  --cliente-filter-gap: var(--admin-filter-gap);
-  --cliente-grid-gap: var(--admin-grid-gap);
-  --cliente-grid-gap-mobile: var(--admin-grid-gap-mobile);
+  --cliente-bg-base: #0b0f1e;
+  --cliente-bg-surface: #111827;
+  --cliente-bg-elevated: #1a2234;
+  --cliente-bg-subtle: #222d42;
+  --cliente-signal: #3b9ef5;
+  --cliente-signal-dim: #1e6bb8;
+  --cliente-signal-glow: rgba(59, 158, 245, 0.15);
+  --cliente-signal-border: rgba(59, 158, 245, 0.25);
+  --cliente-text-primary: #f0f4ff;
+  --cliente-text-secondary: #8b9ac0;
+  --cliente-text-tertiary: #4a5580;
+  --cliente-text-disabled: #2d3a55;
+  --cliente-border-subtle: rgba(255, 255, 255, 0.06);
+  --cliente-border-default: rgba(255, 255, 255, 0.1);
+  --cliente-border-strong: rgba(255, 255, 255, 0.18);
+  --cliente-success: #22c55e;
+  --cliente-success-dim: rgba(34, 197, 94, 0.15);
+  --cliente-warning: #f59e0b;
+  --cliente-warning-dim: rgba(245, 158, 11, 0.15);
+  --cliente-danger: #ef4444;
+  --cliente-danger-dim: rgba(239, 68, 68, 0.15);
+  --cliente-gradient-brand: linear-gradient(135deg, #3b9ef5 0%, #7b4cd4 40%, #e040a0 75%, #ff9d00 100%);
+  --cliente-gradient-subtle: linear-gradient(
+    135deg,
+    rgba(59, 158, 245, 0.08) 0%,
+    rgba(123, 76, 212, 0.06) 50%,
+    rgba(224, 64, 160, 0.04) 100%
+  );
+  --cliente-font-display: 'DM Sans', system-ui, sans-serif;
+  --cliente-font-body: 'DM Sans', system-ui, sans-serif;
+  --cliente-font-data: 'JetBrains Mono', 'Fira Code', monospace;
+  --cliente-radius-sm: 6px;
+  --cliente-radius-md: 10px;
+  --cliente-radius-lg: 14px;
+  --cliente-radius-xl: 20px;
+  --cliente-radius-2xl: 28px;
+  --cliente-radius-full: 9999px;
+  --cliente-space-1: 4px;
+  --cliente-space-2: 8px;
+  --cliente-space-3: 12px;
+  --cliente-space-4: 16px;
+  --cliente-space-5: 20px;
+  --cliente-space-6: 24px;
+  --cliente-space-8: 32px;
+  --cliente-space-10: 40px;
+  --cliente-space-12: 48px;
+  --cliente-space-16: 64px;
+  --cliente-space-20: 80px;
+  --cliente-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  --cliente-shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.18);
+  --cliente-shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.6);
+  --cliente-glow-signal: 0 0 24px rgba(59, 158, 245, 0.3);
+  --cliente-glow-success: 0 0 16px rgba(34, 197, 94, 0.25);
+  --cliente-transition-fast: 150ms ease;
+  --cliente-transition-base: 200ms ease;
+  --cliente-transition-slow: 350ms ease;
+  --cliente-hero-bg: linear-gradient(135deg, rgba(59, 158, 245, 0.12), rgba(123, 76, 212, 0.08) 48%, rgba(17, 24, 39, 0.96) 100%);
+  --cliente-hero-border: rgba(255, 255, 255, 0.1);
+  --cliente-hero-line: linear-gradient(90deg, #38bdf8 0%, rgba(167, 139, 250, 0.7) 45%, transparent 100%);
+  --cliente-card-radius: 24px;
+  --cliente-card-padding: 20px;
+  --cliente-card-padding-mobile: 16px;
+  --cliente-card-shadow: 0 18px 40px rgba(2, 6, 23, 0.24);
+  --cliente-badge-height: 28px;
+  --cliente-badge-padding-x: 12px;
+  --cliente-avatar-size: 48px;
+  --cliente-avatar-size-compact: 32px;
+  --cliente-filter-gap: 8px;
+  --cliente-grid-gap: 16px;
+  --cliente-grid-gap-mobile: 12px;
+}
 
-  --font-display: 'DM Sans', system-ui, sans-serif;
-  --font-body: 'DM Sans', system-ui, sans-serif;
-  --font-data: 'JetBrains Mono', 'Fira Code', monospace;
+[data-surface='client'] {
+  --bg-base: var(--cliente-bg-base);
+  --bg-surface: var(--cliente-bg-surface);
+  --bg-elevated: var(--cliente-bg-elevated);
+  --bg-subtle: var(--cliente-bg-subtle);
+  --signal: var(--cliente-signal);
+  --signal-dim: var(--cliente-signal-dim);
+  --signal-glow: var(--cliente-signal-glow);
+  --signal-border: var(--cliente-signal-border);
+  --text-primary: var(--cliente-text-primary);
+  --text-secondary: var(--cliente-text-secondary);
+  --text-tertiary: var(--cliente-text-tertiary);
+  --text-disabled: var(--cliente-text-disabled);
+  --border-subtle: var(--cliente-border-subtle);
+  --border-default: var(--cliente-border-default);
+  --border-strong: var(--cliente-border-strong);
+  --success: var(--cliente-success);
+  --success-dim: var(--cliente-success-dim);
+  --warning: var(--cliente-warning);
+  --warning-dim: var(--cliente-warning-dim);
+  --danger: var(--cliente-danger);
+  --danger-dim: var(--cliente-danger-dim);
+  --gradient-brand: var(--cliente-gradient-brand);
+  --gradient-subtle: var(--cliente-gradient-subtle);
+  --font-display: var(--cliente-font-display);
+  --font-body: var(--cliente-font-body);
+  --font-data: var(--cliente-font-data);
+}
+
+[data-surface='admin'] {
+  --bg-base: var(--admin-bg-base);
+  --bg-surface: var(--admin-bg-surface);
+  --bg-elevated: var(--admin-bg-elevated);
+  --bg-subtle: var(--admin-bg-subtle);
+  --signal: var(--admin-signal);
+  --signal-dim: var(--admin-signal-dim);
+  --signal-glow: var(--admin-signal-glow);
+  --signal-border: var(--admin-signal-border);
+  --text-primary: var(--admin-text-primary);
+  --text-secondary: var(--admin-text-secondary);
+  --text-tertiary: var(--admin-text-tertiary);
+  --text-disabled: var(--admin-text-disabled);
+  --border-subtle: var(--admin-border-subtle);
+  --border-default: var(--admin-border-default);
+  --border-strong: var(--admin-border-strong);
+  --success: var(--admin-success);
+  --success-dim: var(--admin-success-dim);
+  --warning: var(--admin-warning);
+  --warning-dim: var(--admin-warning-dim);
+  --danger: var(--admin-danger);
+  --danger-dim: var(--admin-danger-dim);
+  --gradient-brand: var(--admin-gradient-brand);
+  --gradient-subtle: var(--admin-gradient-subtle);
+  --font-display: var(--admin-font-display);
+  --font-body: var(--admin-font-body);
+  --font-data: var(--admin-font-data);
 }

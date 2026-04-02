@@ -20,7 +20,7 @@ const ITEMS: Array<{
   {
     key: 'notif_monthly_summary',
     title: 'Resumen mensual',
-    description: 'Recibís el resumen de tu web el primer día de cada mes.',
+    description: 'Recibis el resumen de tu web el primer dia de cada mes.',
     icon: BarChart2,
   },
   {
@@ -53,7 +53,9 @@ export function NotificationSettingsSection({
   if (isLoading) {
     return (
       <div className="space-y-4">
-        {Array.from({ length: 4 }).map((_, index) => <Skeleton key={index} height="88px" rounded="lg" />)}
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Skeleton height="88px" key={index} rounded="lg" />
+        ))}
       </div>
     );
   }
@@ -66,11 +68,11 @@ export function NotificationSettingsSection({
 
         return (
           <NotificationPreferenceToggle
-            key={item.key}
             checked={checked}
             description={item.description}
             disabled={isSaving}
             icon={<Icon className="h-5 w-5" strokeWidth={1.75} />}
+            key={item.key}
             title={item.title}
             onChange={(next) => updatePreference({ [item.key]: next })}
           />

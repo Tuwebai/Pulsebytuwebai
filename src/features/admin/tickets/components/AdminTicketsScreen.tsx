@@ -3,12 +3,12 @@ import { Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AdminPageActionsBar } from '@/features/admin/components/AdminPageActionsBar';
 import { AdminTicketFormDialog } from '@/features/admin/tickets/components/AdminTicketFormDialog';
-import { AdminTicketResponseDialog } from '@/features/admin/tickets/components/AdminTicketResponseDialog';
 import { AdminTicketsFilters } from '@/features/admin/tickets/components/AdminTicketsFilters';
 import { AdminTicketsList } from '@/features/admin/tickets/components/AdminTicketsList';
 import { AdminTicketsStats } from '@/features/admin/tickets/components/AdminTicketsStats';
 import { useAdminTicketsScreen } from '@/features/admin/tickets/hooks/useAdminTicketsScreen';
 import type { AdminTicketsScreenProps } from '@/features/admin/tickets/types/adminTicket.types';
+import { storeSupportChatIntent } from '@/features/support/supportChat.events';
 
 export default function AdminTicketsScreen(props: AdminTicketsScreenProps) {
   const screen = useAdminTicketsScreen(props);
@@ -55,7 +55,7 @@ export default function AdminTicketsScreen(props: AdminTicketsScreenProps) {
           tickets={screen.filteredTickets}
           onDelete={(ticketId) => void screen.handleDelete(ticketId)}
           onEdit={screen.openEditForm}
-          onRespond={screen.openResponseForm}
+          onRespond={(ticket) => storeSupportChatIntent({ scope: 'admin', ticketId: ticket.id, focusInput: true })}
           onStatusChange={(ticketId, status) => void screen.handleStatusChange(ticketId, status)}
         />
       )}
@@ -67,15 +67,6 @@ export default function AdminTicketsScreen(props: AdminTicketsScreenProps) {
         onChange={(updates) => screen.setFormData((current) => ({ ...current, ...updates }))}
         onClose={screen.resetFormState}
         onSubmit={screen.handleSubmit}
-      />
-
-      <AdminTicketResponseDialog
-        open={Boolean(screen.respondingTicket)}
-        responseText={screen.responseText}
-        ticket={screen.respondingTicket}
-        onChange={screen.setResponseText}
-        onClose={screen.resetResponseState}
-        onSubmit={screen.handleSubmitResponse}
       />
     </div>
   );

@@ -2,11 +2,11 @@ import { Navigate } from 'react-router-dom';
 import {
   SupportContactPanel,
   SupportHeader,
-  SupportResponseModal,
   SupportSummaryRow,
   SupportTicketForm,
   SupportTicketsPanel,
 } from '@/features/support';
+import { storeSupportChatIntent } from '@/features/support/supportChat.events';
 import { useSupportPage } from '@/features/support/hooks/useSupportPage';
 
 export default function SupportPage() {
@@ -46,24 +46,11 @@ export default function SupportPage() {
             loading={support.loading}
             tickets={support.tickets}
             userEmail={support.user.email}
-            onReply={support.setRespondingTicketId}
+            onReply={(ticketId) => storeSupportChatIntent({ scope: 'client', ticketId, focusInput: true })}
             onRetry={support.handleRetryLoad}
           />
         </div>
       </div>
-
-      <SupportResponseModal
-        responseText={support.responseText}
-        ticket={support.respondingTicket}
-        onChange={support.setResponseText}
-        onClose={() => {
-          support.setRespondingTicketId(null);
-          support.setResponseText('');
-        }}
-        onSubmit={() => {
-          void support.handleClientResponse();
-        }}
-      />
     </>
   );
 }

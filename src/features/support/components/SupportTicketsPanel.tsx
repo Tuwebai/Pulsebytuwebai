@@ -22,11 +22,15 @@ export default function SupportTicketsPanel({
   userEmail,
 }: SupportTicketsPanelProps) {
   return (
-    <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/92 p-4 shadow-[0_18px_40px_rgba(2,6,23,0.24)] sm:p-5">
+    <section className="rounded-[var(--cliente-card-radius)] border border-[var(--cliente-border-default)] bg-[var(--cliente-bg-surface)]/92 p-4 shadow-[var(--cliente-card-shadow)] sm:p-5">
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Bandeja activa</p>
-        <h2 className="mt-2 text-xl font-medium text-slate-50">Historial de tickets</h2>
-        <p className="mt-1 text-sm text-slate-400">Seguimiento de tus consultas y respuestas del equipo.</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--cliente-text-tertiary)]">
+          Bandeja activa
+        </p>
+        <h2 className="mt-2 text-xl font-medium text-[var(--cliente-text-primary)]">Historial de tickets</h2>
+        <p className="mt-1 text-sm text-[var(--cliente-text-secondary)]">
+          Seguimiento de tus consultas y respuestas del equipo.
+        </p>
       </div>
 
       <div className="mt-5">
@@ -49,7 +53,10 @@ function SupportTicketsSkeleton() {
   return (
     <div className="space-y-3">
       {Array.from({ length: 3 }).map((_, index) => (
-        <div className="rounded-[22px] border border-white/10 bg-[var(--bg-surface)]/92 p-4 shadow-[0_14px_30px_rgba(2,6,23,0.22)]" key={index}>
+        <div
+          className="rounded-[22px] border border-[var(--cliente-border-default)] bg-[var(--cliente-bg-surface)]/92 p-4 shadow-[var(--cliente-card-shadow)]"
+          key={index}
+        >
           <Skeleton height="16px" rounded="sm" width="180px" />
           <div className="mt-3 space-y-2">
             <Skeleton height="14px" rounded="sm" width="100%" />
@@ -64,9 +71,13 @@ function SupportTicketsSkeleton() {
 function SupportTicketsError({ error, onRetry }: { error: string; onRetry: () => void }) {
   return (
     <div className="rounded-[22px] border border-rose-500/20 bg-rose-500/10 px-4 py-5">
-      <p className="text-[14px] font-medium text-slate-100">No pudimos cargar tus tickets</p>
-      <p className="mt-1 text-[13px] text-slate-400">{error}</p>
-      <Button className="mt-4 h-10 rounded-full bg-signal text-white hover:bg-[var(--signal-dim)]" onClick={onRetry} type="button">
+      <p className="text-[14px] font-medium text-[var(--cliente-text-primary)]">No pudimos cargar tus tickets</p>
+      <p className="mt-1 text-[13px] text-[var(--cliente-text-secondary)]">{error}</p>
+      <Button
+        className="mt-4 h-10 rounded-full bg-[var(--cliente-signal)] text-white hover:bg-[var(--cliente-signal-dim)]"
+        type="button"
+        onClick={onRetry}
+      >
         <RefreshCcw className="mr-2 h-4 w-4" strokeWidth={1.5} />
         Reintentar
       </Button>
@@ -77,12 +88,12 @@ function SupportTicketsError({ error, onRetry }: { error: string; onRetry: () =>
 function SupportTicketsEmptyState() {
   return (
     <div className="flex min-h-[260px] flex-col items-center justify-center px-6 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-elevated)]">
-        <MessageSquareText className="h-7 w-7 text-slate-500" strokeWidth={1.5} />
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--cliente-bg-elevated)]">
+        <MessageSquareText className="h-7 w-7 text-[var(--cliente-text-tertiary)]" strokeWidth={1.5} />
       </div>
-      <p className="mt-4 text-[16px] font-medium text-slate-100">Todavía no tienes tickets</p>
-      <p className="mt-1 max-w-[320px] text-[13px] leading-5 text-slate-400">
-        Cuando envíes tu primera consulta, la vas a ver acá con su estado y las respuestas del equipo.
+      <p className="mt-4 text-[16px] font-medium text-[var(--cliente-text-primary)]">Todavia no tienes tickets</p>
+      <p className="mt-1 max-w-[320px] text-[13px] leading-5 text-[var(--cliente-text-secondary)]">
+        Cuando envies tu primera consulta, la vas a ver aca con su estado y las respuestas del equipo.
       </p>
     </div>
   );

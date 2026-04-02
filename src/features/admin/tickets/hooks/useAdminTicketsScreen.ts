@@ -21,8 +21,6 @@ export function useAdminTicketsScreen({ tickets: externalTickets, refreshData }:
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingTicket, setEditingTicket] = useState<AdminTicket | null>(null);
-  const [respondingTicket, setRespondingTicket] = useState<AdminTicket | null>(null);
-  const [responseText, setResponseText] = useState('');
   const [formData, setFormData] = useState<TicketFormData>(INITIAL_TICKET_FORM);
   const [filters, setFilters] = useState(INITIAL_TICKET_FILTERS);
 
@@ -65,11 +63,6 @@ export function useAdminTicketsScreen({ tickets: externalTickets, refreshData }:
     setFormData(INITIAL_TICKET_FORM);
   }
 
-  function resetResponseState() {
-    setRespondingTicket(null);
-    setResponseText('');
-  }
-
   async function refreshTickets() {
     if (refreshData) {
       refreshData();
@@ -83,8 +76,6 @@ export function useAdminTicketsScreen({ tickets: externalTickets, refreshData }:
     editingTicket,
     formData,
     refreshTickets,
-    responseText,
-    respondingTicket,
     setTickets,
   });
 
@@ -94,13 +85,6 @@ export function useAdminTicketsScreen({ tickets: externalTickets, refreshData }:
       resetFormState();
     }
     return saved;
-  }
-
-  async function handleSubmitResponse() {
-    const sent = await mutations.submitResponse();
-    if (sent) {
-      resetResponseState();
-    }
   }
 
   async function handleDelete(ticketId: string) {
@@ -123,20 +107,16 @@ export function useAdminTicketsScreen({ tickets: externalTickets, refreshData }:
     currentAdminId: user?.id ?? null,
     isEmpty,
     loading,
-    respondingTicket,
-    responseText,
     showForm,
     stats: stats || INITIAL_TICKET_STATS,
     tickets,
     setFilters,
     setFormData,
-    setResponseText,
     setShowForm,
     handleDelete,
     handleStatusChange,
     handleTakeTicket,
     handleSubmit,
-    handleSubmitResponse,
     loadTickets,
     openCreateForm: () => {
       setEditingTicket(null);
@@ -148,8 +128,6 @@ export function useAdminTicketsScreen({ tickets: externalTickets, refreshData }:
       setFormData(buildFormDataFromTicket(ticket));
       setShowForm(true);
     },
-    openResponseForm: (ticket: AdminTicket) => setRespondingTicket(ticket),
     resetFormState,
-    resetResponseState,
   };
 }

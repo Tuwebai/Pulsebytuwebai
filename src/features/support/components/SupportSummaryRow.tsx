@@ -17,7 +17,7 @@ export default function SupportSummaryRow({
       <SummaryCard
         detail="esperando respuesta"
         icon={<Clock3 className="h-4 w-4" strokeWidth={1.7} />}
-        iconClassName="bg-signal/15 text-signal"
+        iconClassName="bg-[var(--cliente-signal-glow)] text-[var(--cliente-signal)]"
         label="Resumen"
         title="Tickets abiertos"
         value={openCount}
@@ -58,17 +58,19 @@ function SummaryCard({
   value: number;
 }) {
   return (
-    <article className="rounded-[22px] border border-white/10 bg-[var(--bg-surface)]/92 px-4 py-4 shadow-[0_14px_30px_rgba(2,6,23,0.22)]">
+    <article className="rounded-[22px] border border-[var(--cliente-border-default)] bg-[var(--cliente-bg-surface)]/92 px-4 py-4 shadow-[var(--cliente-card-shadow)]">
       <div className="flex items-start justify-between gap-3">
         <div className={`flex h-9 w-9 items-center justify-center rounded-2xl ${iconClassName}`}>{icon}</div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--cliente-text-tertiary)]">
+          {label}
+        </p>
       </div>
 
-      <p className="mt-4 text-sm font-medium text-slate-100">{title}</p>
-      <p className="mt-1 font-data text-[clamp(2.2rem,3vw,2.8rem)] font-light leading-none tracking-tight text-slate-50">
+      <p className="mt-4 text-sm font-medium text-[var(--cliente-text-primary)]">{title}</p>
+      <p className="mt-1 font-data text-[clamp(2.2rem,3vw,2.8rem)] font-light leading-none tracking-tight text-[var(--cliente-text-primary)]">
         {value.toLocaleString('es-AR')}
       </p>
-      <p className="mt-2 text-xs text-slate-400">{detail}</p>
+      <p className="mt-2 text-xs text-[var(--cliente-text-secondary)]">{detail}</p>
     </article>
   );
 }

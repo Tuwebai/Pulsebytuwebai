@@ -14,12 +14,12 @@ interface SupportTicketCardProps {
 
 export default function SupportTicketCard({ onReply, ticket, userEmail }: SupportTicketCardProps) {
   return (
-    <article className="rounded-[22px] border border-white/10 bg-[var(--bg-surface)]/92 p-4 shadow-[0_14px_30px_rgba(2,6,23,0.22)] transition-colors hover:border-white/15">
+    <article className="rounded-[22px] border border-[var(--cliente-border-default)] bg-[var(--cliente-bg-surface)]/92 p-4 shadow-[var(--cliente-card-shadow)] transition-colors hover:border-white/15">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0 flex-1">
-          <h3 className="text-[15px] font-medium text-slate-100">{ticket.title}</h3>
-          <p className="mt-2 text-[13px] leading-5 text-slate-400">{ticket.description}</p>
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px] text-slate-500">
+          <h3 className="text-[15px] font-medium text-[var(--cliente-text-primary)]">{ticket.title}</h3>
+          <p className="mt-2 text-[13px] leading-5 text-[var(--cliente-text-secondary)]">{ticket.description}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px] text-[var(--cliente-text-tertiary)]">
             <span>{formatDateSafe(ticket.created_at)}</span>
             <span className="h-1 w-1 rounded-full bg-slate-600" />
             <span>{userEmail}</span>
@@ -42,7 +42,7 @@ export default function SupportTicketCard({ onReply, ticket, userEmail }: Suppor
         {ticket.respuesta ? (
           <SupportTicketResponseBlock
             content={ticket.respuesta}
-            icon={<MessageSquareText className="h-4 w-4 text-signal" strokeWidth={1.5} />}
+            icon={<MessageSquareText className="h-4 w-4 text-[var(--cliente-signal)]" strokeWidth={1.5} />}
             meta={
               ticket.respondido_por
                 ? `Respondido por ${ticket.respondido_por}${ticket.fecha_respuesta ? ` · ${formatDateSafe(ticket.fecha_respuesta)}` : ''}`
@@ -67,7 +67,11 @@ export default function SupportTicketCard({ onReply, ticket, userEmail }: Suppor
       </div>
 
       {ticket.respuesta && ticket.status !== 'closed' ? (
-        <Button className="mt-4 h-10 rounded-full bg-signal px-4 text-white hover:bg-[var(--signal-dim)]" onClick={() => onReply(ticket.id)} type="button">
+        <Button
+          className="mt-4 h-10 rounded-full bg-[var(--cliente-signal)] px-4 text-white hover:bg-[var(--cliente-signal-dim)]"
+          type="button"
+          onClick={() => onReply(ticket.id)}
+        >
           <MessageSquareText className="mr-2 h-4 w-4" strokeWidth={1.5} />
           Responder
         </Button>

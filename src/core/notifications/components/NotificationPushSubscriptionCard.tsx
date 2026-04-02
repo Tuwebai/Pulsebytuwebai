@@ -1,6 +1,7 @@
 import { BellRing, Smartphone } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { usePushNotifications } from '@/core/notifications/hooks/usePushNotifications';
+import { requestPushPermission } from '@/core/notifications/services/pushNotifications.service';
 import { NotificationPreferenceToggle } from './NotificationPreferenceToggle';
 
 function getPushDescription(permission: NotificationPermission | 'unsupported', isSubscribed: boolean) {
@@ -9,14 +10,33 @@ function getPushDescription(permission: NotificationPermission | 'unsupported', 
   }
 
   if (permission === 'denied') {
-    return 'Este navegador bloqueó las notificaciones. Podés habilitarlas desde la configuración del sitio.';
+    return 'Este navegador bloqueo las notificaciones. Podes habilitarlas desde la configuracion del sitio.';
   }
 
   if (isSubscribed) {
     return 'Este dispositivo ya recibe avisos en tiempo real cuando haya novedades importantes.';
   }
 
-  return 'Activá avisos en este dispositivo para enterarte al instante de tickets, pagos y novedades.';
+  return 'Al activarlo, el navegador te va a pedir permiso para avisarte al instante de tickets, pagos y novedades.';
+}
+
+function resolvePushErrorMessage(error: unknown) {
+  if (!(error instanceof Error)) {
+    return 'No pudimos actualizar las notificaciones push en este dispositivo.';
+  }
+
+  switch (error.message) {
+    case 'PUSH_PERMISSION_DENIED':
+      return 'Necesitas permitir notificaciones en el navegador para activar los avisos push.';
+    case 'PUSH_SERVICE_WORKER_FAILED':
+      return 'No pudimos preparar el navegador para recibir notificaciones. Recarga la pagina e intenta otra vez.';
+    case 'PUSH_CONFIG_MISSING':
+      return 'Falta la configuracion publica de push en este entorno.';
+    case 'PUSH_NOT_SUPPORTED':
+      return 'Este navegador o contexto no soporta notificaciones push web.';
+    default:
+      return 'No pudimos actualizar las notificaciones push en este dispositivo.';
+  }
 }
 
 export function NotificationPushSubscriptionCard() {
@@ -27,20 +47,26 @@ export function NotificationPushSubscriptionCard() {
   const handleChange = async (next: boolean) => {
     try {
       if (next) {
+        const permission = await requestPushPermission();
+
+        if (permission !== 'granted') {
+          throw new Error('PUSH_PERMISSION_DENIED');
+        }
+
         await enablePush();
         toast({ title: 'Push activado', description: 'Este dispositivo ya puede recibir avisos de Pulse.' });
         return;
       }
 
       await disablePush();
-      toast({ title: 'Push desactivado', description: 'Este dispositivo dejó de recibir avisos push.' });
+      toast({ title: 'Push desactivado', description: 'Este dispositivo dejo de recibir avisos push.' });
     } catch (error) {
-      const message =
-        error instanceof Error && error.message === 'PUSH_PERMISSION_DENIED'
-          ? 'Necesitás permitir notificaciones en el navegador para activar los avisos push.'
-          : 'No pudimos actualizar las notificaciones push en este dispositivo.';
-
-      toast({ title: 'No se pudo guardar', description: message, variant: 'destructive' });
+      console.error('Error activando notificaciones push:', error);
+      toast({
+        title: 'No se pudo guardar',
+        description: resolvePushErrorMessage(error),
+        variant: 'destructive',
+      });
     }
   };
 

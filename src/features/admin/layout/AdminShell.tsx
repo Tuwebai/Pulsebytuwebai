@@ -12,6 +12,7 @@ import { useNotifications } from '@/core/notifications/hooks/useNotifications';
 import { useNotificationsPanelState } from '@/core/notifications/hooks/useNotificationsPanelState';
 import { AdminSectionNav } from '@/features/admin/components/AdminSectionNav';
 import type { AdminSectionId } from '@/features/admin/constants/adminSections';
+import SupportChatDock from '@/features/support/components/SupportChatDock';
 
 interface AdminShellProps {
   activeSection: AdminSectionId;
@@ -37,7 +38,10 @@ export function AdminShell({
 
   return (
     <>
-      <div className="flex h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 transition-all duration-300 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div
+        className="flex h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 transition-all duration-300 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
+        data-surface="admin"
+      >
         <div className="hidden shrink-0 md:block">
           <Sidebar />
         </div>
@@ -93,6 +97,7 @@ export function AdminShell({
           </div>
         </div>
       </div>
+      <SupportChatDock scope="admin" />
       <NotificationsPanel open={panelOpen} onClose={closePanel} />
     </>
   );

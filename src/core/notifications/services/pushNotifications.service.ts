@@ -11,6 +11,7 @@ function urlBase64ToUint8Array(base64String: string) {
 function getBrowserSupport() {
   return (
     typeof window !== 'undefined' &&
+    (window.isSecureContext || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
     'Notification' in window &&
     'serviceWorker' in navigator &&
     'PushManager' in window
@@ -25,12 +26,29 @@ export function getPushPermissionState(): NotificationPermission | 'unsupported'
   return Notification.permission;
 }
 
+export async function requestPushPermission() {
+  if (!getBrowserSupport()) {
+    throw new Error('PUSH_NOT_SUPPORTED');
+  }
+
+  if (Notification.permission === 'granted') {
+    return 'granted';
+  }
+
+  return Notification.requestPermission();
+}
+
 export async function getBrowserPushSubscription() {
   if (!getBrowserSupport()) {
     return null;
   }
 
-  await serviceWorkerManager.register();
+  const nextRegistration = await serviceWorkerManager.register();
+
+  if (!nextRegistration) {
+    throw new Error('PUSH_SERVICE_WORKER_FAILED');
+  }
+
   const registration = await navigator.serviceWorker.ready;
   return registration.pushManager.getSubscription();
 }
@@ -46,14 +64,18 @@ export async function subscribeBrowserPush() {
     throw new Error('PUSH_CONFIG_MISSING');
   }
 
-  const permission =
-    Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
+  const permission = await requestPushPermission();
 
   if (permission !== 'granted') {
     throw new Error('PUSH_PERMISSION_DENIED');
   }
 
-  await serviceWorkerManager.register();
+  const nextRegistration = await serviceWorkerManager.register();
+
+  if (!nextRegistration) {
+    throw new Error('PUSH_SERVICE_WORKER_FAILED');
+  }
+
   const registration = await navigator.serviceWorker.ready;
   const existingSubscription = await registration.pushManager.getSubscription();
 

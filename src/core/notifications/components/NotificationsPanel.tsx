@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { PulseLogo } from '@/core/components';
+import { useApp } from '@/contexts/AppContext';
+import type { Notification } from '@/data/types/notifications';
+import { storeSupportChatIntent } from '@/features/support/supportChat.events';
 import Skeleton from '@/core/components/Skeleton';
 import { useNotifications } from '../hooks/useNotifications';
 import { NotificationItem } from './NotificationItem';
@@ -13,12 +17,40 @@ interface NotificationsPanelProps {
 
 const panelTransition = {
   duration: 0.2,
-  ease: [0.32, 0.72, 0, 1]
+  ease: [0.32, 0.72, 0, 1],
 } as const;
 
 export function NotificationsPanel({ open, onClose }: NotificationsPanelProps) {
+  const navigate = useNavigate();
+  const { user } = useApp();
   const { grouped, unreadCount, isLoading, markRead, markAllRead, isMarkingAllRead } = useNotifications();
   const hasNotifications = grouped.today.length + grouped.thisWeek.length + grouped.older.length > 0;
+
+  const handleSelect = (notification: Notification) => {
+    const ticketId = typeof notification.metadata?.ticket_id === 'string' ? notification.metadata.ticket_id : null;
+
+    if (notification.category === 'ticket' && ticketId) {
+      storeSupportChatIntent({
+        scope: user?.role === 'admin' ? 'admin' : 'client',
+        ticketId,
+        focusInput: true,
+      });
+
+      navigate(notification.action_url || (user?.role === 'admin' ? '/admin/tickets' : '/dashboard/soporte'));
+      onClose();
+      return;
+    }
+
+    if (notification.action_url) {
+      navigate(notification.action_url);
+    }
+
+    if (!notification.is_read) {
+      markRead(notification.id);
+    }
+
+    onClose();
+  };
 
   useEffect(() => {
     if (!open) {
@@ -75,7 +107,7 @@ export function NotificationsPanel({ open, onClose }: NotificationsPanelProps) {
                     type="button"
                     onClick={() => markAllRead()}
                   >
-                    Marcar todo como leído
+                    Marcar todo como leido
                   </button>
                 ) : null}
 
@@ -94,7 +126,7 @@ export function NotificationsPanel({ open, onClose }: NotificationsPanelProps) {
               {isLoading ? (
                 <div className="space-y-3 px-5 py-4">
                   {Array.from({ length: 4 }).map((_, index) => (
-                    <Skeleton key={index} height="56px" rounded="md" />
+                    <Skeleton height="56px" key={index} rounded="md" />
                   ))}
                 </div>
               ) : null}
@@ -104,18 +136,18 @@ export function NotificationsPanel({ open, onClose }: NotificationsPanelProps) {
                   <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-elevated)]">
                     <PulseLogo className="opacity-40" size={32} variant="night" />
                   </div>
-                  <p className="mt-4 text-[14px] text-[var(--text-primary)]">No tenés notificaciones nuevas</p>
+                  <p className="mt-4 text-[14px] text-[var(--text-primary)]">No tenes notificaciones nuevas</p>
                   <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
-                    Cuando haya novedades de tu proyecto, las vas a ver acá.
+                    Cuando haya novedades de tu proyecto, las vas a ver aca.
                   </p>
                 </div>
               ) : null}
 
               {!isLoading && hasNotifications ? (
                 <div className="pb-4">
-                  <NotificationSection items={grouped.today} label="Hoy" onRead={markRead} />
-                  <NotificationSection items={grouped.thisWeek} label="Esta semana" onRead={markRead} />
-                  <NotificationSection items={grouped.older} label="Anteriores" onRead={markRead} />
+                  <NotificationSection items={grouped.today} label="Hoy" onSelect={handleSelect} />
+                  <NotificationSection items={grouped.thisWeek} label="Esta semana" onSelect={handleSelect} />
+                  <NotificationSection items={grouped.older} label="Anteriores" onSelect={handleSelect} />
                 </div>
               ) : null}
             </div>
@@ -127,12 +159,12 @@ export function NotificationsPanel({ open, onClose }: NotificationsPanelProps) {
 }
 
 interface NotificationSectionProps {
-  label: string;
   items: ReturnType<typeof useNotifications>['grouped']['today'];
-  onRead: (id: string) => void;
+  label: string;
+  onSelect: (notification: Notification) => void;
 }
 
-function NotificationSection({ label, items, onRead }: NotificationSectionProps) {
+function NotificationSection({ items, label, onSelect }: NotificationSectionProps) {
   if (items.length === 0) {
     return null;
   }
@@ -144,7 +176,7 @@ function NotificationSection({ label, items, onRead }: NotificationSectionProps)
       </div>
       <div>
         {items.map((notification) => (
-          <NotificationItem key={notification.id} notification={notification} onRead={onRead} />
+          <NotificationItem key={notification.id} notification={notification} onSelect={onSelect} />
         ))}
       </div>
     </section>

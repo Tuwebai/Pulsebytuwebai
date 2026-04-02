@@ -4,10 +4,7 @@ import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 import { useApp } from '@/contexts/AppContext';
 import { ticketService } from '@/features/support/services/ticket.service';
 import { useSupportTicketsRealtime } from '@/features/support/hooks/useSupportTicketsRealtime';
-import {
-  submitSupportTicket,
-  submitSupportTicketReply,
-} from '@/features/support/hooks/supportTicketMutations';
+import { submitSupportTicket } from '@/features/support/hooks/supportTicketMutations';
 import type { SupportDraftState, Ticket } from '@/features/support';
 
 const SUPPORT_DRAFT_INITIAL_STATE: SupportDraftState = {
@@ -25,19 +22,28 @@ export function useSupportPage() {
     `pulse:soporte:${user?.id ?? 'anon'}:new-ticket-draft`,
     SUPPORT_DRAFT_INITIAL_STATE,
   );
-  const [respondingTicketId, setRespondingTicketId] = useSessionStorageState<string | null>(
-    `pulse:soporte:${user?.id ?? 'anon'}:responding-ticket-id`,
-    null,
-  );
-  const [responseText, setResponseText] = useSessionStorageState(`pulse:soporte:${user?.id ?? 'anon'}:response-draft`, '');
 
-  const respondingTicket = useMemo(
-    () => tickets.find((ticket) => ticket.id === respondingTicketId) ?? null,
-    [respondingTicketId, tickets],
+  const pendingRepliesCount = useMemo(
+    () =>
+      tickets.filter((ticket) => {
+        if (!ticket.respuesta || ticket.status === 'closed' || ticket.status === 'resolved') {
+          return false;
+        }
+
+        if (!ticket.fecha_respuesta) {
+          return true;
+        }
+
+        return !ticket.fecha_respuesta_cliente || ticket.fecha_respuesta > ticket.fecha_respuesta_cliente;
+      }).length,
+    [tickets],
   );
 
   const loadTickets = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -66,7 +72,10 @@ export function useSupportPage() {
 
   const handleSubmitTicket = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!user) return;
+
+    if (!user) {
+      return;
+    }
 
     if (!formData.title.trim() || !formData.description.trim()) {
       toast({ title: 'Error', description: 'Por favor completa todos los campos.', variant: 'destructive' });
@@ -89,24 +98,6 @@ export function useSupportPage() {
     })();
   };
 
-  const handleClientResponse = async () => {
-    if (!respondingTicket || !responseText.trim()) return;
-
-    try {
-      const patch = await submitSupportTicketReply({
-        responseText,
-        ticketId: respondingTicket.id,
-      });
-      setTickets((previous) => previous.map((ticket) => (ticket.id === respondingTicket.id ? { ...ticket, ...patch } : ticket)));
-      toast({ title: 'Respuesta enviada', description: 'Tu respuesta se envió correctamente.', variant: 'default' });
-      setRespondingTicketId(null);
-      setResponseText('');
-    } catch (responseError) {
-      console.error('Error enviando respuesta:', responseError);
-      toast({ title: 'Error', description: 'No pudimos enviar tu respuesta en este momento.', variant: 'destructive' });
-    }
-  };
-
   return {
     user,
     projectsCount: getUserProjects().length,
@@ -114,16 +105,12 @@ export function useSupportPage() {
     loading,
     error,
     formData,
-    respondingTicket,
-    responseText,
+    pendingRepliesCount,
     openTickets: tickets.filter((ticket) => ticket.status === 'open').length,
     progressTickets: tickets.filter((ticket) => ticket.status === 'responded' || ticket.status === 'in_conversation').length,
     closedTickets: tickets.filter((ticket) => ticket.status === 'closed' || ticket.status === 'resolved').length,
     setFormData,
-    setRespondingTicketId,
-    setResponseText,
     handleSubmitTicket,
-    handleClientResponse,
     handleRetryLoad: () => {
       setError(null);
       setLoading(true);

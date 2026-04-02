@@ -1,11 +1,9 @@
 import type { Dispatch, SetStateAction } from 'react';
-
 import { useApp } from '@/contexts/AppContext';
 import {
   changeAdminTicketStatus,
   removeAdminTicket,
   saveAdminTicket,
-  sendAdminTicketResponse,
   takeAdminTicket,
 } from '@/features/admin/tickets/hooks/adminTicketMutationActions';
 import type { AdminTicket, TicketFormData } from '@/features/admin/tickets/types/adminTicket.types';
@@ -15,8 +13,6 @@ interface UseAdminTicketMutationsParams {
   editingTicket: AdminTicket | null;
   formData: TicketFormData;
   refreshTickets: () => Promise<void>;
-  responseText: string;
-  respondingTicket: AdminTicket | null;
   setTickets: Dispatch<SetStateAction<AdminTicket[]>>;
 }
 
@@ -24,8 +20,6 @@ export function useAdminTicketMutations({
   editingTicket,
   formData,
   refreshTickets,
-  responseText,
-  respondingTicket,
   setTickets,
 }: UseAdminTicketMutationsParams) {
   const { user } = useApp();
@@ -59,52 +53,6 @@ export function useAdminTicketMutations({
       toast({
         title: 'No pudimos guardar el ticket',
         description: 'Revisá los datos e intentá de nuevo.',
-        variant: 'destructive',
-      });
-      return false;
-    }
-  }
-
-  async function submitResponse() {
-    if (!respondingTicket || !responseText.trim()) {
-      return false;
-    }
-
-    try {
-      const responder = user?.full_name || user?.email || 'Admin';
-      const responseDate = await sendAdminTicketResponse({
-        responder,
-        responseText,
-        ticketId: respondingTicket.id,
-      });
-
-      if (user?.id && respondingTicket.assigned_admin_id !== user.id) {
-        await takeAdminTicket({ adminId: user.id, ticketId: respondingTicket.id });
-      }
-
-      setTickets((currentTickets) =>
-        currentTickets.map((ticket) =>
-          ticket.id === respondingTicket.id
-            ? {
-                ...ticket,
-                assigned_admin_id: user?.id ?? ticket.assigned_admin_id,
-                respuesta: responseText,
-                respondido_por: responder,
-                fecha_respuesta: responseDate,
-                status: 'in_conversation',
-                estado: 'respondido',
-              }
-            : ticket,
-        ),
-      );
-
-      toast({ title: 'Respuesta enviada', description: 'El cliente ya puede verla.' });
-      return true;
-    } catch (error) {
-      console.error('Error sending response:', error);
-      toast({
-        title: 'No pudimos enviar la respuesta',
-        description: 'Volvé a intentar en unos segundos.',
         variant: 'destructive',
       });
       return false;
@@ -146,7 +94,9 @@ export function useAdminTicketMutations({
   }
 
   async function takeTicket(ticketId: string) {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     try {
       await takeAdminTicket({ adminId: user.id, ticketId });
@@ -170,7 +120,6 @@ export function useAdminTicketMutations({
 
   return {
     deleteTicket,
-    submitResponse,
     submitTicket,
     takeTicket,
     updateTicketStatus,

@@ -30,27 +30,6 @@ export async function saveAdminTicket({
   });
 }
 
-export async function sendAdminTicketResponse({
-  responder,
-  responseText,
-  ticketId,
-}: {
-  responder: string;
-  responseText: string;
-  ticketId: string;
-}) {
-  const responseDate = new Date().toISOString();
-
-  await ticketService.updateTicket(ticketId, {
-    respuesta: responseText,
-    respondido_por: responder,
-    fecha_respuesta: responseDate,
-    estado: 'respondido',
-  });
-
-  return responseDate;
-}
-
 export async function removeAdminTicket(ticketId: string) {
   await ticketService.deleteTicket(ticketId);
 }

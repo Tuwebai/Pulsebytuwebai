@@ -323,6 +323,50 @@ async function getCacheSize() {
   return totalSize;
 }
 
+self.addEventListener('push', (event) => {
+  const payload = event.data ? event.data.json() : {};
+  const title = payload.title || 'Pulse';
+  const options = {
+    body: payload.body || 'Tienes una novedad nueva en Pulse.',
+    data: {
+      url: payload.url || '/dashboard',
+      primaryKey: payload.primaryKey || null,
+      category: payload.category || 'system',
+    },
+    icon: '/favicon.svg',
+    badge: '/favicon.svg',
+    tag: payload.primaryKey || undefined,
+    renotify: Boolean(payload.urgent),
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  const targetUrl = event.notification.data?.url || '/dashboard';
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      const matchingClient = clients.find((client) => {
+        return 'focus' in client && client.url.includes(new URL(targetUrl, self.location.origin).pathname);
+      });
+
+      if (matchingClient) {
+        matchingClient.focus();
+        matchingClient.postMessage({
+          type: 'PULSE_PUSH_OPEN',
+          payload: event.notification.data,
+        });
+        return null;
+      }
+
+      return self.clients.openWindow(targetUrl);
+    }),
+  );
+});
+
 // =====================================================
 // NOTIFICACIONES PUSH (FUTURO)
 // =====================================================

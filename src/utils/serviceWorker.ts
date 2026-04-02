@@ -1,11 +1,11 @@
 interface ServiceWorkerMessage {
-  type: string;
   payload?: unknown;
+  type: string;
 }
 
 class ServiceWorkerManager {
   private registration: ServiceWorkerRegistration | null = null;
-  private isSupported = 'serviceWorker' in navigator;
+  private readonly isSupported = typeof navigator !== 'undefined' && 'serviceWorker' in navigator;
 
   async register(): Promise<ServiceWorkerRegistration | null> {
     if (!this.isSupported) {
@@ -13,10 +13,19 @@ class ServiceWorkerManager {
       return null;
     }
 
+    if (this.registration) {
+      return this.registration;
+    }
+
     try {
-      this.registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/',
-      });
+      const existingRegistration = await navigator.serviceWorker.getRegistration('/');
+
+      if (existingRegistration) {
+        this.registration = existingRegistration;
+        return this.registration;
+      }
+
+      this.registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
 
       this.registration.addEventListener('updatefound', () => {
         const newWorker = this.registration?.installing;
@@ -26,12 +35,13 @@ class ServiceWorkerManager {
         }
 
         newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller && !import.meta.env.DEV) {
             this.showUpdateNotification();
           }
         });
       });
 
+      await navigator.serviceWorker.ready;
       return this.registration;
     } catch (error) {
       console.error('Error registrando Service Worker:', error);
@@ -97,14 +107,14 @@ class ServiceWorkerManager {
         void this.sendMessage({ type: 'GET_CACHE_SIZE' }, [messageChannel.port2]);
       });
     } catch (error) {
-      console.error('Error obteniendo tamaño del cache:', error);
+      console.error('Error obteniendo tamano del cache:', error);
       return 0;
     }
   }
 
   private async sendMessage(message: ServiceWorkerMessage, transfer?: Transferable[]) {
     if (!this.registration?.active) {
-      throw new Error('Service Worker no está activo');
+      throw new Error('Service Worker no esta activo');
     }
 
     if (transfer && transfer.length > 0) {
@@ -116,7 +126,7 @@ class ServiceWorkerManager {
   }
 
   private showUpdateNotification() {
-    if (confirm('¡Nueva versión disponible! ¿Deseas actualizar ahora?')) {
+    if (confirm('Nueva version disponible. Quieres actualizar ahora?')) {
       this.updateServiceWorker();
     }
   }
@@ -150,10 +160,8 @@ export const formatBytes = (bytes: number): string => {
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
 export const isOffline = (): boolean => !navigator.onLine;
-
 export const isOnline = (): boolean => navigator.onLine;

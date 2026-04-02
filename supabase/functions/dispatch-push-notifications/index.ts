@@ -29,7 +29,7 @@ serve(async (req) => {
     const adminClient = createSupabaseAdminClient();
     const { data: notification, error: notificationError } = await adminClient
       .from('notifications')
-      .select('id, user_id, title, message, action_url, category, is_urgent')
+      .select('id, user_id, title, message, action_url, category, is_urgent, metadata')
       .eq('id', notificationId)
       .maybeSingle();
 
@@ -50,14 +50,19 @@ serve(async (req) => {
     const url = notification.action_url?.startsWith('http')
       ? notification.action_url
       : `${config.appUrl}${notification.action_url || '/dashboard'}`;
+    const metadata =
+      notification.metadata && typeof notification.metadata === 'object'
+        ? (notification.metadata as Record<string, unknown>)
+        : {};
 
     const payload = JSON.stringify({
       title: notification.title,
-      body: notification.message || 'Tenés una novedad nueva en Pulse.',
+      body: notification.message || 'Tienes una novedad nueva en Pulse.',
       url,
       primaryKey: notification.id,
       category: notification.category,
       urgent: notification.is_urgent ?? false,
+      ticketId: typeof metadata.ticket_id === 'string' ? metadata.ticket_id : null,
     });
 
     const results = await Promise.allSettled(
@@ -94,6 +99,6 @@ serve(async (req) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'UNKNOWN_ERROR';
     console.error('Error dispatch-push-notifications:', message);
-    return jsonResponse(500, { error: 'No pudimos despachar la notificación push.' });
+    return jsonResponse(500, { error: 'No pudimos despachar la notificacion push.' });
   }
 });

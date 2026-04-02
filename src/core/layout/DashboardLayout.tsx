@@ -4,6 +4,7 @@ import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPrefere
 import { useApp } from '@/contexts/AppContext';
 import { ProductTourOverlay } from '@/features/product-tour/components/ProductTourOverlay';
 import { useProductTour } from '@/features/product-tour/hooks/useProductTour';
+import SupportChatDock from '@/features/support/components/SupportChatDock';
 import { useLocation } from 'react-router-dom';
 import BottomNav from './BottomNav';
 import Header from './Header';
@@ -41,7 +42,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-background via-background/95 to-background/90 transition-all duration-300 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div
+      className="flex h-screen overflow-hidden bg-gradient-to-br from-background via-background/95 to-background/90 transition-all duration-300 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
+      data-surface="client"
+    >
       <Sidebar />
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
@@ -75,6 +79,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       <BottomNav />
+      <SupportChatDock scope="client" />
 
       <ProductTourOverlay
         currentStep={currentStep}

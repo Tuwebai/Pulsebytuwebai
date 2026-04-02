@@ -22,15 +22,15 @@ interface SupportContactPanelProps {
 
 export default function SupportContactPanel({ projectsCount }: SupportContactPanelProps) {
   return (
-    <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/92 p-4 shadow-[0_18px_40px_rgba(2,6,23,0.24)] sm:p-5">
+    <section className="rounded-[var(--cliente-card-radius)] border border-[var(--cliente-border-default)] bg-[var(--cliente-bg-surface)]/92 p-4 shadow-[var(--cliente-card-shadow)] sm:p-5">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-signal/15 text-signal">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--cliente-signal-glow)] text-[var(--cliente-signal)]">
           <MessageCircleHeart className="h-4 w-4" strokeWidth={1.6} />
         </div>
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Canales activos</p>
-          <h2 className="mt-2 text-lg font-medium text-slate-100">Cómo hablar con el equipo</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-400">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--cliente-text-tertiary)]">Canales activos</p>
+          <h2 className="mt-2 text-lg font-medium text-[var(--cliente-text-primary)]">Cómo hablar con el equipo</h2>
+          <p className="mt-1 text-sm leading-6 text-[var(--cliente-text-secondary)]">
             Si necesitas ayuda con tu web, pagos o seguimiento, acá tienes los canales disponibles.
           </p>
         </div>
@@ -57,10 +57,10 @@ export default function SupportContactPanel({ projectsCount }: SupportContactPan
         />
       </div>
 
-      <div className="mt-5 rounded-[18px] border border-white/10 bg-[var(--bg-elevated)]/55 px-4 py-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">Contexto actual</p>
-        <p className="mt-2 text-sm font-medium text-slate-100">Proyectos asociados: {projectsCount}</p>
-        <p className="mt-1 text-xs text-slate-400">Esto nos ayuda a responder con más contexto cuando abras una consulta.</p>
+      <div className="mt-5 rounded-[18px] border border-[var(--cliente-border-default)] bg-[var(--cliente-bg-elevated)]/55 px-4 py-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--cliente-text-tertiary)]">Contexto actual</p>
+        <p className="mt-2 text-sm font-medium text-[var(--cliente-text-primary)]">Proyectos asociados: {projectsCount}</p>
+        <p className="mt-1 text-xs text-[var(--cliente-text-secondary)]">Esto nos ayuda a responder con más contexto cuando abras una consulta.</p>
       </div>
     </section>
   );
@@ -78,11 +78,11 @@ function ContactRow({
   value: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-[18px] border border-white/10 bg-[var(--bg-elevated)]/55 px-4 py-3">
+    <div className="flex items-center gap-3 rounded-[18px] border border-[var(--cliente-border-default)] bg-[var(--cliente-bg-elevated)]/55 px-4 py-3">
       <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${toneClassName}`}>{icon}</div>
       <div>
-        <p className="text-sm font-medium text-slate-100">{title}</p>
-        <p className="mt-1 text-sm text-slate-400">{value}</p>
+        <p className="text-sm font-medium text-[var(--cliente-text-primary)]">{title}</p>
+        <p className="mt-1 text-sm text-[var(--cliente-text-secondary)]">{value}</p>
       </div>
     </div>
   );
