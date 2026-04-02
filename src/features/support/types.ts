@@ -8,7 +8,7 @@ export interface Ticket {
   status: 'open' | 'responded' | 'resolved' | 'closed' | 'in_conversation';
   priority: SupportPriority;
   user_id: string;
-  assigned_to?: string;
+  assigned_admin_id?: string | null;
   created_at: string;
   updated_at: string;
   respuesta?: string;

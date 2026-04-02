@@ -5,7 +5,6 @@ import {
   Clock,
   Edit,
   MessageSquare,
-  Tag,
   Ticket,
   Trash2,
   User,
@@ -31,10 +30,12 @@ import {
 } from '@/features/admin/tickets/utils/adminTicket.utils';
 
 interface AdminTicketsListProps {
+  currentAdminId: string | null;
   tickets: AdminTicket[];
   onDelete: (ticketId: string) => void;
   onEdit: (ticket: AdminTicket) => void;
   onRespond: (ticket: AdminTicket) => void;
+  onTakeTicket: (ticketId: string) => void;
   onStatusChange: (ticketId: string, newStatus: string) => void;
 }
 
@@ -54,10 +55,12 @@ function StatusIcon({ status }: { status: string }) {
 }
 
 export function AdminTicketsList({
+  currentAdminId,
   tickets,
   onDelete,
   onEdit,
   onRespond,
+  onTakeTicket,
   onStatusChange,
 }: AdminTicketsListProps) {
   return (
@@ -100,9 +103,22 @@ export function AdminTicketsList({
                       ) : null}
 
                       <div className="flex flex-wrap gap-4 text-xs text-slate-400">
-                        <span className="flex items-center gap-2"><User className="h-3.5 w-3.5" />{getTicketContact(ticket)}</span>
-                        {ticket.category ? <span className="flex items-center gap-2"><Tag className="h-3.5 w-3.5" />{ticket.category}</span> : null}
-                        <span className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5" />{getTicketDate(ticket)}</span>
+                        <span className="flex items-center gap-2">
+                          <User className="h-3.5 w-3.5" />
+                          {getTicketContact(ticket)}
+                        </span>
+                        <span className="flex items-center gap-2">
+                          <Calendar className="h-3.5 w-3.5" />
+                          {getTicketDate(ticket)}
+                        </span>
+                        <span className="flex items-center gap-2">
+                          <MessageSquare className="h-3.5 w-3.5" />
+                          {ticket.assigned_admin_id
+                            ? ticket.assigned_admin_id === currentAdminId
+                              ? 'Lo estás viendo vos'
+                              : 'Ya lo tomó otro admin'
+                            : 'Sin admin asignado'}
+                        </span>
                       </div>
 
                       <div className="grid gap-3 lg:grid-cols-2">
@@ -123,30 +139,51 @@ export function AdminTicketsList({
                     </div>
 
                     <aside className="flex w-full flex-col gap-3 rounded-[20px] border border-white/10 bg-[var(--bg-base)]/70 p-4 xl:w-[250px] xl:shrink-0">
+                      {!ticket.assigned_admin_id ? (
+                        <Button
+                          variant="outline"
+                          onClick={() => onTakeTicket(ticket.id)}
+                          className="border-sky-500/20 bg-sky-500/10 text-sky-100 hover:bg-sky-500/20"
+                        >
+                          Tomar ticket
+                        </Button>
+                      ) : null}
+
                       <div className="space-y-2">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Estado del ticket</p>
                         <Select value={getTicketStatusValue(ticket)} onValueChange={(value) => onStatusChange(ticket.id, value)}>
-                          <SelectTrigger className="border-white/10 bg-slate-900 text-slate-100">
+                          <SelectTrigger className="border-white/10 bg-slate-900/95 text-slate-100 data-[placeholder]:text-slate-400 [&>span]:text-slate-100 [&_svg]:text-slate-400">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="border-white/10 bg-[var(--bg-elevated)] text-slate-100">
-                            <SelectItem value="abierto">Abierto</SelectItem>
-                            <SelectItem value="en_progreso">En progreso</SelectItem>
-                            <SelectItem value="resuelto">Resuelto</SelectItem>
-                            <SelectItem value="cerrado">Cerrado</SelectItem>
-                            <SelectItem value="respondido">Respondido</SelectItem>
+                            <SelectItem value="open" className="text-slate-100 focus:bg-slate-800 focus:text-slate-50">Abierto</SelectItem>
+                            <SelectItem value="in_progress" className="text-slate-100 focus:bg-slate-800 focus:text-slate-50">En progreso</SelectItem>
+                            <SelectItem value="resolved" className="text-slate-100 focus:bg-slate-800 focus:text-slate-50">Resuelto</SelectItem>
+                            <SelectItem value="closed" className="text-slate-100 focus:bg-slate-800 focus:text-slate-50">Cerrado</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="grid grid-cols-3 gap-2">
-                        <Button variant="outline" onClick={() => onRespond(ticket)} className="border-emerald-500/20 bg-emerald-500/10 text-emerald-100 hover:bg-emerald-500/20">
+                        <Button
+                          variant="outline"
+                          onClick={() => onRespond(ticket)}
+                          className="border-emerald-500/20 bg-emerald-500/10 text-emerald-100 hover:bg-emerald-500/20"
+                        >
                           <MessageSquare className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" onClick={() => onEdit(ticket)} className="border-sky-500/20 bg-sky-500/10 text-sky-100 hover:bg-sky-500/20">
+                        <Button
+                          variant="outline"
+                          onClick={() => onEdit(ticket)}
+                          className="border-sky-500/20 bg-sky-500/10 text-sky-100 hover:bg-sky-500/20"
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" onClick={() => onDelete(ticket.id)} className="border-rose-500/20 bg-rose-500/10 text-rose-100 hover:bg-rose-500/20">
+                        <Button
+                          variant="outline"
+                          onClick={() => onDelete(ticket.id)}
+                          className="border-rose-500/20 bg-rose-500/10 text-rose-100 hover:bg-rose-500/20"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

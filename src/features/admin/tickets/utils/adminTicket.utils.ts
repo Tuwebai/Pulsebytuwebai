@@ -1,12 +1,17 @@
-import type { AdminTicket, TicketFilters, TicketFormData, TicketPriority, TicketStats, TicketStatus } from '@/features/admin/tickets/types/adminTicket.types';
+import type {
+  AdminTicket,
+  TicketFilters,
+  TicketFormData,
+  TicketPriority,
+  TicketStats,
+  TicketStatus,
+} from '@/features/admin/tickets/types/adminTicket.types';
 
 export const INITIAL_TICKET_FORM: TicketFormData = {
   title: '',
   description: '',
   priority: 'medium',
   status: 'open',
-  category: '',
-  assignedTo: '',
 };
 
 export const INITIAL_TICKET_FILTERS: TicketFilters = {
@@ -35,7 +40,7 @@ export function getTicketDescription(ticket: AdminTicket) {
 }
 
 export function getTicketContact(ticket: AdminTicket) {
-  return ticket.email || ticket.assigned_to || 'Sin asignar';
+  return ticket.email || 'Sin correo';
 }
 
 export function getTicketDate(ticket: AdminTicket) {
@@ -82,8 +87,6 @@ export function buildFormDataFromTicket(ticket: AdminTicket): TicketFormData {
     description: ticket.description || ticket.mensaje || '',
     priority: getFormPriority(ticket),
     status: getFormStatus(ticket),
-    category: ticket.category || '',
-    assignedTo: ticket.assigned_to || '',
   };
 }
 
@@ -112,8 +115,7 @@ export function filterAndSortTickets(tickets: AdminTicket[], filters: TicketFilt
 
       const matchesStatus =
         filters.status === 'all' || normalizeTicketStatus(getTicketStatusValue(ticket)) === filters.status;
-      const matchesPriority =
-        filters.priority === 'all' || ticket.priority === filters.priority;
+      const matchesPriority = filters.priority === 'all' || ticket.priority === filters.priority;
 
       return matchesSearch && matchesStatus && matchesPriority;
     })

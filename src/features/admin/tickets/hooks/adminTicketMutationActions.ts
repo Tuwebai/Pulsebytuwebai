@@ -16,8 +16,6 @@ export async function saveAdminTicket({
       description: formData.description,
       priority: formData.priority,
       status: formData.status,
-      category: formData.category,
-      assigned_to: formData.assignedTo,
     });
     return;
   }
@@ -29,8 +27,6 @@ export async function saveAdminTicket({
     status: formData.status,
     user_id: null,
     email: currentUserEmail ?? 'admin@pulse.local',
-    assigned_to: formData.assignedTo,
-    category: formData.category,
   });
 }
 
@@ -61,4 +57,17 @@ export async function removeAdminTicket(ticketId: string) {
 
 export async function changeAdminTicketStatus(ticketId: string, newStatus: string) {
   await ticketService.updateTicket(ticketId, { status: newStatus });
+}
+
+export async function takeAdminTicket({
+  adminId,
+  ticketId,
+}: {
+  adminId: string;
+  ticketId: string;
+}) {
+  await ticketService.updateTicket(ticketId, {
+    assigned_admin_id: adminId,
+    status: 'in_conversation',
+  });
 }

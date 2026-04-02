@@ -92,9 +92,7 @@ export function buildTicketInsertPayload(ticket: TicketInput) {
     status,
     priority,
     user_id: ticket.user_id || null,
-    assigned_to: ticket.assigned_to || null,
-    project_id: ticket.project_id || null,
-    category: ticket.category || null,
+    assigned_admin_id: ticket.assigned_admin_id || null,
     created_at: now,
     updated_at: ticket.updated_at || now,
     respuesta: ticket.respuesta || null,
@@ -127,11 +125,9 @@ export function buildTicketUpdatePayload(updates: TicketInput) {
   if ('fecha_respuesta' in updates) payload.fecha_respuesta = updates.fecha_respuesta || null;
   if ('respuesta_cliente' in updates) payload.respuesta_cliente = updates.respuesta_cliente || null;
   if ('fecha_respuesta_cliente' in updates) payload.fecha_respuesta_cliente = updates.fecha_respuesta_cliente || null;
-  if ('assigned_to' in updates) payload.assigned_to = updates.assigned_to || null;
-  if ('category' in updates) payload.category = updates.category || null;
+  if ('assigned_admin_id' in updates) payload.assigned_admin_id = updates.assigned_admin_id || null;
   if ('email' in updates) payload.email = updates.email || null;
   if ('fecha' in updates) payload.fecha = updates.fecha || null;
-  if ('project_id' in updates) payload.project_id = updates.project_id || null;
 
   return payload;
 }

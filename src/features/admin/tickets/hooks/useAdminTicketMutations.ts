@@ -6,6 +6,7 @@ import {
   removeAdminTicket,
   saveAdminTicket,
   sendAdminTicketResponse,
+  takeAdminTicket,
 } from '@/features/admin/tickets/hooks/adminTicketMutationActions';
 import type { AdminTicket, TicketFormData } from '@/features/admin/tickets/types/adminTicket.types';
 import { toast } from '@/hooks/use-toast';
@@ -77,11 +78,16 @@ export function useAdminTicketMutations({
         ticketId: respondingTicket.id,
       });
 
+      if (user?.id && respondingTicket.assigned_admin_id !== user.id) {
+        await takeAdminTicket({ adminId: user.id, ticketId: respondingTicket.id });
+      }
+
       setTickets((currentTickets) =>
         currentTickets.map((ticket) =>
           ticket.id === respondingTicket.id
             ? {
                 ...ticket,
+                assigned_admin_id: user?.id ?? ticket.assigned_admin_id,
                 respuesta: responseText,
                 respondido_por: responder,
                 fecha_respuesta: responseDate,
@@ -139,10 +145,34 @@ export function useAdminTicketMutations({
     }
   }
 
+  async function takeTicket(ticketId: string) {
+    if (!user?.id) return;
+
+    try {
+      await takeAdminTicket({ adminId: user.id, ticketId });
+      setTickets((currentTickets) =>
+        currentTickets.map((ticket) =>
+          ticket.id === ticketId
+            ? { ...ticket, assigned_admin_id: user.id, status: 'in_conversation' }
+            : ticket,
+        ),
+      );
+      toast({ title: 'Ticket tomado', description: 'La conversación ya quedó asignada a tu bandeja.' });
+    } catch (error) {
+      console.error('Error taking ticket:', error);
+      toast({
+        title: 'No pudimos tomar el ticket',
+        description: 'Volvé a intentar en unos segundos.',
+        variant: 'destructive',
+      });
+    }
+  }
+
   return {
     deleteTicket,
     submitResponse,
     submitTicket,
+    takeTicket,
     updateTicketStatus,
   };
 }

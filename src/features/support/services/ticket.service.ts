@@ -23,11 +23,9 @@ export interface SupportAdminTicketRecord {
   status: string;
   priority: string;
   user_id?: string | null;
-  assigned_to?: string | null;
+  assigned_admin_id?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
-  project_id?: string | null;
-  category?: string | null;
 }
 
 type TicketInsertInput = Omit<SupportAdminTicketRecord, 'id'>;
@@ -66,7 +64,7 @@ export const ticketService = {
   },
 
   async getTicketsByAssignee(userId: string): Promise<SupportAdminTicketRecord[]> {
-    const { data, error } = await supabase.from('tickets').select('*').eq('assigned_to', userId).order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('tickets').select('*').eq('assigned_admin_id', userId).order('created_at', { ascending: false });
     if (error) throw error;
     return (data || []).map((row) => mapTicketRow(row as TicketRow));
   },

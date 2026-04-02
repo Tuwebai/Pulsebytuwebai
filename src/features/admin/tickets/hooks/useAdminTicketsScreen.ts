@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { AdminTicket, AdminTicketsScreenProps, TicketFormData } from '@/features/admin/tickets/types/adminTicket.types';
+
+import { useApp } from '@/contexts/AppContext';
 import { useAdminTicketMutations } from '@/features/admin/tickets/hooks/useAdminTicketMutations';
 import { useAdminTicketsRealtime } from '@/features/admin/tickets/hooks/useAdminTicketsRealtime';
+import type { AdminTicket, AdminTicketsScreenProps, TicketFormData } from '@/features/admin/tickets/types/adminTicket.types';
 import {
   INITIAL_TICKET_FILTERS,
   INITIAL_TICKET_FORM,
@@ -14,6 +16,7 @@ import { ticketService } from '@/features/support/services/ticket.service';
 import { toast } from '@/hooks/use-toast';
 
 export function useAdminTicketsScreen({ tickets: externalTickets, refreshData }: AdminTicketsScreenProps) {
+  const { user } = useApp();
   const [tickets, setTickets] = useState<AdminTicket[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -100,14 +103,24 @@ export function useAdminTicketsScreen({ tickets: externalTickets, refreshData }:
     }
   }
 
-  async function handleDelete(ticketId: string) { await mutations.deleteTicket(ticketId); }
-  async function handleStatusChange(ticketId: string, newStatus: string) { await mutations.updateTicketStatus(ticketId, newStatus); }
+  async function handleDelete(ticketId: string) {
+    await mutations.deleteTicket(ticketId);
+  }
+
+  async function handleStatusChange(ticketId: string, newStatus: string) {
+    await mutations.updateTicketStatus(ticketId, newStatus);
+  }
+
+  async function handleTakeTicket(ticketId: string) {
+    await mutations.takeTicket(ticketId);
+  }
 
   return {
     editingTicket,
     filteredTickets,
     filters,
     formData,
+    currentAdminId: user?.id ?? null,
     isEmpty,
     loading,
     respondingTicket,
@@ -121,6 +134,7 @@ export function useAdminTicketsScreen({ tickets: externalTickets, refreshData }:
     setShowForm,
     handleDelete,
     handleStatusChange,
+    handleTakeTicket,
     handleSubmit,
     handleSubmitResponse,
     loadTickets,

@@ -5,8 +5,6 @@ export interface TicketFormData {
   description: string;
   priority: TicketPriority;
   status: TicketStatus;
-  category: string;
-  assignedTo: string;
 }
 
 export interface TicketStats {

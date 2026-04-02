@@ -50,6 +50,8 @@ export default function AdminTicketsScreen(props: AdminTicketsScreenProps) {
         </section>
       ) : (
         <AdminTicketsList
+          currentAdminId={screen.currentAdminId}
+          onTakeTicket={(ticketId) => void screen.handleTakeTicket(ticketId)}
           tickets={screen.filteredTickets}
           onDelete={(ticketId) => void screen.handleDelete(ticketId)}
           onEdit={screen.openEditForm}
