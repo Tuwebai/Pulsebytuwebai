@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 import { toast } from '@/hooks/use-toast';
-import { notificationService } from '@/lib/services/notificationService';
 import { enablePulseAccess } from '@/features/admin/services/pulseAccessAdminService';
+import { createAdminNotification } from '@/features/admin/notifications/services/adminNotificationMutations.service';
 import {
   updateAdminUserRole,
 } from '@/features/admin/users/services/adminUserManagementService';
@@ -43,7 +43,7 @@ export function useAdminUsers() {
       await updateAdminUserRole(userId, newRole);
       setUsers((prev) => prev.map((user) => (user.id === userId ? { ...user, role: newRole } : user)));
 
-      await notificationService.createNotification({
+      await createAdminNotification({
         title: 'Rol de usuario actualizado',
         message: getRoleUpdatedMessage(newRole),
         type: 'info',

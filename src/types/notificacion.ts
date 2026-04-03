@@ -1,5 +1,4 @@
-// Tipos de Notificación para el Dashboard TuWebAI
-// Centralizados desde: lib/services/notificationService.ts
+// Tipos de notificación compartidos del dominio Pulse.
 
 export interface Notification {
   id: string;
