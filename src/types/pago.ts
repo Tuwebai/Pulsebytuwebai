@@ -1,5 +1,5 @@
-// Tipos de Pago para el Dashboard TuWebAI
-// Centralizados desde: lib/services/paymentService.ts
+// Tipos de Pago para Pulse
+// Consumidos por el dominio features/payments
 
 export interface Payment {
   id: string;

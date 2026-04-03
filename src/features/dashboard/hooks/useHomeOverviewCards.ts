@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Project, User } from '@/contexts/appContext.types';
 import { ticketService } from '@/features/support/services/ticket.service';
-import { getUserPayments } from '@/lib/services/paymentService';
+import { getUserPayments } from '@/features/payments/services/payment.service';
 
 interface NormalizedPayment {
   amount: number | null;

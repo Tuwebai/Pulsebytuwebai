@@ -1,6 +1,6 @@
-import { PAYMENT_TYPES, formatCurrency } from '../integrations/mercadopago';
 import { requestMercadoPagoPreference } from '@/api/payments/mercadoPago.api';
-import { supabase } from '../supabase/supabase';
+import { PAYMENT_TYPES, formatCurrency } from '@/lib/integrations/mercadopago';
+import { supabase } from '@/lib/supabase/supabase';
 import type { CreatePaymentData, Payment } from '@/types';
 
 interface PaymentRow {
@@ -63,7 +63,7 @@ async function fetchUserPayments(userId: string, userEmail: string): Promise<Pay
   return ((data ?? []) as PaymentRow[]).map(normalizePayment);
 }
 
-export const createMercadoPagoPreference = async (paymentData: CreatePaymentData) => {
+export async function createMercadoPagoPreference(paymentData: CreatePaymentData) {
   try {
     const paymentType = PAYMENT_TYPES[paymentData.paymentType as keyof typeof PAYMENT_TYPES];
 
@@ -79,9 +79,9 @@ export const createMercadoPagoPreference = async (paymentData: CreatePaymentData
     console.error('Error creating Mercado Pago preference:', error);
     throw error;
   }
-};
+}
 
-export const processMercadoPagoWebhook = async (webhookData: unknown) => {
+export async function processMercadoPagoWebhook(webhookData: unknown) {
   try {
     const payload = webhookData as {
       data?: { id?: string };
@@ -141,7 +141,7 @@ export const processMercadoPagoWebhook = async (webhookData: unknown) => {
     console.error('Error processing webhook:', error);
     throw error;
   }
-};
+}
 
 const getMercadoPagoPayment = async (paymentId: string) => {
   return {
@@ -164,7 +164,7 @@ const generateInvoice = async (
   mercadopagoData: {
     id: string;
     payment_method?: { type?: string };
-  }
+  },
 ) => {
   try {
     const invoiceNumber = `INV-${paymentId.slice(-6)}`;
@@ -206,7 +206,11 @@ const generateInvoice = async (
   }
 };
 
-export const getUserPayments = (userId: string, userEmail: string, callback: (payments: Payment[]) => void) => {
+export function getUserPayments(
+  userId: string,
+  userEmail: string,
+  callback: (payments: Payment[]) => void,
+) {
   const loadPayments = async () => {
     try {
       const payments = await fetchUserPayments(userId, userEmail);
@@ -224,16 +228,16 @@ export const getUserPayments = (userId: string, userEmail: string, callback: (pa
       { event: '*', schema: 'public', table: 'payments' },
       () => {
         void loadPayments();
-      }
+      },
     )
     .subscribe();
 
   void loadPayments();
 
   return () => subscription.unsubscribe();
-};
+}
 
-export const getAllPayments = (callback: (payments: Payment[]) => void) => {
+export function getAllPayments(callback: (payments: Payment[]) => void) {
   const loadPayments = async () => {
     const { data, error } = await supabase
       .from('payments')
@@ -259,4 +263,4 @@ export const getAllPayments = (callback: (payments: Payment[]) => void) => {
   void loadPayments();
 
   return () => subscription.unsubscribe();
-};
+}
