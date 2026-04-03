@@ -5,5 +5,4 @@ export { default as SupportFloatingLauncher } from './components/SupportFloating
 export { default as SupportHeader } from './components/SupportHeader';
 export { default as SupportSummaryRow } from './components/SupportSummaryRow';
 export { default as SupportTicketForm } from './components/SupportTicketForm';
-export { default as SupportTicketsPanel } from './components/SupportTicketsPanel';
 export * from './types';

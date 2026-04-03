@@ -319,9 +319,9 @@ export const PRODUCT_TOUR_STEPS: ProductTourStep[] = [
     id: 'support-tickets',
     scope: 'support',
     route: '/dashboard/soporte',
-    target: 'support-tickets',
-    title: 'Tus tickets quedan listados acá',
-    description: 'Este panel te permite revisar historial, responder y retomar conversaciones activas.',
+    target: 'support-chat-launcher',
+    title: 'Este chat concentra tus conversaciones',
+    description: 'Acá retomás tickets activos desde el chat de soporte, sin duplicar historial en la pantalla.',
     placement: 'top',
   },
 ];

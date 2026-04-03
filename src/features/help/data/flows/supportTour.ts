@@ -49,10 +49,10 @@ export const supportTour: TutorialFlow = {
     },
     {
       id: 'support-tour-4',
-      title: 'Tus conversaciones quedan guardadas',
+      title: 'Desde acá retomás conversaciones activas',
       description:
-        'Este panel te deja retomar tickets anteriores sin perder el contexto.',
-      target: '[data-tour="support-tickets"]',
+        'El chat de soporte concentra tus tickets como conversaciones para seguirlas sin duplicados.',
+      target: '[data-tour="support-chat-launcher"]',
       position: 'top',
       action: 'wait',
       actionText: 'Terminar',

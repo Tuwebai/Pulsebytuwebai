@@ -4,9 +4,7 @@ import {
   SupportHeader,
   SupportSummaryRow,
   SupportTicketForm,
-  SupportTicketsPanel,
 } from '@/features/support';
-import { storeSupportChatIntent } from '@/features/support/supportChat.events';
 import { useSupportPage } from '@/features/support/hooks/useSupportPage';
 
 export default function SupportPage() {
@@ -38,17 +36,6 @@ export default function SupportPage() {
           <div data-tour="support-form">
             <SupportTicketForm formData={support.formData} onChange={support.setFormData} onSubmit={support.handleSubmitTicket} />
           </div>
-        </div>
-
-        <div data-tour="support-tickets">
-          <SupportTicketsPanel
-            error={support.error}
-            loading={support.loading}
-            tickets={support.tickets}
-            userEmail={support.user.email}
-            onReply={(ticketId) => storeSupportChatIntent({ scope: 'client', ticketId, focusInput: true })}
-            onRetry={support.handleRetryLoad}
-          />
         </div>
       </div>
     </>

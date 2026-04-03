@@ -15,6 +15,7 @@ export default function SupportFloatingLauncher({
   return (
     <button
       aria-label={scope === 'admin' ? 'Abrir conversaciones asignadas' : 'Abrir conversacion de soporte'}
+      data-tour={scope === 'client' ? 'support-chat-launcher' : undefined}
       className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full border border-[var(--signal-border)] bg-[var(--signal)] text-white shadow-[var(--shadow-modal)] transition-transform duration-150 hover:scale-[1.02] hover:bg-[var(--signal-dim)] md:bottom-6 md:right-6"
       type="button"
       onClick={onClick}
