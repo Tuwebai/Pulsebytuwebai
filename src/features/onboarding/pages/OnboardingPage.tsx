@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PulseLogo } from '@/core/components';
-import { usePulseOnboarding } from '@/hooks/usePulseOnboarding';
+import { usePulseOnboarding } from '@/features/onboarding/hooks/usePulseOnboarding';
 
 export default function OnboardingPage() {
   const navigate = useNavigate();

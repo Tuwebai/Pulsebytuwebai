@@ -46,36 +46,35 @@ export function usePulseOnboarding(): PulseOnboardingState {
     void refresh();
   }, [refresh]);
 
-  const saveDomain = useCallback(
-    async (value: string) => {
-      if (!user?.id) {
-        return { saved: false, normalizedDomain: '' };
+  const saveDomain = useCallback(async (value: string) => {
+    if (!user?.id) {
+      return { saved: false, normalizedDomain: '' };
+    }
+
+    setSubmitting(true);
+
+    try {
+      const result = await onboardingService.saveDomain(user.id, value);
+
+      if (result.saved) {
+        setDomain(result.normalizedDomain);
+        setWebsiteStatus('pending_review');
+        await updateUserSettings({
+          website: result.normalizedDomain,
+          website_status: 'pending_review',
+          website_submitted_at: new Date().toISOString(),
+          website_reviewed_at: null,
+          website_reviewed_by: null,
+          website_review_notes: null,
+        });
+        await refreshData();
       }
 
-      setSubmitting(true);
-
-      try {
-        const result = await onboardingService.saveDomain(user.id, value);
-        if (result.saved) {
-          setDomain(result.normalizedDomain);
-          setWebsiteStatus('pending_review');
-          await updateUserSettings({
-            website: result.normalizedDomain,
-            website_status: 'pending_review',
-            website_submitted_at: new Date().toISOString(),
-            website_reviewed_at: null,
-            website_reviewed_by: null,
-            website_review_notes: null,
-          });
-          await refreshData();
-        }
-        return result;
-      } finally {
-        setSubmitting(false);
-      }
-    },
-    [refreshData, updateUserSettings, user?.id]
-  );
+      return result;
+    } finally {
+      setSubmitting(false);
+    }
+  }, [refreshData, updateUserSettings, user?.id]);
 
   const complete = useCallback(async () => {
     if (!user?.id) {
@@ -98,15 +97,5 @@ export function usePulseOnboarding(): PulseOnboardingState {
     }
   }, [refreshData, updateUserSettings, user?.id]);
 
-  return {
-    loading,
-    submitting,
-    domain,
-    fullName,
-    completed,
-    websiteStatus,
-    refresh,
-    saveDomain,
-    complete
-  };
+  return { loading, submitting, domain, fullName, completed, websiteStatus, refresh, saveDomain, complete };
 }

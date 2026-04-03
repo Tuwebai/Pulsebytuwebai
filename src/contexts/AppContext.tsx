@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { SupabaseError } from '@/components/SupabaseError';
-import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import type { AppContextType, Project, ProjectLog } from '@/contexts/appContext.types';
 import { defaultAppContext } from '@/contexts/appContext.default';
 import { useAppAuth } from '@/features/auth/hooks/useAppAuth';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
+import { useSupabaseAuth } from '@/features/auth/hooks/useSupabaseAuth';
 import { useAppProjects } from '@/features/project/hooks/useAppProjects';
 
 export type { AppContextType, Project, ProjectLog, User } from '@/contexts/appContext.types';
