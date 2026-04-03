@@ -1,16 +1,25 @@
 [build]
-  command = "pnpm install && pnpm build"
+  command = "corepack enable; pnpm install --frozen-lockfile; pnpm build"
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20.19.0"
   PNPM_VERSION = "10.15.1"
   NODE_OPTIONS = "--max-old-space-size=4096"
+  VITE_DEBUG_MODE = "false"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
 # Headers para archivos JavaScript
 [[headers]]
