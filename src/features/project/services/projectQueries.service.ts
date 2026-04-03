@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 import type { Project, ProjectFilters, ProjectSort } from '@/types/project.types';
 
 export async function getProjects(

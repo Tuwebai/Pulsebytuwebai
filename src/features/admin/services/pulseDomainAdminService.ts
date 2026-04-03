@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 import { validateBusinessDomain } from '@/lib/utils/domain';
 
 export type WebsiteReviewStatus = 'missing' | 'pending_review' | 'approved' | 'rejected';

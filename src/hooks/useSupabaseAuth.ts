@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 import { config } from '@/config/environment';
 import { SUPPORT_CONTACT } from '@/config/supportContact';
 

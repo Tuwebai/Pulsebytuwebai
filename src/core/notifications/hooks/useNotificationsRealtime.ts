@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { Notification } from '@/data/types/notifications';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 import { showForegroundNotification } from '../services/browserNotifications.service';
 
 interface RealtimeNotificationRow {

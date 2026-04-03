@@ -10,7 +10,7 @@ import {
 
 import { Badge } from '@/components/ui/badge';
 import type { AdminSectionChangeHandler } from '@/features/admin/types/adminNavigation';
-import { formatCurrency } from '@/lib/mercadopago';
+import { formatCurrency } from '@/lib/integrations/mercadopago';
 
 interface AdminOperationalStatusProps {
   usuariosActivos: number;

@@ -1,6 +1,6 @@
 import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js';
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 import type { AdminManagedUser, AdminUserFormData } from '@/features/admin/users/types/adminUser';
 
 interface CreateAdminUserResponse {

@@ -16,7 +16,7 @@ import { resolvePulseConnectionState } from '@/features/pulse/hooks/usePulseConn
 import { usePulseMetrics } from '@/features/pulse/hooks/usePulseMetrics';
 import { usePulsePeriod } from '@/features/pulse/hooks/usePulsePeriod';
 import { usePulseRealtime } from '@/features/pulse/hooks/usePulseRealtime';
-import { formatCurrency } from '@/lib/mercadopago';
+import { formatCurrency } from '@/lib/integrations/mercadopago';
 
 function buildProjectSummary(hasProject: boolean, connectionState: string, remainingTasks: number | null) {
   if (!hasProject) {

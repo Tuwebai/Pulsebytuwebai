@@ -1,4 +1,4 @@
-﻿import { supabase } from '../supabase';
+import { supabase } from '../supabase/supabase';
 import { handleSupabaseError } from './errorHandler';
 
 export interface UserPreferences {

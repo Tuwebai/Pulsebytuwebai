@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 import type { Notification, NotificationCategory, NotificationPreferences, NotificationType } from '@/data/types/notifications';
 
 interface NotificationRow {

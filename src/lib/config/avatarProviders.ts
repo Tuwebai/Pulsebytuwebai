@@ -2,7 +2,7 @@
 // SERVICIO SIMPLIFICADO PARA OBTENER AVATARES REALES
 // =====================================================
 
-import { supabase } from '../supabase';
+import { supabase } from '../supabase/supabase';
 
 export interface AvatarResult {
   url: string | null;

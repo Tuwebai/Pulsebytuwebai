@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 import { userService, type UserRecord } from '@/features/auth/services/user.service';
 import { ticketMessagesService } from '@/features/support/services/ticketMessages.service';
 import { ticketService, type SupportAdminTicketRecord } from '@/features/support/services/ticket.service';

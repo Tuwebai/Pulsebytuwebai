@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { AlertCircle, CheckCircle2, CreditCard } from 'lucide-react';
-import { formatCurrency } from '@/lib/mercadopago';
+import { formatCurrency } from '@/lib/integrations/mercadopago';
 import type { Payment } from '@/types';
 import {
   getApprovedPaymentsTotal,

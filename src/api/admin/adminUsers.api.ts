@@ -2,7 +2,7 @@ import type { AdminManagedUser, AdminUserFormData } from '@/features/admin/users
 import { invokeCreateAdminUser } from '@/api/admin/adminUserCreate.api';
 import { invokeUpdateAdminUser } from '@/api/admin/adminUserUpdate.api';
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 
 function normalizeUserRoleForDb(role: string) {
   return role === 'admin' ? 'admin' : 'user';

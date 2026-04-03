@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 import type { EventType, OperationalEventSourceType, OperationalEventSeverity, OperationalEventStatus } from '@/api/admin/operationalEvents.api';
 
 export interface OperationalSourceUserRecord {

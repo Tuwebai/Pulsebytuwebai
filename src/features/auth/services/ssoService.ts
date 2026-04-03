@@ -1,5 +1,5 @@
 import { FunctionsHttpError } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 
 interface SsoBridgeResponse {
   email: string;

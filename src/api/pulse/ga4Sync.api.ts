@@ -1,5 +1,5 @@
 import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 
 interface BootstrapGa4SyncResponse {
   rows_upserted: number;

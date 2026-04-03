@@ -1,4 +1,4 @@
-﻿import { supabase } from '../supabase';
+import { supabase } from '../supabase/supabase';
 import { handleSupabaseError, handleNetworkError } from './errorHandler';
 import type { Notification, NotificationSettings, CreateNotificationData, UpdateNotificationData, NotificationFilters } from '@/types';
 

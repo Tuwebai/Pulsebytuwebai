@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 import type { PulseMetricRow } from '@/data/types/pulse';
 
 interface PulseMetricApiRow {

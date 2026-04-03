@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import type { EventCounts, EventFilters, OperationalEvent } from '@/features/admin/notifications/services/adminNotifications.service';
 import { eventMatchesFilters, updateCountsFromTransition } from '@/features/admin/notifications/hooks/useAdminNotificationsInbox.optimistic';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 
 type InboxRealtimeStatus = OperationalEvent['status'];
 type InboxRealtimeSeverity = OperationalEvent['severity'];

@@ -1,5 +1,5 @@
 import type { BadgeProps } from '@/core/components';
-import { PAYMENT_TYPES } from '@/lib/mercadopago';
+import { PAYMENT_TYPES } from '@/lib/integrations/mercadopago';
 import type { Payment } from '@/types';
 
 export function getPaymentStatusLabel(status: string): string {
