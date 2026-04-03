@@ -30,7 +30,10 @@ export function AdminProjectTrackingLayout({
   children,
 }: AdminProjectTrackingLayoutProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div
+      className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
+      data-surface="admin"
+    >
       <div className="fixed inset-y-0 left-0 z-30 hidden lg:block">
         <AdminProjectTrackingSidebar
           activeItem={activeItem}
@@ -49,13 +52,13 @@ export function AdminProjectTrackingLayout({
         )}
       >
         <div className="mx-auto w-full max-w-[1480px] space-y-4">
-          <div className="flex items-center justify-between gap-3 rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/90 px-4 py-3 shadow-[0_18px_40px_rgba(0,0,0,0.22)] backdrop-blur lg:hidden">
+          <div className="flex items-center justify-between gap-3 rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-3 shadow-2xl lg:hidden">
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={onOpenMobileSidebar}
-              className="h-10 w-10 rounded-2xl border border-white/10 bg-white/[0.03] p-0 text-[var(--text-primary)] hover:bg-white/[0.06]"
+              className="h-10 w-10 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-0 text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
             >
               <Menu className="h-4 w-4" />
             </Button>
@@ -76,7 +79,7 @@ export function AdminProjectTrackingLayout({
           <button
             type="button"
             aria-label="Cerrar sidebar"
-            className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={onCloseMobileSidebar}
           />
           <div className="absolute inset-y-0 left-0 w-[min(84vw,320px)]">

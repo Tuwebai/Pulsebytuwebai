@@ -10,6 +10,7 @@ import {
 
 import { Badge } from '@/components/ui/badge';
 import type { AdminSectionChangeHandler } from '@/features/admin/types/adminNavigation';
+import { formatCurrency } from '@/lib/mercadopago';
 
 interface AdminOperationalStatusProps {
   usuariosActivos: number;
@@ -92,15 +93,15 @@ export function AdminOperationalStatus({
     },
     {
       icon: DollarSign,
-      label: 'Cobranza acumulada',
-      value: `$${ingresosTotales.toLocaleString('es-AR')}`,
+      label: 'Cobranza acreditada',
+      value: formatCurrency(ingresosTotales, 'ARS'),
       toneClassName: 'bg-violet-500/15 text-violet-300',
       sectionId: 'pagos',
     },
     {
       icon: DollarSign,
-      label: 'Cobranza del mes',
-      value: `$${ingresosEsteMes.toLocaleString('es-AR')}`,
+      label: 'Acreditado este mes',
+      value: formatCurrency(ingresosEsteMes, 'ARS'),
       toneClassName: 'bg-signal/15 text-signal',
       sectionId: 'pagos',
     },

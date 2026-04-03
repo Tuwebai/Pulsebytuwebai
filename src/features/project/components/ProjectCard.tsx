@@ -1,4 +1,4 @@
-import { CalendarDays, ChevronRight, PenSquare, Trash2 } from 'lucide-react';
+import { CalendarDays, PenSquare, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Badge from '@/core/components/Badge';
 import { formatDateSafe } from '@/utils/formatDateSafe';
@@ -50,7 +50,7 @@ export default function ProjectCard({
       </div>
 
       <p className="mt-4 min-h-[48px] text-sm leading-6 text-slate-400">
-        {project.description?.trim() || 'Tu equipo de TuWebAI sigue trabajando en este proyecto.'}
+        {project.description?.trim() || 'Tu equipo de TuWebAI sigue avanzando con este proyecto.'}
       </p>
 
       <div className="mt-5">
@@ -83,18 +83,6 @@ export default function ProjectCard({
         <Button className="h-10 rounded-full bg-signal px-4 text-white hover:bg-[var(--signal-dim)]" onClick={() => onViewProject?.(project)} type="button">
           Ver detalles
         </Button>
-
-        {stateVariant !== 'success' ? (
-          <Button
-            className="h-10 rounded-full border border-white/10 bg-[var(--bg-base)]/70 px-4 text-slate-200 hover:border-white/15 hover:bg-[var(--bg-elevated)] hover:text-white"
-            onClick={() => onViewProject?.(project)}
-            type="button"
-            variant="outline"
-          >
-            Continuar
-            <ChevronRight className="ml-2 h-4 w-4" strokeWidth={1.5} />
-          </Button>
-        ) : null}
 
         {showAdminActions ? (
           <>

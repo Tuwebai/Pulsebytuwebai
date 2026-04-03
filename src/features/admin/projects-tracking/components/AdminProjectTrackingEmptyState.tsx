@@ -12,9 +12,9 @@ export function AdminProjectTrackingEmptyState({
   onEditProject,
 }: AdminProjectTrackingEmptyStateProps) {
   return (
-    <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-8 text-center shadow-[0_24px_60px_rgba(0,0,0,0.18)] sm:p-10">
+    <section className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)]/95 p-8 text-center shadow-2xl sm:p-10">
       <div className="mx-auto flex max-w-xl flex-col items-center gap-5">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
           <CheckSquare2 className="h-10 w-10" />
         </div>
         <div className="space-y-2">
@@ -29,7 +29,7 @@ export function AdminProjectTrackingEmptyState({
           <Button
             type="button"
             onClick={onEditProject}
-            className="rounded-xl border border-signal/20 bg-signal text-white hover:bg-signal/90"
+            className="rounded-xl border border-[var(--signal-border)] bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
             Volver y editar
@@ -38,7 +38,7 @@ export function AdminProjectTrackingEmptyState({
             type="button"
             variant="outline"
             onClick={onBack}
-            className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]"
+            className="rounded-xl border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-subtle)]"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver a proyectos

@@ -19,7 +19,7 @@ export function AdminProjectCardHeader({ project }: AdminProjectCardHeaderProps)
   return (
     <header className="space-y-3">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-signal/15 text-signal">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[var(--signal-glow)] text-[var(--signal)]">
           <FolderOpen className="h-4 w-4" />
         </div>
 
@@ -28,7 +28,7 @@ export function AdminProjectCardHeader({ project }: AdminProjectCardHeaderProps)
             <h3 className="truncate text-base font-semibold tracking-tight text-[var(--text-primary)] sm:text-lg">
               {project.name}
             </h3>
-            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-medium text-[var(--text-secondary)]">
+            <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2.5 py-1 text-[11px] font-medium text-[var(--text-secondary)]">
               {project.type || 'Proyecto web'}
             </span>
           </div>
@@ -48,7 +48,7 @@ export function AdminProjectCardHeader({ project }: AdminProjectCardHeaderProps)
               </span>
             )}
 
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-medium text-[var(--text-secondary)]">
+            <span className="inline-flex items-center gap-1 rounded-full border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2.5 py-1 text-[11px] font-medium text-[var(--text-secondary)]">
               <Layers3 className="h-3 w-3" />
               {project.fases?.length ?? 0} fases
             </span>

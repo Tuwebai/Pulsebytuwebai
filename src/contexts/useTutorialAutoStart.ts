@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { shouldAutoOpenProductTour } from '@/features/product-tour/services/productTour.service';
 
 interface TutorialAutoStartUser {
   id: string;
@@ -29,8 +30,9 @@ export function useTutorialAutoStart({
 
     const hasCompletedWelcome = localStorage.getItem(storageKey);
     const hasStartedThisSession = sessionStorage.getItem(sessionKey);
+    const shouldOpenCoreTour = shouldAutoOpenProductTour(user.id, 'core');
 
-    if (hasCompletedWelcome || hasStartedThisSession) {
+    if (hasCompletedWelcome || hasStartedThisSession || !shouldOpenCoreTour) {
       return;
     }
 

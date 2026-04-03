@@ -41,14 +41,14 @@ export function AdminProjectTrackingScreen({
   const totalTasks = project.rootTasks.length + project.phases.reduce((acc, phase) => acc + phase.tareas.length, 0);
   const visibleOwners = project.phases.filter((phase) => Boolean(phase.responsable)).length;
   const overviewCards = [
-    { icon: KanbanSquare, label: 'Fases cargadas', value: project.phases.length, tone: 'text-signal' },
-    { icon: ShieldAlert, label: 'Tareas operativas', value: totalTasks, tone: 'text-amber-300' },
-    { icon: UserRound, label: 'Responsables visibles', value: visibleOwners, tone: 'text-emerald-300' },
+    { icon: KanbanSquare, label: 'Fases cargadas', value: project.phases.length, tone: 'text-[var(--signal)]' },
+    { icon: ShieldAlert, label: 'Tareas operativas', value: totalTasks, tone: 'text-[var(--warning)]' },
+    { icon: UserRound, label: 'Responsables visibles', value: visibleOwners, tone: 'text-[var(--success)]' },
     {
       icon: CalendarClock,
       label: 'Avance declarado',
       value: `${project.completionPercentage}%`,
-      tone: 'text-sky-300',
+      tone: 'text-[var(--signal)]',
     },
   ];
 
@@ -60,7 +60,7 @@ export function AdminProjectTrackingScreen({
         {overviewCards.map(({ icon: Icon, label, tone, value }) => (
           <div
             key={label}
-            className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]"
+            className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)]/95 p-5 shadow-2xl"
           >
             <Icon className={`mb-3 h-5 w-5 ${tone}`} />
             <p className="text-sm text-[var(--text-secondary)]">{label}</p>

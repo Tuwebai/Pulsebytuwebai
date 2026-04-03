@@ -7,6 +7,7 @@ import {
   takeAdminTicket,
 } from '@/features/admin/tickets/hooks/adminTicketMutationActions';
 import type { AdminTicket, TicketFormData } from '@/features/admin/tickets/types/adminTicket.types';
+import { storeSupportChatIntent } from '@/features/support/supportChat.events';
 import { toast } from '@/hooks/use-toast';
 
 interface UseAdminTicketMutationsParams {
@@ -27,8 +28,8 @@ export function useAdminTicketMutations({
   async function submitTicket() {
     if (!formData.title.trim() || !formData.description.trim()) {
       toast({
-        title: 'Completá los campos principales',
-        description: 'El título y la descripción son obligatorios.',
+        title: 'Completa los campos principales',
+        description: 'El titulo y la descripcion son obligatorios.',
         variant: 'destructive',
       });
       return false;
@@ -43,16 +44,15 @@ export function useAdminTicketMutations({
 
       toast({
         title: editingTicket ? 'Ticket actualizado' : 'Ticket creado',
-        description: 'El cambio quedó guardado correctamente.',
+        description: 'El cambio quedo guardado correctamente.',
       });
-
       await refreshTickets();
       return true;
     } catch (error) {
       console.error('Error saving ticket:', error);
       toast({
         title: 'No pudimos guardar el ticket',
-        description: 'Revisá los datos e intentá de nuevo.',
+        description: 'Revisa los datos e intenta de nuevo.',
         variant: 'destructive',
       });
       return false;
@@ -63,12 +63,12 @@ export function useAdminTicketMutations({
     try {
       await removeAdminTicket(ticketId);
       setTickets((currentTickets) => currentTickets.filter((ticket) => ticket.id !== ticketId));
-      toast({ title: 'Ticket eliminado', description: 'El registro salió de la bandeja.' });
+      toast({ title: 'Ticket eliminado', description: 'El registro salio de la bandeja.' });
     } catch (error) {
       console.error('Error deleting ticket:', error);
       toast({
         title: 'No pudimos eliminar el ticket',
-        description: 'Volvé a intentar en unos segundos.',
+        description: 'Vuelve a intentar en unos segundos.',
         variant: 'destructive',
       });
     }
@@ -78,16 +78,14 @@ export function useAdminTicketMutations({
     try {
       await changeAdminTicketStatus(ticketId, newStatus);
       setTickets((currentTickets) =>
-        currentTickets.map((ticket) =>
-          ticket.id === ticketId ? { ...ticket, status: newStatus } : ticket,
-        ),
+        currentTickets.map((ticket) => (ticket.id === ticketId ? { ...ticket, status: newStatus } : ticket)),
       );
-      toast({ title: 'Estado actualizado', description: 'La bandeja ya quedó sincronizada.' });
+      toast({ title: 'Estado actualizado', description: 'La bandeja ya quedo sincronizada.' });
     } catch (error) {
       console.error('Error updating status:', error);
       toast({
         title: 'No pudimos actualizar el estado',
-        description: 'Volvé a intentar en unos segundos.',
+        description: 'Vuelve a intentar en unos segundos.',
         variant: 'destructive',
       });
     }
@@ -102,17 +100,20 @@ export function useAdminTicketMutations({
       await takeAdminTicket({ adminId: user.id, ticketId });
       setTickets((currentTickets) =>
         currentTickets.map((ticket) =>
-          ticket.id === ticketId
-            ? { ...ticket, assigned_admin_id: user.id, status: 'in_conversation' }
-            : ticket,
+          ticket.id === ticketId ? { ...ticket, assigned_admin_id: user.id, status: 'in_conversation' } : ticket,
         ),
       );
-      toast({ title: 'Ticket tomado', description: 'La conversación ya quedó asignada a tu bandeja.' });
+      storeSupportChatIntent({
+        scope: 'admin',
+        ticketId,
+        focusInput: true,
+      });
+      toast({ title: 'Ticket tomado', description: 'La conversacion ya quedo asignada a tu bandeja.' });
     } catch (error) {
       console.error('Error taking ticket:', error);
       toast({
         title: 'No pudimos tomar el ticket',
-        description: 'Volvé a intentar en unos segundos.',
+        description: 'Vuelve a intentar en unos segundos.',
         variant: 'destructive',
       });
     }

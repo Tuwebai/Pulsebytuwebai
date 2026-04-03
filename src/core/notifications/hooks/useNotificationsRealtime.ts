@@ -1,6 +1,65 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import type { Notification } from '@/data/types/notifications';
 import { supabase } from '@/lib/supabase';
+import { showForegroundNotification } from '../services/browserNotifications.service';
+
+interface RealtimeNotificationRow {
+  action_url?: string | null;
+  category?: string | null;
+  created_at?: string | null;
+  id: string;
+  is_read?: boolean | null;
+  is_urgent?: boolean | null;
+  message?: string | null;
+  metadata?: Record<string, unknown> | null;
+  title: string;
+  type?: string | null;
+  updated_at?: string | null;
+  user_id?: string | null;
+}
+
+const NOTIFICATIONS_QUERY_KEY = ['notifications'] as const;
+const NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY = ['notifications-unread-count'] as const;
+
+function normalizeRealtimeType(type: string | null | undefined): Notification['type'] {
+  if (type === 'success' || type === 'warning' || type === 'error' || type === 'critical') {
+    return type;
+  }
+
+  return 'info';
+}
+
+function normalizeRealtimeCategory(category: string | null | undefined): Notification['category'] {
+  if (
+    category === 'project' ||
+    category === 'ticket' ||
+    category === 'payment' ||
+    category === 'security' ||
+    category === 'user'
+  ) {
+    return category;
+  }
+
+  return 'system';
+}
+
+function mapRealtimeNotification(row: RealtimeNotificationRow): Notification {
+  return {
+    id: row.id,
+    user_id: row.user_id ?? '',
+    title: row.title,
+    message: row.message ?? null,
+    type: normalizeRealtimeType(row.type),
+    category: normalizeRealtimeCategory(row.category),
+    is_read: Boolean(row.is_read),
+    is_urgent: Boolean(row.is_urgent),
+    metadata: row.metadata ?? null,
+    action_url: row.action_url ?? null,
+    created_at: row.created_at ?? new Date().toISOString(),
+    updated_at: row.updated_at ?? null,
+  };
+}
 
 export function useNotificationsRealtime(userId: string | null) {
   const queryClient = useQueryClient();
@@ -20,9 +79,45 @@ export function useNotificationsRealtime(userId: string | null) {
           table: 'notifications',
           filter: `user_id=eq.${userId}`
         },
-        () => {
-          void queryClient.invalidateQueries({ queryKey: ['notifications'] });
-          void queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
+        (payload) => {
+          if (payload.eventType === 'INSERT' && payload.new) {
+            const insertedNotification = mapRealtimeNotification(payload.new as RealtimeNotificationRow);
+
+            void showForegroundNotification(payload.new as RealtimeNotificationRow);
+            queryClient.setQueryData<Notification[]>(NOTIFICATIONS_QUERY_KEY, (current = []) => {
+              const withoutDuplicate = current.filter((notification) => notification.id !== insertedNotification.id);
+              return [insertedNotification, ...withoutDuplicate].slice(0, 20);
+            });
+            queryClient.setQueryData<number>(NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY, (current = 0) =>
+              insertedNotification.is_read ? current : current + 1,
+            );
+            return;
+          }
+
+          if (payload.eventType === 'UPDATE' && payload.new) {
+            const updatedNotification = mapRealtimeNotification(payload.new as RealtimeNotificationRow);
+
+            queryClient.setQueryData<Notification[]>(NOTIFICATIONS_QUERY_KEY, (current = []) =>
+              current.map((notification) =>
+                notification.id === updatedNotification.id ? { ...notification, ...updatedNotification } : notification,
+              ),
+            );
+            queryClient.setQueryData<number>(NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY, (current = 0) => {
+              const previousNotification = (payload.old as RealtimeNotificationRow | null) ?? null;
+              const wasUnread = previousNotification?.is_read === false;
+              const isUnread = updatedNotification.is_read === false;
+
+              if (wasUnread === isUnread) {
+                return current;
+              }
+
+              return isUnread ? current + 1 : Math.max(0, current - 1);
+            });
+            return;
+          }
+
+          void queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
+          void queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY });
         }
       )
       .subscribe();

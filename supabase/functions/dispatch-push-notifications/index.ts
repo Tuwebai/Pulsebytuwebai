@@ -62,7 +62,9 @@ serve(async (req) => {
       primaryKey: notification.id,
       category: notification.category,
       urgent: notification.is_urgent ?? false,
+      senderName: typeof metadata.sender_name === 'string' ? metadata.sender_name : null,
       ticketId: typeof metadata.ticket_id === 'string' ? metadata.ticket_id : null,
+      ticketSubject: typeof metadata.ticket_subject === 'string' ? metadata.ticket_subject : null,
     });
 
     const results = await Promise.allSettled(

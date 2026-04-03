@@ -10,7 +10,7 @@ function getPushDescription(permission: NotificationPermission | 'unsupported', 
   }
 
   if (permission === 'denied') {
-    return 'Este navegador bloqueo las notificaciones. Podes habilitarlas desde la configuracion del sitio.';
+    return 'Este navegador bloqueó las notificaciones. Podés habilitarlas desde la configuración del sitio.';
   }
 
   if (isSubscribed) {
@@ -29,13 +29,19 @@ function resolvePushErrorMessage(error: unknown) {
     case 'PUSH_PERMISSION_DENIED':
       return 'Necesitas permitir notificaciones en el navegador para activar los avisos push.';
     case 'PUSH_SERVICE_WORKER_FAILED':
-      return 'No pudimos preparar el navegador para recibir notificaciones. Recarga la pagina e intenta otra vez.';
+      return 'No pudimos preparar el navegador para recibir notificaciones. Recargá la página e intentá otra vez.';
     case 'PUSH_CONFIG_MISSING':
       return 'Falta la configuracion publica de push en este entorno.';
+    case 'PUSH_KEYS_MISSING':
+      return 'El navegador no devolvió las credenciales necesarias para registrar este dispositivo.';
     case 'PUSH_NOT_SUPPORTED':
       return 'Este navegador o contexto no soporta notificaciones push web.';
+    case 'PUSH_AUTH_REQUIRED':
+      return 'Necesitas una sesion activa para registrar este dispositivo.';
+    case 'PUSH_SUBSCRIBE_ABORT':
+      return 'Error al activar notificaciones. Intenta de nuevo.';
     default:
-      return 'No pudimos actualizar las notificaciones push en este dispositivo.';
+      return error.message || 'No pudimos actualizar las notificaciones push en este dispositivo.';
   }
 }
 
@@ -54,12 +60,12 @@ export function NotificationPushSubscriptionCard() {
         }
 
         await enablePush();
-        toast({ title: 'Push activado', description: 'Este dispositivo ya puede recibir avisos de Pulse.' });
-        return;
+      toast({ title: 'Push activado', description: 'Este dispositivo ya puede recibir avisos de Pulse.' });
+      return;
       }
 
       await disablePush();
-      toast({ title: 'Push desactivado', description: 'Este dispositivo dejo de recibir avisos push.' });
+      toast({ title: 'Push desactivado', description: 'Este dispositivo dejó de recibir avisos push.' });
     } catch (error) {
       console.error('Error activando notificaciones push:', error);
       toast({

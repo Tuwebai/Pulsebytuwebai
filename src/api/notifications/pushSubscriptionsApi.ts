@@ -4,51 +4,65 @@ interface PushSubscriptionPayload {
   auth: string;
   endpoint: string;
   p256dh: string;
+  userId: string;
   userAgent: string;
 }
 
-interface PushSubscriptionResponse {
-  endpoint: string | null;
-  error?: string;
-  isSubscribed?: boolean;
-  success?: boolean;
+interface PushSubscriptionScope {
+  endpoint?: string | null;
+  userId: string;
 }
 
-async function invokeManagePushSubscription<T>(payload: Record<string, unknown>) {
-  const { data, error } = await supabase.functions.invoke<T>('manage-push-subscription', {
-    body: payload,
-  });
-
-  if (error) {
-    throw new Error(error.message || 'No pudimos sincronizar este dispositivo para notificaciones push.');
+export async function fetchActivePushSubscription(scope: PushSubscriptionScope) {
+  if (!scope.endpoint) {
+    return null;
   }
 
-  return data;
-}
+  const { data, error } = await supabase
+    .from('push_subscriptions')
+    .select('endpoint')
+    .eq('user_id', scope.userId)
+    .eq('endpoint', scope.endpoint)
+    .eq('is_active', true)
+    .maybeSingle();
 
-export async function fetchActivePushSubscription() {
-  const data = await invokeManagePushSubscription<PushSubscriptionResponse>({ action: 'get-active' });
+  if (error) {
+    throw new Error(error.message || 'No pudimos leer la configuracion push de este dispositivo.');
+  }
+
   return data?.endpoint ?? null;
 }
 
 export async function upsertPushSubscription(payload: PushSubscriptionPayload) {
-  const data = await invokeManagePushSubscription<PushSubscriptionResponse>({
-    action: 'upsert',
-    ...payload,
+  const { error } = await supabase.rpc('register_push_subscription', {
+    p_auth: payload.auth,
+    p_endpoint: payload.endpoint,
+    p_p256dh: payload.p256dh,
+    p_user_agent: payload.userAgent,
   });
 
-  if (!data?.isSubscribed) {
-    throw new Error(data?.error || 'No pudimos registrar este dispositivo para notificaciones push.');
+  if (error) {
+    throw new Error(error.message || 'No pudimos registrar este dispositivo para notificaciones push.');
   }
 }
 
-export async function deactivatePushSubscription(endpoint: string) {
-  const data = await invokeManagePushSubscription<PushSubscriptionResponse>({
-    action: 'deactivate',
-    endpoint,
-  });
+export async function deactivatePushSubscription(scope: PushSubscriptionScope & { endpoint?: string | null }) {
+  if (!scope.endpoint) {
+    return;
+  }
 
-  if (data?.success !== true) {
-    throw new Error(data?.error || 'No pudimos desactivar las notificaciones push en este dispositivo.');
+  const query = supabase
+    .from('push_subscriptions')
+    .update({
+      is_active: false,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('user_id', scope.userId)
+    .eq('endpoint', scope.endpoint);
+
+  const { error } = await query;
+
+  if (error) {
+    throw new Error(error.message || 'No pudimos desactivar las notificaciones push en este dispositivo.');
   }
 }

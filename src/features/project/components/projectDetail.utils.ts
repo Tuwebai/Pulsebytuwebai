@@ -36,7 +36,7 @@ export function getProjectStateLabel(project: ProjectDetailProject): string {
     case 'production':
       return 'Entregado';
     case 'maintenance':
-      return 'Mantenimiento';
+      return 'En seguimiento';
     case 'paused':
       return 'Pausado';
     default:
@@ -87,7 +87,7 @@ export function getPhaseDisplayName(phase: ProjectDetailPhase | null): string | 
   }
 
   const key = phase.key?.replace(/^fase_/, '').trim();
-  return key ? `Fase ${key}` : 'Fase actual';
+  return key ? `Fase ${key}` : 'Etapa actual';
 }
 
 function getTaskTitle(task: ProjectDetailTask): string {

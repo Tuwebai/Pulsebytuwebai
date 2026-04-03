@@ -1,6 +1,7 @@
 import type { AdminPaymentRecord, AdminProjectRecord } from '@/api/admin/adminDashboard.api';
 import type { AdminDashboardTicket } from '@/features/admin/services/adminDashboardService';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
+import { normalizeAdminPaymentStatus } from '@/features/admin/billing/adminPayments.utils';
 
 interface UseAdminDashboardMetricsParams {
   users: AdminManagedUser[];
@@ -40,11 +41,15 @@ export function useAdminDashboardMetrics({
   const proyectosEnCurso = projects.filter((project) => project.status !== 'completed').length;
   const proyectosCompletados = projects.filter((project) => project.status === 'completed').length;
 
-  const ingresosTotales = payments.reduce((accumulator, payment) => {
+  const approvedPayments = payments.filter(
+    (payment) => normalizeAdminPaymentStatus(payment.status) === 'approved',
+  );
+
+  const ingresosTotales = approvedPayments.reduce((accumulator, payment) => {
     return accumulator + (Number(payment.amount) || 0);
   }, 0);
 
-  const ingresosEsteMes = payments
+  const ingresosEsteMes = approvedPayments
     .filter((payment) => {
       const paymentDate = new Date(payment.created_at);
       const currentDate = new Date();

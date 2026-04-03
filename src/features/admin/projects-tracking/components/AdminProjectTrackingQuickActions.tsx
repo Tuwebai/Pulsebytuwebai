@@ -33,7 +33,7 @@ export function AdminProjectTrackingQuickActions({
             variant="outline"
             onClick={action.onClick}
             disabled={action.disabled}
-            className="h-9 rounded-xl border-white/10 bg-white/[0.03] px-3 text-[13px] font-medium text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]"
+            className="h-9 rounded-xl border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 text-[13px] font-medium text-[var(--text-primary)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-subtle)]"
           >
             <ActionIcon className="mr-2 h-4 w-4 text-[var(--text-secondary)]" />
             {action.ctaLabel}

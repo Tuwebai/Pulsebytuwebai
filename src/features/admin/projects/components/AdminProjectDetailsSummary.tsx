@@ -18,13 +18,13 @@ export function AdminProjectDetailsSummary({ project }: AdminProjectDetailsSumma
           <span>Avance operativo</span>
           <span className="font-data text-[var(--text-primary)]">{progress}%</span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
+        <div className="h-2 overflow-hidden rounded-full bg-[var(--bg-subtle)]">
           <div className="h-full rounded-full bg-signal transition-[width] duration-300" style={{ width: `${progress}%` }} />
         </div>
       </div>
 
       <dl className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+        <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3">
           <dt className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
             <Wrench className="h-3.5 w-3.5" />
             Tecnologías
@@ -34,7 +34,7 @@ export function AdminProjectDetailsSummary({ project }: AdminProjectDetailsSumma
           </dd>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+        <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3">
           <dt className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
             <Layers3 className="h-3.5 w-3.5" />
             Base de trabajo
@@ -44,7 +44,7 @@ export function AdminProjectDetailsSummary({ project }: AdminProjectDetailsSumma
           </dd>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+        <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3">
           <dt className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
             <Flag className="h-3.5 w-3.5" />
             Prioridad
@@ -54,7 +54,7 @@ export function AdminProjectDetailsSummary({ project }: AdminProjectDetailsSumma
           </dd>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+        <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3">
           <dt className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
             <GitBranch className="h-3.5 w-3.5" />
             Repositorio
@@ -64,7 +64,7 @@ export function AdminProjectDetailsSummary({ project }: AdminProjectDetailsSumma
           </dd>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+        <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3">
           <dt className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
             <CalendarDays className="h-3.5 w-3.5" />
             Inicio
@@ -72,7 +72,7 @@ export function AdminProjectDetailsSummary({ project }: AdminProjectDetailsSumma
           <dd className="mt-1.5 text-sm text-[var(--text-primary)]">{formatOperationalDate(project.start_date || project.created_at)}</dd>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+        <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3">
           <dt className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
             <CalendarDays className="h-3.5 w-3.5" />
             Último movimiento

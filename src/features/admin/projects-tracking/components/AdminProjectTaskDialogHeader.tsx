@@ -7,7 +7,7 @@ interface AdminProjectTaskDialogHeaderProps {
 export function AdminProjectTaskDialogHeader({ editing }: AdminProjectTaskDialogHeaderProps) {
   return (
     <div className="flex items-start gap-4">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-amber-400/20 bg-amber-500/10 text-amber-300">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[var(--warning)]/20 bg-[var(--warning-dim)] text-[var(--warning)]">
         <ListTodo className="h-5 w-5" />
       </div>
       <div className="space-y-1">

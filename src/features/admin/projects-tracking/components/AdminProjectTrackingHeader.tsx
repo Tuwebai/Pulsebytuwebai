@@ -10,11 +10,11 @@ interface AdminProjectTrackingHeaderProps {
 
 export function AdminProjectTrackingHeader({ project, onEditProject }: AdminProjectTrackingHeaderProps) {
   return (
-    <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur sm:p-6">
+    <section className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-2xl sm:p-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-4">
           <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-signal/20 bg-signal/12 text-signal">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--signal-border)] bg-[var(--signal-glow)] text-[var(--signal)]">
               <FolderKanban className="h-5 w-5" />
             </div>
             <div className="space-y-1">
@@ -35,7 +35,7 @@ export function AdminProjectTrackingHeader({ project, onEditProject }: AdminProj
           <Button
             type="button"
             onClick={onEditProject}
-            className="rounded-xl border border-signal/20 bg-signal text-white hover:bg-signal/90"
+            className="rounded-xl border border-[var(--signal-border)] bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]"
           >
             <SquarePen className="mr-2 h-4 w-4" />
             Volver y editar

@@ -1,4 +1,5 @@
 import { DollarSign, FolderOpen, Ticket, Users } from 'lucide-react';
+import { formatCurrency } from '@/lib/mercadopago';
 
 interface AdminOverviewStatsProps {
   usuariosActivos: number;
@@ -55,9 +56,9 @@ export function AdminOverviewStats({
     },
     {
       icon: DollarSign,
-      value: `$${ingresosTotales.toLocaleString('es-AR')}`,
-      label: 'Cobranza administrada',
-      detail: `$${ingresosEsteMes.toLocaleString('es-AR')} este mes`,
+      value: formatCurrency(ingresosTotales, 'ARS'),
+      label: 'Cobranza acreditada',
+      detail: `${formatCurrency(ingresosEsteMes, 'ARS')} acreditados este mes`,
       iconClassName: 'bg-violet-500/15 text-violet-300',
       detailClassName: 'text-emerald-400',
       valueClassName: 'text-[clamp(1.9rem,3vw,3rem)]',

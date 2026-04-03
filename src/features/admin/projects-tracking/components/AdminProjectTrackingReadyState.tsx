@@ -1,7 +1,7 @@
 export function AdminProjectTrackingReadyState() {
   return (
     <>
-      <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.18)]">
+      <section className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)]/95 p-6 shadow-2xl">
         <div className="space-y-2">
           <h2 className="text-xl font-semibold text-[var(--text-primary)]">Base de seguimiento lista</h2>
           <p className="text-sm leading-6 text-[var(--text-secondary)]">
@@ -11,7 +11,7 @@ export function AdminProjectTrackingReadyState() {
         </div>
       </section>
 
-      <section className="rounded-[24px] border border-dashed border-white/10 bg-[var(--bg-surface)]/70 p-6">
+      <section className="rounded-[24px] border border-dashed border-[var(--border-default)] bg-[var(--bg-surface)]/95 p-6 shadow-2xl">
         <div className="space-y-2">
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">Consola lista para operar</h2>
           <p className="text-sm leading-6 text-[var(--text-secondary)]">

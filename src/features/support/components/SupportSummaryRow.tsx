@@ -17,7 +17,7 @@ export default function SupportSummaryRow({
       <SummaryCard
         detail="esperando respuesta"
         icon={<Clock3 className="h-4 w-4" strokeWidth={1.7} />}
-        iconClassName="bg-[var(--cliente-signal-glow)] text-[var(--cliente-signal)]"
+        iconClassName="bg-[var(--signal-glow)] text-[var(--signal)]"
         label="Resumen"
         title="Tickets abiertos"
         value={openCount}
@@ -25,7 +25,7 @@ export default function SupportSummaryRow({
       <SummaryCard
         detail="con intercambio activo"
         icon={<MessageSquareMore className="h-4 w-4" strokeWidth={1.7} />}
-        iconClassName="bg-amber-500/15 text-amber-300"
+        iconClassName="bg-[var(--warning-dim)] text-[var(--warning)]"
         label="Resumen"
         title="En progreso"
         value={progressCount}
@@ -33,7 +33,7 @@ export default function SupportSummaryRow({
       <SummaryCard
         detail="tickets cerrados"
         icon={<CheckCircle2 className="h-4 w-4" strokeWidth={1.7} />}
-        iconClassName="bg-emerald-500/15 text-emerald-300"
+        iconClassName="bg-[var(--success-dim)] text-[var(--success)]"
         label="Resumen"
         title="Resueltos"
         value={closedCount}
@@ -58,19 +58,19 @@ function SummaryCard({
   value: number;
 }) {
   return (
-    <article className="rounded-[22px] border border-[var(--cliente-border-default)] bg-[var(--cliente-bg-surface)]/92 px-4 py-4 shadow-[var(--cliente-card-shadow)]">
+    <article className="rounded-[22px] border border-[var(--border-default)] bg-[var(--bg-surface)]/92 px-4 py-4 shadow-2xl">
       <div className="flex items-start justify-between gap-3">
         <div className={`flex h-9 w-9 items-center justify-center rounded-2xl ${iconClassName}`}>{icon}</div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--cliente-text-tertiary)]">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
           {label}
         </p>
       </div>
 
-      <p className="mt-4 text-sm font-medium text-[var(--cliente-text-primary)]">{title}</p>
-      <p className="mt-1 font-data text-[clamp(2.2rem,3vw,2.8rem)] font-light leading-none tracking-tight text-[var(--cliente-text-primary)]">
+      <p className="mt-4 text-sm font-medium text-[var(--text-primary)]">{title}</p>
+      <p className="mt-1 font-data text-[clamp(2.2rem,3vw,2.8rem)] font-light leading-none tracking-tight text-[var(--text-primary)]">
         {value.toLocaleString('es-AR')}
       </p>
-      <p className="mt-2 text-xs text-[var(--cliente-text-secondary)]">{detail}</p>
+      <p className="mt-2 text-xs text-[var(--text-secondary)]">{detail}</p>
     </article>
   );
 }

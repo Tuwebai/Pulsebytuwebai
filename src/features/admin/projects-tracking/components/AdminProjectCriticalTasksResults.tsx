@@ -32,7 +32,7 @@ export function AdminProjectCriticalTasksResults({
 
   if (visibleItems.length === 0) {
     return (
-      <section className="rounded-[24px] border border-dashed border-white/10 bg-[var(--bg-surface)]/70 p-8">
+      <section className="rounded-[24px] border border-dashed border-[var(--border-default)] bg-[var(--bg-surface)]/95 p-8 shadow-2xl">
         <div className="mx-auto max-w-2xl space-y-2 text-center">
           <h2 className="text-xl font-semibold text-[var(--text-primary)]">No hay tareas en este filtro</h2>
           <p className="text-sm leading-6 text-[var(--text-secondary)]">

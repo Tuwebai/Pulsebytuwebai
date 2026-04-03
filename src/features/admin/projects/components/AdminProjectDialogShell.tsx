@@ -37,25 +37,26 @@ export function AdminProjectDialogShell({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={`max-h-[92vh] overflow-y-auto border border-white/10 bg-[var(--bg-surface)] p-0 text-slate-100 shadow-2xl ${maxWidthClassName}`}
+        data-surface="admin"
+        className={`max-h-[92vh] overflow-y-auto border border-[var(--border-default)] bg-[var(--bg-surface)] p-0 text-[var(--text-primary)] shadow-2xl ${maxWidthClassName}`}
         aria-describedby={ariaDescribedBy}
       >
-        <div className="border-b border-white/10 bg-[linear-gradient(180deg,rgba(59,158,245,0.08),rgba(8,15,30,0.96)_72%)] px-4 py-4 sm:px-5">
+        <div className="border-b border-[var(--border-default)] bg-[linear-gradient(180deg,var(--signal-glow),var(--bg-surface)_72%)] px-4 py-4 sm:px-5">
           <DialogHeader className="space-y-2.5 text-left">
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-signal/15 text-signal">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[var(--signal-glow)] text-[var(--signal)]">
                 <Icon className="h-4 w-4" />
               </div>
               <div className="space-y-1.5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
                   {kicker}
                 </p>
-                <DialogTitle className="text-lg font-semibold text-slate-50 sm:text-xl">
+                <DialogTitle className="text-lg font-semibold text-[var(--text-primary)] sm:text-xl">
                   {title}
                 </DialogTitle>
                 <DialogDescription
                   id={ariaDescribedBy}
-                  className="max-w-2xl text-sm leading-5 text-slate-400"
+                  className="max-w-2xl text-sm leading-5 text-[var(--text-secondary)]"
                 >
                   {description}
                 </DialogDescription>
@@ -64,10 +65,10 @@ export function AdminProjectDialogShell({
           </DialogHeader>
         </div>
 
-        <div className="space-y-4 px-4 py-4 sm:px-5 sm:py-5">{children}</div>
+        <div className="space-y-4 bg-[var(--bg-surface)] px-4 py-4 sm:px-5 sm:py-5">{children}</div>
 
         {footer ? (
-          <div className="flex flex-col-reverse gap-2 border-t border-white/10 px-4 py-3 sm:flex-row sm:justify-end sm:px-5">
+          <div className="flex flex-col-reverse gap-2 border-t border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-3 sm:flex-row sm:justify-end sm:px-5">
             {footer}
           </div>
         ) : null}

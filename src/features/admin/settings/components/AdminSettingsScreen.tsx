@@ -4,6 +4,7 @@ import { AdminPageActionsBar } from '@/features/admin/components/AdminPageAction
 import { AdminSettingsImpactCard } from '@/features/admin/settings/components/AdminSettingsImpactCard';
 import { AdminSettingsMetrics } from '@/features/admin/settings/components/AdminSettingsMetrics';
 import { AdminSettingsModulesCard } from '@/features/admin/settings/components/AdminSettingsModulesCard';
+import { AdminPushNotificationsCard } from '@/features/admin/settings/components/AdminPushNotificationsCard';
 import { AdminSettingsViewCard } from '@/features/admin/settings/components/AdminSettingsViewCard';
 import { useAdminPulseSettings } from '@/features/admin/settings/hooks/useAdminPulseSettings';
 import { toast } from '@/hooks/use-toast';
@@ -92,6 +93,7 @@ export function AdminSettingsScreen({ onSaveReference }: AdminSettingsScreenProp
       <div className="grid gap-4 xl:grid-cols-2">
         <AdminSettingsViewCard onSettingChange={updateSetting} settings={settings} />
         <AdminSettingsModulesCard onSettingChange={updateSetting} settings={settings} />
+        <AdminPushNotificationsCard />
         <AdminSettingsImpactCard settings={settings} />
       </div>
     </div>

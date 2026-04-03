@@ -21,7 +21,9 @@ class ServiceWorkerManager {
       const existingRegistration = await navigator.serviceWorker.getRegistration('/');
 
       if (existingRegistration) {
+        await existingRegistration.update().catch(() => undefined);
         this.registration = existingRegistration;
+        await navigator.serviceWorker.ready;
         return this.registration;
       }
 
@@ -60,6 +62,10 @@ class ServiceWorkerManager {
     const cacheKeys = await caches.keys();
     await Promise.all(cacheKeys.map((cacheKey) => caches.delete(cacheKey)));
 
+    this.registration = null;
+  }
+
+  resetRegistration() {
     this.registration = null;
   }
 

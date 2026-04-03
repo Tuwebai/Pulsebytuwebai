@@ -17,14 +17,14 @@ export function getProjectStatusLabel(status: Project['status']) {
 export function getProjectStatusClasses(status: Project['status']) {
   switch (status) {
     case 'production':
-      return 'border-emerald-400/20 bg-emerald-500/12 text-emerald-300';
+      return 'border-[var(--success)]/20 bg-[var(--success-dim)] text-[var(--success)]';
     case 'paused':
-      return 'border-amber-400/20 bg-amber-500/12 text-amber-300';
+      return 'border-[var(--warning)]/20 bg-[var(--warning-dim)] text-[var(--warning)]';
     case 'maintenance':
-      return 'border-violet-400/20 bg-violet-500/12 text-violet-300';
+      return 'border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-secondary)]';
     case 'development':
     default:
-      return 'border-signal/20 bg-signal/12 text-signal';
+      return 'border-[var(--signal-border)] bg-[var(--signal-glow)] text-[var(--signal)]';
   }
 }
 
@@ -44,11 +44,11 @@ export function getApprovalLabel(status?: Project['approval_status']) {
 export function getApprovalClasses(status?: Project['approval_status']) {
   switch (status) {
     case 'approved':
-      return 'border-emerald-400/20 bg-emerald-500/12 text-emerald-300';
+      return 'border-[var(--success)]/20 bg-[var(--success-dim)] text-[var(--success)]';
     case 'rejected':
       return 'border-danger/20 bg-danger/12 text-danger';
     case 'pending':
-      return 'border-amber-400/20 bg-amber-500/12 text-amber-300';
+      return 'border-[var(--warning)]/20 bg-[var(--warning-dim)] text-[var(--warning)]';
     default:
       return '';
   }

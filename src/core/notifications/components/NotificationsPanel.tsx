@@ -88,14 +88,16 @@ export function NotificationsPanel({ open, onClose }: NotificationsPanelProps) {
             onClick={onClose}
           />
 
-          <motion.aside
-            aria-label="Panel de notificaciones"
-            className="fixed inset-y-0 right-0 z-50 flex w-full max-w-[360px] flex-col border-l border-[var(--border-default)] bg-[var(--bg-surface)] shadow-2xl md:w-[360px]"
-            initial={{ x: 360 }}
-            animate={{ x: 0 }}
-            exit={{ x: 360 }}
-            transition={panelTransition}
-          >
+          <div data-surface={user?.role === 'admin' ? 'admin' : 'client'}>
+            <motion.aside
+              aria-label="Panel de notificaciones"
+              className="fixed inset-y-0 right-0 z-50 flex w-full max-w-[360px] flex-col border-l border-[var(--border-default)] bg-[color:var(--bg-surface)] shadow-2xl md:w-[360px]"
+              style={{ opacity: 1 }}
+              initial={{ x: 360 }}
+              animate={{ x: 0 }}
+              exit={{ x: 360 }}
+              transition={panelTransition}
+            >
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] px-5 py-4">
               <h2 className="text-[16px] font-medium text-[var(--text-primary)]">Notificaciones</h2>
 
@@ -151,7 +153,8 @@ export function NotificationsPanel({ open, onClose }: NotificationsPanelProps) {
                 </div>
               ) : null}
             </div>
-          </motion.aside>
+            </motion.aside>
+          </div>
         </>
       ) : null}
     </AnimatePresence>

@@ -18,12 +18,12 @@ export function AdminProjectCardActions({
   onDeleteProject,
 }: AdminProjectCardActionsProps) {
   return (
-    <div className="flex flex-col gap-3 border-t border-white/10 pt-4">
+    <div className="flex flex-col gap-3 border-t border-[var(--border-default)] pt-4">
       <div className="flex flex-wrap gap-2">
         <Button
           variant="outline"
           size="sm"
-          className="rounded-xl border-signal/20 bg-signal/10 text-signal hover:bg-signal/16"
+          className="rounded-xl border-[var(--signal-border)] bg-[var(--signal-glow)] text-[var(--signal)] hover:bg-[var(--signal-glow)]"
           onClick={() => onOpenTracking(projectId)}
         >
           Seguimiento
@@ -31,7 +31,7 @@ export function AdminProjectCardActions({
         <Button
           variant="outline"
           size="sm"
-          className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-signal/20 hover:bg-signal/10 hover:text-signal"
+          className="rounded-xl border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:border-[var(--signal-border)] hover:bg-[var(--signal-glow)] hover:text-[var(--signal)]"
           onClick={() => onViewProject(projectId)}
         >
           <ExternalLink className="mr-2 h-4 w-4" />
@@ -41,7 +41,7 @@ export function AdminProjectCardActions({
         <Button
           variant="outline"
           size="sm"
-          className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-signal/20 hover:bg-signal/10 hover:text-signal"
+          className="rounded-xl border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:border-[var(--signal-border)] hover:bg-[var(--signal-glow)] hover:text-[var(--signal)]"
           onClick={() => onEditProject(projectId)}
         >
           <Edit3 className="mr-2 h-4 w-4" />

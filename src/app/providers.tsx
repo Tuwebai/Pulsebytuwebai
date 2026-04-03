@@ -5,6 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { AppProvider } from '@/contexts/AppContext';
+import { PushSubscriptionBootstrap } from '@/core/notifications/components/PushSubscriptionBootstrap';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { TutorialProvider } from '@/contexts/TutorialContext';
 import i18n from '@/lib/config/i18n';
@@ -32,6 +33,7 @@ export function AppProviders({ children }: AppProvidersProps) {
           <TooltipProvider>
             <AppProvider>
               <TutorialProvider>
+                <PushSubscriptionBootstrap />
                 {children}
                 <Toaster />
                 <Sonner />

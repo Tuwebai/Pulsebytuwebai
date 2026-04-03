@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react';
 import type { SupportChatScope } from '@/features/support/supportChat.events';
 import { useSupportChatDock } from '@/features/support/hooks/useSupportChatDock';
 import SupportConversationPanel from './SupportConversationPanel';
@@ -11,35 +10,32 @@ interface SupportChatDockProps {
 export default function SupportChatDock({ scope }: SupportChatDockProps) {
   const chat = useSupportChatDock(scope);
 
-  const supportVars = {
-    '--support-bg-surface': `var(--${scope}-bg-surface)`,
-    '--support-bg-elevated': `var(--${scope}-bg-elevated)`,
-    '--support-border-default': `var(--${scope}-border-default)`,
-    '--support-text-primary': `var(--${scope}-text-primary)`,
-    '--support-text-secondary': `var(--${scope}-text-secondary)`,
-    '--support-text-tertiary': `var(--${scope}-text-tertiary)`,
-    '--support-signal': `var(--${scope}-signal)`,
-    '--support-signal-dim': `var(--${scope}-signal-dim)`,
-    '--support-signal-glow': `var(--${scope}-signal-glow)`,
-    '--support-signal-border': `var(--${scope}-signal-border)`,
-    '--support-shadow-card': `var(--${scope}-shadow-card)`,
-    '--support-shadow-modal': `var(--${scope}-shadow-modal)`,
-    '--support-hero-bg': `var(--${scope}-hero-bg)`,
-    '--support-card-radius': `var(--${scope}-card-radius)`,
-  } as CSSProperties;
-
   return (
-    <div style={supportVars}>
+    <div data-surface={scope === 'admin' ? 'admin' : 'client'}>
       <SupportFloatingLauncher pendingCount={chat.pendingCount} scope={scope} onClick={chat.openConversation} />
       <SupportConversationPanel
+        canClientSend={chat.canClientSend}
         canReply={chat.canReply}
+        clientRemainingMessages={chat.clientRemainingMessages}
+        conversations={chat.conversationSummaries}
+        createTicketOpen={chat.createTicketOpen}
+        draft={chat.draft}
         focusNonce={chat.focusNonce}
+        messages={chat.selectedMessages}
         open={chat.open}
         responseText={chat.responseText}
         scope={scope}
+        selectedConversation={chat.selectedConversation}
         ticket={chat.selectedTicket}
+        tickets={chat.tickets}
         onChange={chat.setResponseText}
         onClose={chat.closeConversation}
+        onCreateTicket={() => {
+          void chat.createTicket();
+        }}
+        onDraftChange={chat.setDraft}
+        onOpenNewTicket={chat.openNewTicketComposer}
+        onSelectTicket={chat.setSelectedTicketId}
         onSubmit={() => {
           void chat.submitReply();
         }}

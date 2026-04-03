@@ -18,7 +18,7 @@ export function AdminProjectCriticalTasksHero({
   onCreateTask,
 }: AdminProjectCriticalTasksHeroProps) {
   return (
-    <section className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
+    <section className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)]/95 p-5 shadow-2xl">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Tareas críticas</p>
@@ -29,14 +29,14 @@ export function AdminProjectCriticalTasksHero({
         </div>
 
         <div className="flex flex-col gap-3 sm:items-end">
-          <div className="flex items-center gap-2 rounded-2xl border border-amber-400/15 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+          <div className="flex items-center gap-2 rounded-2xl border border-[var(--warning)]/20 bg-[var(--warning-dim)] px-4 py-3 text-sm text-[var(--warning)]">
             <ListTodo className="h-4 w-4" />
             <span>{items.length} tareas priorizadas</span>
           </div>
           <Button
             type="button"
             onClick={onCreateTask}
-            className="rounded-xl border border-signal/20 bg-signal text-white hover:bg-signal/90"
+            className="rounded-xl border border-[var(--signal-border)] bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]"
           >
             <Plus className="mr-2 h-4 w-4" />
             Crear tarea
@@ -45,7 +45,7 @@ export function AdminProjectCriticalTasksHero({
       </div>
 
       {items.length > 0 ? (
-        <div className="mt-4 border-t border-white/10 pt-4">
+        <div className="mt-4 border-t border-[var(--border-default)] pt-4">
           <AdminProjectCriticalTasksFilters
             activeFilter={activeFilter}
             items={items}

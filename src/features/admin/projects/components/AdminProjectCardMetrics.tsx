@@ -24,7 +24,7 @@ export function AdminProjectCardMetrics({ project }: AdminProjectCardMetricsProp
           <span className="font-data text-[var(--text-primary)]">{progress}%</span>
         </div>
 
-        <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
+        <div className="h-2 overflow-hidden rounded-full bg-[var(--bg-subtle)]">
           <div
             className="h-full rounded-full bg-signal transition-[width] duration-300"
             style={{ width: `${progress}%` }}
@@ -33,7 +33,7 @@ export function AdminProjectCardMetrics({ project }: AdminProjectCardMetricsProp
       </div>
 
       <dl className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+        <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3">
           <dt className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
             <Wrench className="h-3.5 w-3.5" />
             Tecnologías
@@ -41,7 +41,7 @@ export function AdminProjectCardMetrics({ project }: AdminProjectCardMetricsProp
           <dd className="mt-1.5 text-sm font-medium text-[var(--text-primary)]">{technologies} activas</dd>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+        <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3">
           <dt className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
             <Layers2 className="h-3.5 w-3.5" />
             Tareas
@@ -49,7 +49,7 @@ export function AdminProjectCardMetrics({ project }: AdminProjectCardMetricsProp
           <dd className="mt-1.5 text-sm font-medium text-[var(--text-primary)]">{tasks} registradas</dd>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+        <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3">
           <dt className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
             <CalendarDays className="h-3.5 w-3.5" />
             Última actualización
@@ -59,7 +59,7 @@ export function AdminProjectCardMetrics({ project }: AdminProjectCardMetricsProp
           </dd>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+        <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3">
           <dt className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
             <Gauge className="h-3.5 w-3.5" />
             Prioridad

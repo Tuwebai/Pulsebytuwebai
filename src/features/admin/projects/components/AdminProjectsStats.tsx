@@ -19,28 +19,28 @@ export function AdminProjectsStats({
       value: total,
       detail: 'base operativa',
       icon: Sparkles,
-      iconClassName: 'bg-signal/15 text-signal',
+      iconClassName: 'bg-[var(--signal-glow)] text-[var(--signal)]',
     },
     {
       label: 'En seguimiento',
       value: inProgress,
       detail: 'desarrollo y mantenimiento',
       icon: FolderOpen,
-      iconClassName: 'bg-emerald-500/15 text-emerald-300',
+      iconClassName: 'bg-[var(--success-dim)] text-[var(--success)]',
     },
     {
       label: 'En producción',
       value: inProduction,
       detail: 'sitios ya publicados',
       icon: CheckCircle2,
-      iconClassName: 'bg-sky-500/15 text-sky-300',
+      iconClassName: 'bg-[var(--signal-glow)] text-[var(--signal)]',
     },
     {
       label: 'Pausados',
       value: paused,
       detail: 'esperando próximo paso',
       icon: PauseCircle,
-      iconClassName: 'bg-amber-500/15 text-amber-300',
+      iconClassName: 'bg-[var(--warning-dim)] text-[var(--warning)]',
     },
   ] as const;
 
@@ -52,22 +52,22 @@ export function AdminProjectsStats({
         return (
           <article
             key={card.label}
-            className="rounded-[22px] border border-white/10 bg-[var(--bg-surface)]/92 px-4 py-4 shadow-[0_14px_30px_rgba(2,6,23,0.22)]"
+            className="rounded-[22px] border border-[var(--border-default)] bg-[var(--bg-surface)]/92 px-4 py-4 shadow-2xl"
           >
             <div className="flex items-start justify-between gap-3">
               <div className={`flex h-9 w-9 items-center justify-center rounded-2xl ${card.iconClassName}`}>
                 <Icon className="h-4 w-4" />
               </div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
                 Resumen
               </p>
             </div>
 
-            <p className="mt-4 text-sm font-medium text-slate-100">{card.label}</p>
-            <p className="mt-1 font-data text-[clamp(2.2rem,3vw,2.8rem)] font-light leading-none tracking-tight text-slate-50">
+            <p className="mt-4 text-sm font-medium text-[var(--text-primary)]">{card.label}</p>
+            <p className="mt-1 font-data text-[clamp(2.2rem,3vw,2.8rem)] font-light leading-none tracking-tight text-[var(--text-primary)]">
               {card.value}
             </p>
-            <p className="mt-2 text-xs text-slate-400">{card.detail}</p>
+            <p className="mt-2 text-xs text-[var(--text-secondary)]">{card.detail}</p>
           </article>
         );
       })}

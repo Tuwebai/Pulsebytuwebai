@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useApp } from '@/contexts/AppContext';
 import {
   deactivatePushSubscription,
   fetchActivePushSubscription,
@@ -8,11 +9,12 @@ import type { PushSubscriptionStatus } from '@/data/types/notifications';
 import {
   getBrowserPushSubscription,
   getPushPermissionState,
+  getStoredPushEndpoint,
   subscribeBrowserPush,
   unsubscribeBrowserPush,
 } from '@/core/notifications/services/pushNotifications.service';
 
-async function readPushStatus(): Promise<PushSubscriptionStatus> {
+async function readPushStatus(userId: string): Promise<PushSubscriptionStatus> {
   const permission = getPushPermissionState();
 
   if (permission === 'unsupported') {
@@ -24,12 +26,15 @@ async function readPushStatus(): Promise<PushSubscriptionStatus> {
     };
   }
 
-  const [browserSubscription, dbEndpoint] = await Promise.all([
-    getBrowserPushSubscription(),
-    fetchActivePushSubscription(),
-  ]);
+  const browserSubscription = await getBrowserPushSubscription();
+  const browserEndpoint = browserSubscription?.endpoint ?? getStoredPushEndpoint();
+  const dbEndpoint = await fetchActivePushSubscription({ endpoint: browserEndpoint, userId });
 
-  const endpoint = browserSubscription?.endpoint ?? dbEndpoint ?? null;
+  if (!browserSubscription?.endpoint && dbEndpoint) {
+    await deactivatePushSubscription({ endpoint: dbEndpoint, userId });
+  }
+
+  const endpoint = browserSubscription?.endpoint ?? null;
 
   if (browserSubscription?.endpoint) {
     const keys = browserSubscription.toJSON().keys;
@@ -39,6 +44,7 @@ async function readPushStatus(): Promise<PushSubscriptionStatus> {
         endpoint: browserSubscription.endpoint,
         p256dh: keys.p256dh,
         auth: keys.auth,
+        userId,
         userAgent: navigator.userAgent,
       });
     }
@@ -53,16 +59,24 @@ async function readPushStatus(): Promise<PushSubscriptionStatus> {
 }
 
 export function usePushNotifications() {
+  const { user } = useApp();
   const queryClient = useQueryClient();
+  const queryKey = ['push-notifications-status', user?.id ?? 'anon'];
+  const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
 
   const status = useQuery({
-    queryKey: ['push-notifications-status'],
-    queryFn: readPushStatus,
+    queryKey,
+    queryFn: () => readPushStatus(user?.id ?? ''),
+    enabled: Boolean(user?.id),
     staleTime: 1000 * 60 * 5,
   });
 
   const enablePush = useMutation({
     mutationFn: async () => {
+      if (!user?.id) {
+        throw new Error('PUSH_AUTH_REQUIRED');
+      }
+
       const subscription = await subscribeBrowserPush();
       const keys = subscription.toJSON().keys;
 
@@ -74,24 +88,30 @@ export function usePushNotifications() {
         endpoint: subscription.endpoint,
         p256dh: keys.p256dh,
         auth: keys.auth,
-        userAgent: navigator.userAgent,
+        userId: user.id,
+        userAgent,
       });
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['push-notifications-status'] });
+      void queryClient.invalidateQueries({ queryKey });
     },
   });
 
   const disablePush = useMutation({
     mutationFn: async () => {
+      if (!user?.id) {
+        throw new Error('PUSH_AUTH_REQUIRED');
+      }
+
       const endpoint = await unsubscribeBrowserPush();
 
-      if (endpoint || status.data?.endpoint) {
-        await deactivatePushSubscription(endpoint || status.data?.endpoint || '');
-      }
+      await deactivatePushSubscription({
+        endpoint: endpoint || status.data?.endpoint || null,
+        userId: user.id,
+      });
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['push-notifications-status'] });
+      void queryClient.invalidateQueries({ queryKey });
     },
   });
 

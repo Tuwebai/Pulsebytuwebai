@@ -33,18 +33,18 @@ export function AdminProjectDeleteDialog({
           <Button
             variant="outline"
             onClick={onClose}
-            className="border-white/10 bg-white/[0.03] text-slate-100 hover:bg-white/[0.06]"
+            className="border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
           >
             Cancelar
           </Button>
-          <Button onClick={onConfirm} className="bg-red-500 text-white hover:bg-red-400">
+          <Button onClick={onConfirm} className="bg-[var(--danger)] text-white hover:bg-[var(--danger)]/90">
             Eliminar proyecto
           </Button>
         </>
       }
     >
-      <div className="rounded-2xl border border-red-500/20 bg-red-500/8 px-4 py-3.5">
-        <p className="text-sm leading-6 text-slate-200">
+      <div className="rounded-2xl border border-[var(--danger)]/20 bg-[var(--danger-dim)] px-4 py-3.5">
+        <p className="text-sm leading-6 text-[var(--text-primary)]">
           Esta acción borra el proyecto del panel operativo y no se puede deshacer.
         </p>
       </div>

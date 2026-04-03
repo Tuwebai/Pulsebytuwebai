@@ -1,429 +1,126 @@
-// =====================================================
-// SERVICE WORKER PARA CACHE OFFLINE
-// =====================================================
+// Pulse by TuWebAI - Service Worker
+// Maneja notificaciones push del navegador
 
-const CACHE_NAME = 'tuwebai-dashboard-v1.0.0';
-const STATIC_CACHE_NAME = 'tuwebai-static-v1.0.0';
-const DYNAMIC_CACHE_NAME = 'tuwebai-dynamic-v1.0.0';
+function buildNotificationTitle(data) {
+  return data.ticketSubject || data.title || 'Pulse by TuWebAI';
+}
 
-// Recursos estáticos para cache inmediato
-const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/favicon.ico',
-  '/favicon.svg',
-  '/logoweb.jpg',
-  '/notification-sound.mp3',
-  '/placeholder.svg',
-  '/robots.txt'
-];
+function buildNotificationBody(data) {
+  const senderName = typeof data.senderName === 'string' ? data.senderName.trim() : '';
+  const message = typeof data.body === 'string' && data.body.trim() ? data.body.trim() : 'Tienes una nueva notificacion en Pulse';
 
-// Recursos dinámicos para cache bajo demanda
-const DYNAMIC_PATTERNS = [
-  /^https:\/\/.*\.supabase\.co\/.*$/,
-  /^https:\/\/fonts\.googleapis\.com\/.*$/,
-  /^https:\/\/fonts\.gstatic\.com\/.*$/
-];
-
-// =====================================================
-// INSTALACIÓN DEL SERVICE WORKER
-// =====================================================
+  return senderName ? `${senderName}\n${message}` : message;
+}
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE_NAME)
-      .then((cache) => {
-        // Cachear recursos uno por uno para manejar respuestas 206
-        return Promise.allSettled(
-          STATIC_ASSETS.map(asset => {
-            return fetch(asset)
-              .then(response => {
-                // Solo cachear respuestas exitosas y completas
-                if (response.ok && response.status !== 206) {
-                  return cache.put(asset, response);
-                }
-                return Promise.resolve();
-              })
-              .catch(() => {
-                return Promise.resolve();
-              });
-          })
-        );
-      })
-      .then(() => {
-        return self.skipWaiting();
-      })
-      .catch((error) => {
-        console.error('Service Worker installation error:', error);
-      })
-  );
+  event.waitUntil(self.skipWaiting());
 });
-
-// =====================================================
-// ACTIVACIÓN DEL SERVICE WORKER
-// =====================================================
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys()
-      .then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-            // Eliminar caches antiguos
-            if (cacheName !== STATIC_CACHE_NAME && 
-                cacheName !== DYNAMIC_CACHE_NAME && 
-                cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-      .then(() => {
-        return self.clients.claim();
-      })
-  );
+  event.waitUntil(self.clients.claim());
 });
-
-// =====================================================
-// INTERCEPTACIÓN DE REQUESTS
-// =====================================================
-
-self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
-
-  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
-    return;
-  }
-  
-  // Solo interceptar requests HTTP/HTTPS
-  if (!request.url.startsWith('http')) {
-    return;
-  }
-  
-  // En modo desarrollo, no interceptar peticiones de Vite
-  if (url.hostname === 'localhost' && (url.port === '8083' || url.port === '5173')) {
-    // Permitir que Vite maneje sus propios recursos en desarrollo
-    if (url.pathname.includes('/node_modules/') || 
-        url.pathname.includes('/@vite/') ||
-        url.pathname.includes('/@fs/') ||
-        url.pathname.includes('/src/') ||
-        url.pathname.includes('.tsx') ||
-        url.pathname.includes('.ts') ||
-        url.pathname.includes('.jsx') ||
-        url.pathname.includes('.js')) {
-      return;
-    }
-  }
-  
-  // Estrategia: Cache First para recursos estáticos
-  if (isStaticAsset(request)) {
-    event.respondWith(cacheFirst(request));
-    return;
-  }
-  
-  // Estrategia: Network Only para peticiones POST, PATCH, DELETE
-  if (isNonCacheableRequest(request)) {
-    event.respondWith(networkOnly(request));
-    return;
-  }
-  
-  // Estrategia: Network First para API calls GET
-  if (isApiRequest(request)) {
-    event.respondWith(networkFirst(request));
-    return;
-  }
-  
-  // Estrategia: Stale While Revalidate para otros recursos
-  event.respondWith(staleWhileRevalidate(request));
-});
-
-// =====================================================
-// ESTRATEGIAS DE CACHE
-// =====================================================
-
-// Network Only: Para peticiones que no deben ser cacheadas
-async function networkOnly(request) {
-  try {
-    return await fetch(request);
-  } catch (error) {
-    console.error('❌ Network Only Error:', error);
-    return new Response('Error de red', { status: 503 });
-  }
-}
-
-// Cache First: Para recursos estáticos que raramente cambian
-async function cacheFirst(request) {
-  try {
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-    
-    const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
-      const cache = await caches.open(STATIC_CACHE_NAME);
-      cache.put(request, networkResponse.clone());
-    }
-    
-    return networkResponse;
-  } catch (error) {
-    console.error('❌ Cache First Error:', error);
-    return new Response('Recurso no disponible offline', { status: 503 });
-  }
-}
-
-// Network First: Para API calls que necesitan datos frescos
-async function networkFirst(request) {
-  try {
-    const networkResponse = await fetch(request);
-    
-    // Solo cachear peticiones GET exitosas
-    if (networkResponse.ok && request.method === 'GET') {
-      const cache = await caches.open(DYNAMIC_CACHE_NAME);
-      cache.put(request, networkResponse.clone());
-    }
-    
-    return networkResponse;
-  } catch (error) {
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-    return new Response('Datos no disponibles offline', { status: 503 });
-  }
-}
-
-// Stale While Revalidate: Para recursos que pueden usar versión cacheada
-async function staleWhileRevalidate(request) {
-  const cache = await caches.open(DYNAMIC_CACHE_NAME);
-  const cachedResponse = await cache.match(request);
-  
-  const fetchPromise = fetch(request).then((networkResponse) => {
-    // Solo cachear peticiones GET exitosas y respuestas completas
-    if (networkResponse.ok && request.method === 'GET' && networkResponse.status !== 206) {
-      cache.put(request, networkResponse.clone());
-    }
-    return networkResponse;
-  }).catch(() => {
-    // Si falla la red, devolver cache si existe
-    return cachedResponse || new Response('Recurso no disponible', { status: 503 });
-  });
-  
-  // Devolver cache inmediatamente si existe, luego actualizar en background
-  return cachedResponse || fetchPromise;
-}
-
-// =====================================================
-// FUNCIONES AUXILIARES
-// =====================================================
-
-function isStaticAsset(request) {
-  const url = new URL(request.url);
-  const pathname = url.pathname;
-  
-  // En desarrollo, no cachear recursos de Vite
-  if (url.hostname === 'localhost' && (url.port === '8083' || url.port === '5173')) {
-    return false;
-  }
-  
-  // Recursos estáticos solo en producción
-  return pathname.endsWith('.js') ||
-         pathname.endsWith('.css') ||
-         pathname.endsWith('.png') ||
-         pathname.endsWith('.jpg') ||
-         pathname.endsWith('.jpeg') ||
-         pathname.endsWith('.svg') ||
-         pathname.endsWith('.ico') ||
-         pathname.endsWith('.woff') ||
-         pathname.endsWith('.woff2') ||
-         pathname.endsWith('.ttf') ||
-         pathname.endsWith('.eot') ||
-         pathname === '/' ||
-         pathname === '/index.html';
-}
-
-function isApiRequest(request) {
-  const url = new URL(request.url);
-  
-  // Supabase API - solo para peticiones GET
-  if (url.hostname.includes('supabase.co') && request.method === 'GET') {
-    return true;
-  }
-  
-  // Otras APIs GET
-  return (url.pathname.startsWith('/api/') || url.pathname.startsWith('/auth/')) && 
-         request.method === 'GET';
-}
-
-function isNonCacheableRequest(request) {
-  // Peticiones que no deben ser cacheadas
-  return request.method === 'POST' || 
-         request.method === 'PATCH' || 
-         request.method === 'DELETE' || 
-         request.method === 'PUT';
-}
-
-// =====================================================
-// MANEJO DE MENSAJES
-// =====================================================
-
-self.addEventListener('message', (event) => {
-  const { type, payload } = event.data;
-  
-  switch (type) {
-    case 'SKIP_WAITING':
-    self.skipWaiting();
-      break;
-      
-    case 'CLEAR_CACHE':
-      clearAllCaches();
-      break;
-      
-    case 'GET_CACHE_SIZE':
-      getCacheSize().then((size) => {
-        event.ports[0].postMessage({ type: 'CACHE_SIZE', size });
-      });
-      break;
-      
-    default:
-      // Mensaje desconocido ignorado
-  }
-});
-
-// =====================================================
-// FUNCIONES DE UTILIDAD
-// =====================================================
-
-async function clearAllCaches() {
-  const cacheNames = await caches.keys();
-  await Promise.all(
-    cacheNames.map(cacheName => caches.delete(cacheName))
-  );
-}
-
-async function getCacheSize() {
-  const cacheNames = await caches.keys();
-  let totalSize = 0;
-  
-  for (const cacheName of cacheNames) {
-    const cache = await caches.open(cacheName);
-    const keys = await cache.keys();
-    
-    for (const request of keys) {
-      const response = await cache.match(request);
-      if (response) {
-        const blob = await response.blob();
-        totalSize += blob.size;
-      }
-    }
-  }
-  
-  return totalSize;
-}
 
 self.addEventListener('push', (event) => {
-  const payload = event.data ? event.data.json() : {};
-  const title = payload.title || 'Pulse';
+  if (!event.data) {
+    return;
+  }
+
+  let data = {};
+
+  try {
+    data = event.data.json();
+  } catch {
+    data = { title: 'Pulse', body: event.data.text() };
+  }
+
   const options = {
-    body: payload.body || 'Tienes una novedad nueva en Pulse.',
+    badge: '/favicon.ico',
+    body: buildNotificationBody(data),
     data: {
-      url: payload.url || '/dashboard',
-      primaryKey: payload.primaryKey || null,
-      category: payload.category || 'system',
+      category: data.category || 'system',
+      primaryKey: data.primaryKey || null,
+      senderName: data.senderName || null,
+      ticketId: data.ticketId || null,
+      ticketSubject: data.ticketSubject || null,
+      url: data.url || '/dashboard',
     },
-    icon: '/favicon.svg',
-    badge: '/favicon.svg',
-    tag: payload.primaryKey || undefined,
-    renotify: Boolean(payload.urgent),
+    icon: '/favicon.ico',
+    requireInteraction: false,
+    tag: data.primaryKey || undefined,
   };
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(self.registration.showNotification(buildNotificationTitle(data), options));
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  const targetUrl = event.notification.data?.url || '/dashboard';
+  const notificationUrl = event.notification.data?.url || '/dashboard';
+  const ticketId = event.notification.data?.ticketId || null;
+  const url = new URL(notificationUrl, self.location.origin);
 
-  event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
-      const matchingClient = clients.find((client) => {
-        return 'focus' in client && client.url.includes(new URL(targetUrl, self.location.origin).pathname);
-      });
-
-      if (matchingClient) {
-        matchingClient.focus();
-        matchingClient.postMessage({
-          type: 'PULSE_PUSH_OPEN',
-          payload: event.notification.data,
-        });
-        return null;
-      }
-
-      return self.clients.openWindow(targetUrl);
-    }),
-  );
-});
-
-// =====================================================
-// NOTIFICACIONES PUSH (FUTURO)
-// =====================================================
-
-self.addEventListener('push', (event) => {
-  if (event.data) {
-    const data = event.data.json();
-    const options = {
-      body: data.body || data.message,
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
-      vibrate: [100, 50, 100],
-      data: {
-        dateOfArrival: Date.now(),
-        primaryKey: data.primaryKey,
-        url: data.url || '/dashboard',
-      },
-      actions: [
-        {
-          action: 'explore',
-          title: 'Ver detalles',
-          icon: '/favicon.ico'
-        },
-        {
-          action: 'close',
-          title: 'Cerrar',
-          icon: '/favicon.ico'
-        }
-      ]
-    };
-    
-    event.waitUntil(
-      self.registration.showNotification(data.title, options)
-    );
+  if (ticketId) {
+    url.searchParams.set('ticket', ticketId);
+    url.searchParams.set('focusInput', '1');
   }
-});
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-
-  const targetUrl = event.notification.data?.url || '/dashboard';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
-        if ('focus' in client && client.url.includes(new URL(targetUrl, self.location.origin).pathname)) {
+        if (client.url.includes(url.pathname) && 'focus' in client) {
+          client.postMessage({
+            type: 'PULSE_PUSH_OPEN',
+            payload: event.notification.data,
+          });
           return client.focus();
         }
       }
 
       if (clients.openWindow) {
-        return clients.openWindow(targetUrl);
+        return clients.openWindow(url.toString());
       }
 
       return undefined;
-    })
+    }),
   );
 });
 
-// Service Worker cargado y listo
+self.addEventListener('message', (event) => {
+  const type = event.data?.type;
+
+  if (type === 'SKIP_WAITING') {
+    self.skipWaiting();
+    return;
+  }
+
+  if (type === 'CLEAR_CACHE') {
+    event.waitUntil(
+      caches.keys().then((cacheNames) => Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)))),
+    );
+    return;
+  }
+
+  if (type === 'GET_CACHE_SIZE' && event.ports?.[0]) {
+    event.waitUntil(
+      caches.keys().then(async (cacheNames) => {
+        let totalSize = 0;
+
+        for (const cacheName of cacheNames) {
+          const cache = await caches.open(cacheName);
+          const keys = await cache.keys();
+
+          for (const request of keys) {
+            const response = await cache.match(request);
+
+            if (response) {
+              const blob = await response.blob();
+              totalSize += blob.size;
+            }
+          }
+        }
+
+        event.ports[0].postMessage({ type: 'CACHE_SIZE', size: totalSize });
+      }),
+    );
+  }
+});

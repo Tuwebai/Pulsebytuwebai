@@ -10,9 +10,26 @@ const DEFAULT_STATE: ProductTourPersistenceState = {
   completedAt: null,
   dismissedAt: null,
 };
+const LEGACY_WELCOME_TOUR_KEY = 'tutorial-welcome-tour-completed';
 
 function getStorageKey(userId: string, scope: ProductTourScope) {
   return `pulse:product-tour:${userId}:${scope}:state`;
+}
+
+function readLegacyWelcomeTourState() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  return window.localStorage.getItem(LEGACY_WELCOME_TOUR_KEY) === 'true';
+}
+
+function writeLegacyWelcomeTourCompleted() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  window.localStorage.setItem(LEGACY_WELCOME_TOUR_KEY, 'true');
 }
 
 export function getProductTourScopeFromPath(pathname: string): ProductTourScope | null {
@@ -52,6 +69,13 @@ export function readProductTourState(userId: string | null | undefined, scope: P
     const raw = window.localStorage.getItem(getStorageKey(userId, scope));
 
     if (!raw) {
+      if (scope === 'core' && readLegacyWelcomeTourState()) {
+        return {
+          completedAt: 'legacy-completed',
+          dismissedAt: null,
+        };
+      }
+
       return DEFAULT_STATE;
     }
 
@@ -75,6 +99,10 @@ function writeProductTourState(userId: string, scope: ProductTourScope, nextStat
 }
 
 export function dismissProductTour(userId: string, scope: ProductTourScope) {
+  if (scope === 'core') {
+    writeLegacyWelcomeTourCompleted();
+  }
+
   writeProductTourState(userId, scope, {
     completedAt: null,
     dismissedAt: new Date().toISOString(),
@@ -82,6 +110,10 @@ export function dismissProductTour(userId: string, scope: ProductTourScope) {
 }
 
 export function completeProductTour(userId: string, scope: ProductTourScope) {
+  if (scope === 'core') {
+    writeLegacyWelcomeTourCompleted();
+  }
+
   writeProductTourState(userId, scope, {
     completedAt: new Date().toISOString(),
     dismissedAt: null,

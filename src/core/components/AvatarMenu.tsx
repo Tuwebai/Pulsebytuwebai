@@ -58,7 +58,8 @@ export default function AvatarMenu({ onLogout, user }: AvatarMenuProps) {
 
       <DropdownMenuContent
         align="end"
-        className="min-w-[220px] rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-elevated)] p-1 text-[var(--text-primary)] shadow-[0_18px_40px_rgba(0,0,0,0.32)]"
+        data-surface={isAdmin ? 'admin' : 'client'}
+        className="min-w-[220px] rounded-[14px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-1 text-[var(--text-primary)] shadow-2xl"
         sideOffset={10}
       >
         <DropdownMenuLabel className="cursor-default px-3 py-3">

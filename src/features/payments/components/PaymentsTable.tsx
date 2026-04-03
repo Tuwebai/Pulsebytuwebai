@@ -1,13 +1,7 @@
-import { Download, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge, PulseFeedbackState } from '@/core/components';
-import { formatCurrency } from '@/lib/mercadopago';
+import { PulseFeedbackState } from '@/core/components';
 import type { Payment } from '@/types';
-import {
-  getPaymentPlanName,
-  getPaymentStatusLabel,
-  getPaymentStatusVariant,
-} from '../payments.utils';
+import PaymentsTableDesktop from './PaymentsTableDesktop';
+import PaymentsTableMobile from './PaymentsTableMobile';
 
 interface PaymentsTableProps {
   error: string | null;
@@ -31,7 +25,7 @@ export default function PaymentsTable({
   if (loading) {
     return (
       <PulseFeedbackState
-        description="Estamos sincronizando tu informacion de pagos. Esto puede tomar unos segundos."
+        description="Estamos sincronizando tu información de pagos. Esto puede tomar unos segundos."
         title="Cargando historial de pagos"
         variant="loading"
       />
@@ -42,15 +36,8 @@ export default function PaymentsTable({
     return (
       <PulseFeedbackState
         description={error}
-        primaryAction={{
-          label: 'Reintentar',
-          onClick: onRetryLoad,
-        }}
-        secondaryAction={{
-          label: 'Crear pago',
-          onClick: onCreatePayment,
-          variant: 'secondary',
-        }}
+        primaryAction={{ label: 'Reintentar', onClick: onRetryLoad }}
+        secondaryAction={{ label: 'Crear pago', onClick: onCreatePayment, variant: 'secondary' }}
         title="Error al cargar los pagos"
         variant="error"
       />
@@ -60,86 +47,36 @@ export default function PaymentsTable({
   if (payments.length === 0) {
     return (
       <PulseFeedbackState
-        description="Tu historial va a aparecer aca cuando registres el primer pago o una nueva transaccion quede acreditada."
-        primaryAction={{
-          label: 'Crear primer pago',
-          onClick: onCreatePayment,
-        }}
-        secondaryAction={{
-          label: 'Actualizar',
-          onClick: onRetryLoad,
-          variant: 'secondary',
-        }}
-        title="No tienes pagos registrados"
+        description="Tu historial va a aparecer acá cuando registres el primer pago o una nueva transacción quede acreditada."
+        primaryAction={{ label: 'Crear primer pago', onClick: onCreatePayment }}
+        secondaryAction={{ label: 'Actualizar', onClick: onRetryLoad, variant: 'secondary' }}
+        title="Todavía no tienes pagos registrados"
         variant="empty"
       />
     );
   }
 
   return (
-    <section className="overflow-hidden rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)]">
-      <div className="border-b border-[var(--border-subtle)] px-5 py-4">
-        <h2 className="text-base font-medium text-[var(--text-primary)]">Historial de pagos</h2>
-        <p className="mt-1 text-sm text-[var(--text-secondary)]">
-          Lista completa de todos tus pagos y transacciones registradas.
+    <section className="overflow-hidden rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/92 p-4 shadow-[0_18px_40px_rgba(2,6,23,0.24)] sm:p-5">
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Bandeja activa</p>
+        <h2 className="mt-2 text-xl font-medium text-slate-50">Historial de pagos</h2>
+        <p className="mt-1 max-w-[680px] text-sm text-slate-400">
+          Encontrá tus movimientos, revisá el estado de cada cobro y descargá la factura sin salir de Pulse.
         </p>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[720px]">
-          <thead>
-            <tr className="border-b border-[var(--border-subtle)] text-left text-[10px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
-              <th className="px-5 py-3 font-medium">Concepto</th>
-              <th className="px-5 py-3 font-medium">Fecha</th>
-              <th className="px-5 py-3 font-medium">Estado</th>
-              <th className="px-5 py-3 font-medium">Monto</th>
-              <th className="px-5 py-3 text-right font-medium">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {payments.map((payment) => (
-              <tr
-                className="cursor-pointer border-b border-[var(--border-subtle)] transition-colors hover:bg-[var(--bg-elevated)] last:border-b-0"
-                key={payment.id}
-                onClick={() => onSelectPayment(payment)}
-              >
-                <td className="px-5 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[var(--bg-elevated)]">
-                      <FileText className="h-4 w-4 text-[var(--signal)]" strokeWidth={1.5} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[var(--text-primary)]">{getPaymentPlanName(payment)}</p>
-                      <p className="text-xs text-[var(--text-tertiary)]">ID {payment.id.slice(0, 8)}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-5 py-4 text-sm text-[var(--text-secondary)]">
-                  {new Date(payment.createdAt).toLocaleDateString('es-AR')}
-                </td>
-                <td className="px-5 py-4">
-                  <Badge variant={getPaymentStatusVariant(payment.status)}>{getPaymentStatusLabel(payment.status)}</Badge>
-                </td>
-                <td className="px-5 py-4 font-data text-sm text-[var(--text-primary)]">
-                  {formatCurrency(payment.amount, payment.currency)}
-                </td>
-                <td className="px-5 py-4 text-right">
-                  <Button
-                    className="rounded-[10px] border border-[var(--border-default)] bg-transparent px-3 text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onDownloadInvoice(payment);
-                    }}
-                    type="button"
-                    variant="outline"
-                  >
-                    <Download className="h-4 w-4" strokeWidth={1.5} />
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="mt-5">
+        <PaymentsTableMobile
+          onDownloadInvoice={onDownloadInvoice}
+          onSelectPayment={onSelectPayment}
+          payments={payments}
+        />
+        <PaymentsTableDesktop
+          onDownloadInvoice={onDownloadInvoice}
+          onSelectPayment={onSelectPayment}
+          payments={payments}
+        />
       </div>
     </section>
   );

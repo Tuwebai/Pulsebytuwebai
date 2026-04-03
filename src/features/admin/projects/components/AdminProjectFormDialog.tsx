@@ -99,14 +99,14 @@ export function AdminProjectFormDialog({
           <Button
             type="button"
             variant="outline"
-            className="border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:bg-white/[0.06]"
+            className="border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
             onClick={onCancel}
           >
             Cancelar
           </Button>
           <Button
             type="button"
-            className="bg-sky-500 text-slate-950 hover:bg-sky-400"
+            className="bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]"
             onClick={() => void onSubmit(formData)}
             disabled={loading || !formData.name.trim()}
           >
@@ -116,7 +116,7 @@ export function AdminProjectFormDialog({
         </>
       }
     >
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+      <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] px-4 py-3">
         <p className="text-sm leading-6 text-[var(--text-secondary)]">
           El detalle técnico profundo y el trabajo interno siguen fuera de este alta inicial.
         </p>

@@ -14,10 +14,10 @@ import type { AdminProjectTrackingNavItem } from '@/features/admin/projects-trac
 import { cn } from '@/lib/utils';
 
 const trackingNavItems = [
-  { id: 'resumen', label: 'Resumen', icon: ClipboardList, iconClassName: 'text-signal border-signal/20 bg-signal/12' },
-  { id: 'fases', label: 'Fases', icon: KanbanSquare, iconClassName: 'text-emerald-300 border-emerald-400/20 bg-emerald-500/12' },
-  { id: 'tareas-criticas', label: 'Tareas críticas', icon: ListTodo, iconClassName: 'text-amber-300 border-amber-400/20 bg-amber-500/12' },
-  { id: 'alertas', label: 'Alertas', icon: AlertTriangle, iconClassName: 'text-rose-300 border-rose-400/20 bg-rose-500/12' },
+  { id: 'resumen', label: 'Resumen', icon: ClipboardList, iconClassName: 'text-[var(--signal)] border-[var(--signal-border)] bg-[var(--signal-glow)]' },
+  { id: 'fases', label: 'Fases', icon: KanbanSquare, iconClassName: 'text-[var(--success)] border-[var(--success)]/20 bg-[var(--success-dim)]' },
+  { id: 'tareas-criticas', label: 'Tareas críticas', icon: ListTodo, iconClassName: 'text-[var(--warning)] border-[var(--warning)]/20 bg-[var(--warning-dim)]' },
+  { id: 'alertas', label: 'Alertas', icon: AlertTriangle, iconClassName: 'text-[var(--danger)] border-[var(--danger)]/20 bg-[var(--danger-dim)]' },
 ] as const;
 
 interface AdminProjectTrackingSidebarProps {
@@ -42,7 +42,7 @@ export function AdminProjectTrackingSidebar({
   return (
     <aside
       className={cn(
-        'flex h-full flex-col rounded-[28px] border border-white/10 bg-[var(--bg-surface)]/95 p-3 shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur transition-all duration-300',
+        'flex h-full flex-col rounded-[28px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-3 shadow-2xl transition-all duration-300',
         collapsed ? 'w-[92px]' : 'w-[280px]',
         className,
       )}
@@ -60,7 +60,7 @@ export function AdminProjectTrackingSidebar({
           variant="ghost"
           size="sm"
           onClick={onToggleCollapse}
-          className="h-10 w-10 shrink-0 rounded-2xl border border-white/10 bg-white/[0.03] p-0 text-[var(--text-primary)] hover:bg-white/[0.06]"
+          className="h-10 w-10 shrink-0 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-0 text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
           aria-label={collapsed ? 'Expandir sidebar' : 'Colapsar sidebar'}
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -83,8 +83,8 @@ export function AdminProjectTrackingSidebar({
               key={id}
               to={to}
               className={cn(
-                'flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-sm text-[var(--text-secondary)] transition-colors hover:border-white/10 hover:bg-white/[0.04] hover:text-[var(--text-primary)]',
-                activeItem === id && 'border-white/10 bg-white/[0.06] text-[var(--text-primary)]',
+                'flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-sm text-[var(--text-secondary)] transition-colors hover:border-[var(--border-default)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]',
+                activeItem === id && 'border-[var(--border-default)] bg-[var(--bg-subtle)] text-[var(--text-primary)]',
                 collapsed && 'justify-center px-0',
               )}
               title={collapsed ? label : undefined}
@@ -104,12 +104,12 @@ export function AdminProjectTrackingSidebar({
           variant="outline"
           onClick={onBack}
           className={cn(
-            'h-11 w-full rounded-2xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]',
+            'h-11 w-full rounded-2xl border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-subtle)]',
             collapsed && 'justify-center px-0',
           )}
           title={collapsed ? 'Volver a proyectos' : undefined}
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-signal">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] text-[var(--signal)]">
             <ArrowLeft className="h-4 w-4 shrink-0" />
           </span>
           {!collapsed && <span>Volver a proyectos</span>}

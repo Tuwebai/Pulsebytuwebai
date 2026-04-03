@@ -1,195 +1,162 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 import { useApp } from '@/contexts/AppContext';
-import { supabase } from '@/lib/supabase';
-import { ticketService } from '@/features/support/services/ticket.service';
+import type { SupportDraftState } from '@/features/support';
+import { buildSupportConversationSummary } from '@/features/support/services/ticketMessages.service';
+import { type SupportConversationSummary } from '@/features/support/ticketMessages.types';
 import {
-  SUPPORT_CHAT_INTENT_EVENT,
-  consumeSupportChatIntent,
-  type SupportChatIntent,
-  type SupportChatScope,
-} from '@/features/support/supportChat.events';
+  MAX_CLIENT_CONSECUTIVE_MESSAGES,
+  canClientSendMessage,
+  getClientConsecutiveMessages,
+} from '@/features/support/hooks/useSupportChatDock.business';
+import {
+  useSupportChatDockData,
+  useSupportChatDockIntents,
+  useSupportChatReadState,
+} from '@/features/support/hooks/useSupportChatDock.effects';
+import { createSupportChatTicket, submitSupportChatReply } from '@/features/support/hooks/useSupportChatDock.actions';
+import { buildConversationIdentity } from '@/features/support/hooks/supportChatIdentity.utils';
+import { type SupportChatScope } from '@/features/support/supportChat.events';
 import {
   canReplyToSupportTicket,
   resolveDefaultSupportTicket,
   resolveSupportPendingCount,
 } from '@/features/support/supportChat.utils';
 
-const emptyTickets: Awaited<ReturnType<typeof ticketService.getTickets>> = [];
+const SUPPORT_DRAFT_INITIAL_STATE: SupportDraftState = {
+  title: '',
+  description: '',
+  priority: 'medium',
+};
 
 export function useSupportChatDock(scope: SupportChatScope) {
   const { user } = useApp();
-  const [tickets, setTickets] = useState(emptyTickets);
-  const [loading, setLoading] = useState(false);
   const [responseText, setResponseText] = useState('');
+  const [createTicketOpen, setCreateTicketOpen] = useState(false);
   const [focusNonce, setFocusNonce] = useState(0);
+  const [draft, setDraft] = useSessionStorageState<SupportDraftState>(
+    `pulse:support-chat:${scope}:${user?.id ?? 'anon'}:draft`,
+    SUPPORT_DRAFT_INITIAL_STATE,
+  );
   const [open, setOpen] = useSessionStorageState(`pulse:support-chat:${scope}:${user?.id ?? 'anon'}:open`, false);
   const [selectedTicketId, setSelectedTicketId] = useSessionStorageState<string | null>(
     `pulse:support-chat:${scope}:${user?.id ?? 'anon'}:ticket`,
     null,
   );
-  const selectedTicketIdRef = useRef<string | null>(selectedTicketId);
-  selectedTicketIdRef.current = selectedTicketId;
-
-  const loadTickets = useCallback(async () => {
-    if (!user?.id) {
-      setTickets(emptyTickets);
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const nextTickets =
-        scope === 'admin' ? await ticketService.getTickets() : await ticketService.getTicketsByClient(user.id);
-      setTickets(nextTickets);
-    } catch (error) {
-      console.error('Error cargando tickets del chat:', error);
-      toast({
-        title: 'No pudimos abrir el chat',
-        description: 'Volve a intentar en unos segundos.',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [scope, user?.id]);
-
-  useEffect(() => {
-    void loadTickets();
-  }, [loadTickets]);
-
-  useEffect(() => {
-    if (!user?.id) {
-      return;
-    }
-
-    const filter = scope === 'admin' ? undefined : `user_id=eq.${user.id}`;
-    const channel = supabase
-      .channel(`support-chat-${scope}-${user.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'tickets', filter }, () => void loadTickets())
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [loadTickets, scope, user?.id]);
+  const { loading, loadTickets, messagesByTicketId, setMessagesByTicketId, tickets, userMap } = useSupportChatDockData(scope, user?.id);
 
   const selectedTicket = useMemo(
-    () =>
-      tickets.find((ticket) => ticket.id === selectedTicketId) ??
-      resolveDefaultSupportTicket(tickets, scope, user?.id) ??
-      null,
-    [scope, selectedTicketId, tickets, user?.id],
+    () => {
+      if (!selectedTicketId) {
+        return null;
+      }
+
+      return tickets.find((ticket) => ticket.id === selectedTicketId) ?? null;
+    },
+    [selectedTicketId, tickets],
   );
-  const pendingCount = useMemo(() => resolveSupportPendingCount(tickets, scope, user?.id), [scope, tickets, user?.id]);
+  const selectedMessages = useMemo(
+    () => (selectedTicket ? messagesByTicketId[selectedTicket.id] ?? [] : []),
+    [messagesByTicketId, selectedTicket],
+  );
+  const conversationSummaries = useMemo<SupportConversationSummary[]>(
+    () =>
+      tickets
+        .map((ticket) => {
+          const summary = buildSupportConversationSummary({
+            ticket,
+            messages: messagesByTicketId[ticket.id] ?? [],
+            viewerRole: scope === 'admin' ? 'admin' : 'client',
+          });
+
+          return buildConversationIdentity({
+            scope,
+            summary,
+            ticket,
+            userMap,
+          });
+        })
+        .sort((left, right) => new Date(right.lastMessageAt ?? 0).getTime() - new Date(left.lastMessageAt ?? 0).getTime()),
+    [messagesByTicketId, scope, tickets, userMap],
+  );
+  const selectedConversation = useMemo(
+    () => conversationSummaries.find((conversation) => conversation.ticketId === selectedTicket?.id) ?? null,
+    [conversationSummaries, selectedTicket?.id],
+  );
+  const selectTicket = useCallback(
+    (ticketId: string | null) => {
+      setCreateTicketOpen(false);
+      setSelectedTicketId(ticketId);
+    },
+    [setSelectedTicketId],
+  );
   const canReply = canReplyToSupportTicket(selectedTicket, scope, user?.id);
-
-  useEffect(() => {
-    const applyIntent = (intent: SupportChatIntent | null) => {
-      if (!intent || intent.scope !== scope) {
-        return;
-      }
-
-      setSelectedTicketId(intent.ticketId ?? selectedTicketIdRef.current);
-      setOpen(true);
-
-      if (intent.focusInput) {
-        setFocusNonce((current) => current + 1);
-      }
-    };
-
-    applyIntent(consumeSupportChatIntent());
-
-    const handleIntent = (event: Event) => {
-      applyIntent((event as CustomEvent<SupportChatIntent>).detail ?? null);
-    };
-
-    window.addEventListener(SUPPORT_CHAT_INTENT_EVENT, handleIntent);
-    return () => window.removeEventListener(SUPPORT_CHAT_INTENT_EVENT, handleIntent);
-  }, [scope, setOpen, setSelectedTicketId]);
-
-  useEffect(() => {
-    if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) {
-      return;
+  const canClientSend = useMemo(() => (scope === 'client' ? canClientSendMessage(selectedMessages) : true), [scope, selectedMessages]);
+  const clientRemainingMessages = useMemo(
+    () => Math.max(MAX_CLIENT_CONSECUTIVE_MESSAGES - getClientConsecutiveMessages(selectedMessages), 0),
+    [selectedMessages],
+  );
+  const pendingCount = useMemo(() => {
+    if (scope === 'client') {
+      return conversationSummaries.reduce((total, conversation) => total + conversation.unreadCount, 0);
     }
 
-    const handleServiceWorkerMessage = (event: MessageEvent) => {
-      const payload =
-        event.data?.type === 'PULSE_PUSH_OPEN' && event.data?.payload && typeof event.data.payload === 'object'
-          ? (event.data.payload as Record<string, unknown>)
-          : null;
+    return resolveSupportPendingCount(tickets, scope, user?.id);
+  }, [conversationSummaries, scope, tickets, user?.id]);
 
-      if (!payload) {
-        return;
-      }
-
-      const ticketId = typeof payload.ticketId === 'string' ? payload.ticketId : null;
-
-      if (!ticketId) {
-        return;
-      }
-
-      const nextScope: SupportChatScope = scope;
-      const intent: SupportChatIntent = { scope: nextScope, ticketId, focusInput: true };
-      setSelectedTicketId(ticketId);
-      setOpen(true);
-      setFocusNonce((current) => current + 1);
-      window.dispatchEvent(new CustomEvent(SUPPORT_CHAT_INTENT_EVENT, { detail: intent }));
-    };
-
-    navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
-    return () => navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
-  }, [scope, setOpen, setSelectedTicketId]);
+  useSupportChatReadState({
+    open,
+    scope,
+    selectedMessages,
+    selectedTicket,
+    setMessagesByTicketId,
+    userId: user?.id,
+  });
+  useSupportChatDockIntents({
+    scope,
+    selectTicket,
+    setFocusNonce,
+    setOpen,
+  });
 
   const openConversation = useCallback(() => {
-    setSelectedTicketId((current) => current ?? resolveDefaultSupportTicket(tickets, scope, user?.id)?.id ?? null);
+    selectTicket(selectedTicketId ?? resolveDefaultSupportTicket(tickets, scope, user?.id)?.id ?? null);
+    setCreateTicketOpen(false);
     setOpen(true);
     setFocusNonce((current) => current + 1);
-  }, [scope, setOpen, setSelectedTicketId, tickets, user?.id]);
+  }, [scope, selectTicket, selectedTicketId, setOpen, tickets, user?.id]);
 
   const closeConversation = useCallback(() => {
     setOpen(false);
+    setCreateTicketOpen(false);
     setResponseText('');
   }, [setOpen]);
 
+  const openNewTicketComposer = useCallback(() => {
+    selectTicket(null);
+    setCreateTicketOpen(true);
+    setOpen(true);
+  }, [selectTicket, setOpen]);
+
   const submitReply = useCallback(async () => {
-    if (!selectedTicket || !responseText.trim()) {
-      return;
-    }
-
-    const now = new Date().toISOString();
-
     try {
-      if (scope === 'admin') {
-        if (!canReply) {
-          toast({
-            title: 'Este ticket ya tiene responsable',
-            description: 'Continua desde la bandeja del admin asignado.',
-            variant: 'destructive',
-          });
-          return;
-        }
+      const sent = await submitSupportChatReply({
+        canClientSend,
+        canReply,
+        loadTickets,
+        responseText,
+        scope,
+        selectedTicket,
+        user,
+      });
 
-        await ticketService.updateTicket(selectedTicket.id, {
-          assigned_admin_id: user?.id ?? selectedTicket.assigned_admin_id ?? null,
-          respuesta: responseText,
-          respondido_por: user?.full_name || user?.email || 'Equipo Pulse',
-          fecha_respuesta: now,
-          status: 'in_conversation',
-        });
-      } else {
-        await ticketService.updateTicket(selectedTicket.id, {
-          respuesta_cliente: responseText,
-          fecha_respuesta_cliente: now,
-          status: 'in_conversation',
-        });
+      if (!sent) {
+        return;
       }
 
       setResponseText('');
       setOpen(true);
-      await loadTickets();
     } catch (error) {
       console.error('Error respondiendo ticket desde burbuja:', error);
       toast({
@@ -198,19 +165,57 @@ export function useSupportChatDock(scope: SupportChatScope) {
         variant: 'destructive',
       });
     }
-  }, [canReply, loadTickets, responseText, scope, selectedTicket, setOpen, user?.email, user?.full_name, user?.id]);
+  }, [canClientSend, canReply, loadTickets, responseText, scope, selectedTicket, setOpen, user]);
+
+  const createTicket = useCallback(async () => {
+    try {
+      const ticket = await createSupportChatTicket({
+        draft,
+        loadTickets,
+        scope,
+        user,
+      });
+
+      if (!ticket) {
+        return;
+      }
+
+      setDraft(SUPPORT_DRAFT_INITIAL_STATE);
+      selectTicket(ticket.id);
+      setOpen(true);
+    } catch (error) {
+      console.error('Error creando ticket desde el chat:', error);
+      toast({
+        title: 'No pudimos abrir el ticket',
+        description: 'Volve a intentar en unos segundos.',
+        variant: 'destructive',
+      });
+    }
+  }, [draft, loadTickets, scope, selectTicket, setDraft, setOpen, user]);
 
   return {
+    canClientSend,
     canReply,
+    clientRemainingMessages,
     closeConversation,
+    conversationSummaries,
+    createTicket,
+    createTicketOpen,
+    draft,
     focusNonce,
     loading,
     open,
     openConversation,
+    openNewTicketComposer,
     pendingCount,
     responseText,
+    selectedConversation,
+    selectedMessages,
     selectedTicket,
+    setDraft,
+    setSelectedTicketId: selectTicket,
     setResponseText,
     submitReply,
+    tickets,
   };
 }

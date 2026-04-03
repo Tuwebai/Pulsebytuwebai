@@ -20,7 +20,7 @@ export function AdminProjectCard({
   onDeleteProject,
 }: AdminProjectCardProps) {
   return (
-    <article className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/92 p-4 shadow-[0_18px_40px_rgba(2,6,23,0.24)] transition-colors duration-150 hover:border-white/15 sm:p-5">
+    <article className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)]/92 p-4 shadow-2xl transition-colors duration-150 hover:border-[var(--border-strong)] sm:p-5">
       <div className="space-y-4">
         <AdminProjectCardHeader project={project} />
         <AdminProjectCardMetrics project={project} />

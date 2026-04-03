@@ -66,8 +66,7 @@ export const TutorialProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     setCompletedFlows((currentCompletedFlows) => [
-      ...currentCompletedFlows,
-      currentFlow.id,
+      ...new Set([...currentCompletedFlows, currentFlow.id]),
     ]);
     localStorage.setItem(`tutorial-${currentFlow.id}-completed`, 'true');
     playTutorialSound(0.5);
@@ -157,6 +156,14 @@ export const TutorialProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     setAvailableFlows(getAvailableTutorialFlows(user, TUTORIAL_FLOWS));
   }, [user]);
+
+  useEffect(() => {
+    const completed = TUTORIAL_FLOWS
+      .filter((flow) => window.localStorage.getItem(`tutorial-${flow.id}-completed`) === 'true')
+      .map((flow) => flow.id);
+
+    setCompletedFlows(completed);
+  }, []);
 
   useTutorialAutoStart({
     autoStart,

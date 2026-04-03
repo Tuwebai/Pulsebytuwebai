@@ -18,7 +18,7 @@ export function AdminProjectPhaseTasksList({
 }: AdminProjectPhaseTasksListProps) {
   if (tasks.length === 0) {
     return (
-      <section className="rounded-[24px] border border-dashed border-white/10 bg-[var(--bg-surface)]/70 p-6">
+      <section className="rounded-[24px] border border-dashed border-[var(--border-default)] bg-[var(--bg-surface)]/95 p-6 shadow-2xl">
         <div className="space-y-2">
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">Todavía no hay tareas en esta fase</h2>
           <p className="text-sm leading-6 text-[var(--text-secondary)]">
@@ -35,7 +35,7 @@ export function AdminProjectPhaseTasksList({
       {tasks.map((task) => (
         <article
           key={task.key}
-          className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]"
+          className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)]/95 p-5 shadow-2xl"
         >
           <div className="flex flex-col gap-4">
             <div className="flex items-start justify-between gap-3">
@@ -46,29 +46,29 @@ export function AdminProjectPhaseTasksList({
                 ) : null}
               </div>
               <div className="flex flex-col items-end gap-2">
-                <span className="rounded-full border border-amber-400/20 bg-amber-500/12 px-3 py-1 text-xs font-medium text-amber-300">
+                <span className="rounded-full border border-[var(--warning)]/20 bg-[var(--warning-dim)] px-3 py-1 text-xs font-medium text-[var(--warning)]">
                   {task.status}
                 </span>
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-                <UserRound className="mb-2 h-4 w-4 text-sky-300" />
+              <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3">
+                <UserRound className="mb-2 h-4 w-4 text-[var(--signal)]" />
                 <p className="text-xs uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Responsable</p>
                 <p className="mt-1 text-sm font-medium text-[var(--text-primary)]">
                   {task.responsable ?? task.assigned_to ?? 'Sin responsable'}
                 </p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-                <CalendarClock className="mb-2 h-4 w-4 text-amber-300" />
+              <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3">
+                <CalendarClock className="mb-2 h-4 w-4 text-[var(--warning)]" />
                 <p className="text-xs uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Fecha objetivo</p>
                 <p className="mt-1 text-sm font-medium text-[var(--text-primary)]">
                   {task.fechaLimite ?? task.dueDate ?? 'Sin fecha'}
                 </p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-                <CircleAlert className="mb-2 h-4 w-4 text-rose-300" />
+              <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3">
+                <CircleAlert className="mb-2 h-4 w-4 text-[var(--danger)]" />
                 <p className="text-xs uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Prioridad</p>
                 <p className="mt-1 text-sm font-medium text-[var(--text-primary)]">{task.priority ?? 'Normal'}</p>
               </div>
@@ -82,7 +82,7 @@ export function AdminProjectPhaseTasksList({
                   type="button"
                   variant="outline"
                   onClick={() => onEditTask(task)}
-                  className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]"
+                  className="rounded-xl border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-subtle)]"
                 >
                   <SquarePen className="mr-2 h-4 w-4" />
                   Editar tarea

@@ -14,16 +14,16 @@ interface SupportTicketCardProps {
 
 export default function SupportTicketCard({ onReply, ticket, userEmail }: SupportTicketCardProps) {
   return (
-    <article className="rounded-[22px] border border-[var(--cliente-border-default)] bg-[var(--cliente-bg-surface)]/92 p-4 shadow-[var(--cliente-card-shadow)] transition-colors hover:border-white/15">
+    <article className="rounded-[22px] border border-[var(--border-default)] bg-[var(--bg-surface)]/92 p-4 shadow-2xl transition-colors hover:border-[var(--border-strong)]">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0 flex-1">
-          <h3 className="text-[15px] font-medium text-[var(--cliente-text-primary)]">{ticket.title}</h3>
-          <p className="mt-2 text-[13px] leading-5 text-[var(--cliente-text-secondary)]">{ticket.description}</p>
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px] text-[var(--cliente-text-tertiary)]">
+          <h3 className="text-[15px] font-medium text-[var(--text-primary)]">{ticket.title}</h3>
+          <p className="mt-2 text-[13px] leading-5 text-[var(--text-secondary)]">{ticket.description}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px] text-[var(--text-tertiary)]">
             <span>{formatDateSafe(ticket.created_at)}</span>
-            <span className="h-1 w-1 rounded-full bg-slate-600" />
+            <span className="h-1 w-1 rounded-full bg-[var(--text-disabled)]" />
             <span>{userEmail}</span>
-            <span className="h-1 w-1 rounded-full bg-slate-600" />
+            <span className="h-1 w-1 rounded-full bg-[var(--text-disabled)]" />
             <span className="font-data">#{ticket.id.slice(-6).toUpperCase()}</span>
           </div>
         </div>
@@ -42,7 +42,7 @@ export default function SupportTicketCard({ onReply, ticket, userEmail }: Suppor
         {ticket.respuesta ? (
           <SupportTicketResponseBlock
             content={ticket.respuesta}
-            icon={<MessageSquareText className="h-4 w-4 text-[var(--cliente-signal)]" strokeWidth={1.5} />}
+            icon={<MessageSquareText className="h-4 w-4 text-[var(--signal)]" strokeWidth={1.5} />}
             meta={
               ticket.respondido_por
                 ? `Respondido por ${ticket.respondido_por}${ticket.fecha_respuesta ? ` · ${formatDateSafe(ticket.fecha_respuesta)}` : ''}`
@@ -58,7 +58,7 @@ export default function SupportTicketCard({ onReply, ticket, userEmail }: Suppor
         {ticket.respuesta_cliente ? (
           <SupportTicketResponseBlock
             content={ticket.respuesta_cliente}
-            icon={<MessageSquareText className="h-4 w-4 text-emerald-300" strokeWidth={1.5} />}
+            icon={<MessageSquareText className="h-4 w-4 text-[var(--success)]" strokeWidth={1.5} />}
             meta={ticket.fecha_respuesta_cliente ? formatDateSafe(ticket.fecha_respuesta_cliente) : undefined}
             title="Tu respuesta"
             tone="success"
@@ -68,7 +68,7 @@ export default function SupportTicketCard({ onReply, ticket, userEmail }: Suppor
 
       {ticket.respuesta && ticket.status !== 'closed' ? (
         <Button
-          className="mt-4 h-10 rounded-full bg-[var(--cliente-signal)] px-4 text-white hover:bg-[var(--cliente-signal-dim)]"
+          className="mt-4 h-10 rounded-full bg-[var(--signal)] px-4 text-white hover:bg-[var(--signal-dim)]"
           type="button"
           onClick={() => onReply(ticket.id)}
         >

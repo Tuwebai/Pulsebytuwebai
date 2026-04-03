@@ -1,11 +1,18 @@
 import { serviceWorkerManager } from '@/utils/serviceWorker';
 
-function urlBase64ToUint8Array(base64String: string) {
-  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const normalized = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const raw = window.atob(normalized);
+const PUSH_ENDPOINT_STORAGE_KEY = 'pulse:push:endpoint';
 
-  return Uint8Array.from([...raw].map((character) => character.charCodeAt(0)));
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let index = 0; index < rawData.length; index += 1) {
+    outputArray[index] = rawData.charCodeAt(index);
+  }
+
+  return outputArray;
 }
 
 function getBrowserSupport() {
@@ -16,6 +23,64 @@ function getBrowserSupport() {
     'serviceWorker' in navigator &&
     'PushManager' in window
   );
+}
+
+function setStoredPushEndpoint(endpoint: string | null) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  if (!endpoint) {
+    window.localStorage.removeItem(PUSH_ENDPOINT_STORAGE_KEY);
+    return;
+  }
+
+  window.localStorage.setItem(PUSH_ENDPOINT_STORAGE_KEY, endpoint);
+}
+
+export function getStoredPushEndpoint() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return window.localStorage.getItem(PUSH_ENDPOINT_STORAGE_KEY);
+}
+
+async function getReadyRegistration() {
+  const registration = await serviceWorkerManager.register();
+
+  if (!registration) {
+    throw new Error('PUSH_SERVICE_WORKER_FAILED');
+  }
+
+  return navigator.serviceWorker.ready;
+}
+
+async function resetBrowserPushState() {
+  serviceWorkerManager.resetRegistration();
+
+  const registrations = await navigator.serviceWorker.getRegistrations();
+
+  await Promise.all(
+    registrations.map(async (registration) => {
+      const subscription = await registration.pushManager.getSubscription().catch(() => null);
+
+      if (subscription) {
+        await subscription.unsubscribe().catch(() => undefined);
+      }
+
+      await registration.unregister().catch(() => false);
+    }),
+  );
+}
+
+async function subscribeWithRegistration(vapidPublicKey: string) {
+  const registration = await getReadyRegistration();
+
+  return registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as BufferSource,
+  });
 }
 
 export function getPushPermissionState(): NotificationPermission | 'unsupported' {
@@ -43,24 +108,21 @@ export async function getBrowserPushSubscription() {
     return null;
   }
 
-  const nextRegistration = await serviceWorkerManager.register();
-
-  if (!nextRegistration) {
-    throw new Error('PUSH_SERVICE_WORKER_FAILED');
-  }
-
-  const registration = await navigator.serviceWorker.ready;
-  return registration.pushManager.getSubscription();
+  const registration = await getReadyRegistration();
+  const subscription = await registration.pushManager.getSubscription();
+  setStoredPushEndpoint(subscription?.endpoint ?? null);
+  return subscription;
 }
 
 export async function subscribeBrowserPush() {
-  const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+  const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY;
 
   if (!getBrowserSupport()) {
     throw new Error('PUSH_NOT_SUPPORTED');
   }
 
-  if (!vapidPublicKey) {
+  if (!VAPID_PUBLIC_KEY) {
+    console.error('[Pulse] VITE_VAPID_PUBLIC_KEY no configurada');
     throw new Error('PUSH_CONFIG_MISSING');
   }
 
@@ -70,32 +132,52 @@ export async function subscribeBrowserPush() {
     throw new Error('PUSH_PERMISSION_DENIED');
   }
 
-  const nextRegistration = await serviceWorkerManager.register();
-
-  if (!nextRegistration) {
-    throw new Error('PUSH_SERVICE_WORKER_FAILED');
-  }
-
-  const registration = await navigator.serviceWorker.ready;
-  const existingSubscription = await registration.pushManager.getSubscription();
+  const existingSubscription = await getBrowserPushSubscription();
 
   if (existingSubscription) {
     return existingSubscription;
   }
 
-  return registration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-  });
+  try {
+    const subscription = await subscribeWithRegistration(VAPID_PUBLIC_KEY);
+    setStoredPushEndpoint(subscription.endpoint);
+    return subscription;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      console.error('[Pulse] Push service error:', error);
+      await resetBrowserPushState();
+
+      try {
+        const subscription = await subscribeWithRegistration(VAPID_PUBLIC_KEY);
+        setStoredPushEndpoint(subscription.endpoint);
+        return subscription;
+      } catch (retryError) {
+        if (retryError instanceof DOMException && retryError.name === 'AbortError') {
+          throw new Error('PUSH_SUBSCRIBE_ABORT');
+        }
+
+        throw retryError;
+      }
+    }
+
+    if (error instanceof DOMException && error.name === 'NotAllowedError') {
+      throw new Error('PUSH_PERMISSION_DENIED');
+    }
+
+    throw error;
+  }
 }
 
 export async function unsubscribeBrowserPush() {
   const existingSubscription = await getBrowserPushSubscription();
 
   if (!existingSubscription) {
-    return null;
+    const storedEndpoint = getStoredPushEndpoint();
+    setStoredPushEndpoint(null);
+    return storedEndpoint;
   }
 
   await existingSubscription.unsubscribe();
+  setStoredPushEndpoint(null);
   return existingSubscription.endpoint;
 }

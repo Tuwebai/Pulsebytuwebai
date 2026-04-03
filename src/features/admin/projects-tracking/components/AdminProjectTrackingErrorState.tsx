@@ -16,7 +16,7 @@ export function AdminProjectTrackingErrorState({
   onRetry,
 }: AdminProjectTrackingErrorStateProps) {
   return (
-    <section className="rounded-[24px] border border-danger/20 bg-danger/10 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
+    <section className="rounded-[24px] border border-danger/20 bg-danger/10 p-5 shadow-2xl">
       <div className="flex items-start gap-3">
         <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-danger/20 text-danger">
           <AlertCircle className="h-4 w-4" />
@@ -27,7 +27,7 @@ export function AdminProjectTrackingErrorState({
             <p className="text-sm leading-6 text-[var(--text-secondary)]">{description}</p>
           </div>
           <div className="flex gap-3">
-            <button className="text-sm font-medium text-signal" onClick={() => void onRetry()}>
+            <button className="text-sm font-medium text-[var(--signal)]" onClick={() => void onRetry()}>
               Reintentar carga
             </button>
             <button className="text-sm font-medium text-[var(--text-secondary)]" onClick={onBack}>

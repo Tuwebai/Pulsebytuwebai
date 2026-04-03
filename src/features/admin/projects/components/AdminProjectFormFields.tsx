@@ -32,17 +32,17 @@ export function AdminProjectFormFields({
             value={formData.name}
             onChange={(event) => onChange('name', event.target.value)}
             placeholder="Sitio institucional, e-commerce, landing..."
-            className="border-white/10 bg-white/[0.03] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
+            className="border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
           />
         </div>
 
         <div className="space-y-2">
           <Label className="text-sm font-medium text-[var(--text-primary)]">Estado operativo</Label>
           <Select value={formData.status} onValueChange={(value) => onChange('status', value as CreateProjectData['status'])}>
-            <SelectTrigger className="border-white/10 bg-white/[0.03] text-[var(--text-primary)]">
+            <SelectTrigger className="border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)]">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="border-white/10 bg-[var(--bg-elevated)] text-[var(--text-primary)]">
+            <SelectContent className="border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)]">
               {ADMIN_PROJECT_STATUS_OPTIONS.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -59,7 +59,7 @@ export function AdminProjectFormFields({
           value={formData.description || ''}
           onChange={(event) => onChange('description', event.target.value)}
           placeholder="Contexto, entregable y foco del proyecto."
-          className="min-h-[104px] border-white/10 bg-white/[0.03] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
+          className="min-h-[104px] border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
         />
       </div>
 
@@ -69,7 +69,7 @@ export function AdminProjectFormFields({
           value={formData.github_repository_url || ''}
           onChange={(event) => onChange('github_repository_url', event.target.value)}
           placeholder="https://github.com/tu-equipo/proyecto"
-          className="border-white/10 bg-white/[0.03] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
+          className="border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
         />
       </div>
 

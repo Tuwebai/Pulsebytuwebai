@@ -20,7 +20,7 @@ const ITEMS: Array<{
   {
     key: 'notif_monthly_summary',
     title: 'Resumen mensual',
-    description: 'Recibis el resumen de tu web el primer dia de cada mes.',
+    description: 'Recibís el resumen de tu web el primer día de cada mes.',
     icon: BarChart2,
   },
   {

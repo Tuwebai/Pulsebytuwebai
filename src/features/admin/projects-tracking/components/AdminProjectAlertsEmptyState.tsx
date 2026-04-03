@@ -10,9 +10,9 @@ export function AdminProjectAlertsEmptyState({
   onBackToTracking,
 }: AdminProjectAlertsEmptyStateProps) {
   return (
-    <section className="rounded-[28px] border border-white/10 bg-[var(--bg-surface)]/95 p-8 shadow-[0_24px_60px_rgba(0,0,0,0.18)]">
+    <section className="rounded-[28px] border border-[var(--border-default)] bg-[var(--bg-surface)]/95 p-8 shadow-2xl">
       <div className="mx-auto max-w-2xl space-y-5 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[24px] border border-emerald-400/20 bg-emerald-500/10 text-emerald-300">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[24px] border border-[var(--success)]/20 bg-[var(--success-dim)] text-[var(--success)]">
           <CheckCircle2 className="h-7 w-7" />
         </div>
 
@@ -29,7 +29,7 @@ export function AdminProjectAlertsEmptyState({
             type="button"
             variant="outline"
             onClick={onBackToTracking}
-            className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]"
+            className="rounded-xl border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-subtle)]"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver al resumen

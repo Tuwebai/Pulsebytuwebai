@@ -9,8 +9,8 @@ interface AdminProjectAlertCardProps {
 }
 
 const severityStyles = {
-  high: 'border-rose-400/20 bg-rose-500/10 text-rose-200',
-  medium: 'border-amber-400/20 bg-amber-500/10 text-amber-200',
+  high: 'border-[var(--danger)]/20 bg-[var(--danger-dim)] text-[var(--danger)]',
+  medium: 'border-[var(--warning)]/20 bg-[var(--warning-dim)] text-[var(--warning)]',
 } as const;
 
 export function AdminProjectAlertCard({ item }: AdminProjectAlertCardProps) {
@@ -18,11 +18,11 @@ export function AdminProjectAlertCard({ item }: AdminProjectAlertCardProps) {
   const AccentIcon = item.targetType === 'phase' ? FolderKanban : ListTodo;
 
   return (
-    <article className="rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
+    <article className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)]/95 p-5 shadow-2xl">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-[var(--text-primary)]">
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)]">
               <AccentIcon className="h-4 w-4" />
             </span>
             <span
@@ -43,7 +43,7 @@ export function AdminProjectAlertCard({ item }: AdminProjectAlertCardProps) {
           type="button"
           variant="outline"
           onClick={() => navigate(`${item.to}?from=alertas&edit=1`)}
-          className="rounded-xl border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:border-white/15 hover:bg-white/[0.06]"
+          className="rounded-xl border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-subtle)]"
         >
           {item.ctaLabel}
           <ArrowRight className="ml-2 h-4 w-4" />

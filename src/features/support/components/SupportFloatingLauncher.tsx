@@ -14,20 +14,15 @@ export default function SupportFloatingLauncher({
 }: SupportFloatingLauncherProps) {
   return (
     <button
-      aria-label="Abrir conversacion de soporte"
-      className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full border shadow-[var(--support-shadow-modal,var(--cliente-shadow-modal))] transition-transform duration-150 hover:scale-[1.02] md:bottom-6 md:right-6"
-      style={{
-        borderColor: `var(--${scope}-signal-border)`,
-        backgroundColor: `var(--${scope}-bg-elevated)`,
-      }}
+      aria-label={scope === 'admin' ? 'Abrir conversaciones asignadas' : 'Abrir conversacion de soporte'}
+      className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full border border-[var(--signal-border)] bg-[var(--signal)] text-white shadow-[var(--shadow-modal)] transition-transform duration-150 hover:scale-[1.02] hover:bg-[var(--signal-dim)] md:bottom-6 md:right-6"
       type="button"
       onClick={onClick}
     >
-      <PulseLogo size={22} variant="signal" />
+      <PulseLogo size={22} variant="night" />
       {pendingCount > 0 ? (
         <span
-          className="absolute -right-1 -top-1 min-w-6 rounded-full px-1.5 py-0.5 text-center text-[11px] font-semibold text-white"
-          style={{ backgroundColor: `var(--${scope}-signal)` }}
+          className="absolute -right-1 -top-1 min-w-6 rounded-full border border-[var(--bg-base)] bg-[var(--bg-base)] px-1.5 py-0.5 text-center text-[11px] font-semibold text-[var(--text-primary)]"
         >
           {pendingCount > 9 ? '9+' : pendingCount}
         </span>

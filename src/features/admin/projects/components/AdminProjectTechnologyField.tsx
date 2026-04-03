@@ -25,7 +25,7 @@ export function AdminProjectTechnologyField({
           value={draft}
           onChange={(event) => onDraftChange(event.target.value)}
           placeholder="Agregar tecnología"
-          className="border-white/10 bg-white/[0.03] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
+          className="border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
               event.preventDefault();
@@ -37,7 +37,7 @@ export function AdminProjectTechnologyField({
           type="button"
           variant="outline"
           size="sm"
-          className="rounded-xl border-white/10 bg-white/[0.03] px-3 text-[var(--text-primary)] hover:bg-white/[0.06]"
+          className="rounded-xl border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
           onClick={onAdd}
         >
           <Plus className="h-4 w-4" />
@@ -49,13 +49,13 @@ export function AdminProjectTechnologyField({
           {value.map((technology) => (
             <span
               key={technology}
-              className="inline-flex items-center gap-2 rounded-full border border-signal/20 bg-signal/10 px-3 py-1 text-xs font-medium text-signal"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--signal-border)] bg-[var(--signal-glow)] px-3 py-1 text-xs font-medium text-[var(--signal)]"
             >
               {technology}
               <button
                 type="button"
                 onClick={() => onRemove(technology)}
-                className="text-signal/80 transition-colors hover:text-signal"
+                className="text-[var(--signal)]/80 transition-colors hover:text-[var(--signal)]"
               >
                 <X className="h-3 w-3" />
               </button>

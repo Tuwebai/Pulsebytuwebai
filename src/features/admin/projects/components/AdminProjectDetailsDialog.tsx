@@ -49,14 +49,14 @@ export function AdminProjectDetailsDialog({
           <Button
             type="button"
             variant="outline"
-            className="border-white/10 bg-white/[0.03] text-[var(--text-primary)] hover:bg-white/[0.06]"
+            className="border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
             onClick={onClose}
           >
             Cerrar
           </Button>
           <Button
             type="button"
-            className="bg-sky-500 text-slate-950 hover:bg-sky-400"
+            className="bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]"
             onClick={() => onEdit(project)}
           >
             <PencilLine className="mr-2 h-4 w-4" />
@@ -74,7 +74,7 @@ export function AdminProjectDetailsDialog({
             {approvalLabel}
           </Badge>
         ) : null}
-        <Badge variant="outline" className="border-white/10 bg-white/[0.04] text-slate-300">
+        <Badge variant="outline" className="border-[var(--border-default)] bg-[var(--bg-subtle)] text-[var(--text-secondary)]">
           Último movimiento: {formatOperationalDate(project.updated_at)}
         </Badge>
       </div>

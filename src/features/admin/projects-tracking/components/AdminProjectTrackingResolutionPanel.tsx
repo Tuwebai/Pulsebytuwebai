@@ -24,10 +24,10 @@ const iconMap = {
 } as const;
 
 const accentMap = {
-  owner: 'border-sky-400/15 bg-sky-500/10 text-sky-200',
-  date: 'border-amber-400/15 bg-amber-500/10 text-amber-200',
-  status: 'border-emerald-400/15 bg-emerald-500/10 text-emerald-200',
-  priority: 'border-rose-400/15 bg-rose-500/10 text-rose-200',
+  owner: 'border-[var(--signal)]/20 bg-[var(--signal-glow)] text-[var(--signal)]',
+  date: 'border-[var(--warning)]/20 bg-[var(--warning-dim)] text-[var(--warning)]',
+  status: 'border-[var(--success)]/20 bg-[var(--success-dim)] text-[var(--success)]',
+  priority: 'border-[var(--danger)]/20 bg-[var(--danger-dim)] text-[var(--danger)]',
 } as const;
 
 export function AdminProjectTrackingResolutionPanel({
@@ -53,11 +53,11 @@ export function AdminProjectTrackingResolutionPanel({
           return (
             <article
               key={action.id}
-              className={`rounded-[24px] border p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)] ${accentMap[action.icon]}`}
+              className={`rounded-[24px] border p-5 shadow-2xl ${accentMap[action.icon]}`}
             >
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div className="space-y-2">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-black/10">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)]">
                     <AccentIcon className="h-5 w-5" />
                   </div>
                   <div className="space-y-1">
@@ -70,7 +70,7 @@ export function AdminProjectTrackingResolutionPanel({
                   type="button"
                   onClick={action.onClick}
                   disabled={action.disabled}
-                  className="rounded-xl border border-signal/20 bg-signal text-white hover:bg-signal/90"
+                  className="rounded-xl border border-[var(--signal-border)] bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]"
                 >
                   {action.ctaLabel}
                 </Button>

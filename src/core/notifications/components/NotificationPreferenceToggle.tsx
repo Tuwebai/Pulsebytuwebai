@@ -19,14 +19,14 @@ export function NotificationPreferenceToggle({
   onChange
 }: NotificationPreferenceToggleProps) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl border border-[var(--cliente-border-default)] bg-[var(--cliente-bg-surface)] px-4 py-4 shadow-[var(--cliente-card-shadow)]">
+    <div className="flex items-center justify-between gap-4 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-4 shadow-2xl">
       <div className="flex min-w-0 items-start gap-3">
-        <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--cliente-bg-elevated)] text-[var(--cliente-signal)]">
+        <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-[var(--signal)]">
           {icon}
         </div>
         <div className="min-w-0">
-          <p className="text-[13px] font-medium text-[var(--cliente-text-primary)]">{title}</p>
-          <p className="mt-1 text-[12px] leading-5 text-[var(--cliente-text-secondary)]">{description}</p>
+          <p className="text-[13px] font-medium text-[var(--text-primary)]">{title}</p>
+          <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">{description}</p>
         </div>
       </div>
 
@@ -34,7 +34,7 @@ export function NotificationPreferenceToggle({
         aria-checked={checked}
         className={cn(
           'relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors duration-150',
-          checked ? 'bg-[var(--cliente-signal)]' : 'bg-[var(--cliente-bg-subtle)]',
+          checked ? 'bg-[var(--signal)]' : 'bg-[var(--bg-subtle)]',
           disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
         )}
         disabled={disabled}
@@ -45,7 +45,7 @@ export function NotificationPreferenceToggle({
         <span
           className={cn(
             'inline-block h-5 w-5 rounded-full transition-transform duration-150',
-            checked ? 'translate-x-6 bg-white' : 'translate-x-1 bg-[var(--cliente-text-tertiary)]'
+            checked ? 'translate-x-6 bg-white' : 'translate-x-1 bg-[var(--text-tertiary)]'
           )}
         />
       </button>

@@ -7,7 +7,7 @@ function WhatsAppIcon() {
     <svg
       aria-hidden="true"
       className="h-[18px] w-[18px]"
-      style={{ color: '#22C55E' }}
+      style={{ color: 'var(--success)' }}
       viewBox="0 0 24 24"
       fill="currentColor"
     >
@@ -22,15 +22,15 @@ interface SupportContactPanelProps {
 
 export default function SupportContactPanel({ projectsCount }: SupportContactPanelProps) {
   return (
-    <section className="rounded-[var(--cliente-card-radius)] border border-[var(--cliente-border-default)] bg-[var(--cliente-bg-surface)]/92 p-4 shadow-[var(--cliente-card-shadow)] sm:p-5">
+    <section className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)]/92 p-4 shadow-2xl sm:p-5">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--cliente-signal-glow)] text-[var(--cliente-signal)]">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--signal-glow)] text-[var(--signal)]">
           <MessageCircleHeart className="h-4 w-4" strokeWidth={1.6} />
         </div>
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--cliente-text-tertiary)]">Canales activos</p>
-          <h2 className="mt-2 text-lg font-medium text-[var(--cliente-text-primary)]">Cómo hablar con el equipo</h2>
-          <p className="mt-1 text-sm leading-6 text-[var(--cliente-text-secondary)]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Canales activos</p>
+          <h2 className="mt-2 text-lg font-medium text-[var(--text-primary)]">Cómo hablar con el equipo</h2>
+          <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
             Si necesitas ayuda con tu web, pagos o seguimiento, acá tienes los canales disponibles.
           </p>
         </div>
@@ -38,29 +38,29 @@ export default function SupportContactPanel({ projectsCount }: SupportContactPan
 
       <div className="mt-5 grid gap-3">
         <ContactRow
-          icon={<Mail className="h-4 w-4 text-white" strokeWidth={1.7} />}
+          icon={<Mail className="h-4 w-4" strokeWidth={1.7} />}
           title="Email principal"
-          toneClassName="bg-rose-500/15 text-rose-300"
+          toneClassName="bg-[var(--signal-glow)] text-[var(--signal)]"
           value={SUPPORT_CONTACT.publicEmail}
         />
         <ContactRow
           icon={<WhatsAppIcon />}
           title="WhatsApp"
-          toneClassName="bg-emerald-500/15 text-emerald-300"
+          toneClassName="bg-[var(--success-dim)] text-[var(--success)]"
           value={SUPPORT_CONTACT.phoneDisplay}
         />
         <ContactRow
-          icon={<Clock3 className="h-4 w-4 text-amber-300" strokeWidth={1.7} />}
+          icon={<Clock3 className="h-4 w-4" strokeWidth={1.7} />}
           title="Horario de atención"
-          toneClassName="bg-amber-500/15 text-amber-300"
+          toneClassName="bg-[var(--warning-dim)] text-[var(--warning)]"
           value={SUPPORT_CONTACT.hoursDisplay}
         />
       </div>
 
-      <div className="mt-5 rounded-[18px] border border-[var(--cliente-border-default)] bg-[var(--cliente-bg-elevated)]/55 px-4 py-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--cliente-text-tertiary)]">Contexto actual</p>
-        <p className="mt-2 text-sm font-medium text-[var(--cliente-text-primary)]">Proyectos asociados: {projectsCount}</p>
-        <p className="mt-1 text-xs text-[var(--cliente-text-secondary)]">Esto nos ayuda a responder con más contexto cuando abras una consulta.</p>
+      <div className="mt-5 rounded-[18px] border border-[var(--border-default)] bg-[var(--bg-elevated)]/55 px-4 py-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-tertiary)]">Contexto actual</p>
+        <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">Proyectos asociados: {projectsCount}</p>
+        <p className="mt-1 text-xs text-[var(--text-secondary)]">Esto nos ayuda a responder con más contexto cuando abras una consulta.</p>
       </div>
     </section>
   );
@@ -78,11 +78,11 @@ function ContactRow({
   value: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-[18px] border border-[var(--cliente-border-default)] bg-[var(--cliente-bg-elevated)]/55 px-4 py-3">
+    <div className="flex items-center gap-3 rounded-[18px] border border-[var(--border-default)] bg-[var(--bg-elevated)]/55 px-4 py-3">
       <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${toneClassName}`}>{icon}</div>
       <div>
-        <p className="text-sm font-medium text-[var(--cliente-text-primary)]">{title}</p>
-        <p className="mt-1 text-sm text-[var(--cliente-text-secondary)]">{value}</p>
+        <p className="text-sm font-medium text-[var(--text-primary)]">{title}</p>
+        <p className="mt-1 text-sm text-[var(--text-secondary)]">{value}</p>
       </div>
     </div>
   );
