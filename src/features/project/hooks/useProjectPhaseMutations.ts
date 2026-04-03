@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import type { Project } from '@/contexts/appContext.types';
-import { projectService } from '@/lib/services/projectService';
+import { projectService } from '@/features/project/services';
 
 type ProjectPhase = NonNullable<Project['fases']>[number];
 

@@ -2,7 +2,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useCallback } from 'react';
 
 import type { Project, User } from '@/contexts/appContext.types';
-import { projectService } from '@/lib/services/projectService';
+import { projectService } from '@/features/project/services';
 
 import {
   type AppProjectInput,
