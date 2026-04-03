@@ -7,6 +7,9 @@
   "scripts": {
     "dev": "vite",
     "check": "tsc --noEmit -p tsconfig.app.json",
+    "mcp:dev": "pnpm --dir services/pulse-mcp dev",
+    "mcp:check": "pnpm --dir services/pulse-mcp check",
+    "mcp:start": "pnpm --dir services/pulse-mcp start",
     "build": "pnpm vite build",
     "build:dev": "pnpm vite build --mode development",
     "lint": "eslint .",

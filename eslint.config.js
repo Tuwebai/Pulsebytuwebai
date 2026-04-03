@@ -10,6 +10,7 @@ export default tseslint.config(
       "dist",
       "proyecto-template/**",
       "skills/**",
+      "services/pulse-mcp/**",
       "src/components/**",
       "src/pages/**",
       "src/hooks/**",

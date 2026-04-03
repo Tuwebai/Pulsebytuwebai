@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: pulse-mcp
+    runtime: docker
+    rootDir: services/pulse-mcp
+    plan: starter
+    healthCheckPath: /healthz
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 3333
+      - key: PULSE_MCP_REQUIRE_AUTH
+        value: true
+      - key: PULSE_MCP_PUBLIC_URL
+        sync: false
+      - key: PULSE_MCP_ALLOWED_HOSTS
+        sync: false
+      - key: PULSE_MCP_AUTH_TOKEN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: PULSE_MCP_ALLOWED_PROJECT_IDS
+        sync: false
+      - key: PULSE_MCP_ALLOWED_USER_IDS
+        sync: false

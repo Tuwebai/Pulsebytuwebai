@@ -1,0 +1,24 @@
+{
+  "name": "@pulse/pulse-mcp",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Servidor MCP remoto de Pulse by TuWebAI para ChatGPT.",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "check": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@supabase/supabase-js": "^2.56.0",
+    "dotenv": "^17.2.2",
+    "express": "^5.2.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
