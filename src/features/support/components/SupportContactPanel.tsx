@@ -22,7 +22,7 @@ interface SupportContactPanelProps {
 
 export default function SupportContactPanel({ projectsCount }: SupportContactPanelProps) {
   return (
-    <section className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)]/92 p-4 shadow-2xl sm:p-5">
+    <section className="flex h-full flex-col rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)]/92 p-4 shadow-2xl sm:p-5">
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--signal-glow)] text-[var(--signal)]">
           <MessageCircleHeart className="h-4 w-4" strokeWidth={1.6} />
@@ -57,7 +57,7 @@ export default function SupportContactPanel({ projectsCount }: SupportContactPan
         />
       </div>
 
-      <div className="mt-5 rounded-[18px] border border-[var(--border-default)] bg-[var(--bg-elevated)]/55 px-4 py-3">
+      <div className="mt-auto rounded-[18px] border border-[var(--border-default)] bg-[var(--bg-elevated)]/55 px-4 py-3 pt-3">
         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-tertiary)]">Contexto actual</p>
         <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">Proyectos asociados: {projectsCount}</p>
         <p className="mt-1 text-xs text-[var(--text-secondary)]">Esto nos ayuda a responder con más contexto cuando abras una consulta.</p>

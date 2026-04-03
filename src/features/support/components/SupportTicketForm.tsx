@@ -17,7 +17,7 @@ const fieldClassName =
 
 export default function SupportTicketForm({ formData, onChange, onSubmit }: SupportTicketFormProps) {
   return (
-    <section className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)]/92 p-4 shadow-2xl sm:p-5">
+    <section className="flex h-full flex-col rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)]/92 p-4 shadow-2xl sm:p-5">
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--signal-glow)] text-[var(--signal)]">
           <Plus className="h-4 w-4" strokeWidth={1.6} />
@@ -31,7 +31,7 @@ export default function SupportTicketForm({ formData, onChange, onSubmit }: Supp
         </div>
       </div>
 
-      <form className="mt-5 space-y-4" onSubmit={onSubmit}>
+      <form className="mt-5 flex flex-1 flex-col gap-4" onSubmit={onSubmit}>
         <div className="space-y-2">
           <label className="text-[13px] font-medium text-[var(--text-secondary)]" htmlFor="support-title">
             Asunto
@@ -84,7 +84,7 @@ export default function SupportTicketForm({ formData, onChange, onSubmit }: Supp
           </Select>
         </div>
 
-        <Button className="h-11 w-full rounded-full bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]" type="submit">
+        <Button className="mt-auto h-11 w-full rounded-full bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]" type="submit">
           <Send className="mr-2 h-4 w-4" strokeWidth={1.5} />
           Enviar ticket
         </Button>

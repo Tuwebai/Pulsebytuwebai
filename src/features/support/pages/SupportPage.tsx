@@ -29,7 +29,7 @@ export default function SupportPage() {
           />
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-[0.92fr_1.08fr]">
+        <div className="grid items-stretch gap-4 xl:grid-cols-[0.92fr_1.08fr]">
           <div data-tour="support-contact">
             <SupportContactPanel projectsCount={support.projectsCount} />
           </div>
