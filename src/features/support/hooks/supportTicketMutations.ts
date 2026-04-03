@@ -1,4 +1,4 @@
-import { sendSupportTicketEmail, sendTicketConfirmationEmail } from '@/lib/services/emailService';
+import { sendSupportTicketEmail, sendTicketConfirmationEmail } from '@/features/support/services/supportEmail.service';
 import { ticketService } from '@/features/support/services/ticket.service';
 import { mapSupportPriorityToEmailPriority } from '@/features/support/support.utils';
 import type { SupportDraftState, Ticket } from '@/features/support';
