@@ -1,6 +1,7 @@
 import * as z from 'zod/v4';
 
 import { assertProjectAllowed, assertUserAllowed } from '../auth.js';
+import { pulseMcpConfig } from '../env.js';
 import { resolveProjectIdentifier, resolveUserIdentifier } from '../pulse-data.js';
 
 export const periodSchema = z.enum(['this_month', 'last_month', 'last_7_days', 'last_30_days', 'this_year']);
@@ -25,6 +26,21 @@ export function asToolError(error: unknown) {
     content: [{ type: 'text' as const, text: message }],
     isError: true,
   };
+}
+
+export function assertMutationsEnabled() {
+  if (!pulseMcpConfig.mutationsEnabled) {
+    throw new Error('Las acciones de escritura estan deshabilitadas en este servidor MCP. Activá PULSE_MCP_ENABLE_MUTATIONS=true en Render antes de operar Pulse.');
+  }
+}
+
+export function asConfirmationResult<T>(message: string, preview: T) {
+  return asToolResult({
+    executed: false,
+    requires_confirmation: true,
+    message,
+    preview,
+  });
 }
 
 export async function resolveUserFromInput(userIdentifier: string) {

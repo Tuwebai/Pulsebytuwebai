@@ -17,10 +17,13 @@ const envSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   PULSE_MCP_AUTH_TOKEN: z.string().optional(),
   PULSE_MCP_REQUIRE_AUTH: z.enum(['true', 'false']).default('true'),
+  PULSE_MCP_ENABLE_MUTATIONS: z.enum(['true', 'false']).default('false'),
   PULSE_MCP_ALLOWED_HOSTS: z.string().optional(),
   PULSE_MCP_ALLOWED_PROJECT_IDS: z.string().optional(),
   PULSE_MCP_ALLOWED_USER_IDS: z.string().optional(),
+  PULSE_MCP_OPERATOR_USER_ID: z.string().uuid().optional(),
   PULSE_MCP_PUBLIC_URL: z.string().url().optional(),
+  PULSE_ACCESS_REDIRECT_URL: z.string().url().optional(),
 });
 
 const env = envSchema.parse(process.env);
@@ -41,10 +44,13 @@ export const pulseMcpConfig = {
   port: env.PORT,
   publicUrl: env.PULSE_MCP_PUBLIC_URL ?? `http://${env.HOST}:${env.PORT}/mcp`,
   requireAuth: env.PULSE_MCP_REQUIRE_AUTH === 'true',
+  mutationsEnabled: env.PULSE_MCP_ENABLE_MUTATIONS === 'true',
   authToken: env.PULSE_MCP_AUTH_TOKEN,
   allowedHosts: parseCsv(env.PULSE_MCP_ALLOWED_HOSTS),
   allowedProjectIds: parseCsv(env.PULSE_MCP_ALLOWED_PROJECT_IDS),
   allowedUserIds: parseCsv(env.PULSE_MCP_ALLOWED_USER_IDS),
+  operatorUserId: env.PULSE_MCP_OPERATOR_USER_ID,
+  pulseAccessRedirectUrl: env.PULSE_ACCESS_REDIRECT_URL ?? 'https://pulse.tuweb-ai.com/',
   supabaseUrl: env.SUPABASE_URL,
   supabaseServiceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY,
 };

@@ -59,6 +59,8 @@ services:
         value: 3333
       - key: PULSE_MCP_REQUIRE_AUTH
         value: false
+      - key: PULSE_MCP_ENABLE_MUTATIONS
+        value: false
       - key: PULSE_MCP_PUBLIC_URL
         value: https://pulse-mcp-rpnb.onrender.com/mcp
       - key: PULSE_MCP_ALLOWED_HOSTS
@@ -72,4 +74,8 @@ services:
       - key: PULSE_MCP_ALLOWED_PROJECT_IDS
         sync: false
       - key: PULSE_MCP_ALLOWED_USER_IDS
+        sync: false
+      - key: PULSE_MCP_OPERATOR_USER_ID
+        sync: false
+      - key: PULSE_ACCESS_REDIRECT_URL
         sync: false
