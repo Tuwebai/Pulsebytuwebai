@@ -1,9 +1,10 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
-interface ProjectPaginationProps {
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+interface AdminProjectPaginationProps {
   currentPage: number;
   totalPages: number;
   totalItems: number;
@@ -12,13 +13,13 @@ interface ProjectPaginationProps {
   onItemsPerPageChange: (itemsPerPage: number) => void;
 }
 
-export const ProjectPagination: React.FC<ProjectPaginationProps> = ({
+export const AdminProjectPagination: React.FC<AdminProjectPaginationProps> = ({
   currentPage,
   totalPages,
   totalItems,
   itemsPerPage,
   onPageChange,
-  onItemsPerPageChange
+  onItemsPerPageChange,
 }) => {
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
@@ -26,51 +27,46 @@ export const ProjectPagination: React.FC<ProjectPaginationProps> = ({
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
+      for (let index = 1; index <= totalPages; index += 1) {
+        pages.push(index);
+      }
+    } else if (currentPage <= 3) {
+      for (let index = 1; index <= 4; index += 1) {
+        pages.push(index);
+      }
+      pages.push('...');
+      pages.push(totalPages);
+    } else if (currentPage >= totalPages - 2) {
+      pages.push(1);
+      pages.push('...');
+      for (let index = totalPages - 3; index <= totalPages; index += 1) {
+        pages.push(index);
       }
     } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 4; i++) {
-          pages.push(i);
-        }
-        pages.push('...');
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        pages.push(1);
-        pages.push('...');
-        for (let i = totalPages - 3; i <= totalPages; i++) {
-          pages.push(i);
-        }
-      } else {
-        pages.push(1);
-        pages.push('...');
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-          pages.push(i);
-        }
-        pages.push('...');
-        pages.push(totalPages);
+      pages.push(1);
+      pages.push('...');
+      for (let index = currentPage - 1; index <= currentPage + 1; index += 1) {
+        pages.push(index);
       }
+      pages.push('...');
+      pages.push(totalPages);
     }
-    
+
     return pages;
   };
 
   if (totalPages <= 1) {
     return (
-      <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+      <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800">
         <div className="text-sm text-slate-600 dark:text-slate-400">
           Mostrando {totalItems} de {totalItems} proyectos
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-slate-600 dark:text-slate-400">Mostrar:</span>
-          <Select
-            value={itemsPerPage.toString()}
-            onValueChange={(value) => onItemsPerPageChange(parseInt(value))}
-          >
-            <SelectTrigger className="w-20 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200">
+          <Select value={itemsPerPage.toString()} onValueChange={(value) => onItemsPerPageChange(parseInt(value, 10))}>
+            <SelectTrigger className="w-20 border-slate-200 bg-white text-slate-800 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -87,22 +83,19 @@ export const ProjectPagination: React.FC<ProjectPaginationProps> = ({
   }
 
   return (
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
-          {/* Información de elementos mostrados */}
-          <div className="text-sm text-slate-600 dark:text-slate-400">
-            Mostrando {startItem}-{endItem} de {totalItems} proyectos
-          </div>
+    <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+      <div className="text-sm text-slate-600 dark:text-slate-400">
+        Mostrando {startItem}-{endItem} de {totalItems} proyectos
+      </div>
 
-      {/* Controles de paginación */}
       <div className="flex items-center gap-2">
-        {/* Botones de navegación */}
         <div className="flex items-center gap-1">
           <Button
             variant="outline"
             size="sm"
             onClick={() => onPageChange(1)}
             disabled={currentPage === 1}
-            className="bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 disabled:opacity-50"
+            className="border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
           >
             <ChevronsLeft className="h-4 w-4" />
           </Button>
@@ -111,15 +104,14 @@ export const ProjectPagination: React.FC<ProjectPaginationProps> = ({
             size="sm"
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 disabled:opacity-50"
+            className="border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
-          {/* Números de página */}
           <div className="flex items-center gap-1">
             {getPageNumbers().map((page, index) => (
-              <React.Fragment key={index}>
+              <React.Fragment key={`${page}-${index}`}>
                 {page === '...' ? (
                   <span className="px-2 py-1 text-slate-500 dark:text-slate-400">...</span>
                 ) : (
@@ -129,8 +121,8 @@ export const ProjectPagination: React.FC<ProjectPaginationProps> = ({
                     onClick={() => onPageChange(page as number)}
                     className={
                       currentPage === page
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                        : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600'
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600'
                     }
                   >
                     {page}
@@ -145,7 +137,7 @@ export const ProjectPagination: React.FC<ProjectPaginationProps> = ({
             size="sm"
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 disabled:opacity-50"
+            className="border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -154,20 +146,16 @@ export const ProjectPagination: React.FC<ProjectPaginationProps> = ({
             size="sm"
             onClick={() => onPageChange(totalPages)}
             disabled={currentPage === totalPages}
-            className="bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 disabled:opacity-50"
+            className="border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
           >
             <ChevronsRight className="h-4 w-4" />
           </Button>
         </div>
 
-        {/* Selector de elementos por página */}
-        <div className="flex items-center gap-2 ml-4">
+        <div className="ml-4 flex items-center gap-2">
           <span className="text-sm text-slate-600 dark:text-slate-400">Mostrar:</span>
-          <Select
-            value={itemsPerPage.toString()}
-            onValueChange={(value) => onItemsPerPageChange(parseInt(value))}
-          >
-            <SelectTrigger className="w-20 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200">
+          <Select value={itemsPerPage.toString()} onValueChange={(value) => onItemsPerPageChange(parseInt(value, 10))}>
+            <SelectTrigger className="w-20 border-slate-200 bg-white text-slate-800 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

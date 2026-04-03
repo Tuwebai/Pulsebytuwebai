@@ -3,8 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
 
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { ProjectPagination } from '@/components/admin/ProjectPagination';
 import { AdminPageActionsBar } from '@/features/admin/components/AdminPageActionsBar';
+import { AdminProjectPagination } from '@/features/admin/projects/components/AdminProjectPagination';
 import { AdminProjectsEmptyState } from '@/features/admin/projects/components/AdminProjectsEmptyState';
 import { AdminProjectsGrid } from '@/features/admin/projects/components/AdminProjectsGrid';
 import { AdminProjectsOverlays } from '@/features/admin/projects/components/AdminProjectsOverlays';
@@ -115,7 +115,7 @@ export function AdminProjectsScreen() {
           />
 
           <section className="rounded-[24px] border border-[var(--border-default)] bg-[var(--bg-surface)]/95 p-4 shadow-2xl sm:p-5">
-            <ProjectPagination
+            <AdminProjectPagination
               currentPage={pagination.page}
               totalPages={pagination.totalPages}
               totalItems={pagination.total}
