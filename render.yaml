@@ -58,7 +58,7 @@ services:
       - key: PORT
         value: 3333
       - key: PULSE_MCP_REQUIRE_AUTH
-        value: true
+        value: false
       - key: PULSE_MCP_PUBLIC_URL
         value: https://pulse-mcp-rpnb.onrender.com/mcp
       - key: PULSE_MCP_ALLOWED_HOSTS
