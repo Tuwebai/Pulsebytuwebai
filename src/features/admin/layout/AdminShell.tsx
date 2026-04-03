@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 
 import { RefreshCw } from 'lucide-react';
 
-import Sidebar from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
 import { AvatarMenu } from '@/core/components';
@@ -12,6 +11,7 @@ import { useNotifications } from '@/core/notifications/hooks/useNotifications';
 import { useNotificationsPanelState } from '@/core/notifications/hooks/useNotificationsPanelState';
 import { AdminSectionNav } from '@/features/admin/components/AdminSectionNav';
 import type { AdminSectionId } from '@/features/admin/constants/adminSections';
+import AdminSidebar from '@/features/admin/layout/AdminSidebar';
 import SupportChatDock from '@/features/support/components/SupportChatDock';
 
 interface AdminShellProps {
@@ -43,7 +43,7 @@ export function AdminShell({
         data-surface="admin"
       >
         <div className="hidden shrink-0 md:block">
-          <Sidebar />
+          <AdminSidebar />
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
