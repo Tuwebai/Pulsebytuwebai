@@ -2,8 +2,8 @@ import React, { Suspense, lazy } from 'react';
 import type { ComponentType } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import { PulseLoaderScreen } from '@/components/PulseLoaderScreen';
-import TouchGestureProvider from '@/components/TouchGestureProvider';
 import RouteLoadErrorState from '@/core/components/RouteLoadErrorState';
+import TouchGestureProvider from '@/core/components/TouchGestureProvider';
 import { renderAdminRoutes } from '@/app/adminRoutes';
 import { useApp } from '@/contexts/AppContext';
 import { renderAuthRoutes } from '@/features/auth/routes/AuthRoutes';
@@ -262,7 +262,7 @@ export function AppRouter() {
         v7_relativeSplatPath: false
       }}
     >
-      <TouchGestureProvider enableGlobalGestures={true} enableNavigationGestures={true}>
+      <TouchGestureProvider enableGlobalGestures={true}>
         <ServiceWorkerInitializer />
         <Suspense fallback={<PulseLoaderScreen />}>
           <PulseLoaderDismissBoundary>
