@@ -60,9 +60,9 @@ services:
       - key: PULSE_MCP_REQUIRE_AUTH
         value: true
       - key: PULSE_MCP_PUBLIC_URL
-        sync: false
+        value: https://pulse-mcp-rpnb.onrender.com/mcp
       - key: PULSE_MCP_ALLOWED_HOSTS
-        sync: false
+        value: pulse-mcp-rpnb.onrender.com
       - key: PULSE_MCP_AUTH_TOKEN
         sync: false
       - key: SUPABASE_URL
