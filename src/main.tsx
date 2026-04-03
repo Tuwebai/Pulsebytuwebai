@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App.tsx'
 import './index.css'
+import { setupGlobalErrorHandling } from './app/setupGlobalErrorHandling';
 import './lib/config/i18n';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './lib/config/i18n';
-import { setupErrorHandler } from './lib/services/errorHandler';
 import { setupAutoCacheCleanup } from './lib/utils/cacheManager';
 
 // Configurar cliente de React Query con opciones recomendadas
@@ -24,7 +24,7 @@ const queryClient = new QueryClient({
 });
 
 // Configurar manejador de errores personalizado
-setupErrorHandler();
+setupGlobalErrorHandling();
 
 // Configurar limpieza automática de cache en desarrollo
 setupAutoCacheCleanup();

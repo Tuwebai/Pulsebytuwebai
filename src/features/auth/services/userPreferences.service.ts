@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase/supabase';
-import { handleSupabaseError } from '@/lib/services/errorHandler';
+import { handleSupabaseError } from '@/lib/errors/errorHandler';
 import type { JsonValue, UserPreferenceRecord, UserPreferenceType } from '@/features/auth/services/userPreferences.types';
 import {
   isPreferencesAuthError,
