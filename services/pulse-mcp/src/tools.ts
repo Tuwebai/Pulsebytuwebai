@@ -3,7 +3,15 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import { assertProjectAllowed, assertUserAllowed } from './auth.js';
 import { type PulsePeriod } from './date-ranges.js';
-import { fetchNotifications, fetchProjectSummary, fetchPulseMetrics, fetchSupportTickets } from './pulse-data.js';
+import {
+  fetchLatestProjectForUser,
+  fetchNotifications,
+  fetchProjectSummary,
+  fetchPulseMetrics,
+  fetchSupportTickets,
+  resolveProjectIdentifier,
+  resolveUserIdentifier,
+} from './pulse-data.js';
 
 const periodSchema = z.enum(['this_month', 'last_month', 'last_7_days', 'last_30_days', 'this_year']);
 const topPageSchema = z.object({
@@ -26,6 +34,18 @@ function asToolError(error: unknown) {
     content: [{ type: 'text' as const, text: message }],
     isError: true,
   };
+}
+
+async function resolveUserFromInput(userIdentifier: string) {
+  const user = await resolveUserIdentifier(userIdentifier);
+  assertUserAllowed(user.id);
+  return user;
+}
+
+async function resolveProjectFromInput(projectIdentifier: string) {
+  const project = await resolveProjectIdentifier(projectIdentifier);
+  assertProjectAllowed(project.id);
+  return project;
 }
 
 export function createPulseMcpServer() {
@@ -57,9 +77,15 @@ export function createPulseMcpServer() {
 
   server.registerTool('get_project_summary', {
     title: 'Resumen de proyecto',
-    description: 'Trae contexto ejecutivo del proyecto y su actividad reciente.',
-    inputSchema: { projectId: z.string().min(1) },
+    description: 'Trae contexto ejecutivo del proyecto y su actividad reciente usando UUID, nombre o dominio.',
+    inputSchema: {
+      projectIdentifier: z.string().min(1).describe('UUID, nombre o dominio del proyecto'),
+    },
     outputSchema: z.object({
+      resolvedProject: z.object({
+        id: z.string(),
+        matchedBy: z.string(),
+      }),
       project: z.object({
         id: z.string(),
         name: z.string().nullable(),
@@ -72,10 +98,18 @@ export function createPulseMcpServer() {
       latestMetric: z.object({ date: z.string(), visits: z.number(), contacts: z.number() }).nullable(),
       recentTotals: z.object({ visits: z.number(), contacts: z.number(), topPages: z.array(topPageSchema) }),
     }),
-  }, async ({ projectId }) => {
+  }, async ({ projectIdentifier }) => {
     try {
-      assertProjectAllowed(projectId);
-      return asToolResult(await fetchProjectSummary(projectId));
+      const project = await resolveProjectFromInput(projectIdentifier);
+      const summary = await fetchProjectSummary(project.id);
+
+      return asToolResult({
+        resolvedProject: {
+          id: project.id,
+          matchedBy: projectIdentifier,
+        },
+        ...summary,
+      });
     } catch (error) {
       return asToolError(error);
     }
@@ -83,9 +117,22 @@ export function createPulseMcpServer() {
 
   server.registerTool('get_pulse_metrics', {
     title: 'Metricas Pulse',
-    description: 'Resume metricas historicas de Pulse por periodo.',
-    inputSchema: { projectId: z.string().min(1), period: periodSchema.default('last_30_days') },
+    description: 'Resume metricas historicas por periodo usando un proyecto o un usuario. Acepta UUID, email, nombre o dominio.',
+    inputSchema: {
+      projectIdentifier: z.string().min(1).optional().describe('UUID, nombre o dominio del proyecto'),
+      userIdentifier: z.string().min(1).optional().describe('UUID, email, nombre o telefono del usuario'),
+      period: periodSchema.default('last_30_days'),
+    },
     outputSchema: z.object({
+      resolvedProject: z.object({
+        id: z.string(),
+        matchedBy: z.string(),
+      }),
+      resolvedUser: z.object({
+        id: z.string(),
+        email: z.string().nullable(),
+        full_name: z.string().nullable(),
+      }).nullable(),
       period: periodSchema,
       dateRange: z.object({ from: z.string(), to: z.string() }),
       totals: z.object({
@@ -100,10 +147,38 @@ export function createPulseMcpServer() {
       hasData: z.boolean(),
       lastUpdatedAt: z.string().nullable(),
     }),
-  }, async ({ projectId, period }) => {
+  }, async ({ projectIdentifier, userIdentifier, period }) => {
     try {
-      assertProjectAllowed(projectId);
-      return asToolResult(await fetchPulseMetrics(projectId, period as PulsePeriod));
+      if (!projectIdentifier && !userIdentifier) {
+        throw new Error('Necesitamos projectIdentifier o userIdentifier para buscar metricas.');
+      }
+
+      let resolvedUser: { id: string; email: string | null; full_name: string | null } | null = null;
+      let project;
+
+      if (projectIdentifier) {
+        project = await resolveProjectFromInput(projectIdentifier);
+      } else {
+        const user = await resolveUserFromInput(userIdentifier as string);
+        resolvedUser = {
+          id: user.id,
+          email: user.email,
+          full_name: user.full_name,
+        };
+        project = await fetchLatestProjectForUser(user.id);
+        assertProjectAllowed(project.id);
+      }
+
+      const metrics = await fetchPulseMetrics(project.id, period as PulsePeriod);
+
+      return asToolResult({
+        resolvedProject: {
+          id: project.id,
+          matchedBy: projectIdentifier || userIdentifier || project.id,
+        },
+        resolvedUser,
+        ...metrics,
+      });
     } catch (error) {
       return asToolError(error);
     }
@@ -111,13 +186,18 @@ export function createPulseMcpServer() {
 
   server.registerTool('get_notifications', {
     title: 'Notificaciones',
-    description: 'Lista notificaciones de un usuario Pulse.',
+    description: 'Lista notificaciones de un usuario Pulse usando UUID, email, nombre o telefono.',
     inputSchema: {
-      userId: z.string().min(1),
+      userIdentifier: z.string().min(1).describe('UUID, email, nombre o telefono del usuario'),
       limit: z.number().int().positive().max(50).default(10),
       unreadOnly: z.boolean().default(false),
     },
     outputSchema: z.object({
+      resolvedUser: z.object({
+        id: z.string(),
+        email: z.string().nullable(),
+        full_name: z.string().nullable(),
+      }),
       userId: z.string(),
       unreadCount: z.number(),
       notifications: z.array(z.object({
@@ -131,10 +211,19 @@ export function createPulseMcpServer() {
         created_at: z.string().nullable(),
       })),
     }),
-  }, async ({ userId, limit, unreadOnly }) => {
+  }, async ({ userIdentifier, limit, unreadOnly }) => {
     try {
-      assertUserAllowed(userId);
-      return asToolResult(await fetchNotifications(userId, limit, unreadOnly));
+      const user = await resolveUserFromInput(userIdentifier);
+      const notifications = await fetchNotifications(user.id, limit, unreadOnly);
+
+      return asToolResult({
+        resolvedUser: {
+          id: user.id,
+          email: user.email,
+          full_name: user.full_name,
+        },
+        ...notifications,
+      });
     } catch (error) {
       return asToolError(error);
     }
@@ -142,12 +231,17 @@ export function createPulseMcpServer() {
 
   server.registerTool('get_support_tickets', {
     title: 'Tickets de soporte',
-    description: 'Trae tickets y ultimo mensaje visible del usuario.',
+    description: 'Trae tickets y ultimo mensaje visible usando UUID, email, nombre o telefono del usuario.',
     inputSchema: {
-      userId: z.string().min(1),
+      userIdentifier: z.string().min(1).describe('UUID, email, nombre o telefono del usuario'),
       limit: z.number().int().positive().max(30).default(10),
     },
     outputSchema: z.object({
+      resolvedUser: z.object({
+        id: z.string(),
+        email: z.string().nullable(),
+        full_name: z.string().nullable(),
+      }),
       userId: z.string(),
       tickets: z.array(z.object({
         id: z.string(),
@@ -164,10 +258,19 @@ export function createPulseMcpServer() {
         }).nullable(),
       })),
     }),
-  }, async ({ userId, limit }) => {
+  }, async ({ userIdentifier, limit }) => {
     try {
-      assertUserAllowed(userId);
-      return asToolResult(await fetchSupportTickets(userId, limit));
+      const user = await resolveUserFromInput(userIdentifier);
+      const tickets = await fetchSupportTickets(user.id, limit);
+
+      return asToolResult({
+        resolvedUser: {
+          id: user.id,
+          email: user.email,
+          full_name: user.full_name,
+        },
+        ...tickets,
+      });
     } catch (error) {
       return asToolError(error);
     }

@@ -11,6 +11,14 @@ interface ProjectRow {
   ga4_property_id: string | null;
   completion_percentage: number | null;
   updated_at: string | null;
+  created_by?: string | null;
+}
+
+interface UserRow {
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  phone: string | null;
 }
 
 interface PulseMetricRow {
@@ -54,6 +62,27 @@ interface TicketMessageRow {
 const supabase = createClient(pulseMcpConfig.supabaseUrl, pulseMcpConfig.supabaseServiceRoleKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
+
+function normalizeIdentifier(value: string) {
+  return value.trim();
+}
+
+function normalizeDomain(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .replace(/^www\./, '')
+    .replace(/\/.*$/, '');
+}
+
+function looksLikeUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+function looksLikeEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
 
 function sum(rows: PulseMetricRow[], field: 'visits' | 'contacts' | 'avg_session_sec') {
   return rows.reduce((total, row) => total + (row[field] ?? 0), 0);
@@ -107,6 +136,141 @@ async function fetchMetricRows(projectId: string, from: string, to: string) {
 
   if (error) throw error;
   return (data ?? []) as PulseMetricRow[];
+}
+
+export async function resolveUserIdentifier(userIdentifier: string) {
+  const identifier = normalizeIdentifier(userIdentifier);
+
+  if (!identifier) {
+    throw new Error('Necesitamos un identificador de usuario valido.');
+  }
+
+  if (looksLikeUuid(identifier)) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, email, full_name, phone')
+      .eq('id', identifier)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (data) return data as UserRow;
+  }
+
+  if (looksLikeEmail(identifier)) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, email, full_name, phone')
+      .ilike('email', identifier)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (data) return data as UserRow;
+  }
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, email, full_name, phone')
+    .or(`full_name.ilike.%${identifier}%,phone.ilike.%${identifier}%`)
+    .limit(5);
+
+  if (error) throw error;
+
+  const users = (data ?? []) as UserRow[];
+
+  if (users.length === 1) {
+    return users[0];
+  }
+
+  if (users.length > 1) {
+    const candidates = users
+      .map((user) => user.full_name || user.email || user.id)
+      .join(', ');
+
+    throw new Error(`Encontramos varios usuarios para "${identifier}". Probá con email o UUID. Coincidencias: ${candidates}.`);
+  }
+
+  throw new Error(`No encontramos un usuario en Pulse para "${identifier}".`);
+}
+
+export async function resolveProjectIdentifier(projectIdentifier: string) {
+  const identifier = normalizeIdentifier(projectIdentifier);
+
+  if (!identifier) {
+    throw new Error('Necesitamos un identificador de proyecto valido.');
+  }
+
+  if (looksLikeUuid(identifier)) {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('id, name, status, domain, ga4_property_id, completion_percentage, updated_at, created_by')
+      .eq('id', identifier)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (data) return data as ProjectRow;
+  }
+
+  const normalizedDomain = normalizeDomain(identifier);
+  const { data: domainMatch, error: domainError } = await supabase
+    .from('projects')
+    .select('id, name, status, domain, ga4_property_id, completion_percentage, updated_at, created_by')
+    .ilike('domain', normalizedDomain)
+    .limit(5);
+
+  if (domainError) throw domainError;
+
+  const domainProjects = (domainMatch ?? []) as ProjectRow[];
+
+  if (domainProjects.length === 1) {
+    return domainProjects[0];
+  }
+
+  const { data: nameMatch, error: nameError } = await supabase
+    .from('projects')
+    .select('id, name, status, domain, ga4_property_id, completion_percentage, updated_at, created_by')
+    .ilike('name', `%${identifier}%`)
+    .limit(5);
+
+  if (nameError) throw nameError;
+
+  const nameProjects = (nameMatch ?? []) as ProjectRow[];
+
+  if (nameProjects.length === 1) {
+    return nameProjects[0];
+  }
+
+  const combined = [...domainProjects, ...nameProjects].filter(
+    (project, index, list) => list.findIndex((item) => item.id === project.id) === index,
+  );
+
+  if (combined.length > 1) {
+    const candidates = combined
+      .map((project) => project.name || project.domain || project.id)
+      .join(', ');
+
+    throw new Error(`Encontramos varios proyectos para "${identifier}". Probá con dominio exacto o UUID. Coincidencias: ${candidates}.`);
+  }
+
+  throw new Error(`No encontramos un proyecto en Pulse para "${identifier}".`);
+}
+
+export async function fetchLatestProjectForUser(userId: string) {
+  const { data, error } = await supabase
+    .from('projects')
+    .select('id, name, status, domain, ga4_property_id, completion_percentage, updated_at, created_by')
+    .eq('created_by', userId)
+    .order('updated_at', { ascending: false })
+    .limit(5);
+
+  if (error) throw error;
+
+  const projects = (data ?? []) as ProjectRow[];
+
+  if (projects.length === 0) {
+    throw new Error('No encontramos proyectos asociados a ese usuario en Pulse.');
+  }
+
+  return projects[0];
 }
 
 export async function fetchProjectSummary(projectId: string) {
