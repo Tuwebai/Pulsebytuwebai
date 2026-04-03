@@ -22,14 +22,13 @@ function getInitialValue<T>(key: string, initialValue: T, deserialize: (value: s
 export function useSessionStorageState<T>(
   key: string,
   initialValue: T,
-  options: StorageOptions<T> = {}
+  options: StorageOptions<T> = {},
 ): [T, Dispatch<SetStateAction<T>>] {
   const serialize = useMemo(() => options.serialize ?? JSON.stringify, [options.serialize]);
   const deserialize = useMemo(
     () => options.deserialize ?? ((value: string) => JSON.parse(value) as T),
-    [options.deserialize]
+    [options.deserialize],
   );
-
   const [state, setState] = useState<T>(() => getInitialValue(key, initialValue, deserialize));
 
   useEffect(() => {

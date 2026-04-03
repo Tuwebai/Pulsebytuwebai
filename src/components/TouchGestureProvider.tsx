@@ -4,7 +4,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTouchGestures, useNavigationGestures } from '@/hooks/useTouchGestures';
+import { useTouchGestures, useNavigationGestures } from '@/core/hooks/useTouchGestures';
 
 interface TouchGestureProviderProps {
   children: React.ReactNode;
@@ -84,7 +84,7 @@ export const useTouchGestureProvider = () => {
   
   return {
     navigationGestures: useNavigationGestures(navigate),
-    attachGestures: (element: HTMLElement, options?: any) => {
+    attachGestures: (element: HTMLElement, options?: Parameters<typeof useTouchGestures>[0]) => {
       const gestures = useTouchGestures(options);
       return gestures.attachGestures(element);
     }

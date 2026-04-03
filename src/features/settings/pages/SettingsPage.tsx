@@ -4,8 +4,8 @@ import React, { useEffect } from 'react';
 import { motion } from '@/components/OptimizedMotion';
 import { Tabs } from '@/components/ui/tabs';
 import { PulseFeedbackState } from '@/core/components';
+import { useSessionStorageState } from '@/core/hooks/useSessionStorageState';
 import { PRODUCT_TOUR_STEP_CHANGE_EVENT } from '@/features/product-tour/services/productTour.service';
-import { useSessionStorageState } from '@/hooks/useSessionStorageState';
 import type { ProductTourStep } from '@/features/product-tour/types/productTour.types';
 import { useClientSettings } from '@/features/settings/hooks/useClientSettings';
 import {

@@ -1,4 +1,4 @@
-import { useSessionStorageState } from '@/hooks/useSessionStorageState';
+import { useSessionStorageState } from '@/core/hooks/useSessionStorageState';
 import { useNotificationsRealtime } from './useNotificationsRealtime';
 
 export function useNotificationsPanelState(storageKey: string, userId: string | null) {
