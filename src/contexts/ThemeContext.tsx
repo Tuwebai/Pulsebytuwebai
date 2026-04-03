@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { useApp } from './AppContext';
-import { userPreferencesService } from '@/lib/services/userPreferencesService';
+import { userPreferencesService } from '@/features/auth/services/userPreferences.service';
 
 interface ThemeContextType {
   theme: 'dark';
