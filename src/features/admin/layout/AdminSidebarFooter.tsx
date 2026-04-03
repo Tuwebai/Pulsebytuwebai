@@ -5,22 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import PulseLogo from '@/core/components/PulseLogo';
 
-interface SidebarFooterProps {
-  isAdmin: boolean;
+interface AdminSidebarFooterProps {
   onLogout: () => void;
 }
 
-export function SidebarFooter({ isAdmin, onLogout }: SidebarFooterProps) {
+export function AdminSidebarFooter({ onLogout }: AdminSidebarFooterProps) {
   const { t } = useTranslation();
 
   return (
-    <div
-      className={`border-t border-sidebar-border dark:border-slate-700 ${
-        isAdmin
-          ? 'bg-sidebar-background px-4 py-4'
-          : 'bg-gradient-to-r from-sidebar-accent to-sidebar-background p-4 dark:from-slate-800 dark:to-slate-900'
-      }`}
-    >
+    <div className="border-t border-sidebar-border bg-sidebar-background px-4 py-4 dark:border-slate-700">
       <Button
         onClick={onLogout}
         variant="ghost"
