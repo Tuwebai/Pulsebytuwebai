@@ -345,6 +345,12 @@ verify_jwt = false
 [functions.dispatch-push-notifications]
 verify_jwt = false
 
+[functions.google-search-console-connect]
+verify_jwt = false
+
+[functions.google-search-console-callback]
+verify_jwt = false
+
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 

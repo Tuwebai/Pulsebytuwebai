@@ -1,14 +1,18 @@
 interface GoogleConnectionCardProps {
   actionLabel: string;
   description: string;
+  isLoading?: boolean;
   onAction: () => void;
+  secondaryText?: string | null;
   title: string;
 }
 
 export default function GoogleConnectionCard({
   actionLabel,
   description,
+  isLoading = false,
   onAction,
+  secondaryText,
   title,
 }: GoogleConnectionCardProps) {
   return (
@@ -20,13 +24,15 @@ export default function GoogleConnectionCard({
       </div>
 
       <button
-        className="mt-6 inline-flex items-center justify-center rounded-full bg-[var(--signal)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--signal-dim)]"
+        className="mt-6 inline-flex items-center justify-center rounded-full bg-[var(--signal)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--signal-dim)] disabled:cursor-not-allowed disabled:opacity-60"
+        disabled={isLoading}
         onClick={onAction}
         type="button"
       >
-        {actionLabel}
+        {isLoading ? 'Abriendo Google...' : actionLabel}
       </button>
+
+      {secondaryText ? <p className="mt-3 text-[13px] text-[var(--text-tertiary)]">{secondaryText}</p> : null}
     </section>
   );
 }
-
