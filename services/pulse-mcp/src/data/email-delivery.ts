@@ -4,8 +4,11 @@ function escapeHtml(value: string) {
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;')
-    .replace(/[^\u0000-\u007F]/g, (character) => `&#${character.codePointAt(0)};`);
+    .replaceAll("'", '&#39;');
+}
+
+function encodeNonAsciiHtml(value: string) {
+  return value.replace(/[^\u0000-\u007F]/g, (character) => `&#${character.codePointAt(0)};`);
 }
 
 function formatParagraphs(message: string) {
@@ -37,7 +40,7 @@ export function buildPulseBrandedEmailHtml(input: {
     ? `<p style="margin:18px 0 0;font-size:13px;line-height:1.7;color:#8B9AC0;">${escapeHtml(input.footerNote).replaceAll('\n', '<br />')}</p>`
     : '';
 
-  return `<!doctype html>
+  const html = `<!doctype html>
   <html lang="es">
     <head>
       <meta charset="utf-8" />
@@ -61,6 +64,8 @@ export function buildPulseBrandedEmailHtml(input: {
       </div>
     </body>
   </html>`;
+
+  return encodeNonAsciiHtml(html);
 }
 
 export async function sendPulseEmail(input: {
