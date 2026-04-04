@@ -2,7 +2,7 @@ import * as z from 'zod/v4';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import { type PulsePeriod } from '../date-ranges.js';
-import { fetchDashboardSummary, fetchLatestProjectForUser, fetchProjectSummary, fetchPulseMetrics } from '../pulse-data.js';
+import { fetchDashboardSummary, fetchLatestProjectForUser, fetchProjectSummary, fetchPulseMetrics, listProjects } from '../pulse-data.js';
 import { asToolError, asToolResult, periodSchema, resolveProjectFromInput, resolveUserFromInput, topPageSchema } from './shared.js';
 
 export function registerPulseTools(server: McpServer) {
@@ -35,6 +35,67 @@ export function registerPulseTools(server: McpServer) {
       return asToolResult({
         resolvedProject: { id: project.id, matchedBy: projectIdentifier },
         ...(await fetchProjectSummary(project.id)),
+      });
+    } catch (error) {
+      return asToolError(error);
+    }
+  });
+
+  server.registerTool('list_projects', {
+    title: 'Listar proyectos',
+    description: 'Lista proyectos de Pulse y permite filtrar por cliente, estado o completion_percentage menor a un umbral.',
+    inputSchema: {
+      userIdentifier: z.string().min(1).optional().describe('UUID, email, nombre o telefono del cliente'),
+      status: z.string().min(1).optional(),
+      completion_percentage_lt: z.number().int().min(0).max(100).optional(),
+    },
+    outputSchema: z.object({
+      filters: z.object({
+        userId: z.string().nullable(),
+        status: z.string().nullable(),
+        completion_percentage_lt: z.number().nullable(),
+      }),
+      resolvedUser: z.object({
+        id: z.string(),
+        email: z.string().nullable(),
+        full_name: z.string().nullable(),
+      }).nullable(),
+      projects: z.array(z.object({
+        id: z.string(),
+        name: z.string().nullable(),
+        status: z.string().nullable(),
+        domain: z.string().nullable(),
+        ga4_property_id: z.string().nullable(),
+        completion_percentage: z.number().nullable(),
+        created_at: z.string().nullable(),
+        updated_at: z.string().nullable(),
+        created_by: z.string().nullable(),
+        client: z.object({
+          id: z.string(),
+          email: z.string().nullable(),
+          full_name: z.string().nullable(),
+          phone: z.string().nullable(),
+        }).nullable(),
+      })),
+    }),
+  }, async ({ userIdentifier, status, completion_percentage_lt }) => {
+    try {
+      const resolvedUser = userIdentifier ? await resolveUserFromInput(userIdentifier) : null;
+      const result = await listProjects({
+        userId: resolvedUser?.id,
+        status,
+        completionPercentageLt: completion_percentage_lt,
+      });
+
+      return asToolResult({
+        ...result,
+        resolvedUser: resolvedUser
+          ? {
+              id: resolvedUser.id,
+              email: resolvedUser.email,
+              full_name: resolvedUser.full_name,
+            }
+          : null,
       });
     } catch (error) {
       return asToolError(error);

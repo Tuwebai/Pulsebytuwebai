@@ -15,6 +15,15 @@ type ProjectUpdates = {
   ga4_property_id?: string;
 };
 
+type ProjectCreateInput = {
+  userIdentifier: string;
+  name: string;
+  status?: string;
+  completion_percentage?: number;
+  domain?: string;
+  ga4_property_id?: string;
+};
+
 async function resolveProjectFromActionInput(input: ProjectMutationInput) {
   if (input.projectIdentifier?.trim()) {
     return resolveProjectIdentifier(input.projectIdentifier);
@@ -61,6 +70,74 @@ function sanitizeProjectUpdates(input: ProjectUpdates) {
   }
 
   return updates;
+}
+
+function sanitizeProjectCreateInput(input: ProjectCreateInput) {
+  const name = input.name.trim();
+
+  if (!name) {
+    throw new Error('Necesitamos el nombre del proyecto para crearlo.');
+  }
+
+  const payload: {
+    created_by: string;
+    name: string;
+    status?: string;
+    completion_percentage?: number;
+    domain?: string;
+    ga4_property_id?: string;
+  } = {
+    created_by: input.userIdentifier,
+    name,
+  };
+
+  if (typeof input.status === 'string' && input.status.trim()) {
+    payload.status = input.status.trim();
+  }
+
+  if (typeof input.domain === 'string') {
+    payload.domain = input.domain.trim();
+  }
+
+  if (typeof input.ga4_property_id === 'string') {
+    payload.ga4_property_id = input.ga4_property_id.trim();
+  }
+
+  if (typeof input.completion_percentage === 'number' && Number.isFinite(input.completion_percentage)) {
+    payload.completion_percentage = Math.max(0, Math.min(100, Math.round(input.completion_percentage)));
+  }
+
+  return payload;
+}
+
+export async function createProject(input: ProjectCreateInput) {
+  const user = await resolveUserIdentifier(input.userIdentifier);
+  const projectInsert = sanitizeProjectCreateInput({
+    userIdentifier: user.id,
+    name: input.name,
+    status: input.status,
+    completion_percentage: input.completion_percentage,
+    domain: input.domain,
+    ga4_property_id: input.ga4_property_id,
+  });
+
+  const { data: createdProject, error } = await supabase
+    .from('projects')
+    .insert(projectInsert)
+    .select('id, name, status, domain, ga4_property_id, completion_percentage, created_at, updated_at, created_by')
+    .single();
+
+  if (error) throw error;
+
+  return {
+    resolvedUser: {
+      id: user.id,
+      email: user.email,
+      full_name: user.full_name,
+      phone: user.phone,
+    },
+    project: createdProject,
+  };
 }
 
 export async function updateProjectDetails(input: ProjectMutationInput & ProjectUpdates) {

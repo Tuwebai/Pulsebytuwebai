@@ -106,7 +106,6 @@ docs/*
 docsproyecto/*
 planes/*
 *.md
-!/README.md
 scripts/*
 *.sql
 SQL/*

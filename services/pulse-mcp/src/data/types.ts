@@ -5,6 +5,7 @@ export interface ProjectRow {
   domain: string | null;
   ga4_property_id: string | null;
   completion_percentage: number | null;
+  created_at?: string | null;
   updated_at: string | null;
   created_by?: string | null;
 }

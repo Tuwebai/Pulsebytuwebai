@@ -1,11 +1,11 @@
 export { fetchClientOverview } from './data/client-overview.js';
 export { createClientAccount, enableClientAccess, updateClientProfile } from './data/action-client.js';
 export { createUserNotification } from './data/action-notifications.js';
-export { assignProjectGa4, updateProjectDetails } from './data/action-project.js';
+export { assignProjectGa4, createProject, updateProjectDetails } from './data/action-project.js';
 export { fetchDashboardSummary } from './data/dashboard.js';
 export { fetchPulseMetrics } from './data/metrics.js';
 export { fetchNotifications } from './data/notifications.js';
-export { fetchLatestProjectForUser, fetchProjectSummary, resolveProjectIdentifier } from './data/projects.js';
+export { fetchLatestProjectForUser, fetchProjectSummary, listProjects, resolveProjectIdentifier } from './data/projects.js';
 export { fetchSupportTickets } from './data/support.js';
 export { listClients, searchEntities } from './data/user-search.js';
 export { fetchUserById, resolveUserIdentifier } from './data/users.js';

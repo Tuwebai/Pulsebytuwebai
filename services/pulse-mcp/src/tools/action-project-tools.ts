@@ -1,7 +1,7 @@
 import * as z from 'zod/v4';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
-import { assignProjectGa4, fetchLatestProjectForUser, updateProjectDetails } from '../pulse-data.js';
+import { assignProjectGa4, createProject, fetchLatestProjectForUser, updateProjectDetails } from '../pulse-data.js';
 import { asConfirmationResult, asToolError, asToolResult, assertMutationsEnabled, resolveProjectFromInput, resolveUserFromInput } from './shared.js';
 
 async function resolveProjectPreview(projectIdentifier?: string, userIdentifier?: string) {
@@ -25,6 +25,64 @@ async function resolveProjectPreview(projectIdentifier?: string, userIdentifier?
 }
 
 export function registerProjectActionTools(server: McpServer) {
+  server.registerTool('create_project', {
+    title: 'Crear proyecto',
+    description: 'Crea un proyecto real de Pulse asociado a un cliente existente usando UUID, email, nombre o telefono.',
+    inputSchema: {
+      userIdentifier: z.string().min(1),
+      name: z.string().min(1),
+      status: z.string().min(1).optional(),
+      completion_percentage: z.number().int().min(0).max(100).optional(),
+      domain: z.string().min(1).optional(),
+      ga4_property_id: z.string().min(1).optional(),
+      confirm: z.boolean().default(false),
+    },
+    outputSchema: z.object({
+      executed: z.boolean(),
+      requires_confirmation: z.boolean().optional(),
+      message: z.string(),
+      preview: z.unknown().optional(),
+      result: z.unknown().optional(),
+    }),
+  }, async ({ userIdentifier, name, status, completion_percentage, domain, ga4_property_id, confirm }) => {
+    try {
+      assertMutationsEnabled();
+      const resolvedUser = await resolveUserFromInput(userIdentifier);
+
+      if (!confirm) {
+        return asConfirmationResult('Esta accion va a crear un proyecto real de Pulse. Reintentá con confirm=true para ejecutarla.', {
+          resolvedUser: {
+            id: resolvedUser.id,
+            email: resolvedUser.email,
+            full_name: resolvedUser.full_name,
+          },
+          projectDraft: {
+            name,
+            status: status ?? null,
+            completion_percentage: completion_percentage ?? null,
+            domain: domain ?? null,
+            ga4_property_id: ga4_property_id ?? null,
+          },
+        });
+      }
+
+      return asToolResult({
+        executed: true,
+        message: 'Proyecto creado en Pulse.',
+        result: await createProject({
+          userIdentifier: resolvedUser.id,
+          name,
+          status,
+          completion_percentage,
+          domain,
+          ga4_property_id,
+        }),
+      });
+    } catch (error) {
+      return asToolError(error);
+    }
+  });
+
   server.registerTool('update_project', {
     title: 'Actualizar proyecto',
     description: 'Actualiza nombre, estado, progreso, dominio o GA4 de un proyecto real de Pulse.',

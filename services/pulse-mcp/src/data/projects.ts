@@ -1,9 +1,27 @@
 import { supabase } from './client.js';
 import { normalizeDomain, normalizeIdentifier, looksLikeUuid } from './identifiers.js';
 import { fetchProjectMetricSummary } from './metrics.js';
-import type { ProjectRow } from './types.js';
+import type { ProjectRow, UserRow } from './types.js';
 
 const PROJECT_SELECT = 'id, name, status, domain, ga4_property_id, completion_percentage, updated_at, created_by';
+const PROJECT_LIST_SELECT = 'id, name, status, domain, ga4_property_id, completion_percentage, created_at, updated_at, created_by';
+
+async function fetchProjectClients(userIds: string[]) {
+  if (userIds.length === 0) {
+    return new Map<string, UserRow>();
+  }
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, email, full_name, phone')
+    .in('id', userIds);
+
+  if (error) throw error;
+
+  return new Map(
+    ((data ?? []) as UserRow[]).map((user) => [user.id, user]),
+  );
+}
 
 export async function resolveProjectIdentifier(projectIdentifier: string) {
   const identifier = normalizeIdentifier(projectIdentifier);
@@ -86,5 +104,69 @@ export async function fetchProjectSummary(projectId: string) {
   return {
     project: project as ProjectRow,
     ...metricSummary,
+  };
+}
+
+export async function listProjects(filters: {
+  userId?: string;
+  status?: string;
+  completionPercentageLt?: number;
+}) {
+  let query = supabase
+    .from('projects')
+    .select(PROJECT_LIST_SELECT)
+    .order('updated_at', { ascending: false });
+
+  if (filters.userId) {
+    query = query.eq('created_by', filters.userId);
+  }
+
+  if (filters.status?.trim()) {
+    query = query.eq('status', filters.status.trim());
+  }
+
+  if (typeof filters.completionPercentageLt === 'number') {
+    query = query.lt('completion_percentage', filters.completionPercentageLt);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+
+  const projects = (data ?? []) as ProjectRow[];
+  const clientsById = await fetchProjectClients(
+    projects
+      .map((project) => project.created_by)
+      .filter((value): value is string => typeof value === 'string' && value.length > 0),
+  );
+
+  return {
+    filters: {
+      userId: filters.userId ?? null,
+      status: filters.status?.trim() || null,
+      completion_percentage_lt: typeof filters.completionPercentageLt === 'number' ? filters.completionPercentageLt : null,
+    },
+    projects: projects.map((project) => {
+      const client = project.created_by ? clientsById.get(project.created_by) ?? null : null;
+
+      return {
+        id: project.id,
+        name: project.name,
+        status: project.status,
+        domain: project.domain,
+        ga4_property_id: project.ga4_property_id ?? null,
+        completion_percentage: project.completion_percentage ?? null,
+        created_at: project.created_at ?? null,
+        updated_at: project.updated_at ?? null,
+        created_by: project.created_by ?? null,
+        client: client
+          ? {
+              id: client.id,
+              email: client.email,
+              full_name: client.full_name,
+              phone: client.phone,
+            }
+          : null,
+      };
+    }),
   };
 }
