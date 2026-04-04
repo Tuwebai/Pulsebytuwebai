@@ -36,6 +36,34 @@ function normalizeTicketPriority(priority?: string) {
   throw new Error('La prioridad del ticket debe ser baja, media, alta, low, medium o high.');
 }
 
+async function appendTicketMessage(input: {
+  ticketId: string;
+  senderId: string;
+  senderRole: 'admin' | 'client';
+  content: string;
+}) {
+  const content = input.content.trim();
+
+  if (!content) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('ticket_messages')
+    .insert({
+      ticket_id: input.ticketId,
+      sender_id: input.senderId,
+      sender_role: input.senderRole,
+      content,
+    })
+    .select('id, ticket_id, sender_id, sender_role, content, created_at')
+    .single();
+
+  if (error) throw error;
+
+  return data;
+}
+
 export async function createTicket(input: {
   userIdentifier: string;
   title: string;
@@ -76,18 +104,12 @@ export async function createTicket(input: {
 
   if (error) throw error;
 
-  const { data: createdMessage, error: messageError } = await supabase
-    .from('ticket_messages')
-    .insert({
-      ticket_id: createdTicket.id,
-      sender_id: user.id,
-      sender_role: 'client',
-      content: message,
-    })
-    .select('id, ticket_id, sender_id, sender_role, content, created_at')
-    .single();
-
-  if (messageError) throw messageError;
+  const createdMessage = await appendTicketMessage({
+    ticketId: createdTicket.id,
+    senderId: user.id,
+    senderRole: 'client',
+    content: message,
+  });
 
   return {
     resolvedUser: {
@@ -150,22 +172,146 @@ export async function replyToTicket(input: {
 
   if (ticketError) throw ticketError;
 
-  const { data: createdMessage, error: messageError } = await supabase
-    .from('ticket_messages')
-    .insert({
-      ticket_id: ticket.id,
-      sender_id: senderId,
-      sender_role: authorRole,
-      content: message,
-    })
-    .select('id, ticket_id, sender_id, sender_role, content, created_at')
-    .single();
-
-  if (messageError) throw messageError;
+  const createdMessage = await appendTicketMessage({
+    ticketId: ticket.id,
+    senderId,
+    senderRole: authorRole,
+    content: message,
+  });
 
   return {
     ticketBefore: ticket,
     ticketAfter: updatedTicket,
     message: createdMessage,
+  };
+}
+
+export async function closeTicket(input: {
+  ticketIdentifier: string;
+  operatorUserId?: string;
+  resolutionNote?: string;
+}) {
+  const ticket = await resolveTicketIdentifier(input.ticketIdentifier);
+
+  if (ticket.estado === 'cerrado') {
+    throw new Error('El ticket ya esta cerrado en Pulse.');
+  }
+
+  const operatorUserId = requireOperatorUserId(input.operatorUserId);
+  const closedAt = new Date().toISOString();
+  const resolutionNote = input.resolutionNote?.trim() || null;
+  const { data: updatedTicket, error } = await supabase
+    .from('tickets')
+    .update({
+      estado: 'cerrado',
+      status: 'closed',
+      respuesta: resolutionNote ?? ticket.mensaje ?? ticket.asunto ?? 'Ticket cerrado.',
+      respondido_por: operatorUserId,
+      fecha_respuesta: closedAt,
+      assigned_admin_id: ticket.assigned_admin_id ?? operatorUserId,
+      updated_at: closedAt,
+    })
+    .eq('id', ticket.id)
+    .select('id, asunto, mensaje, email, estado, prioridad, status, priority, user_id, assigned_admin_id, created_at, updated_at')
+    .single();
+
+  if (error) throw error;
+
+  const message = resolutionNote
+    ? await appendTicketMessage({
+        ticketId: ticket.id,
+        senderId: operatorUserId,
+        senderRole: 'admin',
+        content: resolutionNote,
+      })
+    : null;
+
+  return {
+    closed_at: closedAt,
+    ticketBefore: ticket,
+    ticketAfter: updatedTicket,
+    message,
+  };
+}
+
+export async function reopenTicket(input: {
+  ticketIdentifier: string;
+  operatorUserId?: string;
+  reason?: string;
+}) {
+  const ticket = await resolveTicketIdentifier(input.ticketIdentifier);
+
+  if (ticket.estado !== 'cerrado') {
+    throw new Error('Solo podemos reabrir tickets que ya esten cerrados en Pulse.');
+  }
+
+  const operatorUserId = requireOperatorUserId(input.operatorUserId);
+  const reopenedAt = new Date().toISOString();
+  const reason = input.reason?.trim() || null;
+  const { data: updatedTicket, error } = await supabase
+    .from('tickets')
+    .update({
+      estado: 'abierto',
+      status: 'open',
+      updated_at: reopenedAt,
+    })
+    .eq('id', ticket.id)
+    .select('id, asunto, mensaje, email, estado, prioridad, status, priority, user_id, assigned_admin_id, created_at, updated_at')
+    .single();
+
+  if (error) throw error;
+
+  const message = reason
+    ? await appendTicketMessage({
+        ticketId: ticket.id,
+        senderId: operatorUserId,
+        senderRole: 'admin',
+        content: reason,
+      })
+    : null;
+
+  return {
+    reopened_at: reopenedAt,
+    ticketBefore: ticket,
+    ticketAfter: updatedTicket,
+    message,
+  };
+}
+
+export async function assignTicket(input: {
+  ticketIdentifier: string;
+  assigneeIdentifier: string;
+}) {
+  const ticket = await resolveTicketIdentifier(input.ticketIdentifier);
+  const assignee = await resolveUserIdentifier(input.assigneeIdentifier);
+  const assigneeDetail = await fetchUserById(assignee.id);
+
+  if (assigneeDetail.role !== 'admin') {
+    throw new Error('Solo podemos asignar tickets a usuarios admin en Pulse.');
+  }
+
+  const assignedAt = new Date().toISOString();
+  const { data: updatedTicket, error } = await supabase
+    .from('tickets')
+    .update({
+      assigned_admin_id: assignee.id,
+      updated_at: assignedAt,
+    })
+    .eq('id', ticket.id)
+    .select('id, asunto, mensaje, email, estado, prioridad, status, priority, user_id, assigned_admin_id, created_at, updated_at')
+    .single();
+
+  if (error) throw error;
+
+  return {
+    assigned_at: assignedAt,
+    ticketBefore: ticket,
+    ticketAfter: updatedTicket,
+    assignee: {
+      id: assigneeDetail.id,
+      email: assigneeDetail.email,
+      full_name: assigneeDetail.full_name,
+      role: assigneeDetail.role ?? null,
+    },
   };
 }
