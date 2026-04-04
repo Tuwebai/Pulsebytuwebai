@@ -40,6 +40,7 @@ export function buildPulseBrandedEmailHtml(input: {
   <html lang="es">
     <head>
       <meta charset="utf-8" />
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Pulse by TuWebAI</title>
     </head>
@@ -83,7 +84,7 @@ export async function sendPulseEmail(input: {
     headers: {
       Accept: 'application/json',
       Authorization: `Zoho-enczapikey ${zeptoMailToken}`,
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json; charset=utf-8',
     },
     body: JSON.stringify({
       from: { address: from, name: fromName },

@@ -1,10 +1,116 @@
 import * as z from 'zod/v4';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
-import { createUserNotification, sendBrandedEmail } from '../pulse-data.js';
+import { createUserNotification, sendBillingEmail, sendBrandedEmail, sendOnboardingEmail } from '../pulse-data.js';
 import { asConfirmationResult, asToolError, asToolResult, assertMutationsEnabled, resolveUserFromInput } from './shared.js';
 
 export function registerNotificationActionTools(server: McpServer) {
+  server.registerTool('send_onboarding_email', {
+    title: 'Enviar email de onboarding Pulse',
+    description: 'Envía un email de onboarding con copy cerrado y branding Pulse a un cliente existente.',
+    inputSchema: {
+      recipientIdentifier: z.string().min(1),
+      nextStep: z.string().min(1).optional(),
+      ctaUrl: z.string().url().optional(),
+      confirm: z.boolean().default(false),
+    },
+    outputSchema: z.object({
+      executed: z.boolean(),
+      requires_confirmation: z.boolean().optional(),
+      message: z.string(),
+      preview: z.unknown().optional(),
+      result: z.unknown().optional(),
+    }),
+  }, async ({ recipientIdentifier, nextStep, ctaUrl, confirm }) => {
+    try {
+      assertMutationsEnabled();
+      const resolvedUser = await resolveUserFromInput(recipientIdentifier);
+
+      if (!confirm) {
+        return asConfirmationResult('Esta accion va a enviar un email de onboarding con branding Pulse. Reintentá con confirm=true para ejecutarla.', {
+          resolvedRecipient: {
+            id: resolvedUser.id,
+            email: resolvedUser.email,
+            full_name: resolvedUser.full_name,
+          },
+          email: {
+            variant: 'onboarding',
+            nextStep: nextStep ?? null,
+            ctaUrl: ctaUrl ?? 'https://pulse.tuweb-ai.com/dashboard',
+          },
+        });
+      }
+
+      return asToolResult({
+        executed: true,
+        message: 'Email de onboarding enviado con branding Pulse.',
+        result: await sendOnboardingEmail({
+          recipientIdentifier: resolvedUser.id,
+          nextStep,
+          ctaUrl,
+        }),
+      });
+    } catch (error) {
+      return asToolError(error);
+    }
+  });
+
+  server.registerTool('send_billing_email', {
+    title: 'Enviar email de facturacion Pulse',
+    description: 'Envía un email de facturación con branding Pulse a un cliente existente.',
+    inputSchema: {
+      recipientIdentifier: z.string().min(1),
+      summary: z.string().min(1),
+      dueDate: z.string().min(1).optional(),
+      ctaLabel: z.string().min(1).optional(),
+      ctaUrl: z.string().url().optional(),
+      confirm: z.boolean().default(false),
+    },
+    outputSchema: z.object({
+      executed: z.boolean(),
+      requires_confirmation: z.boolean().optional(),
+      message: z.string(),
+      preview: z.unknown().optional(),
+      result: z.unknown().optional(),
+    }),
+  }, async ({ recipientIdentifier, summary, dueDate, ctaLabel, ctaUrl, confirm }) => {
+    try {
+      assertMutationsEnabled();
+      const resolvedUser = await resolveUserFromInput(recipientIdentifier);
+
+      if (!confirm) {
+        return asConfirmationResult('Esta accion va a enviar un email de facturación con branding Pulse. Reintentá con confirm=true para ejecutarla.', {
+          resolvedRecipient: {
+            id: resolvedUser.id,
+            email: resolvedUser.email,
+            full_name: resolvedUser.full_name,
+          },
+          email: {
+            variant: 'billing',
+            summary,
+            dueDate: dueDate ?? null,
+            ctaLabel: ctaLabel ?? null,
+            ctaUrl: ctaUrl ?? null,
+          },
+        });
+      }
+
+      return asToolResult({
+        executed: true,
+        message: 'Email de facturación enviado con branding Pulse.',
+        result: await sendBillingEmail({
+          recipientIdentifier: resolvedUser.id,
+          summary,
+          dueDate,
+          ctaLabel,
+          ctaUrl,
+        }),
+      });
+    } catch (error) {
+      return asToolError(error);
+    }
+  });
+
   server.registerTool('send_branded_email', {
     title: 'Enviar email con branding Pulse',
     description: 'Envia un email a un cliente existente usando email, nombre, telefono o UUID, con plantilla visual de Pulse by TuWebAI.',
