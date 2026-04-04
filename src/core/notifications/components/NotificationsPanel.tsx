@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import { flushSync } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { PulseLogo } from '@/core/components';
 import { useApp } from '@/contexts/AppContext';
@@ -33,7 +34,9 @@ export function NotificationsPanel({ open, onClose }: NotificationsPanelProps) {
       markRead(notification.id);
     }
 
-    onClose();
+    flushSync(() => {
+      onClose();
+    });
 
     if (notification.category === 'ticket' && ticketId) {
       storeSupportChatIntent({
