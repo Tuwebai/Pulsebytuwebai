@@ -14,17 +14,19 @@ interface PushSubscriptionScope {
 }
 
 export async function fetchActivePushSubscription(scope: PushSubscriptionScope) {
-  if (!scope.endpoint) {
-    return null;
-  }
-
-  const { data, error } = await supabase
+  let query = supabase
     .from('push_subscriptions')
     .select('endpoint')
     .eq('user_id', scope.userId)
-    .eq('endpoint', scope.endpoint)
-    .eq('is_active', true)
-    .maybeSingle();
+    .eq('is_active', true);
+
+  if (scope.endpoint) {
+    query = query.eq('endpoint', scope.endpoint);
+  } else {
+    query = query.order('updated_at', { ascending: false }).limit(1);
+  }
+
+  const { data, error } = await query.maybeSingle();
 
   if (error) {
     throw new Error(error.message || 'No pudimos leer la configuracion push de este dispositivo.');

@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { Notification } from '@/data/types/notifications';
 import { supabase } from '@/lib/supabase/supabase';
 import { showForegroundNotification } from '../services/browserNotifications.service';
+import { notificationQueryKeys } from './notificationQueryKeys';
 
 interface RealtimeNotificationRow {
   action_url?: string | null;
@@ -18,9 +19,6 @@ interface RealtimeNotificationRow {
   updated_at?: string | null;
   user_id?: string | null;
 }
-
-const NOTIFICATIONS_QUERY_KEY = ['notifications'] as const;
-const NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY = ['notifications-unread-count'] as const;
 
 function normalizeRealtimeType(type: string | null | undefined): Notification['type'] {
   if (type === 'success' || type === 'warning' || type === 'error' || type === 'critical') {
@@ -84,11 +82,11 @@ export function useNotificationsRealtime(userId: string | null) {
             const insertedNotification = mapRealtimeNotification(payload.new as RealtimeNotificationRow);
 
             void showForegroundNotification(payload.new as RealtimeNotificationRow);
-            queryClient.setQueryData<Notification[]>(NOTIFICATIONS_QUERY_KEY, (current = []) => {
+            queryClient.setQueryData<Notification[]>(notificationQueryKeys.list(userId), (current = []) => {
               const withoutDuplicate = current.filter((notification) => notification.id !== insertedNotification.id);
               return [insertedNotification, ...withoutDuplicate].slice(0, 20);
             });
-            queryClient.setQueryData<number>(NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY, (current = 0) =>
+            queryClient.setQueryData<number>(notificationQueryKeys.unreadCount(userId), (current = 0) =>
               insertedNotification.is_read ? current : current + 1,
             );
             return;
@@ -97,12 +95,12 @@ export function useNotificationsRealtime(userId: string | null) {
           if (payload.eventType === 'UPDATE' && payload.new) {
             const updatedNotification = mapRealtimeNotification(payload.new as RealtimeNotificationRow);
 
-            queryClient.setQueryData<Notification[]>(NOTIFICATIONS_QUERY_KEY, (current = []) =>
+            queryClient.setQueryData<Notification[]>(notificationQueryKeys.list(userId), (current = []) =>
               current.map((notification) =>
                 notification.id === updatedNotification.id ? { ...notification, ...updatedNotification } : notification,
               ),
             );
-            queryClient.setQueryData<number>(NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY, (current = 0) => {
+            queryClient.setQueryData<number>(notificationQueryKeys.unreadCount(userId), (current = 0) => {
               const previousNotification = (payload.old as RealtimeNotificationRow | null) ?? null;
               const wasUnread = previousNotification?.is_read === false;
               const isUnread = updatedNotification.is_read === false;
@@ -116,8 +114,8 @@ export function useNotificationsRealtime(userId: string | null) {
             return;
           }
 
-          void queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
-          void queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY });
+          void queryClient.invalidateQueries({ queryKey: notificationQueryKeys.list(userId) });
+          void queryClient.invalidateQueries({ queryKey: notificationQueryKeys.unreadCount(userId) });
         }
       )
       .subscribe();

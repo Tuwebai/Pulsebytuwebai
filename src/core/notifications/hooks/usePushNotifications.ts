@@ -7,12 +7,15 @@ import {
 } from '@/api/notifications/pushSubscriptionsApi';
 import type { PushSubscriptionStatus } from '@/data/types/notifications';
 import {
+  clearStoredPushEndpoint,
   getBrowserPushSubscription,
   getPushPermissionState,
   getStoredPushEndpoint,
+  persistPushEndpoint,
   subscribeBrowserPush,
   unsubscribeBrowserPush,
 } from '@/core/notifications/services/pushNotifications.service';
+import { notificationQueryKeys } from './notificationQueryKeys';
 
 async function readPushStatus(userId: string): Promise<PushSubscriptionStatus> {
   const permission = getPushPermissionState();
@@ -27,14 +30,11 @@ async function readPushStatus(userId: string): Promise<PushSubscriptionStatus> {
   }
 
   const browserSubscription = await getBrowserPushSubscription();
-  const browserEndpoint = browserSubscription?.endpoint ?? getStoredPushEndpoint();
-  const dbEndpoint = await fetchActivePushSubscription({ endpoint: browserEndpoint, userId });
-
-  if (!browserSubscription?.endpoint && dbEndpoint) {
-    await deactivatePushSubscription({ endpoint: dbEndpoint, userId });
-  }
-
-  const endpoint = browserSubscription?.endpoint ?? null;
+  const browserEndpoint = browserSubscription?.endpoint ?? getStoredPushEndpoint(userId);
+  const dbEndpoint =
+    (await fetchActivePushSubscription({ endpoint: browserEndpoint, userId })) ??
+    (browserEndpoint ? await fetchActivePushSubscription({ userId }) : null);
+  const endpoint = browserSubscription?.endpoint ?? dbEndpoint ?? null;
 
   if (browserSubscription?.endpoint) {
     const keys = browserSubscription.toJSON().keys;
@@ -47,6 +47,7 @@ async function readPushStatus(userId: string): Promise<PushSubscriptionStatus> {
         userId,
         userAgent: navigator.userAgent,
       });
+      persistPushEndpoint(browserSubscription.endpoint, userId);
     }
   }
 
@@ -61,7 +62,7 @@ async function readPushStatus(userId: string): Promise<PushSubscriptionStatus> {
 export function usePushNotifications() {
   const { user } = useApp();
   const queryClient = useQueryClient();
-  const queryKey = ['push-notifications-status', user?.id ?? 'anon'];
+  const queryKey = notificationQueryKeys.pushStatus(user?.id ?? null);
   const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
 
   const status = useQuery({
@@ -77,7 +78,7 @@ export function usePushNotifications() {
         throw new Error('PUSH_AUTH_REQUIRED');
       }
 
-      const subscription = await subscribeBrowserPush();
+      const subscription = await subscribeBrowserPush(user.id);
       const keys = subscription.toJSON().keys;
 
       if (!keys?.p256dh || !keys.auth) {
@@ -91,6 +92,7 @@ export function usePushNotifications() {
         userId: user.id,
         userAgent,
       });
+      persistPushEndpoint(subscription.endpoint, user.id);
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey });
@@ -104,6 +106,7 @@ export function usePushNotifications() {
       }
 
       const endpoint = await unsubscribeBrowserPush();
+      clearStoredPushEndpoint(user.id);
 
       await deactivatePushSubscription({
         endpoint: endpoint || status.data?.endpoint || null,

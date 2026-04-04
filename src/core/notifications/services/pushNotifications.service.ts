@@ -1,6 +1,8 @@
 import { serviceWorkerManager } from '@/utils/serviceWorker';
 
-const PUSH_ENDPOINT_STORAGE_KEY = 'pulse:push:endpoint';
+function getPushEndpointStorageKey(userId?: string | null) {
+  return `pulse:push:endpoint:${userId ?? 'anon'}`;
+}
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -25,25 +27,27 @@ function getBrowserSupport() {
   );
 }
 
-function setStoredPushEndpoint(endpoint: string | null) {
+function setStoredPushEndpoint(endpoint: string | null, userId?: string | null) {
   if (typeof window === 'undefined') {
     return;
   }
 
+  const storageKey = getPushEndpointStorageKey(userId);
+
   if (!endpoint) {
-    window.localStorage.removeItem(PUSH_ENDPOINT_STORAGE_KEY);
+    window.localStorage.removeItem(storageKey);
     return;
   }
 
-  window.localStorage.setItem(PUSH_ENDPOINT_STORAGE_KEY, endpoint);
+  window.localStorage.setItem(storageKey, endpoint);
 }
 
-export function getStoredPushEndpoint() {
+export function getStoredPushEndpoint(userId?: string | null) {
   if (typeof window === 'undefined') {
     return null;
   }
 
-  return window.localStorage.getItem(PUSH_ENDPOINT_STORAGE_KEY);
+  return window.localStorage.getItem(getPushEndpointStorageKey(userId));
 }
 
 async function getReadyRegistration() {
@@ -109,12 +113,10 @@ export async function getBrowserPushSubscription() {
   }
 
   const registration = await getReadyRegistration();
-  const subscription = await registration.pushManager.getSubscription();
-  setStoredPushEndpoint(subscription?.endpoint ?? null);
-  return subscription;
+  return registration.pushManager.getSubscription();
 }
 
-export async function subscribeBrowserPush() {
+export async function subscribeBrowserPush(userId?: string | null) {
   const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY;
 
   if (!getBrowserSupport()) {
@@ -140,7 +142,7 @@ export async function subscribeBrowserPush() {
 
   try {
     const subscription = await subscribeWithRegistration(VAPID_PUBLIC_KEY);
-    setStoredPushEndpoint(subscription.endpoint);
+    setStoredPushEndpoint(subscription.endpoint, userId);
     return subscription;
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
@@ -149,7 +151,7 @@ export async function subscribeBrowserPush() {
 
       try {
         const subscription = await subscribeWithRegistration(VAPID_PUBLIC_KEY);
-        setStoredPushEndpoint(subscription.endpoint);
+        setStoredPushEndpoint(subscription.endpoint, userId);
         return subscription;
       } catch (retryError) {
         if (retryError instanceof DOMException && retryError.name === 'AbortError') {
@@ -172,12 +174,17 @@ export async function unsubscribeBrowserPush() {
   const existingSubscription = await getBrowserPushSubscription();
 
   if (!existingSubscription) {
-    const storedEndpoint = getStoredPushEndpoint();
-    setStoredPushEndpoint(null);
-    return storedEndpoint;
+    return null;
   }
 
   await existingSubscription.unsubscribe();
-  setStoredPushEndpoint(null);
   return existingSubscription.endpoint;
+}
+
+export function persistPushEndpoint(endpoint: string | null, userId?: string | null) {
+  setStoredPushEndpoint(endpoint, userId);
+}
+
+export function clearStoredPushEndpoint(userId?: string | null) {
+  setStoredPushEndpoint(null, userId);
 }

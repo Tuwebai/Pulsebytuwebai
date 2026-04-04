@@ -1,61 +1,69 @@
 import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useApp } from '@/contexts/AppContext';
 import { fetchNotifications, fetchUnreadCount, markAllAsRead, markAsRead } from '@/api/notifications/notificationsApi';
 import type { Notification } from '@/data/types/notifications';
 import { groupNotificationsByDay } from '../services/notifications.service';
-
-const NOTIFICATIONS_QUERY_KEY = ['notifications'] as const;
-const NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY = ['notifications-unread-count'] as const;
+import { notificationQueryKeys } from './notificationQueryKeys';
 
 interface NotificationsSnapshot {
   notifications: Notification[];
   unreadCount: number;
 }
 
-function readNotificationsSnapshot(queryClient: ReturnType<typeof useQueryClient>): NotificationsSnapshot {
+function readNotificationsSnapshot(
+  queryClient: ReturnType<typeof useQueryClient>,
+  userId: string | null,
+): NotificationsSnapshot {
   return {
-    notifications: queryClient.getQueryData<Notification[]>(NOTIFICATIONS_QUERY_KEY) ?? [],
-    unreadCount: queryClient.getQueryData<number>(NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY) ?? 0
+    notifications: queryClient.getQueryData<Notification[]>(notificationQueryKeys.list(userId)) ?? [],
+    unreadCount: queryClient.getQueryData<number>(notificationQueryKeys.unreadCount(userId)) ?? 0
   };
 }
 
 function writeNotificationsSnapshot(
   queryClient: ReturnType<typeof useQueryClient>,
+  userId: string | null,
   snapshot: NotificationsSnapshot,
 ) {
-  queryClient.setQueryData(NOTIFICATIONS_QUERY_KEY, snapshot.notifications);
-  queryClient.setQueryData(NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY, snapshot.unreadCount);
+  queryClient.setQueryData(notificationQueryKeys.list(userId), snapshot.notifications);
+  queryClient.setQueryData(notificationQueryKeys.unreadCount(userId), snapshot.unreadCount);
 }
 
 export function useNotifications() {
+  const { user } = useApp();
   const queryClient = useQueryClient();
+  const notificationsQueryKey = notificationQueryKeys.list(user?.id ?? null);
+  const unreadCountQueryKey = notificationQueryKeys.unreadCount(user?.id ?? null);
 
   const { data: notifications, isLoading } = useQuery({
-    queryKey: NOTIFICATIONS_QUERY_KEY,
+    queryKey: notificationsQueryKey,
     queryFn: () => fetchNotifications(20),
+    enabled: Boolean(user?.id),
     staleTime: 1000 * 60 * 5
   });
 
   const { data: unreadCount } = useQuery({
-    queryKey: NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY,
+    queryKey: unreadCountQueryKey,
     queryFn: fetchUnreadCount,
+    enabled: Boolean(user?.id),
     staleTime: 1000 * 30
   });
 
   const markRead = useMutation({
     mutationFn: markAsRead,
     onMutate: async (notificationId) => {
-      await queryClient.cancelQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
-      await queryClient.cancelQueries({ queryKey: NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY });
+      await queryClient.cancelQueries({ queryKey: notificationsQueryKey });
+      await queryClient.cancelQueries({ queryKey: unreadCountQueryKey });
 
-      const previous = readNotificationsSnapshot(queryClient);
+      const previous = readNotificationsSnapshot(queryClient, user?.id ?? null);
       const target = previous.notifications.find((notification) => notification.id === notificationId);
 
       if (!target || target.is_read) {
         return { previous };
       }
 
-      writeNotificationsSnapshot(queryClient, {
+      writeNotificationsSnapshot(queryClient, user?.id ?? null, {
         notifications: previous.notifications.map((notification) =>
           notification.id === notificationId ? { ...notification, is_read: true } : notification,
         ),
@@ -66,29 +74,29 @@ export function useNotifications() {
     },
     onError: (_error, _variables, context) => {
       if (context?.previous) {
-        writeNotificationsSnapshot(queryClient, context.previous);
+        writeNotificationsSnapshot(queryClient, user?.id ?? null, context.previous);
       }
     },
     onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
-      void queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY });
+      void queryClient.invalidateQueries({ queryKey: notificationsQueryKey });
+      void queryClient.invalidateQueries({ queryKey: unreadCountQueryKey });
     }
   });
 
   const markAllRead = useMutation({
     mutationFn: markAllAsRead,
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
-      await queryClient.cancelQueries({ queryKey: NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY });
+      await queryClient.cancelQueries({ queryKey: notificationsQueryKey });
+      await queryClient.cancelQueries({ queryKey: unreadCountQueryKey });
 
-      const previous = readNotificationsSnapshot(queryClient);
+      const previous = readNotificationsSnapshot(queryClient, user?.id ?? null);
       const hasUnread = previous.notifications.some((notification) => !notification.is_read);
 
       if (!hasUnread && previous.unreadCount === 0) {
         return { previous };
       }
 
-      writeNotificationsSnapshot(queryClient, {
+      writeNotificationsSnapshot(queryClient, user?.id ?? null, {
         notifications: previous.notifications.map((notification) =>
           notification.is_read ? notification : { ...notification, is_read: true },
         ),
@@ -99,12 +107,12 @@ export function useNotifications() {
     },
     onError: (_error, _variables, context) => {
       if (context?.previous) {
-        writeNotificationsSnapshot(queryClient, context.previous);
+        writeNotificationsSnapshot(queryClient, user?.id ?? null, context.previous);
       }
     },
     onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
-      void queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_UNREAD_COUNT_QUERY_KEY });
+      void queryClient.invalidateQueries({ queryKey: notificationsQueryKey });
+      void queryClient.invalidateQueries({ queryKey: unreadCountQueryKey });
     }
   });
 
