@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { Notification } from '@/data/types/notifications';
+import { playPulseNotificationSound } from '@/lib/audio/notificationSound';
 import { supabase } from '@/lib/supabase/supabase';
 import { showForegroundNotification } from '../services/browserNotifications.service';
 import { notificationQueryKeys } from './notificationQueryKeys';
@@ -59,6 +60,10 @@ function mapRealtimeNotification(row: RealtimeNotificationRow): Notification {
   };
 }
 
+function shouldPlayRealtimeNotificationSound() {
+  return typeof document !== 'undefined' && document.visibilityState === 'visible';
+}
+
 export function useNotificationsRealtime(userId: string | null) {
   const queryClient = useQueryClient();
 
@@ -80,6 +85,10 @@ export function useNotificationsRealtime(userId: string | null) {
         (payload) => {
           if (payload.eventType === 'INSERT' && payload.new) {
             const insertedNotification = mapRealtimeNotification(payload.new as RealtimeNotificationRow);
+
+            if (shouldPlayRealtimeNotificationSound()) {
+              playPulseNotificationSound();
+            }
 
             void showForegroundNotification(payload.new as RealtimeNotificationRow);
             queryClient.setQueryData<Notification[]>(notificationQueryKeys.list(userId), (current = []) => {
