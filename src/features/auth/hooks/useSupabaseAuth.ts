@@ -11,6 +11,22 @@ export function useSupabaseAuth() {
 
   useEffect(() => {
     let unsubscribe = () => undefined;
+    let isMounted = true;
+
+    const applyRecoveredSession = async () => {
+      const {
+        data: { session: recoveredSession },
+      } = await authService.getSession();
+
+      if (!isMounted || !recoveredSession) {
+        return false;
+      }
+
+      setSession(recoveredSession);
+      setUser(recoveredSession.user);
+      setLoading(false);
+      return true;
+    };
 
     const getInitialSession = async () => {
       try {
@@ -47,15 +63,8 @@ export function useSupabaseAuth() {
       const {
         data: { subscription },
       } = authService.onAuthStateChange(async (event, nextSession) => {
-        if (!nextSession && event === 'SIGNED_OUT') {
-          const recoveredSession = await authService.recoverSession();
-
-          if (recoveredSession) {
-            setSession(recoveredSession);
-            setUser(recoveredSession.user);
-            setLoading(false);
-            return;
-          }
+        if (!nextSession && (await applyRecoveredSession())) {
+          return;
         }
 
         setSession(nextSession);
@@ -71,8 +80,27 @@ export function useSupabaseAuth() {
       setLoading(false);
     }
 
+    const reconcileSession = () => {
+      void applyRecoveredSession().catch(() => undefined);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', reconcileSession);
+      window.addEventListener('online', reconcileSession);
+      window.addEventListener('storage', reconcileSession);
+      document.addEventListener('visibilitychange', reconcileSession);
+    }
+
     return () => {
+      isMounted = false;
       unsubscribe();
+
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', reconcileSession);
+        window.removeEventListener('online', reconcileSession);
+        window.removeEventListener('storage', reconcileSession);
+        document.removeEventListener('visibilitychange', reconcileSession);
+      }
     };
   }, []);
 
