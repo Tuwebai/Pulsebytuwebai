@@ -31,6 +31,23 @@ function notifyClientsToPlayPushSound(payload) {
   });
 }
 
+function normalizeNotificationTarget(rawUrl) {
+  try {
+    const nextUrl = new URL(rawUrl || '/dashboard', self.location.origin);
+    const isLocalHost = nextUrl.hostname === 'localhost' || nextUrl.hostname === '127.0.0.1';
+    const currentHostIsLocal = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+
+    if (isLocalHost && !currentHostIsLocal) {
+      nextUrl.protocol = self.location.protocol;
+      nextUrl.host = self.location.host;
+    }
+
+    return nextUrl;
+  } catch {
+    return new URL('/dashboard', self.location.origin);
+  }
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
 });
@@ -76,7 +93,7 @@ self.addEventListener('notificationclick', (event) => {
 
   const notificationUrl = event.notification.data?.url || '/dashboard';
   const ticketId = event.notification.data?.ticketId || null;
-  const url = new URL(notificationUrl, self.location.origin);
+  const url = normalizeNotificationTarget(notificationUrl);
 
   if (ticketId) {
     url.searchParams.set('ticket', ticketId);

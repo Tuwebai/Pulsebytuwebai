@@ -28,12 +28,34 @@ export function createSupabaseAdminClient() {
   });
 }
 
+function normalizePublicAppUrl(rawUrl: string) {
+  const fallbackUrl = 'https://pulse.tuweb-ai.com';
+
+  if (!rawUrl) {
+    return fallbackUrl;
+  }
+
+  try {
+    const parsedUrl = new URL(rawUrl);
+    const isLocalHost = parsedUrl.hostname === 'localhost' || parsedUrl.hostname === '127.0.0.1';
+    const environment = Deno.env.get('DENO_DEPLOYMENT_ID') ? 'production' : Deno.env.get('NODE_ENV') || 'production';
+
+    if (environment === 'production' && isLocalHost) {
+      return fallbackUrl;
+    }
+
+    return parsedUrl.origin.replace(/\/$/, '');
+  } catch {
+    return fallbackUrl;
+  }
+}
+
 export function getPushConfig() {
   const publicKey = Deno.env.get('VAPID_PUBLIC_KEY') || '';
   const privateKey = Deno.env.get('VAPID_PRIVATE_KEY') || '';
   const subject = Deno.env.get('VAPID_SUBJECT') || '';
   const dispatchSecret = Deno.env.get('PUSH_DISPATCH_SECRET') || '';
-  const appUrl = (Deno.env.get('PULSE_PUBLIC_URL') || Deno.env.get('VITE_PUBLIC_URL') || 'https://pulse.tuweb-ai.com').replace(/\/$/, '');
+  const appUrl = normalizePublicAppUrl(Deno.env.get('PULSE_PUBLIC_URL') || Deno.env.get('VITE_PUBLIC_URL') || '');
 
   if (!publicKey || !privateKey || !subject || !dispatchSecret) {
     throw new Error('PUSH_CONFIG_MISSING');

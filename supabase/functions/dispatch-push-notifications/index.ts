@@ -2,6 +2,29 @@ import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import webpush from 'npm:web-push@3.6.7';
 import { corsHeaders, createSupabaseAdminClient, getPushConfig, jsonResponse } from './shared.ts';
 
+function resolveNotificationUrl(actionUrl: string | null | undefined, appUrl: string) {
+  const fallbackUrl = `${appUrl}/dashboard`;
+
+  if (!actionUrl) {
+    return fallbackUrl;
+  }
+
+  try {
+    const parsedUrl = new URL(actionUrl, appUrl);
+    const isLocalHost = parsedUrl.hostname === 'localhost' || parsedUrl.hostname === '127.0.0.1';
+
+    if (isLocalHost) {
+      const appOrigin = new URL(appUrl);
+      parsedUrl.protocol = appOrigin.protocol;
+      parsedUrl.host = appOrigin.host;
+    }
+
+    return parsedUrl.toString();
+  } catch {
+    return fallbackUrl;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 200, headers: corsHeaders });
@@ -47,9 +70,7 @@ serve(async (req) => {
 
     webpush.setVapidDetails(config.subject, config.publicKey, config.privateKey);
 
-    const url = notification.action_url?.startsWith('http')
-      ? notification.action_url
-      : `${config.appUrl}${notification.action_url || '/dashboard'}`;
+    const url = resolveNotificationUrl(notification.action_url, config.appUrl);
     const metadata =
       notification.metadata && typeof notification.metadata === 'object'
         ? (notification.metadata as Record<string, unknown>)
