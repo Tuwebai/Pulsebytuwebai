@@ -29,6 +29,12 @@ export function NotificationsPanel({ open, onClose }: NotificationsPanelProps) {
   const handleSelect = (notification: Notification) => {
     const ticketId = typeof notification.metadata?.ticket_id === 'string' ? notification.metadata.ticket_id : null;
 
+    if (!notification.is_read) {
+      markRead(notification.id);
+    }
+
+    onClose();
+
     if (notification.category === 'ticket' && ticketId) {
       storeSupportChatIntent({
         scope: user?.role === 'admin' ? 'admin' : 'client',
@@ -37,19 +43,12 @@ export function NotificationsPanel({ open, onClose }: NotificationsPanelProps) {
       });
 
       navigate(notification.action_url || (user?.role === 'admin' ? '/admin/tickets' : '/dashboard/soporte'));
-      onClose();
       return;
     }
 
     if (notification.action_url) {
       navigate(notification.action_url);
     }
-
-    if (!notification.is_read) {
-      markRead(notification.id);
-    }
-
-    onClose();
   };
 
   useEffect(() => {
