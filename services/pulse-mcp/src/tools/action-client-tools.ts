@@ -2,7 +2,7 @@ import * as z from 'zod/v4';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import { createClientAccount, disableClientAccess, enableClientAccess, updateClientProfile } from '../pulse-data.js';
-import { asConfirmationResult, asToolError, asToolResult, assertMutationsEnabled, resolveUserFromInput } from './shared.js';
+import { asConfirmationResult, asToolError, asToolResult, assertMutationsEnabled, resolveUserFromInput, runIdempotentMutation } from './shared.js';
 
 export function registerClientActionTools(server: McpServer) {
   server.registerTool('invite_client', {
@@ -33,10 +33,16 @@ export function registerClientActionTools(server: McpServer) {
         });
       }
 
+      const client = await runIdempotentMutation('invite_client', {
+        email,
+        fullName,
+        role,
+      }, () => createClientAccount({ email, fullName, role }));
+
       return asToolResult({
         executed: true,
         message: 'Cliente creado en Pulse.',
-        client: await createClientAccount({ email, fullName, role }),
+        client,
       });
     } catch (error) {
       return asToolError(error);
@@ -74,10 +80,15 @@ export function registerClientActionTools(server: McpServer) {
         });
       }
 
+      const result = await runIdempotentMutation('enable_client_access', {
+        userId: resolvedUser.id,
+        operatorUserId: operatorUserId ?? null,
+      }, () => enableClientAccess({ userIdentifier: resolvedUser.id, operatorUserId }));
+
       return asToolResult({
         executed: true,
         message: 'Acceso operativo actualizado en Pulse.',
-        result: await enableClientAccess({ userIdentifier: resolvedUser.id, operatorUserId }),
+        result,
       });
     } catch (error) {
       return asToolError(error);
@@ -117,10 +128,16 @@ export function registerClientActionTools(server: McpServer) {
         });
       }
 
+      const result = await runIdempotentMutation('disable_client', {
+        userId: resolvedUser.id,
+        operatorUserId: operatorUserId ?? null,
+        disableAdmin,
+      }, () => disableClientAccess({ userIdentifier: resolvedUser.id, operatorUserId, disableAdmin }));
+
       return asToolResult({
         executed: true,
         message: 'Acceso operativo deshabilitado en Pulse.',
-        result: await disableClientAccess({ userIdentifier: resolvedUser.id, operatorUserId, disableAdmin }),
+        result,
       });
     } catch (error) {
       return asToolError(error);
@@ -164,10 +181,17 @@ export function registerClientActionTools(server: McpServer) {
         });
       }
 
+      const client = await runIdempotentMutation('update_client', {
+        userId: resolvedUser.id,
+        email: email ?? null,
+        fullName: fullName ?? null,
+        role: role ?? null,
+      }, () => updateClientProfile({ userIdentifier: resolvedUser.id, email, fullName, role }));
+
       return asToolResult({
         executed: true,
         message: 'Cliente actualizado en Pulse.',
-        client: await updateClientProfile({ userIdentifier: resolvedUser.id, email, fullName, role }),
+        client,
       });
     } catch (error) {
       return asToolError(error);

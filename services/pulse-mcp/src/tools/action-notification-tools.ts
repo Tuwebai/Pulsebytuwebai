@@ -2,7 +2,7 @@ import * as z from 'zod/v4';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import { createUserNotification, sendBillingEmail, sendBrandedEmail, sendOnboardingEmail } from '../pulse-data.js';
-import { asConfirmationResult, asToolError, asToolResult, assertMutationsEnabled, resolveUserFromInput } from './shared.js';
+import { asConfirmationResult, asToolError, asToolResult, assertMutationsEnabled, resolveUserFromInput, runIdempotentMutation } from './shared.js';
 
 export function registerNotificationActionTools(server: McpServer) {
   server.registerTool('send_onboarding_email', {
@@ -41,14 +41,20 @@ export function registerNotificationActionTools(server: McpServer) {
         });
       }
 
+      const result = await runIdempotentMutation('send_onboarding_email', {
+        recipientId: resolvedUser.id,
+        nextStep: nextStep ?? null,
+        ctaUrl: ctaUrl ?? null,
+      }, () => sendOnboardingEmail({
+        recipientIdentifier: resolvedUser.id,
+        nextStep,
+        ctaUrl,
+      }));
+
       return asToolResult({
         executed: true,
         message: 'Email de onboarding enviado con branding Pulse.',
-        result: await sendOnboardingEmail({
-          recipientIdentifier: resolvedUser.id,
-          nextStep,
-          ctaUrl,
-        }),
+        result,
       });
     } catch (error) {
       return asToolError(error);
@@ -95,16 +101,24 @@ export function registerNotificationActionTools(server: McpServer) {
         });
       }
 
+      const result = await runIdempotentMutation('send_billing_email', {
+        recipientId: resolvedUser.id,
+        summary,
+        dueDate: dueDate ?? null,
+        ctaLabel: ctaLabel ?? null,
+        ctaUrl: ctaUrl ?? null,
+      }, () => sendBillingEmail({
+        recipientIdentifier: resolvedUser.id,
+        summary,
+        dueDate,
+        ctaLabel,
+        ctaUrl,
+      }));
+
       return asToolResult({
         executed: true,
         message: 'Email de facturación enviado con branding Pulse.',
-        result: await sendBillingEmail({
-          recipientIdentifier: resolvedUser.id,
-          summary,
-          dueDate,
-          ctaLabel,
-          ctaUrl,
-        }),
+        result,
       });
     } catch (error) {
       return asToolError(error);
@@ -156,19 +170,30 @@ export function registerNotificationActionTools(server: McpServer) {
         });
       }
 
+      const result = await runIdempotentMutation('send_branded_email', {
+        recipientId: resolvedUser.id,
+        subject,
+        message,
+        heading: heading ?? null,
+        preheader: preheader ?? null,
+        ctaLabel: ctaLabel ?? null,
+        ctaUrl: ctaUrl ?? null,
+        footerNote: footerNote ?? null,
+      }, () => sendBrandedEmail({
+        recipientIdentifier: resolvedUser.id,
+        subject,
+        message,
+        heading,
+        preheader,
+        ctaLabel,
+        ctaUrl,
+        footerNote,
+      }));
+
       return asToolResult({
         executed: true,
         message: 'Email enviado con branding Pulse.',
-        result: await sendBrandedEmail({
-          recipientIdentifier: resolvedUser.id,
-          subject,
-          message,
-          heading,
-          preheader,
-          ctaLabel,
-          ctaUrl,
-          footerNote,
-        }),
+        result,
       });
     } catch (error) {
       return asToolError(error);
@@ -218,18 +243,28 @@ export function registerNotificationActionTools(server: McpServer) {
         });
       }
 
+      const result = await runIdempotentMutation('send_notification', {
+        userId: resolvedUser.id,
+        title,
+        message,
+        category,
+        type,
+        actionUrl: actionUrl ?? null,
+        isUrgent,
+      }, () => createUserNotification({
+        userIdentifier: resolvedUser.id,
+        title,
+        message,
+        category,
+        type,
+        actionUrl,
+        isUrgent,
+      }));
+
       return asToolResult({
         executed: true,
         message: 'Notificacion creada en Pulse.',
-        result: await createUserNotification({
-          userIdentifier: resolvedUser.id,
-          title,
-          message,
-          category,
-          type,
-          actionUrl,
-          isUrgent,
-        }),
+        result,
       });
     } catch (error) {
       return asToolError(error);

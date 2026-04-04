@@ -36,6 +36,30 @@ function normalizeTicketPriority(priority?: string) {
   throw new Error('La prioridad del ticket debe ser baja, media, alta, low, medium o high.');
 }
 
+async function findRecentTicketMessage(input: {
+  ticketId: string;
+  senderId: string;
+  senderRole: 'admin' | 'client';
+  content: string;
+  windowMs?: number;
+}) {
+  const createdAfter = new Date(Date.now() - (input.windowMs ?? 30_000)).toISOString();
+  const { data, error } = await supabase
+    .from('ticket_messages')
+    .select('id, ticket_id, sender_id, sender_role, content, created_at')
+    .eq('ticket_id', input.ticketId)
+    .eq('sender_id', input.senderId)
+    .eq('sender_role', input.senderRole)
+    .eq('content', input.content)
+    .gte('created_at', createdAfter)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
 async function appendTicketMessage(input: {
   ticketId: string;
   senderId: string;
@@ -46,6 +70,17 @@ async function appendTicketMessage(input: {
 
   if (!content) {
     return null;
+  }
+
+  const recentDuplicate = await findRecentTicketMessage({
+    ticketId: input.ticketId,
+    senderId: input.senderId,
+    senderRole: input.senderRole,
+    content,
+  });
+
+  if (recentDuplicate) {
+    return recentDuplicate;
   }
 
   const { data, error } = await supabase

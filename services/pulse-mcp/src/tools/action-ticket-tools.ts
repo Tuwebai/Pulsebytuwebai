@@ -2,7 +2,7 @@ import * as z from 'zod/v4';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import { assignTicket, closeTicket, createTicket, reopenTicket, replyToTicket, resolveTicketIdentifier } from '../pulse-data.js';
-import { asConfirmationResult, asToolError, asToolResult, assertMutationsEnabled, resolveUserFromInput } from './shared.js';
+import { asConfirmationResult, asToolError, asToolResult, assertMutationsEnabled, resolveUserFromInput, runIdempotentMutation } from './shared.js';
 
 export function registerTicketActionTools(server: McpServer) {
   server.registerTool('create_ticket', {
@@ -42,10 +42,17 @@ export function registerTicketActionTools(server: McpServer) {
         });
       }
 
+      const result = await runIdempotentMutation('create_ticket', {
+        userId: resolvedUser.id,
+        title,
+        message,
+        priority: priority ?? null,
+      }, () => createTicket({ userIdentifier: resolvedUser.id, title, message, priority }));
+
       return asToolResult({
         executed: true,
         message: 'Ticket creado en Pulse.',
-        result: await createTicket({ userIdentifier: resolvedUser.id, title, message, priority }),
+        result,
       });
     } catch (error) {
       return asToolError(error);
@@ -83,10 +90,16 @@ export function registerTicketActionTools(server: McpServer) {
         });
       }
 
+      const result = await runIdempotentMutation('close_ticket', {
+        ticketId: ticket.id,
+        resolutionNote: resolutionNote ?? null,
+        operatorUserId: operatorUserId ?? null,
+      }, () => closeTicket({ ticketIdentifier: ticket.id, resolutionNote, operatorUserId }));
+
       return asToolResult({
         executed: true,
         message: 'Ticket cerrado en Pulse.',
-        result: await closeTicket({ ticketIdentifier: ticket.id, resolutionNote, operatorUserId }),
+        result,
       });
     } catch (error) {
       return asToolError(error);
@@ -124,10 +137,16 @@ export function registerTicketActionTools(server: McpServer) {
         });
       }
 
+      const result = await runIdempotentMutation('reopen_ticket', {
+        ticketId: ticket.id,
+        reason: reason ?? null,
+        operatorUserId: operatorUserId ?? null,
+      }, () => reopenTicket({ ticketIdentifier: ticket.id, reason, operatorUserId }));
+
       return asToolResult({
         executed: true,
         message: 'Ticket reabierto en Pulse.',
-        result: await reopenTicket({ ticketIdentifier: ticket.id, reason, operatorUserId }),
+        result,
       });
     } catch (error) {
       return asToolError(error);
@@ -161,10 +180,16 @@ export function registerTicketActionTools(server: McpServer) {
         });
       }
 
+      const resolvedAssignee = await resolveUserFromInput(assigneeIdentifier);
+      const result = await runIdempotentMutation('assign_ticket', {
+        ticketId: ticket.id,
+        assigneeId: resolvedAssignee.id,
+      }, () => assignTicket({ ticketIdentifier: ticket.id, assigneeIdentifier: resolvedAssignee.id }));
+
       return asToolResult({
         executed: true,
         message: 'Ticket asignado en Pulse.',
-        result: await assignTicket({ ticketIdentifier: ticket.id, assigneeIdentifier }),
+        result,
       });
     } catch (error) {
       return asToolError(error);
@@ -204,10 +229,17 @@ export function registerTicketActionTools(server: McpServer) {
         });
       }
 
+      const result = await runIdempotentMutation('reply_to_ticket', {
+        ticketId: ticket.id,
+        message,
+        authorRole,
+        operatorUserId: operatorUserId ?? null,
+      }, () => replyToTicket({ ticketIdentifier: ticket.id, message, authorRole, operatorUserId }));
+
       return asToolResult({
         executed: true,
         message: 'Respuesta registrada en Pulse.',
-        result: await replyToTicket({ ticketIdentifier: ticket.id, message, authorRole, operatorUserId }),
+        result,
       });
     } catch (error) {
       return asToolError(error);

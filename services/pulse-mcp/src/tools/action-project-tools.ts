@@ -2,7 +2,7 @@ import * as z from 'zod/v4';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import { archiveProject, assignProjectGa4, createProject, deleteProject, fetchLatestProjectForUser, previewProjectDeletion, updateProjectDetails } from '../pulse-data.js';
-import { asConfirmationResult, asToolError, asToolResult, assertMutationsEnabled, resolveProjectFromInput, resolveUserFromInput } from './shared.js';
+import { asConfirmationResult, asToolError, asToolResult, assertMutationsEnabled, resolveProjectFromInput, resolveUserFromInput, runIdempotentMutation } from './shared.js';
 
 async function resolveProjectPreview(projectIdentifier?: string, userIdentifier?: string) {
   if (projectIdentifier?.trim()) {
@@ -66,17 +66,26 @@ export function registerProjectActionTools(server: McpServer) {
         });
       }
 
+      const result = await runIdempotentMutation('create_project', {
+        userId: resolvedUser.id,
+        name,
+        status: status ?? null,
+        completion_percentage: completion_percentage ?? null,
+        domain: domain ?? null,
+        ga4_property_id: ga4_property_id ?? null,
+      }, () => createProject({
+        userIdentifier: resolvedUser.id,
+        name,
+        status,
+        completion_percentage,
+        domain,
+        ga4_property_id,
+      }));
+
       return asToolResult({
         executed: true,
         message: 'Proyecto creado en Pulse.',
-        result: await createProject({
-          userIdentifier: resolvedUser.id,
-          name,
-          status,
-          completion_percentage,
-          domain,
-          ga4_property_id,
-        }),
+        result,
       });
     } catch (error) {
       return asToolError(error);
@@ -109,10 +118,14 @@ export function registerProjectActionTools(server: McpServer) {
         });
       }
 
+      const result = await runIdempotentMutation('archive_project', {
+        projectId: previewTarget.id,
+      }, () => archiveProject({ projectIdentifier: previewTarget.id }));
+
       return asToolResult({
         executed: true,
         message: 'Proyecto archivado en Pulse.',
-        result: await archiveProject({ projectIdentifier }),
+        result,
       });
     } catch (error) {
       return asToolError(error);
@@ -157,10 +170,24 @@ export function registerProjectActionTools(server: McpServer) {
         });
       }
 
+      const targetProjectId = 'project' in previewTarget ? previewTarget.project.id : previewTarget.id;
+      const result = await runIdempotentMutation('update_project', {
+        projectId: targetProjectId,
+        name: input.name ?? null,
+        status: input.status ?? null,
+        completion_percentage: input.completion_percentage ?? null,
+        domain: input.domain ?? null,
+        ga4_property_id: input.ga4_property_id ?? null,
+      }, () => updateProjectDetails({
+        ...input,
+        projectIdentifier: targetProjectId,
+        userIdentifier: undefined,
+      }));
+
       return asToolResult({
         executed: true,
         message: 'Proyecto actualizado en Pulse.',
-        result: await updateProjectDetails(input),
+        result,
       });
     } catch (error) {
       return asToolError(error);
@@ -191,10 +218,15 @@ export function registerProjectActionTools(server: McpServer) {
         return asConfirmationResult('Esta accion va a eliminar un proyecto archivado de forma permanente. Reintentá con confirm=true y forceDelete=true para ejecutarla.', preview);
       }
 
+      const result = await runIdempotentMutation('delete_project', {
+        projectId: preview.project.id,
+        forceDelete,
+      }, () => deleteProject({ projectIdentifier: preview.project.id }));
+
       return asToolResult({
         executed: true,
         message: 'Proyecto eliminado de Pulse.',
-        result: await deleteProject({ projectIdentifier }),
+        result,
       });
     } catch (error) {
       return asToolError(error);
@@ -229,10 +261,16 @@ export function registerProjectActionTools(server: McpServer) {
         });
       }
 
+      const targetProjectId = 'project' in previewTarget ? previewTarget.project.id : previewTarget.id;
+      const result = await runIdempotentMutation('assign_ga4', {
+        projectId: targetProjectId,
+        ga4_property_id,
+      }, () => assignProjectGa4({ projectIdentifier: targetProjectId, ga4_property_id }));
+
       return asToolResult({
         executed: true,
         message: 'GA4 vinculado en Pulse.',
-        result: await assignProjectGa4({ projectIdentifier, userIdentifier, ga4_property_id }),
+        result,
       });
     } catch (error) {
       return asToolError(error);
