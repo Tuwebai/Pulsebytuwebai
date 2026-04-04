@@ -9,7 +9,7 @@ function requireOperatorUserId(operatorUserId?: string) {
   const resolvedOperatorUserId = operatorUserId?.trim() || pulseMcpConfig.operatorUserId;
 
   if (!resolvedOperatorUserId) {
-    throw new Error('Falta operatorUserId para auditar esta accion en Pulse.');
+    throw new Error('Falta operatorUserId para auditar esta accion en Pulse. En produccion podes definir PULSE_MCP_OPERATOR_USER_ID para no enviarlo en cada llamada.');
   }
 
   return resolvedOperatorUserId;
