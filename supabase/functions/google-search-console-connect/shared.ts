@@ -45,6 +45,10 @@ function getRequiredEnv(name: string) {
   return value;
 }
 
+function normalizeGoogleClientSecret(secret: string) {
+  return secret.startsWith('GOCSPX-GOCSPX-') ? secret.replace(/^GOCSPX-GOCSPX-/, 'GOCSPX-') : secret;
+}
+
 export function createSupabaseAdminClient() {
   return createClient(getRequiredEnv('SUPABASE_URL'), getRequiredEnv('SUPABASE_SERVICE_ROLE_KEY'), {
     auth: {
@@ -126,7 +130,7 @@ export function getGoogleConnectEnv() {
       .map((value) => value.trim())
       .filter(Boolean),
     clientId: getRequiredEnv('GOOGLE_SEARCH_CONSOLE_CLIENT_ID'),
-    clientSecret: getRequiredEnv('GOOGLE_SEARCH_CONSOLE_CLIENT_SECRET'),
+    clientSecret: normalizeGoogleClientSecret(getRequiredEnv('GOOGLE_SEARCH_CONSOLE_CLIENT_SECRET')),
     encryptionKey: getRequiredEnv('GOOGLE_SEARCH_CONSOLE_ENCRYPTION_KEY'),
     redirectUri: getRequiredEnv('GOOGLE_SEARCH_CONSOLE_REDIRECT_URI'),
   };
