@@ -1,5 +1,5 @@
-import { Activity, CreditCard, FolderOpen, LayoutDashboard, LifeBuoy, Settings } from 'lucide-react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { Activity, CreditCard, FolderOpen, LayoutDashboard, LifeBuoy } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PulseLogo } from '@/core/components';
 import { useApp } from '@/contexts/AppContext';
@@ -21,7 +21,6 @@ const navItems = [
 ] as const;
 
 export default function Sidebar() {
-  const navigate = useNavigate();
   const { user } = useApp();
   const { profile } = useProfile();
   const displayName = getDisplayName(profile, user, 'Cliente Pulse');
@@ -29,7 +28,7 @@ export default function Sidebar() {
   const displayEmail = getDisplayEmail(profile, user, '');
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-[240px] shrink-0 flex-col overflow-hidden border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] md:flex" data-tour="shell-sidebar">
+    <aside className="sticky top-0 hidden h-[100dvh] min-h-[100dvh] w-[240px] shrink-0 flex-col overflow-hidden border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] md:flex" data-tour="shell-sidebar">
       <div className="h-0.5 w-full bg-[var(--gradient-brand)]" />
 
       <div className="px-5 py-6">
@@ -81,34 +80,18 @@ export default function Sidebar() {
       <div className="flex-1" />
 
       <div className="border-t border-[var(--border-subtle)] px-3 py-4">
-        <div className="flex items-center gap-2">
-          <NavLink
-            className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-[var(--bg-elevated)]"
-            data-tour="shell-profile-entry"
-            to="/dashboard/perfil"
-          >
-            <Avatar className="h-10 w-10 ring-0">
-              <AvatarImage alt={displayName || displayEmail || 'Usuario Pulse'} src={displayAvatar} />
-              <AvatarFallback className="bg-[var(--bg-elevated)] text-[var(--text-primary)]">
-                {getIdentityInitials(displayName, displayEmail)}
-              </AvatarFallback>
-            </Avatar>
+        <div className="flex min-w-0 items-center gap-3 rounded-xl px-2 py-2">
+          <Avatar className="h-10 w-10 ring-0">
+            <AvatarImage alt={displayName || displayEmail || 'Usuario Pulse'} src={displayAvatar} />
+            <AvatarFallback className="bg-[var(--bg-elevated)] text-[var(--text-primary)]">
+              {getIdentityInitials(displayName, displayEmail)}
+            </AvatarFallback>
+          </Avatar>
 
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[13px] font-medium text-[var(--text-primary)]">{displayName}</p>
-              <p className="truncate text-[11px] text-[var(--text-tertiary)]">{displayEmail}</p>
-            </div>
-          </NavLink>
-
-          <button
-            aria-label="Abrir configuración"
-            className="rounded-xl p-2 text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
-            data-tour="shell-settings-entry"
-            onClick={() => navigate('/dashboard/configuracion')}
-            type="button"
-          >
-            <Settings size={16} strokeWidth={1.5} />
-          </button>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[13px] font-medium text-[var(--text-primary)]">{displayName}</p>
+            <p className="truncate text-[11px] text-[var(--text-tertiary)]">{displayEmail}</p>
+          </div>
         </div>
       </div>
     </aside>

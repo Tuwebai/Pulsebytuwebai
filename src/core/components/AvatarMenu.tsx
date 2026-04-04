@@ -1,4 +1,4 @@
-import { Compass, LogOut, UserCircle2 } from 'lucide-react';
+import { Compass, LogOut, Settings, UserCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -35,7 +35,8 @@ export default function AvatarMenu({ onLogout, user }: AvatarMenuProps) {
   const displayName = getDisplayName(profile, user, isAdmin ? 'Operador Pulse' : 'Cliente Pulse');
   const displayEmail = getDisplayEmail(profile, user);
   const displayAvatar = getDisplayAvatar(profile, user);
-  const accountRoute = isAdmin ? '/admin/settings' : '/dashboard/perfil';
+  const profileRoute = isAdmin ? '/admin/settings' : '/dashboard/perfil';
+  const settingsRoute = '/dashboard/configuracion';
   const homeRoute = isAdmin ? '/admin' : '/dashboard';
   const showPulseTour = !isAdmin;
 
@@ -71,13 +72,25 @@ export default function AvatarMenu({ onLogout, user }: AvatarMenuProps) {
 
         <DropdownMenuSeparator className="my-1 bg-[var(--border-subtle)]" />
 
-        <DropdownMenuItem
-          className="cursor-pointer rounded-[10px] px-3 py-2 text-[13px] text-[var(--text-primary)] transition-colors duration-150 ease-out focus:bg-[var(--bg-subtle)] focus:text-[var(--text-primary)]"
-          onSelect={() => navigate(accountRoute)}
-        >
-          <UserCircle2 className="mr-2 h-4 w-4 text-[var(--text-secondary)]" strokeWidth={1.5} />
-          Mi cuenta
-        </DropdownMenuItem>
+        {profileRoute ? (
+          <DropdownMenuItem
+            className="cursor-pointer rounded-[10px] px-3 py-2 text-[13px] text-[var(--text-primary)] transition-colors duration-150 ease-out focus:bg-[var(--bg-subtle)] focus:text-[var(--text-primary)]"
+            onSelect={() => navigate(profileRoute)}
+          >
+            <UserCircle2 className="mr-2 h-4 w-4 text-[var(--text-secondary)]" strokeWidth={1.5} />
+            Mi perfil
+          </DropdownMenuItem>
+        ) : null}
+
+        {!isAdmin ? (
+          <DropdownMenuItem
+            className="cursor-pointer rounded-[10px] px-3 py-2 text-[13px] text-[var(--text-primary)] transition-colors duration-150 ease-out focus:bg-[var(--bg-subtle)] focus:text-[var(--text-primary)]"
+            onSelect={() => navigate(settingsRoute)}
+          >
+            <Settings className="mr-2 h-4 w-4 text-[var(--text-secondary)]" strokeWidth={1.5} />
+            Configuración
+          </DropdownMenuItem>
+        ) : null}
 
         {showPulseTour ? (
           <DropdownMenuItem

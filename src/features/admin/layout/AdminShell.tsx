@@ -39,7 +39,7 @@ export function AdminShell({
   return (
     <>
       <div
-        className="flex h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 transition-all duration-300 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
+        className="flex h-[100dvh] min-h-[100dvh] w-full bg-gradient-to-br from-background via-background/95 to-background/90 transition-all duration-300 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
         data-surface="admin"
       >
         <div className="hidden shrink-0 md:block">
@@ -47,7 +47,7 @@ export function AdminShell({
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch]">
             <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-3 py-3 sm:px-4 sm:py-4 lg:px-8 lg:py-6">
               <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[var(--bg-surface)]/95 shadow-[0_24px_60px_rgba(0,0,0,0.28)] backdrop-blur">
                 <div className="absolute inset-x-5 top-0 h-px bg-gradient-to-r from-signal via-sky-300/80 to-transparent" />

@@ -8,11 +8,11 @@ import { AdminSidebarProfile } from '@/features/admin/layout/AdminSidebarProfile
 import { AdminSidebarSection } from '@/features/admin/layout/AdminSidebarSection';
 
 export default function AdminSidebar() {
-  const { user, logout } = useApp();
+  const { user } = useApp();
   const { t } = useTranslation();
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar-background dark:border-slate-700 dark:bg-slate-900">
+    <aside className="flex h-[100dvh] min-h-[100dvh] w-64 flex-col border-r border-sidebar-border bg-sidebar-background dark:border-slate-700 dark:bg-slate-900">
       <div className="h-0.5 w-full" style={{ background: 'var(--gradient-brand)' }} />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <AdminSidebarProfile user={user} />
@@ -24,7 +24,7 @@ export default function AdminSidebar() {
         </nav>
       </div>
 
-      <AdminSidebarFooter onLogout={logout} />
+      <AdminSidebarFooter />
     </aside>
   );
 }

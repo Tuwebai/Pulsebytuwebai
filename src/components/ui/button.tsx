@@ -46,7 +46,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }, ref) => {
     const prefersReducedMotion = useReducedMotionPreference();
     const Comp = asChild ? Slot : 'button';
-    const baseStyles = "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 relative overflow-hidden";
+    const baseStyles = "relative inline-flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg font-medium transition-all duration-200 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50";
     
     const widthStyles = fullWidth ? "w-full" : "";
 

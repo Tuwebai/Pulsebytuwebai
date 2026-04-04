@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import { useApp } from '@/contexts/AppContext';
@@ -28,22 +28,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     stepCount,
   } = useProductTour({ userId: user?.id });
 
-  useEffect(() => {
-    const previousBodyOverflow = document.body.style.overflow;
-    const previousHtmlOverflow = document.documentElement.style.overflow;
-
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-
-    return () => {
-      document.body.style.overflow = previousBodyOverflow;
-      document.documentElement.style.overflow = previousHtmlOverflow;
-    };
-  }, []);
-
   return (
     <div
-      className="flex h-screen overflow-hidden bg-gradient-to-br from-background via-background/95 to-background/90 transition-all duration-300 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
+      className="flex h-[100dvh] min-h-[100dvh] overflow-hidden bg-gradient-to-br from-background via-background/95 to-background/90 transition-all duration-300 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
       data-surface="client"
     >
       <Sidebar />
@@ -52,7 +39,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <Header />
         <motion.main
           animate={prefersReducedMotion ? { opacity: 1, x: 0 } : { opacity: 1, x: 0 }}
-          className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 pb-24 md:px-8 md:py-8 md:pb-8"
+          className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-4 py-4 pb-24 touch-pan-y [-webkit-overflow-scrolling:touch] md:px-8 md:py-8 md:pb-8"
           initial={prefersReducedMotion ? false : { opacity: 0, x: 8 }}
           key={location.pathname}
           transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
