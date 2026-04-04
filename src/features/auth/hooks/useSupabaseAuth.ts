@@ -13,39 +13,31 @@ export function useSupabaseAuth() {
     let unsubscribe = () => undefined;
     let isMounted = true;
 
-    const applyRecoveredSession = async () => {
+    const syncSessionState = async () => {
       const {
-        data: { session: recoveredSession },
+        data: { session: nextSession },
+        error: sessionError,
       } = await authService.getSession();
 
-      if (!isMounted || !recoveredSession) {
+      if (!isMounted) {
         return false;
       }
 
-      setSession(recoveredSession);
-      setUser(recoveredSession.user);
+      if (sessionError) {
+        setError(getFriendlyAuthErrorMessage(sessionError));
+        setLoading(false);
+        return false;
+      }
+
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
       setLoading(false);
-      return true;
+      return Boolean(nextSession);
     };
 
     const getInitialSession = async () => {
       try {
-        const {
-          data: { session: initialSession },
-          error: sessionError,
-        } = await authService.getSession();
-
-        if (sessionError) {
-          setError(
-            sessionError.message.includes('Invalid API key')
-              ? 'Error de configuración: Clave API de Supabase inválida'
-              : sessionError.message,
-          );
-          return;
-        }
-
-        setSession(initialSession);
-        setUser(initialSession?.user ?? null);
+        await syncSessionState();
       } catch (caughtError) {
         if (caughtError instanceof Error) {
           setError(getFriendlyAuthErrorMessage(caughtError));
@@ -62,11 +54,10 @@ export function useSupabaseAuth() {
     try {
       const {
         data: { subscription },
-      } = authService.onAuthStateChange(async (event, nextSession) => {
-        if (!nextSession && (await applyRecoveredSession())) {
+      } = authService.onAuthStateChange(async (_event, nextSession) => {
+        if (!isMounted) {
           return;
         }
-
         setSession(nextSession);
         setUser(nextSession?.user ?? null);
         setLoading(false);
@@ -81,7 +72,7 @@ export function useSupabaseAuth() {
     }
 
     const reconcileSession = () => {
-      void applyRecoveredSession().catch(() => undefined);
+      void syncSessionState().catch(() => undefined);
     };
 
     if (typeof window !== 'undefined') {
@@ -107,7 +98,6 @@ export function useSupabaseAuth() {
   const signInWithOAuth = async (provider: 'google' | 'github') => {
     try {
       setError(null);
-      setLoading(true);
       const { error: authError } = await authService.signInWithOAuth(provider);
 
       if (authError) {
@@ -127,7 +117,6 @@ export function useSupabaseAuth() {
   const signInWithEmail = async (email: string, password: string) => {
     try {
       setError(null);
-      setLoading(true);
       const { error: authError } = await authService.signInWithEmail(email, password);
 
       if (authError) {
@@ -153,7 +142,6 @@ export function useSupabaseAuth() {
   const signUpWithEmail = async (email: string, password: string, metadata?: { full_name?: string }) => {
     try {
       setError(null);
-      setLoading(true);
       const { error: authError } = await authService.signUpWithEmail(email, password, metadata);
 
       if (authError) {

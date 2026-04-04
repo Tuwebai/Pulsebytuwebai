@@ -220,6 +220,20 @@ export function useCurrentUser({
         setLoading(false);
       }
     } else {
+      try {
+        const {
+          data: { session: liveSession },
+        } = await supabase.auth.getSession();
+
+        if (liveSession?.user) {
+          setAuthReady(true);
+          setLoading(false);
+          return;
+        }
+      } catch {
+        // Si Supabase falla al revalidar, seguimos con limpieza controlada.
+      }
+
       setUser(null);
       setIsAuthenticated(false);
       setProjects([]);

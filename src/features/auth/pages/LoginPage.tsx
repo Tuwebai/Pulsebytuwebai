@@ -9,7 +9,7 @@ import { useApp } from '@/contexts/AppContext';
 import { getPostLoginPath } from '../utils/getPostLoginPath';
 
 export default function LoginPage() {
-  const { isAuthenticated, user, login, loginWithGoogle, loading, error, clearError } = useApp();
+  const { isAuthenticated, user, login, loginWithGoogle, error, clearError } = useApp();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -57,7 +57,7 @@ export default function LoginPage() {
         <div className="rounded-[28px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-6 text-left shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
           <Button
             className="h-12 w-full rounded-[10px] border border-[var(--border-default)] bg-transparent text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
-            disabled={submitting || loading}
+            disabled={submitting}
             onClick={handleGoogleLogin}
             type="button"
             variant="ghost"
@@ -123,7 +123,7 @@ export default function LoginPage() {
 
             <Button
               className="h-12 w-full rounded-[10px] bg-[var(--signal)] text-white hover:bg-[var(--signal-dim)]"
-              disabled={submitting || loading}
+              disabled={submitting}
               type="submit"
             >
               Ingresar al dashboard
