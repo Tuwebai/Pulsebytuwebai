@@ -8,6 +8,8 @@ import {
   SyncSearchConsoleError,
 } from './types.ts';
 
+const GOOGLE_SEARCH_CONSOLE_DATA_LAG_DAYS = 2;
+
 interface SyncSearchConsoleRequestBody {
   days?: number;
   projectId?: string;
@@ -45,7 +47,7 @@ function normalizeSyncDays(input: unknown) {
 
 export function buildDateWindow(days: number) {
   const endDate = new Date();
-  endDate.setUTCDate(endDate.getUTCDate() - 1);
+  endDate.setUTCDate(endDate.getUTCDate() - GOOGLE_SEARCH_CONSOLE_DATA_LAG_DAYS);
   endDate.setUTCHours(0, 0, 0, 0);
 
   const startDate = new Date(endDate);

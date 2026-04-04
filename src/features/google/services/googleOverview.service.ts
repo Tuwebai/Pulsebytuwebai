@@ -8,13 +8,15 @@ import type {
   GoogleSearchConsolePeriod,
 } from '@/data/types/google';
 
+const GOOGLE_SEARCH_CONSOLE_DATA_LAG_DAYS = 2;
+
 function toIsoDate(date: Date) {
   return date.toISOString().slice(0, 10);
 }
 
 function getDateRange(days: number) {
   const to = new Date();
-  to.setUTCDate(to.getUTCDate() - 1);
+  to.setUTCDate(to.getUTCDate() - GOOGLE_SEARCH_CONSOLE_DATA_LAG_DAYS);
   to.setUTCHours(0, 0, 0, 0);
 
   const from = new Date(to);
