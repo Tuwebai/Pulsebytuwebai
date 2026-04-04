@@ -121,6 +121,10 @@ export async function readSignedState<T>(state: string): Promise<T> {
 export function getGoogleConnectEnv() {
   return {
     appUrl: getRequiredEnv('GOOGLE_SEARCH_CONSOLE_APP_URL'),
+    allowedAppUrls: (Deno.env.get('GOOGLE_SEARCH_CONSOLE_ALLOWED_APP_URLS') || '')
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean),
     clientId: getRequiredEnv('GOOGLE_SEARCH_CONSOLE_CLIENT_ID'),
     clientSecret: getRequiredEnv('GOOGLE_SEARCH_CONSOLE_CLIENT_SECRET'),
     encryptionKey: getRequiredEnv('GOOGLE_SEARCH_CONSOLE_ENCRYPTION_KEY'),
@@ -223,6 +227,25 @@ export function buildCallbackUrl(appUrl: string, status: 'connected' | 'property
   return `${baseUrl}/dashboard/google?google=${status}`;
 }
 
+export function resolveReturnAppUrl(requestedUrl: string | null | undefined) {
+  const { allowedAppUrls, appUrl } = getGoogleConnectEnv();
+  const fallbackUrl = appUrl.replace(/\/+$/, '');
+
+  if (!requestedUrl) {
+    return fallbackUrl;
+  }
+
+  try {
+    const parsedUrl = new URL(requestedUrl);
+    const normalizedRequestedUrl = parsedUrl.origin.replace(/\/+$/, '');
+    const normalizedAllowedUrls = [...new Set([fallbackUrl, ...allowedAppUrls.map((value) => value.replace(/\/+$/, ''))])];
+
+    return normalizedAllowedUrls.includes(normalizedRequestedUrl) ? normalizedRequestedUrl : fallbackUrl;
+  } catch {
+    return fallbackUrl;
+  }
+}
+
 export function normalizeDomain(domain: string) {
   return domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/+$/, '');
 }
@@ -271,4 +294,3 @@ export function resolveMatchingSite(
 
   return bestScore > 0 ? bestMatch : null;
 }
-

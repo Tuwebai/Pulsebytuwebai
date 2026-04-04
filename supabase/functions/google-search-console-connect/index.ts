@@ -9,6 +9,7 @@ import {
   ensureAuthorizedProject,
   getGoogleConnectEnv,
   jsonResponse,
+  resolveReturnAppUrl,
 } from './shared.ts';
 
 serve(async (req) => {
@@ -21,7 +22,7 @@ serve(async (req) => {
   }
 
   try {
-    const body = (await req.json().catch(() => null)) as { projectId?: string } | null;
+    const body = (await req.json().catch(() => null)) as { projectId?: string; returnToOrigin?: string } | null;
     const projectId = body?.projectId?.trim();
 
     if (!projectId) {
@@ -34,9 +35,11 @@ serve(async (req) => {
 
     const { clientId, redirectUri } = getGoogleConnectEnv();
     const { project, user } = await ensureAuthorizedProject(req, projectId);
+    const returnAppUrl = resolveReturnAppUrl(body?.returnToOrigin);
     const state = await createSignedState({
       exp: Date.now() + 1000 * 60 * 10,
       projectId: project.id,
+      returnAppUrl,
       userId: user.id,
     });
 
@@ -66,4 +69,3 @@ serve(async (req) => {
     });
   }
 });
-

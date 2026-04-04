@@ -62,7 +62,10 @@ export async function getGoogleSearchConsoleConnection(projectId: string): Promi
   return mapConnectionRow(data as GoogleSearchConsoleApiRow);
 }
 
-export async function startGoogleSearchConsoleConnect(projectId: string): Promise<GoogleSearchConsoleConnectResponse> {
+export async function startGoogleSearchConsoleConnect(
+  projectId: string,
+  returnToOrigin: string,
+): Promise<GoogleSearchConsoleConnectResponse> {
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -77,6 +80,7 @@ export async function startGoogleSearchConsoleConnect(projectId: string): Promis
     },
     body: {
       projectId,
+      returnToOrigin,
     },
   });
 
@@ -128,4 +132,3 @@ export async function startGoogleSearchConsoleConnect(projectId: string): Promis
 
   return data;
 }
-

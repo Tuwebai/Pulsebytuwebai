@@ -84,7 +84,8 @@ export default function GooglePage() {
     }
 
     setIsConnecting(true);
-    void startGoogleSearchConsoleConnect(projectId)
+    const returnToOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+    void startGoogleSearchConsoleConnect(projectId, returnToOrigin)
       .then(({ authorizationUrl }) => {
         window.location.assign(authorizationUrl);
       })

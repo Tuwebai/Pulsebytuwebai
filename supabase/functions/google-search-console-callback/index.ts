@@ -28,6 +28,7 @@ interface SearchConsoleSiteEntry {
 interface SignedStatePayload {
   exp: number;
   projectId: string;
+  returnAppUrl?: string;
   userId: string;
 }
 
@@ -37,9 +38,7 @@ function redirectTo(url: string) {
 
 serve(async (req) => {
   const { appUrl, clientId, clientSecret, redirectUri } = getGoogleConnectEnv();
-  const successUrl = buildCallbackUrl(appUrl, 'connected');
-  const propertyNotFoundUrl = buildCallbackUrl(appUrl, 'property-not-found');
-  const errorUrl = buildCallbackUrl(appUrl, 'error');
+  const defaultErrorUrl = buildCallbackUrl(appUrl, 'error');
 
   try {
     const requestUrl = new URL(req.url);
@@ -48,7 +47,7 @@ serve(async (req) => {
     const oauthError = requestUrl.searchParams.get('error');
 
     if (oauthError) {
-      return redirectTo(errorUrl);
+      return redirectTo(defaultErrorUrl);
     }
 
     if (!code || !state) {
@@ -56,6 +55,9 @@ serve(async (req) => {
     }
 
     const signedState = await readSignedState<SignedStatePayload>(state);
+    const returnAppUrl = signedState.returnAppUrl || appUrl;
+    const successUrl = buildCallbackUrl(returnAppUrl, 'connected');
+    const propertyNotFoundUrl = buildCallbackUrl(returnAppUrl, 'property-not-found');
 
     if (!signedState.exp || signedState.exp < Date.now()) {
       throw new GoogleSearchConsoleError(400, 'La conexión con Google venció. Probá de nuevo.', 'STATE_EXPIRED');
@@ -202,6 +204,6 @@ serve(async (req) => {
       console.error('[google-search-console-callback]', error);
     }
 
-    return redirectTo(errorUrl);
+    return redirectTo(defaultErrorUrl);
   }
 });
