@@ -1,3 +1,4 @@
+import { canReadProject, canReadUser, hasProjectAllowlist, hasUserAllowlist } from '../auth.js';
 import { supabase } from './client.js';
 import { normalizeDomain, normalizeIdentifier } from './identifiers.js';
 import type { ProjectRow, UserRow } from './types.js';
@@ -17,6 +18,35 @@ const USER_DETAIL_SELECT = [
   'created_at',
   'updated_at',
 ].join(', ');
+
+async function fetchVisibleProjectsByUserIds(userIds: string[]) {
+  if (userIds.length === 0) {
+    return new Map<string, ProjectRow>();
+  }
+
+  const { data, error } = await supabase
+    .from('projects')
+    .select('id, name, status, domain, ga4_property_id, completion_percentage, updated_at, created_by')
+    .in('created_by', userIds)
+    .order('updated_at', { ascending: false });
+
+  if (error) throw error;
+
+  const projects = ((data ?? []) as ProjectRow[]).filter((project) => (
+    canReadProject(project.id) && canReadUser(project.created_by)
+  ));
+  const primaryProjectByUserId = new Map<string, ProjectRow>();
+
+  for (const project of projects) {
+    if (!project.created_by || primaryProjectByUserId.has(project.created_by)) {
+      continue;
+    }
+
+    primaryProjectByUserId.set(project.created_by, project);
+  }
+
+  return primaryProjectByUserId;
+}
 
 export async function searchEntities(query: string) {
   const normalizedQuery = normalizeIdentifier(query);
@@ -48,7 +78,7 @@ export async function searchEntities(query: string) {
   if (projectsByNameResult.error) throw projectsByNameResult.error;
   if (projectsByDomainResult.error) throw projectsByDomainResult.error;
 
-  const users = (usersResult.data ?? []) as UserRow[];
+  const users = ((usersResult.data ?? []) as UserRow[]).filter((user) => canReadUser(user.id));
   const matchedUserIds = users.map((user) => user.id);
   const linkedProjectsResult = matchedUserIds.length === 0
     ? { data: [], error: null }
@@ -62,10 +92,14 @@ export async function searchEntities(query: string) {
   if (linkedProjectsResult.error) throw linkedProjectsResult.error;
 
   const projectMap = new Map<string, ProjectRow>();
-  const linkedProjects = (linkedProjectsResult.data ?? []) as ProjectRow[];
+  const linkedProjects = ((linkedProjectsResult.data ?? []) as ProjectRow[]).filter((project) => (
+    canReadProject(project.id) && canReadUser(project.created_by)
+  ));
 
   for (const row of [...(projectsByNameResult.data ?? []), ...(projectsByDomainResult.data ?? [])] as ProjectRow[]) {
-    projectMap.set(row.id, row);
+    if (canReadProject(row.id) && canReadUser(row.created_by)) {
+      projectMap.set(row.id, row);
+    }
   }
   for (const row of linkedProjects) {
     projectMap.set(row.id, row);
@@ -77,9 +111,21 @@ export async function searchEntities(query: string) {
     primaryProjectByUserId.set(project.created_by, project);
   }
 
+  const visibleUsers = users.filter((user) => {
+    if (primaryProjectByUserId.has(user.id)) {
+      return true;
+    }
+
+    if (hasProjectAllowlist() && !hasUserAllowlist()) {
+      return false;
+    }
+
+    return true;
+  });
+
   return {
     query: normalizedQuery,
-    users: users.map((user) => ({
+    users: visibleUsers.map((user) => ({
       id: user.id,
       email: user.email,
       full_name: user.full_name,
@@ -107,17 +153,18 @@ export async function searchEntities(query: string) {
 export async function listClients(status: 'activo' | 'sin_onboarding' | 'sin_proyecto' | 'todos') {
   const { data, error } = await supabase
     .from('users')
-    .select([
-      USER_DETAIL_SELECT,
-      'projects(id, name, status, domain, ga4_property_id, completion_percentage, updated_at, created_by)',
-    ].join(', '))
+    .select(USER_DETAIL_SELECT)
     .eq('role', 'user')
     .order('created_at', { ascending: false });
 
   if (error) throw error;
 
-  const clients = ((data ?? []) as unknown as Array<UserRow & { projects?: ProjectRow[] | null }>).map((client) => {
-    const project = Array.isArray(client.projects) ? client.projects[0] ?? null : null;
+  const rawClients = ((data ?? []) as unknown as UserRow[]).filter((client) => canReadUser(client.id));
+  const primaryProjectByUserId = await fetchVisibleProjectsByUserIds(rawClients.map((client) => client.id));
+
+  const clients = rawClients
+    .map((client) => {
+    const project = primaryProjectByUserId.get(client.id) ?? null;
     const accessStatus = client.pulse_access_status ?? (client.onboarding_completed ? 'active' : 'pending');
     const operationalStatus = !project ? 'sin_proyecto' : accessStatus === 'active' || accessStatus === 'invited' ? 'activo' : 'sin_onboarding';
 
@@ -132,7 +179,18 @@ export async function listClients(status: 'activo' | 'sin_onboarding' | 'sin_pro
       operational_status: operationalStatus,
       created_at: client.created_at ?? null,
     };
-  });
+  })
+    .filter((client) => {
+      if (client.project) {
+        return true;
+      }
+
+      if (hasProjectAllowlist() && !hasUserAllowlist()) {
+        return false;
+      }
+
+      return true;
+    });
 
   return {
     status,

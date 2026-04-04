@@ -1,3 +1,4 @@
+import { canReadProject, canReadUser, hasProjectAllowlist, hasUserAllowlist } from '../auth.js';
 import { type PulsePeriod, getDateRange } from '../date-ranges.js';
 import { supabase } from './client.js';
 
@@ -6,16 +7,38 @@ export async function fetchDashboardSummary(period: PulsePeriod) {
   const [clientsResult, projectsResult, metricsResult] = await Promise.all([
     supabase.from('users').select('id, onboarding_completed, pulse_access_status, role').eq('role', 'user'),
     supabase.from('projects').select('id, status, ga4_property_id, created_by'),
-    supabase.from('pulse_metrics').select('visits, contacts').gte('metric_date', currentRange.from).lte('metric_date', currentRange.to),
+    supabase.from('pulse_metrics').select('project_id, visits, contacts').gte('metric_date', currentRange.from).lte('metric_date', currentRange.to),
   ]);
 
   if (clientsResult.error) throw clientsResult.error;
   if (projectsResult.error) throw projectsResult.error;
   if (metricsResult.error) throw metricsResult.error;
 
-  const clients = (clientsResult.data ?? []) as Array<{ id: string; onboarding_completed?: boolean | null; pulse_access_status?: string | null }>;
-  const projects = (projectsResult.data ?? []) as Array<{ status?: string | null; ga4_property_id?: string | null; created_by?: string | null }>;
-  const metrics = (metricsResult.data ?? []) as Array<{ visits?: number | null; contacts?: number | null }>;
+  const projects = ((projectsResult.data ?? []) as Array<{ id: string; status?: string | null; ga4_property_id?: string | null; created_by?: string | null }>)
+    .filter((project) => canReadProject(project.id) && canReadUser(project.created_by));
+  const visibleUserIds = new Set(
+    projects
+      .map((project) => project.created_by)
+      .filter((value): value is string => typeof value === 'string' && value.length > 0),
+  );
+  const clients = ((clientsResult.data ?? []) as Array<{ id: string; onboarding_completed?: boolean | null; pulse_access_status?: string | null }>)
+    .filter((client) => {
+      if (!canReadUser(client.id)) {
+        return false;
+      }
+
+      if (visibleUserIds.has(client.id)) {
+        return true;
+      }
+
+      if (hasProjectAllowlist() && !hasUserAllowlist()) {
+        return false;
+      }
+
+      return true;
+    });
+  const metrics = ((metricsResult.data ?? []) as Array<{ project_id?: string | null; visits?: number | null; contacts?: number | null }>)
+    .filter((row) => canReadProject(row.project_id));
 
   const usersWithProject = new Set(projects.map((project) => project.created_by).filter((value): value is string => Boolean(value)));
   const activeProjectsByStatus = projects.reduce<Record<string, number>>((acc, project) => {

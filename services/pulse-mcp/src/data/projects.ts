@@ -1,3 +1,4 @@
+import { canReadProject, canReadUser } from '../auth.js';
 import { supabase } from './client.js';
 import { normalizeDomain, normalizeIdentifier, looksLikeUuid } from './identifiers.js';
 import { fetchProjectMetricSummary } from './metrics.js';
@@ -132,7 +133,9 @@ export async function listProjects(filters: {
   const { data, error } = await query;
   if (error) throw error;
 
-  const projects = (data ?? []) as ProjectRow[];
+  const projects = ((data ?? []) as ProjectRow[]).filter((project) => (
+    canReadProject(project.id) && canReadUser(project.created_by)
+  ));
   const clientsById = await fetchProjectClients(
     projects
       .map((project) => project.created_by)

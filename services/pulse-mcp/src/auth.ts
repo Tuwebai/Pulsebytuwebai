@@ -50,3 +50,31 @@ export function assertUserAllowed(userId: string) {
     throw new Error(`El usuario ${userId} no esta habilitado para este servidor MCP.`);
   }
 }
+
+export function canReadProject(projectId: string | null | undefined) {
+  const { allowedProjectIds } = pulseMcpConfig;
+
+  if (allowedProjectIds.length === 0) {
+    return true;
+  }
+
+  return typeof projectId === 'string' && allowedProjectIds.includes(projectId);
+}
+
+export function canReadUser(userId: string | null | undefined) {
+  const { allowedUserIds } = pulseMcpConfig;
+
+  if (allowedUserIds.length === 0) {
+    return true;
+  }
+
+  return typeof userId === 'string' && allowedUserIds.includes(userId);
+}
+
+export function hasProjectAllowlist() {
+  return pulseMcpConfig.allowedProjectIds.length > 0;
+}
+
+export function hasUserAllowlist() {
+  return pulseMcpConfig.allowedUserIds.length > 0;
+}
