@@ -28,6 +28,23 @@ export function isPlainObject(value: unknown): value is Record<string, unknown> 
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+export function getErrorReason(error: unknown) {
+  if (error instanceof Error && error.message.trim()) {
+    return error.message.trim();
+  }
+
+  if (isPlainObject(error)) {
+    const message = typeof error.message === 'string' ? error.message.trim() : '';
+    const details = typeof error.details === 'string' ? error.details.trim() : '';
+    const hint = typeof error.hint === 'string' ? error.hint.trim() : '';
+    const code = typeof error.code === 'string' ? error.code.trim() : '';
+
+    return [message, details, hint, code].filter(Boolean).join(' | ') || 'UNKNOWN_ERROR';
+  }
+
+  return 'UNKNOWN_ERROR';
+}
+
 export function createSupabaseAdminClient() {
   const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';

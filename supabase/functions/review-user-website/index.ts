@@ -1,5 +1,5 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
-import { corsHeaders, ensureAuthenticatedAdmin, isPlainObject, jsonResponse, validateBusinessDomain } from './shared.ts';
+import { corsHeaders, ensureAuthenticatedAdmin, getErrorReason, isPlainObject, jsonResponse, validateBusinessDomain } from './shared.ts';
 
 type WebsiteReviewStatus = 'missing' | 'pending_review' | 'approved' | 'rejected';
 type WebsiteReviewAction = 'save_pending' | 'approve' | 'reject';
@@ -216,7 +216,7 @@ serve(async (req) => {
       project_created: projectCreated,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'UNKNOWN_ERROR';
+    const message = getErrorReason(error);
 
     if (message === 'UNAUTHORIZED') {
       return jsonResponse(401, { error: message });
