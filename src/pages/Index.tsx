@@ -1,16 +1,7 @@
-import { Navigate } from 'react-router-dom';
-import { PulseLoaderScreen } from '@/components/PulseLoaderScreen';
-import { useApp } from '@/contexts/AppContext';
-import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
+import PulsePublicHomePage from '@/features/marketing/pages/PulsePublicHomePage';
 
 const Index = () => {
-  const { isAuthenticated, authReady, user } = useApp();
-
-  if (!authReady) {
-    return <PulseLoaderScreen />;
-  }
-
-  return <Navigate replace to={isAuthenticated ? getPostLoginPath(user) : '/login'} />;
+  return <PulsePublicHomePage />;
 };
 
 export default Index;
