@@ -1,5 +1,33 @@
 import { supabase } from './client.js';
+import { looksLikeUuid, normalizeIdentifier } from './identifiers.js';
 import type { TicketMessageRow, TicketRow } from './types.js';
+
+const TICKET_SELECT = 'id, asunto, mensaje, email, estado, prioridad, status, priority, user_id, assigned_admin_id, created_at, updated_at';
+
+export async function resolveTicketIdentifier(ticketIdentifier: string) {
+  const identifier = normalizeIdentifier(ticketIdentifier);
+
+  if (!identifier) {
+    throw new Error('Necesitamos un identificador de ticket valido.');
+  }
+
+  if (!looksLikeUuid(identifier)) {
+    throw new Error('El identificador real del ticket en Pulse debe ser un UUID valido.');
+  }
+
+  const { data, error } = await supabase
+    .from('tickets')
+    .select(TICKET_SELECT)
+    .eq('id', identifier)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) {
+    throw new Error(`No encontramos un ticket en Pulse para "${identifier}".`);
+  }
+
+  return data as TicketRow;
+}
 
 export async function fetchSupportTickets(userId: string, limit: number) {
   const { data: tickets, error } = await supabase

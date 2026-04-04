@@ -53,15 +53,23 @@ export interface NotificationRow {
 export interface TicketRow {
   id: string;
   asunto: string | null;
+  mensaje?: string | null;
+  email?: string | null;
   estado: string | null;
   prioridad: string | null;
+  status?: string | null;
+  priority?: string | null;
+  user_id?: string | null;
+  assigned_admin_id?: string | null;
   created_at: string | null;
   updated_at: string | null;
 }
 
 export interface TicketMessageRow {
+  id?: string;
   ticket_id: string;
   content: string;
   sender_role: 'client' | 'admin';
+  sender_id?: string;
   created_at: string;
 }

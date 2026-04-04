@@ -1,11 +1,12 @@
 export { fetchClientOverview } from './data/client-overview.js';
 export { createClientAccount, disableClientAccess, enableClientAccess, updateClientProfile } from './data/action-client.js';
 export { createUserNotification } from './data/action-notifications.js';
+export { createTicket, replyToTicket } from './data/action-ticket.js';
 export { archiveProject, assignProjectGa4, createProject, deleteProject, previewProjectDeletion, updateProjectDetails } from './data/action-project.js';
 export { fetchDashboardSummary } from './data/dashboard.js';
 export { fetchPulseMetrics } from './data/metrics.js';
 export { fetchNotifications } from './data/notifications.js';
 export { fetchLatestProjectForUser, fetchProjectSummary, listProjects, resolveProjectIdentifier } from './data/projects.js';
-export { fetchSupportTickets } from './data/support.js';
+export { fetchSupportTickets, resolveTicketIdentifier } from './data/support.js';
 export { listClients, searchEntities } from './data/user-search.js';
 export { fetchUserById, resolveUserIdentifier } from './data/users.js';

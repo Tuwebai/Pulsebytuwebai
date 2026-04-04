@@ -3,6 +3,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { registerClientActionTools } from './tools/action-client-tools.js';
 import { registerNotificationActionTools } from './tools/action-notification-tools.js';
 import { registerProjectActionTools } from './tools/action-project-tools.js';
+import { registerTicketActionTools } from './tools/action-ticket-tools.js';
 import { registerClientActivityTools } from './tools/client-activity-tools.js';
 import { registerClientTools } from './tools/client-tools.js';
 import { registerPulseTools } from './tools/pulse-tools.js';
@@ -20,6 +21,7 @@ export function createPulseMcpServer() {
   registerClientActivityTools(server);
   registerClientActionTools(server);
   registerProjectActionTools(server);
+  registerTicketActionTools(server);
   registerNotificationActionTools(server);
 
   return server;
