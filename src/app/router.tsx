@@ -86,6 +86,7 @@ const createLazyComponent = (importFn: () => Promise<LazyComponentModule>) =>
 const Onboarding = createLazyComponent(() => import('@/pages/Onboarding'));
 const Register = createLazyComponent(() => import('@/pages/Register'));
 const HomePage = createLazyComponent(() => import('@/features/dashboard/pages/HomePage'));
+const GooglePage = createLazyComponent(() => import('@/features/google/pages/GooglePage'));
 const PulsePage = createLazyComponent(() => import('@/features/pulse/pages/PulsePage'));
 const Admin = createLazyComponent(() => import('@/features/admin/pages/AdminPage'));
 const AdminProjectAlertsPage = createLazyComponent(() => import('@/features/admin/projects-tracking/pages/AdminProjectAlertsPage'));
@@ -149,6 +150,18 @@ function AppRoutes() {
             <OnboardingGate>
               <DashboardShell>
                 <HomePage />
+              </DashboardShell>
+            </OnboardingGate>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/google"
+        element={
+          <ProtectedRoute clientOnly>
+            <OnboardingGate>
+              <DashboardShell>
+                <GooglePage />
               </DashboardShell>
             </OnboardingGate>
           </ProtectedRoute>

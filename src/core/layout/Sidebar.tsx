@@ -1,4 +1,4 @@
-import { Activity, CreditCard, FolderOpen, LayoutDashboard, LifeBuoy } from 'lucide-react';
+import { Activity, CreditCard, FolderOpen, LayoutDashboard, LifeBuoy, Search } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PulseLogo } from '@/core/components';
@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { icon: LayoutDashboard, label: 'Inicio', to: '/dashboard' },
   { icon: Activity, label: 'Pulse', to: '/dashboard/pulse' },
+  { icon: Search, label: 'Google', to: '/dashboard/google' },
   { icon: FolderOpen, label: 'Proyecto', to: '/dashboard/proyecto' },
   { icon: CreditCard, label: 'Pagos', to: '/dashboard/pagos' },
   { icon: LifeBuoy, label: 'Soporte', to: '/dashboard/soporte' }

@@ -1,4 +1,4 @@
-import { CreditCard, FolderOpen, LifeBuoy } from 'lucide-react';
+import { CreditCard, FolderOpen, LifeBuoy, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AnimatedList from '@/core/components/AnimatedList';
 import { useApp } from '@/contexts/AppContext';
@@ -11,6 +11,7 @@ import {
   getProjectStatusVariant,
 } from '@/features/dashboard/components/homePage.utils';
 import { useHomeOverviewCards } from '@/features/dashboard/hooks/useHomeOverviewCards';
+import { getGoogleConnectionCopy, resolveGoogleConnectionState } from '@/features/google/services/googlePage.service';
 import { useUserProject } from '@/features/project/hooks/useUserProject';
 import { resolvePulseConnectionState } from '@/features/pulse/hooks/usePulseConnectionState';
 import { usePulseMetrics } from '@/features/pulse/hooks/usePulseMetrics';
@@ -67,6 +68,12 @@ export default function HomePage() {
     website: user?.website,
     websiteStatus: user?.website_status,
   });
+  const googleConnectionState = resolveGoogleConnectionState({
+    domain,
+    website: user?.website,
+    websiteStatus: user?.website_status,
+  });
+  const googleConnectionCopy = getGoogleConnectionCopy(googleConnectionState);
 
   return (
     <div className="space-y-6">
@@ -91,7 +98,7 @@ export default function HomePage() {
         visitsDelta={data?.visitsDelta ?? null}
       />
 
-      <AnimatedList className="grid gap-4 md:grid-cols-3" staggerMs={80}>
+      <AnimatedList className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" staggerMs={80}>
         <HomeShortcutCard
           badgeLabel={hasProject ? getProjectStatusLabel(primaryProject?.status) : 'Sin proyecto'}
           badgeVariant={hasProject ? getProjectStatusVariant(primaryProject?.status) : 'default'}
@@ -102,6 +109,18 @@ export default function HomePage() {
           iconClassName="bg-signal/15 text-signal"
           label="Mi Proyecto"
           onClick={() => navigate('/dashboard/proyecto')}
+        />
+
+        <HomeShortcutCard
+          badgeLabel={googleConnectionCopy.badgeLabel}
+          badgeVariant={googleConnectionCopy.badgeVariant}
+          ctaLabel="Ver Google →"
+          dataTour="home-google-card"
+          detail={googleConnectionCopy.description}
+          icon={Search}
+          iconClassName="bg-amber-500/15 text-amber-300"
+          label="Google"
+          onClick={() => navigate('/dashboard/google')}
         />
 
         <HomeShortcutCard

@@ -147,6 +147,15 @@ export function HelpCenterSearchPanel({
             variant="ghost"
             size="sm"
             className="h-10 w-full justify-start rounded-xl text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]"
+            onClick={() => onNavigate('/dashboard/google')}
+          >
+            <Search className="mr-2 h-4 w-4" />
+            Google
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-10 w-full justify-start rounded-xl text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]"
             onClick={() => onNavigate('/dashboard/proyecto')}
           >
             <FolderKanban className="mr-2 h-4 w-4" />
