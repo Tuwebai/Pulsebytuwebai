@@ -137,7 +137,18 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="mt-6 text-sm text-[var(--text-secondary)]">¿No tenés cuenta? Tu agencia te invita.</p>
+        <div className="mt-6 text-center">
+          <p className="text-sm text-[var(--text-secondary)]">¿No tenés cuenta? Tu agencia te invita.</p>
+          <div className="mt-3 flex items-center justify-center gap-2 text-xs text-[var(--text-tertiary)]">
+            <Link className="transition hover:text-[var(--text-primary)]" to="/terminos-condiciones">
+              Términos y condiciones
+            </Link>
+            <span>|</span>
+            <Link className="transition hover:text-[var(--text-primary)]" to="/politica-privacidad">
+              Política de privacidad
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -31,6 +31,25 @@ async function recoverSessionFromPersistence() {
   return data.session;
 }
 
+function readOAuthHashParams() {
+  if (typeof window === 'undefined' || !window.location.hash) {
+    return null;
+  }
+
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const accessToken = hashParams.get('access_token');
+  const refreshToken = hashParams.get('refresh_token');
+
+  if (!accessToken || !refreshToken) {
+    return null;
+  }
+
+  return {
+    accessToken,
+    refreshToken,
+  };
+}
+
 export const authService = {
   async getSession() {
     const sessionResult = await supabase.auth.getSession();
@@ -84,6 +103,61 @@ export const authService = {
         redirectTo: config.getAuthRedirectUrl(),
       },
     });
+  },
+
+  async processOAuthCallback() {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    const currentUrl = new URL(window.location.href);
+    const code = currentUrl.searchParams.get('code');
+
+    if (code) {
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.session) {
+        persistPulseSession(data.session);
+        return data.session;
+      }
+    }
+
+    const hashSession = readOAuthHashParams();
+    if (hashSession) {
+      const { data, error } = await supabase.auth.setSession({
+        access_token: hashSession.accessToken,
+        refresh_token: hashSession.refreshToken,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.session) {
+        persistPulseSession(data.session);
+        return data.session;
+      }
+    }
+
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+
+    if (error) {
+      throw error;
+    }
+
+    if (session) {
+      persistPulseSession(session);
+      return session;
+    }
+
+    return recoverSessionFromPersistence();
   },
 
   async signInWithEmail(email: string, password: string) {

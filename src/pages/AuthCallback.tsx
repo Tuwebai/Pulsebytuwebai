@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { config } from '@/config/environment';
 import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
+import { authService } from '@/features/auth/services/auth.service';
 import { userService } from '@/features/auth/services/user.service';
-import { supabase } from '@/lib/supabase/supabase';
 
 export default function AuthCallback() {
   const navigate = useNavigate();
@@ -11,18 +12,10 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-
-        if (error) {
-          console.error('Error en callback de autenticación:', error);
-          navigate('/login?error=auth_callback_failed');
-          return;
-        }
+        const session = await authService.processOAuthCallback();
 
         if (session?.user) {
+          window.history.replaceState({}, document.title, new URL(config.getAuthRedirectUrl()).pathname);
           let appUser = await userService.getUserById(session.user.id);
 
           if (!appUser) {
@@ -53,14 +46,14 @@ export default function AuthCallback() {
             appUser = await userService.getUserById(session.user.id);
           }
 
-          navigate(getPostLoginPath(appUser));
+          navigate(getPostLoginPath(appUser), { replace: true });
           return;
         }
 
-        navigate('/login');
+        navigate('/login', { replace: true });
       } catch (error) {
         console.error('Error procesando callback:', error);
-        navigate('/login?error=callback_processing_failed');
+        navigate('/login?error=callback_processing_failed', { replace: true });
       }
     };
 

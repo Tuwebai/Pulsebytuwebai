@@ -1,12 +1,44 @@
 // Configuración de entorno para la aplicación TuWebAI Dashboard
 
+function isLocalHost(hostname: string) {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('localhost');
+}
+
+function normalizeBasePath(basePath?: string) {
+  const value = (basePath || '/').trim();
+
+  if (!value || value === '/') {
+    return '';
+  }
+
+  const withLeadingSlash = value.startsWith('/') ? value : `/${value}`;
+  return withLeadingSlash.replace(/\/+$/, '');
+}
+
+function getRuntimeOrigin() {
+  if (typeof window !== 'undefined' && window.location.origin) {
+    return window.location.origin;
+  }
+
+  return import.meta.env.VITE_PUBLIC_URL || 'https://pulse.tuweb-ai.com';
+}
+
+function buildRuntimeUrl(pathname = '') {
+  const origin = getRuntimeOrigin();
+  const basePath = normalizeBasePath(import.meta.env.BASE_URL);
+  const normalizedPath = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  return `${origin}${basePath}${normalizedPath}`;
+}
+
 // Detectar el entorno actual
-const isDevelopment = import.meta.env.DEV || 
-                     window.location.hostname === 'localhost' || 
-                     window.location.hostname === '127.0.0.1' ||
-                     window.location.hostname.includes('localhost');
+const isDevelopment = import.meta.env.DEV || isLocalHost(window.location.hostname);
 
 const isProduction = import.meta.env.PROD;
+const baseUrl = `${getRuntimeOrigin()}${normalizeBasePath(import.meta.env.BASE_URL)}`;
+const authRedirectUrl = buildRuntimeUrl('/auth/callback');
+const resetPasswordUrl = buildRuntimeUrl('/auth/reset-password');
+const supportUrl = buildRuntimeUrl('/soporte');
+const adminSupportUrl = buildRuntimeUrl('/admin/support');
 
 export const config = {
   // Detectar el entorno actual
@@ -14,16 +46,11 @@ export const config = {
   isProduction,
   
   // Obtener la URL base según el entorno
-  getBaseUrl: () => {
-    if (isDevelopment) {
-      return window.location.origin;
-    }
-    return import.meta.env.VITE_PUBLIC_URL || window.location.origin;
-  },
+  getBaseUrl: () => baseUrl,
   
   // URLs de redirección
-  getAuthRedirectUrl: () => `${config.getBaseUrl()}/auth/callback`,
-  getResetPasswordUrl: () => `${config.getBaseUrl()}/auth/reset-password`,
+  getAuthRedirectUrl: () => authRedirectUrl,
+  getResetPasswordUrl: () => resetPasswordUrl,
   
   // Configuración de Supabase
   supabase: {
@@ -51,9 +78,9 @@ export const config = {
     version: '1.0.0',
     environment: isDevelopment ? 'development' : 'production',
     baseUrl: import.meta.env.BASE_URL || '/',
-    publicUrl: import.meta.env.VITE_PUBLIC_URL || (isDevelopment ? window.location.origin : 'https://pulse.tuweb-ai.com'),
-    supportUrl: `${import.meta.env.VITE_PUBLIC_URL || (isDevelopment ? window.location.origin : 'https://pulse.tuweb-ai.com')}/soporte`,
-    adminSupportUrl: `${import.meta.env.VITE_PUBLIC_URL || (isDevelopment ? window.location.origin : 'https://pulse.tuweb-ai.com')}/admin/support`
+    publicUrl: baseUrl,
+    supportUrl,
+    adminSupportUrl
   },
 
   // Configuración de features
