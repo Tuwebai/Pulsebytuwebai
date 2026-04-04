@@ -48,12 +48,14 @@ export function registerPulseTools(server: McpServer) {
       userIdentifier: z.string().min(1).optional().describe('UUID, email, nombre o telefono del cliente'),
       status: z.string().min(1).optional(),
       completion_percentage_lt: z.number().int().min(0).max(100).optional(),
+      include_archived: z.boolean().default(false),
     },
     outputSchema: z.object({
       filters: z.object({
         userId: z.string().nullable(),
         status: z.string().nullable(),
         completion_percentage_lt: z.number().nullable(),
+        include_archived: z.boolean(),
       }),
       resolvedUser: z.object({
         id: z.string(),
@@ -67,6 +69,7 @@ export function registerPulseTools(server: McpServer) {
         domain: z.string().nullable(),
         ga4_property_id: z.string().nullable(),
         completion_percentage: z.number().nullable(),
+        is_active: z.boolean(),
         created_at: z.string().nullable(),
         updated_at: z.string().nullable(),
         created_by: z.string().nullable(),
@@ -78,13 +81,14 @@ export function registerPulseTools(server: McpServer) {
         }).nullable(),
       })),
     }),
-  }, async ({ userIdentifier, status, completion_percentage_lt }) => {
+  }, async ({ userIdentifier, status, completion_percentage_lt, include_archived }) => {
     try {
       const resolvedUser = userIdentifier ? await resolveUserFromInput(userIdentifier) : null;
       const result = await listProjects({
         userId: resolvedUser?.id,
         status,
         completionPercentageLt: completion_percentage_lt,
+        includeArchived: include_archived,
       });
 
       return asToolResult({

@@ -24,6 +24,14 @@ type ProjectCreateInput = {
   ga4_property_id?: string;
 };
 
+type ProjectArchiveInput = {
+  projectIdentifier: string;
+};
+
+type ProjectDeleteInput = {
+  projectIdentifier: string;
+};
+
 async function resolveProjectFromActionInput(input: ProjectMutationInput) {
   if (input.projectIdentifier?.trim()) {
     return resolveProjectIdentifier(input.projectIdentifier);
@@ -110,6 +118,19 @@ function sanitizeProjectCreateInput(input: ProjectCreateInput) {
   return payload;
 }
 
+async function fetchProjectDeletionDependencies(projectId: string) {
+  const { count, error } = await supabase
+    .from('pulse_metrics')
+    .select('*', { count: 'exact', head: true })
+    .eq('project_id', projectId);
+
+  if (error) throw error;
+
+  return {
+    pulse_metrics: count ?? 0,
+  };
+}
+
 export async function createProject(input: ProjectCreateInput) {
   const user = await resolveUserIdentifier(input.userIdentifier);
   const projectInsert = sanitizeProjectCreateInput({
@@ -137,6 +158,73 @@ export async function createProject(input: ProjectCreateInput) {
       phone: user.phone,
     },
     project: createdProject,
+  };
+}
+
+export async function archiveProject(input: ProjectArchiveInput) {
+  const project = await resolveProjectIdentifier(input.projectIdentifier);
+
+  if (project.is_active === false) {
+    return {
+      archived_at: project.updated_at ?? new Date().toISOString(),
+      projectBefore: project,
+      projectAfter: project,
+    };
+  }
+
+  const archivedAt = new Date().toISOString();
+  const { data: archivedProject, error } = await supabase
+    .from('projects')
+    .update({
+      is_active: false,
+      updated_at: archivedAt,
+    })
+    .eq('id', project.id)
+    .select('id, name, status, domain, ga4_property_id, completion_percentage, is_active, updated_at, created_by')
+    .single();
+
+  if (error) throw error;
+
+  return {
+    archived_at: archivedAt,
+    projectBefore: project,
+    projectAfter: archivedProject,
+  };
+}
+
+export async function previewProjectDeletion(input: ProjectDeleteInput) {
+  const project = await resolveProjectIdentifier(input.projectIdentifier);
+  const dependencies = await fetchProjectDeletionDependencies(project.id);
+
+  return {
+    project,
+    is_archived: project.is_active === false,
+    dependencies,
+  };
+}
+
+export async function deleteProject(input: ProjectDeleteInput) {
+  const preview = await previewProjectDeletion(input);
+
+  if (!preview.is_archived) {
+    throw new Error('Solo podemos eliminar proyectos que ya esten archivados en Pulse.');
+  }
+
+  const { error } = await supabase
+    .from('projects')
+    .delete()
+    .eq('id', preview.project.id);
+
+  if (error) throw error;
+
+  return {
+    deleted_at: new Date().toISOString(),
+    project: {
+      id: preview.project.id,
+      name: preview.project.name,
+      domain: preview.project.domain,
+    },
+    deleted_dependencies: preview.dependencies,
   };
 }
 
