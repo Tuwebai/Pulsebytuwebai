@@ -4,7 +4,8 @@ function escapeHtml(value: string) {
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+    .replaceAll("'", '&#39;')
+    .replace(/[^\u0000-\u007F]/g, (character) => `&#${character.codePointAt(0)};`);
 }
 
 function formatParagraphs(message: string) {
