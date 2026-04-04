@@ -10,13 +10,21 @@ function normalizeUserRole(role: string | null | undefined): AppUser['role'] {
 export function createFallbackAppUser(supabaseUser: SupabaseUser): AppUser {
   const { email, user_metadata } = supabaseUser;
   const avatar = user_metadata?.avatar_url || user_metadata?.picture || user_metadata?.photoURL || user_metadata?.image;
+  const role = normalizeUserRole(typeof user_metadata?.role === 'string' ? user_metadata.role : undefined);
+  const pulseAccessStatus =
+    user_metadata?.pulse_access_status === 'active' ||
+    user_metadata?.pulse_access_status === 'invited' ||
+    user_metadata?.pulse_access_status === 'disabled' ||
+    user_metadata?.pulse_access_status === 'pending'
+      ? user_metadata.pulse_access_status
+      : undefined;
 
   return {
     id: supabaseUser.id,
     email: supabaseUser.email || '',
     full_name: user_metadata?.full_name || user_metadata?.name || email?.split('@')[0] || '',
-    role: 'user',
-    pulse_access_status: 'pending',
+    role,
+    pulse_access_status: role === 'admin' ? pulseAccessStatus : (pulseAccessStatus ?? 'pending'),
     avatar_url: avatar,
     avatar,
     created_at: new Date().toISOString(),

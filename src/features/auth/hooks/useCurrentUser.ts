@@ -10,6 +10,12 @@ import { realAvatarService } from '@/lib/config/avatarProviders';
 import { onboardingApi } from '@/api/pulse/onboardingApi';
 import { hasPulseAccess } from '@/features/auth/utils/pulseAccess';
 import { createFallbackAppUser, mergeOnboardingSnapshot, normalizeAppUser } from '@/features/auth/hooks/useCurrentUser.utils';
+import {
+  clearPersistedResolvedUser,
+  persistResolvedUser,
+  readPersistedResolvedUser,
+} from '@/features/auth/services/authResolvedUserPersistence.service';
+import { TransientUserFetchError } from '@/features/auth/services/user.service';
 
 interface UserUpdatePayload {
   full_name?: string | null;
@@ -67,6 +73,7 @@ export function useCurrentUser({
     accessToken: null,
     userId: null
   });
+  const resolvedUserRef = useRef<User | null>(null);
 
   useEffect(() => {
     authSnapshotRef.current = {
@@ -74,6 +81,10 @@ export function useCurrentUser({
       userId: supabaseUser?.id ?? null
     };
   }, [session?.access_token, supabaseUser?.id]);
+
+  useEffect(() => {
+    resolvedUserRef.current = user;
+  }, [user]);
 
   const clearError = useCallback(() => {
     setError(null);
@@ -93,12 +104,20 @@ export function useCurrentUser({
         setLoading(true);
 
         const cacheKey = `user_${supabaseUser.id}`;
-        let userData = getCachedData<User>(cacheKey);
+        let userData = getCachedData<User>(cacheKey) ?? readPersistedResolvedUser(supabaseUser.id);
 
         if (!userData) {
           try {
             userData = normalizeAppUser(await userService.getUserById(supabaseUser.id));
-          } catch {
+          } catch (error) {
+            if (error instanceof TransientUserFetchError) {
+              userData = readPersistedResolvedUser(supabaseUser.id);
+            } else {
+              throw error;
+            }
+          }
+
+          if (!userData) {
             userData = createFallbackAppUser(supabaseUser);
 
             await userService.upsertUser(userData);
@@ -106,6 +125,7 @@ export function useCurrentUser({
 
           if (userData) {
             setCachedData(cacheKey, userData, 10 * 60 * 1000);
+            persistResolvedUser(userData);
           }
         }
 
@@ -159,6 +179,7 @@ export function useCurrentUser({
             }
 
             setCachedData(cacheKey, userData, 10 * 60 * 1000);
+            persistResolvedUser(userData);
           } catch {
             // Error sincronizando avatar
           }
@@ -167,6 +188,7 @@ export function useCurrentUser({
         setUser(userData as User);
         setIsAuthenticated(true);
         setError(null);
+        persistResolvedUser(userData as User);
 
         if (userData && userData.id && !isStaleAuthFlow()) {
           await userPreferencesService.migrateLocalStorageToDB(userData.id);
@@ -182,8 +204,17 @@ export function useCurrentUser({
             await userPreferencesService.saveUserPreference(userData.id, 'welcome_back', 'tuwebai_welcome_back', 'true');
           }
         }
-      } catch {
-        setError('Error de autenticación');
+      } catch (error) {
+        const persistedUser = readPersistedResolvedUser(supabaseUser.id) ?? resolvedUserRef.current;
+
+        if (persistedUser) {
+          setUser(persistedUser);
+          setIsAuthenticated(true);
+          setError(null);
+          setCachedData(`user_${persistedUser.id}`, persistedUser, 10 * 60 * 1000);
+        } else {
+          setError(error instanceof Error ? error.message : 'Error de autenticación');
+        }
       } finally {
         setAuthReady(true);
         setLoading(false);
@@ -194,6 +225,7 @@ export function useCurrentUser({
       setProjects([]);
       setLogs([]);
       clearCache();
+      clearPersistedResolvedUser(resolvedUserRef.current?.id ?? authSnapshotRef.current.userId);
 
       setAuthReady(true);
       setLoading(false);
@@ -262,6 +294,7 @@ export function useCurrentUser({
             }
 
             setCachedData(`user_${user.id}`, nextUser, 10 * 60 * 1000);
+            persistResolvedUser(nextUser);
 
             return nextUser;
           });
@@ -280,7 +313,15 @@ export function useCurrentUser({
       setLoading(true);
       try {
         await userService.updateUser(user.id, { ...updates, updated_at: new Date().toISOString() });
-        setUser((prev) => (prev ? { ...prev, ...updates } : prev));
+        setUser((prev) => {
+          if (!prev) {
+            return prev;
+          }
+
+          const nextUser = { ...prev, ...updates };
+          persistResolvedUser(nextUser);
+          return nextUser;
+        });
         setCachedData(`user_${user.id}`, { ...user, ...updates }, 10 * 60 * 1000);
         return true;
       } catch {

@@ -1,5 +1,12 @@
 import { supabase } from '@/lib/supabase/supabase';
 
+export class TransientUserFetchError extends Error {
+  constructor(message = 'USER_FETCH_TRANSIENT') {
+    super(message);
+    this.name = 'TransientUserFetchError';
+  }
+}
+
 export interface UserRecord {
   id: string;
   email: string;
@@ -75,7 +82,7 @@ export const userService = {
 
     if (error) {
       if (error.message?.includes('Failed to fetch') || error.message?.includes('ERR_CONNECTION_CLOSED')) {
-        return null;
+        throw new TransientUserFetchError(error.message);
       }
 
       throw error;
