@@ -12,6 +12,25 @@ function buildNotificationBody(data) {
   return senderName ? `${senderName}\n${message}` : message;
 }
 
+function notifyClientsToPlayPushSound(payload) {
+  return clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+    if (!clientList.length) {
+      return;
+    }
+
+    const hasVisibleClient = clientList.some((client) => client.visibilityState === 'visible' || client.focused);
+
+    if (hasVisibleClient) {
+      return;
+    }
+
+    clientList[0].postMessage({
+      type: 'PULSE_PUSH_SOUND',
+      payload,
+    });
+  });
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
 });
@@ -49,7 +68,7 @@ self.addEventListener('push', (event) => {
     tag: data.primaryKey || undefined,
   };
 
-  event.waitUntil(self.registration.showNotification(buildNotificationTitle(data), options));
+  event.waitUntil(Promise.all([self.registration.showNotification(buildNotificationTitle(data), options), notifyClientsToPlayPushSound(options.data)]));
 });
 
 self.addEventListener('notificationclick', (event) => {
