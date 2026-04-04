@@ -1,5 +1,6 @@
 import { pulseMcpConfig } from '../env.js';
 import { supabase } from './client.js';
+import { sendPulseEmail } from './email-delivery.js';
 
 type PulseAccessMode = 'welcome' | 'reentry';
 
@@ -48,39 +49,14 @@ async function sendPulseAccessEmail(params: {
   accessUrl: string;
   mode: PulseAccessMode;
 }) {
-  const zeptoMailToken = process.env.ZEPTOMAIL_SEND_MAIL_TOKEN;
-  const zeptoMailApiUrl = process.env.ZEPTOMAIL_API_URL || 'https://api.zeptomail.com/v1.1/email';
-  const from = process.env.SMTP_FROM || 'pulse@tuweb-ai.com';
-  const replyTo = process.env.EMAIL_REPLY_TO || 'pulse@tuweb-ai.com';
-  const fromName = process.env.EMAIL_FROM_NAME || 'Pulse by TuWebAI';
-
-  if (!zeptoMailToken) {
-    throw new Error('PULSE_ACCESS_EMAIL_CONFIG_MISSING');
-  }
-
   const copy = getPulseAccessCopy(params.mode);
-  const response = await fetch(zeptoMailApiUrl, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Zoho-enczapikey ${zeptoMailToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: { address: from, name: fromName },
-      to: [{ email_address: { address: params.email, name: params.name } }],
-      reply_to: [{ address: replyTo, name: fromName }],
-      subject: copy.subject,
-      htmlbody: buildHtml(params),
-      track_clicks: false,
-      track_opens: false,
-      client_reference: `pulse-access:${params.mode}:${params.email}`,
-    }),
+  await sendPulseEmail({
+    toEmail: params.email,
+    toName: params.name,
+    subject: copy.subject,
+    htmlbody: buildHtml(params),
+    clientReference: `pulse-access:${params.mode}:${params.email}`,
   });
-
-  if (!response.ok) {
-    throw new Error(`PULSE_ACCESS_EMAIL_FAILED:${response.status}`);
-  }
 }
 
 export async function deliverPulseAccessEmail(params: {

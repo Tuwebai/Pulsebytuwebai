@@ -1,4 +1,5 @@
 export { fetchClientOverview } from './data/client-overview.js';
+export { sendBrandedEmail } from './data/action-email.js';
 export { createClientAccount, disableClientAccess, enableClientAccess, updateClientProfile } from './data/action-client.js';
 export { createUserNotification } from './data/action-notifications.js';
 export { assignTicket, closeTicket, createTicket, reopenTicket, replyToTicket } from './data/action-ticket.js';
