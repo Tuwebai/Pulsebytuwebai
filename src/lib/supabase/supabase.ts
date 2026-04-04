@@ -67,7 +67,8 @@ const getSupabaseClient = (): SupabaseClient => {
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: true,
-          storage: createCustomStorage()
+          storage: createCustomStorage(),
+          storageKey: 'pulse.auth.supabase'
         }
       });
       

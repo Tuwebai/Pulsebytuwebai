@@ -46,7 +46,18 @@ export function useSupabaseAuth() {
     try {
       const {
         data: { subscription },
-      } = authService.onAuthStateChange(async (_event, nextSession) => {
+      } = authService.onAuthStateChange(async (event, nextSession) => {
+        if (!nextSession && event === 'SIGNED_OUT') {
+          const recoveredSession = await authService.recoverSession();
+
+          if (recoveredSession) {
+            setSession(recoveredSession);
+            setUser(recoveredSession.user);
+            setLoading(false);
+            return;
+          }
+        }
+
         setSession(nextSession);
         setUser(nextSession?.user ?? null);
         setLoading(false);
