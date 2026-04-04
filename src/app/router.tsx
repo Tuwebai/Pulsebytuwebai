@@ -11,28 +11,55 @@ import ProtectedRoute from '@/features/auth/components/ProtectedRoute';
 import OnboardingGate from '@/features/onboarding/components/OnboardingGate';
 import DashboardShell from '@/core/layout/DashboardLayout';
 import { serviceWorkerManager } from '@/utils/serviceWorker';
+import Index from '@/pages/Index';
+import Login from '@/pages/Login';
+import AuthCallback from '@/pages/AuthCallback';
+import PoliticaPrivacidad from '@/pages/PoliticaPrivacidad';
+import TerminosCondiciones from '@/pages/TerminosCondiciones';
+import PulseAccessPendingPage from '@/features/auth/pages/PulseAccessPendingPage';
+import SSOPage from '@/features/auth/pages/SSOPage';
 
 type LazyComponentModule = {
   default: ComponentType;
 };
 
+const ROUTE_CHUNK_RELOAD_KEY = 'pulse.route.chunk-reload';
+
+function isRecoverableChunkError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  const message = error.message.toLowerCase();
+  return (
+    message.includes('failed to fetch dynamically imported module') ||
+    message.includes('importing a module script failed') ||
+    message.includes('dynamically imported module') ||
+    message.includes('chunk')
+  );
+}
+
 const createLazyComponent = (importFn: () => Promise<LazyComponentModule>) =>
   lazy(() =>
     importFn().catch((error): Promise<LazyComponentModule> => {
       console.error('Error loading component:', error);
+
+      if (typeof window !== 'undefined' && isRecoverableChunkError(error)) {
+        const alreadyRetried = window.sessionStorage.getItem(ROUTE_CHUNK_RELOAD_KEY) === '1';
+
+        if (!alreadyRetried) {
+          window.sessionStorage.setItem(ROUTE_CHUNK_RELOAD_KEY, '1');
+          window.location.reload();
+        }
+      }
+
       return Promise.resolve({
         default: RouteLoadErrorState
       });
     })
   );
-
-const Index = createLazyComponent(() => import('@/pages/Index'));
-const Login = createLazyComponent(() => import('@/pages/Login'));
 const Onboarding = createLazyComponent(() => import('@/pages/Onboarding'));
 const Register = createLazyComponent(() => import('@/pages/Register'));
-const PulseAccessPendingPage = createLazyComponent(() => import('@/features/auth/pages/PulseAccessPendingPage'));
-const PoliticaPrivacidad = createLazyComponent(() => import('@/pages/PoliticaPrivacidad'));
-const TerminosCondiciones = createLazyComponent(() => import('@/pages/TerminosCondiciones'));
 const HomePage = createLazyComponent(() => import('@/features/dashboard/pages/HomePage'));
 const PulsePage = createLazyComponent(() => import('@/features/pulse/pages/PulsePage'));
 const Admin = createLazyComponent(() => import('@/features/admin/pages/AdminPage'));
@@ -48,8 +75,6 @@ const Configuracion = createLazyComponent(() => import('@/features/settings/page
 const Facturacion = createLazyComponent(() => import('@/features/payments/pages/PaymentsPage'));
 const Soporte = createLazyComponent(() => import('@/features/support/pages/SupportPage'));
 const NotFound = createLazyComponent(() => import('@/pages/NotFound'));
-const AuthCallback = createLazyComponent(() => import('@/pages/AuthCallback'));
-const SSOPage = createLazyComponent(() => import('@/features/auth/pages/SSOPage'));
 
 const ServiceWorkerInitializer = () => {
   React.useEffect(() => {
