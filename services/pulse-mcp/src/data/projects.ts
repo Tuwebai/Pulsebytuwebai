@@ -24,6 +24,15 @@ async function fetchProjectClients(userIds: string[]) {
   );
 }
 
+async function fetchProjectClient(userId: string | null | undefined) {
+  if (!userId) {
+    return null;
+  }
+
+  const clients = await fetchProjectClients([userId]);
+  return clients.get(userId) ?? null;
+}
+
 export async function resolveProjectIdentifier(projectIdentifier: string) {
   const identifier = normalizeIdentifier(projectIdentifier);
 
@@ -105,6 +114,59 @@ export async function fetchProjectSummary(projectId: string) {
   return {
     project: project as ProjectRow,
     ...metricSummary,
+  };
+}
+
+export async function fetchProjectDetail(projectId: string) {
+  const { data, error } = await supabase
+    .from('projects')
+    .select('id, name, status, domain, ga4_property_id, completion_percentage, is_active, created_at, updated_at, created_by, description, priority, progress, start_date, end_date')
+    .eq('id', projectId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) throw new Error(`No encontramos el proyecto ${projectId}.`);
+
+  const project = data as ProjectRow & {
+    description?: string | null;
+    priority?: string | null;
+    progress?: number | null;
+    start_date?: string | null;
+    end_date?: string | null;
+  };
+  const [client, metricSummary] = await Promise.all([
+    fetchProjectClient(project.created_by),
+    fetchProjectSummary(projectId),
+  ]);
+
+  return {
+    project: {
+      id: project.id,
+      name: project.name,
+      status: project.status,
+      domain: project.domain,
+      ga4_property_id: project.ga4_property_id ?? null,
+      completion_percentage: project.completion_percentage ?? null,
+      is_active: project.is_active ?? true,
+      created_at: project.created_at ?? null,
+      updated_at: project.updated_at ?? null,
+      created_by: project.created_by ?? null,
+      description: project.description ?? null,
+      priority: project.priority ?? null,
+      progress: project.progress ?? null,
+      start_date: project.start_date ?? null,
+      end_date: project.end_date ?? null,
+    },
+    client: client
+      ? {
+          id: client.id,
+          email: client.email,
+          full_name: client.full_name,
+          phone: client.phone,
+        }
+      : null,
+    latestMetric: metricSummary.latestMetric,
+    recentTotals: metricSummary.recentTotals,
   };
 }
 

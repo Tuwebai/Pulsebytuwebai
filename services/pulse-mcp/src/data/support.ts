@@ -113,3 +113,55 @@ export async function fetchSupportTickets(userId: string, limit: number) {
     })),
   };
 }
+
+export async function fetchTicketDetail(ticketId: string) {
+  const ticket = await resolveTicketIdentifier(ticketId);
+  const [messagesResult, clientResult, assigneeResult] = await Promise.all([
+    supabase
+      .from('ticket_messages')
+      .select('id, ticket_id, sender_id, sender_role, content, is_read, read_at, created_at')
+      .eq('ticket_id', ticketId)
+      .order('created_at', { ascending: true }),
+    ticket.user_id
+      ? supabase.from('users').select('id, email, full_name, phone, role').eq('id', ticket.user_id).maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+    ticket.assigned_admin_id
+      ? supabase.from('users').select('id, email, full_name, role').eq('id', ticket.assigned_admin_id).maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+  ]);
+
+  if (messagesResult.error) throw messagesResult.error;
+  if (clientResult.error) throw clientResult.error;
+  if (assigneeResult.error) throw assigneeResult.error;
+
+  return {
+    ticket,
+    client: clientResult.data
+      ? {
+          id: clientResult.data.id,
+          email: clientResult.data.email,
+          full_name: clientResult.data.full_name,
+          phone: clientResult.data.phone ?? null,
+          role: clientResult.data.role ?? null,
+        }
+      : null,
+    assignee: assigneeResult.data
+      ? {
+          id: assigneeResult.data.id,
+          email: assigneeResult.data.email,
+          full_name: assigneeResult.data.full_name,
+          role: assigneeResult.data.role ?? null,
+        }
+      : null,
+    messages: ((messagesResult.data ?? []) as Array<TicketMessageRow & { is_read?: boolean | null; read_at?: string | null }>).map((message) => ({
+      id: message.id ?? null,
+      ticket_id: message.ticket_id,
+      sender_id: message.sender_id ?? null,
+      sender_role: message.sender_role,
+      content: message.content,
+      is_read: message.is_read ?? null,
+      read_at: message.read_at ?? null,
+      created_at: message.created_at,
+    })),
+  };
+}
