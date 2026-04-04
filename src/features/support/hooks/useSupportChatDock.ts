@@ -15,14 +15,15 @@ import {
   useSupportChatDockIntents,
   useSupportChatReadState,
 } from '@/features/support/hooks/useSupportChatDock.effects';
+import { useSupportChatMessagesRealtime } from '@/features/support/hooks/useSupportChatMessagesRealtime';
 import { createSupportChatTicket, submitSupportChatReply } from '@/features/support/hooks/useSupportChatDock.actions';
 import { buildConversationIdentity } from '@/features/support/hooks/supportChatIdentity.utils';
 import { type SupportChatScope } from '@/features/support/supportChat.events';
 import {
   canReplyToSupportTicket,
-  resolveDefaultSupportTicket,
   resolveSupportPendingCount,
 } from '@/features/support/supportChat.utils';
+import type { TicketMessage } from '@/features/support/ticketMessages.types';
 
 const SUPPORT_DRAFT_INITIAL_STATE: SupportDraftState = {
   title: '',
@@ -30,9 +31,39 @@ const SUPPORT_DRAFT_INITIAL_STATE: SupportDraftState = {
   priority: 'medium',
 };
 
+function buildOptimisticTicketMessage({
+  content,
+  scope,
+  ticketId,
+  user,
+}: {
+  content: string;
+  scope: SupportChatScope;
+  ticketId: string;
+  user: NonNullable<ReturnType<typeof useApp>['user']>;
+}): TicketMessage {
+  return {
+    content,
+    created_at: new Date().toISOString(),
+    id: `optimistic:${ticketId}:${Date.now()}`,
+    is_read: true,
+    read_at: null,
+    sender: {
+      avatar_url: user.avatar_url ?? null,
+      email: user.email,
+      full_name: user.full_name ?? null,
+      id: user.id,
+    },
+    sender_id: user.id,
+    sender_role: scope === 'admin' ? 'admin' : 'client',
+    ticket_id: ticketId,
+  };
+}
+
 export function useSupportChatDock(scope: SupportChatScope) {
   const { user } = useApp();
   const [responseText, setResponseText] = useState('');
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
   const [createTicketOpen, setCreateTicketOpen] = useState(false);
   const [focusNonce, setFocusNonce] = useState(0);
   const [draft, setDraft] = useSessionStorageState<SupportDraftState>(
@@ -113,6 +144,11 @@ export function useSupportChatDock(scope: SupportChatScope) {
     setMessagesByTicketId,
     userId: user?.id,
   });
+  useSupportChatMessagesRealtime({
+    ticketIds: tickets.map((ticket) => ticket.id),
+    userId: user?.id,
+    setMessagesByTicketId,
+  });
   useSupportChatDockIntents({
     scope,
     selectTicket,
@@ -121,11 +157,10 @@ export function useSupportChatDock(scope: SupportChatScope) {
   });
 
   const openConversation = useCallback(() => {
-    selectTicket(selectedTicketId ?? resolveDefaultSupportTicket(tickets, scope, user?.id)?.id ?? null);
+    selectTicket(null);
     setCreateTicketOpen(false);
     setOpen(true);
-    setFocusNonce((current) => current + 1);
-  }, [scope, selectTicket, selectedTicketId, setOpen, tickets, user?.id]);
+  }, [selectTicket, setOpen]);
 
   const closeConversation = useCallback(() => {
     setOpen(false);
@@ -140,32 +175,73 @@ export function useSupportChatDock(scope: SupportChatScope) {
   }, [selectTicket, setOpen]);
 
   const submitReply = useCallback(async () => {
+    if (isSubmittingReply) {
+      return;
+    }
+
+    const currentTicketId = selectedTicket?.id ?? null;
+    const trimmedResponse = responseText.trim();
+
+    if (!currentTicketId || !trimmedResponse || !user?.id) {
+      return;
+    }
+
+    setIsSubmittingReply(true);
+    setResponseText('');
+    const optimisticMessage = buildOptimisticTicketMessage({
+      content: trimmedResponse,
+      scope,
+      ticketId: currentTicketId,
+      user,
+    });
+    setMessagesByTicketId((current) => ({
+      ...current,
+      [currentTicketId]: [...(current[currentTicketId] ?? []), optimisticMessage],
+    }));
+
     try {
-      const sent = await submitSupportChatReply({
+      const result = await submitSupportChatReply({
         canClientSend,
         canReply,
         loadTickets,
-        responseText,
+        responseText: trimmedResponse,
         scope,
         selectedTicket,
         user,
       });
 
-      if (!sent) {
+      if (!result) {
+        setMessagesByTicketId((current) => ({
+          ...current,
+          [currentTicketId]: (current[currentTicketId] ?? []).filter((message) => message.id !== optimisticMessage.id),
+        }));
+        setResponseText(trimmedResponse);
         return;
       }
 
-      setResponseText('');
+      setMessagesByTicketId((current) => ({
+        ...current,
+        [result.ticketId]: (current[result.ticketId] ?? []).map((message) =>
+          message.id === optimisticMessage.id ? result.message : message,
+        ),
+      }));
       setOpen(true);
     } catch (error) {
+      setMessagesByTicketId((current) => ({
+        ...current,
+        [currentTicketId]: (current[currentTicketId] ?? []).filter((message) => message.id !== optimisticMessage.id),
+      }));
+      setResponseText(trimmedResponse);
       console.error('Error respondiendo ticket desde burbuja:', error);
       toast({
         title: 'No pudimos enviar tu mensaje',
         description: 'Volve a intentar en unos segundos.',
         variant: 'destructive',
       });
+    } finally {
+      setIsSubmittingReply(false);
     }
-  }, [canClientSend, canReply, loadTickets, responseText, scope, selectedTicket, setOpen, user]);
+  }, [canClientSend, canReply, isSubmittingReply, loadTickets, responseText, scope, selectedTicket, setMessagesByTicketId, setOpen, user]);
 
   const createTicket = useCallback(async () => {
     try {
@@ -215,6 +291,7 @@ export function useSupportChatDock(scope: SupportChatScope) {
     setDraft,
     setSelectedTicketId: selectTicket,
     setResponseText,
+    isSubmittingReply,
     submitReply,
     tickets,
   };
