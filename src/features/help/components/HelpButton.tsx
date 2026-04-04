@@ -13,16 +13,11 @@ import { HelpSettings } from './HelpSettings';
 
 export default function HelpButton({
   variant = 'default',
-  showBadge = true,
   className,
 }: HelpButtonProps) {
   const { isMobile } = useResponsiveHelpButton();
-  const { availableFlows, completedFlows, startTutorial } = useHelpCenterState();
+  const { completedFlows, startTutorial } = useHelpCenterState();
   const [isHelpCenterOpen, setIsHelpCenterOpen] = useState(false);
-
-  const tutorialsCount = availableFlows.filter(
-    (flow) => !completedFlows.includes(flow.id),
-  ).length;
   const openHelpCenter = () => {
     window.dispatchEvent(new CustomEvent(PRODUCT_TOUR_CLOSE_EVENT));
     setIsHelpCenterOpen(true);
@@ -34,8 +29,6 @@ export default function HelpButton({
         <HelpButtonMinimal
           className={className}
           onOpen={openHelpCenter}
-          showBadge={showBadge}
-          tutorialsCount={tutorialsCount}
         />
       ) : null}
 
@@ -46,8 +39,6 @@ export default function HelpButton({
           isMobile={isMobile}
           onOpen={openHelpCenter}
           onStartTutorial={startTutorial}
-          showBadge={showBadge}
-          tutorialsCount={tutorialsCount}
         />
       ) : null}
 
@@ -56,8 +47,6 @@ export default function HelpButton({
           className={className}
           isMobile={isMobile}
           onOpen={openHelpCenter}
-          showBadge={showBadge}
-          tutorialsCount={tutorialsCount}
         />
       ) : null}
 

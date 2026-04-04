@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { motion } from '@/components/OptimizedMotion';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { HelpButtonQuickMenu } from './HelpButtonQuickMenu';
 import { cn } from '@/lib/utils';
@@ -13,8 +12,6 @@ interface HelpButtonFloatingProps {
   isMobile: boolean;
   onOpen: () => void;
   onStartTutorial: (flowId: string) => void;
-  showBadge: boolean;
-  tutorialsCount: number;
 }
 
 export function HelpButtonFloating({
@@ -23,8 +20,6 @@ export function HelpButtonFloating({
   isMobile,
   onOpen,
   onStartTutorial,
-  showBadge,
-  tutorialsCount,
 }: HelpButtonFloatingProps) {
   const [showQuickMenu, setShowQuickMenu] = useState(false);
 
@@ -54,19 +49,6 @@ export function HelpButtonFloating({
           >
             <HelpCircle className={cn(isMobile ? 'w-5 h-5' : 'w-6 h-6')} />
           </Button>
-
-          {showBadge && tutorialsCount > 0 && (
-            <Badge
-              variant="destructive"
-              className={cn(
-                'absolute p-0 flex items-center justify-center text-xs font-bold',
-                isMobile ? '-top-1 -right-1 h-5 w-5' : '-top-2 -right-2 h-6 w-6',
-              )}
-            >
-              {tutorialsCount}
-            </Badge>
-          )}
-
           {showQuickMenu && (
             <HelpButtonQuickMenu
               completedFlows={completedFlows}

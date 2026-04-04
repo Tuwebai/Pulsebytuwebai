@@ -1,21 +1,16 @@
 import { HelpCircle } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface HelpButtonMinimalProps {
   className?: string;
   onOpen: () => void;
-  showBadge: boolean;
-  tutorialsCount: number;
 }
 
 export function HelpButtonMinimal({
   className,
   onOpen,
-  showBadge,
-  tutorialsCount,
 }: HelpButtonMinimalProps) {
   return (
     <div className={cn('relative', className)}>
@@ -29,15 +24,6 @@ export function HelpButtonMinimal({
       >
         <HelpCircle className="h-4 w-4" />
       </Button>
-
-      {showBadge && tutorialsCount > 0 ? (
-        <Badge
-          variant="destructive"
-          className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-[10px]"
-        >
-          {tutorialsCount}
-        </Badge>
-      ) : null}
     </div>
   );
 }
