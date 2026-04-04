@@ -66,7 +66,13 @@ serve(async (req) => {
       .eq('is_active', true);
 
     if (subscriptionsError) throw subscriptionsError;
-    if (!subscriptions?.length) return jsonResponse(200, { delivered: 0, inactive: 0 });
+    if (!subscriptions?.length) {
+      console.log('dispatch-push-notifications: no active subscriptions', {
+        notificationId,
+        userId: notification.user_id,
+      });
+      return jsonResponse(200, { delivered: 0, inactive: 0 });
+    }
 
     webpush.setVapidDetails(config.subject, config.publicKey, config.privateKey);
 
@@ -115,8 +121,18 @@ serve(async (req) => {
       if (deactivateError) throw deactivateError;
     }
 
+    const delivered = results.filter((result) => result.status === 'fulfilled').length;
+
+    console.log('dispatch-push-notifications: completed', {
+      notificationId,
+      userId: notification.user_id,
+      subscriptionCount: subscriptions.length,
+      delivered,
+      inactive: inactiveEndpoints.length,
+    });
+
     return jsonResponse(200, {
-      delivered: results.filter((result) => result.status === 'fulfilled').length,
+      delivered,
       inactive: inactiveEndpoints.length,
     });
   } catch (error) {

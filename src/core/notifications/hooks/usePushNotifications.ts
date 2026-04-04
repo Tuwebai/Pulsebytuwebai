@@ -17,6 +17,21 @@ import {
 } from '@/core/notifications/services/pushNotifications.service';
 import { notificationQueryKeys } from './notificationQueryKeys';
 
+async function resolveBrowserSubscription(userId: string, permission: NotificationPermission | 'unsupported') {
+  const browserSubscription = await getBrowserPushSubscription();
+
+  if (browserSubscription || permission !== 'granted') {
+    return browserSubscription;
+  }
+
+  try {
+    return await subscribeBrowserPush(userId);
+  } catch (error) {
+    console.warn('[Pulse] No pudimos reactivar la suscripcion push en segundo plano.', error);
+    return null;
+  }
+}
+
 async function readPushStatus(userId: string): Promise<PushSubscriptionStatus> {
   const permission = getPushPermissionState();
 
@@ -29,7 +44,7 @@ async function readPushStatus(userId: string): Promise<PushSubscriptionStatus> {
     };
   }
 
-  const browserSubscription = await getBrowserPushSubscription();
+  const browserSubscription = await resolveBrowserSubscription(userId, permission);
   const browserEndpoint = browserSubscription?.endpoint ?? getStoredPushEndpoint(userId);
   const dbEndpoint =
     (await fetchActivePushSubscription({ endpoint: browserEndpoint, userId })) ??
