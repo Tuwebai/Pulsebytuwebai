@@ -41,7 +41,7 @@ export async function submitSupportChatReply({
       return false;
     }
 
-    await ticketMessagesService.send({
+    const message = await ticketMessagesService.send({
       content: trimmedResponse,
       ticketId: selectedTicket.id,
       user: { id: user.id, role: 'admin' },
@@ -51,6 +51,11 @@ export async function submitSupportChatReply({
       fecha_respuesta: now,
       status: 'in_conversation',
     });
+    void loadTickets();
+    return {
+      message,
+      ticketId: selectedTicket.id,
+    };
   } else {
     if (!canClientSend) {
       toast({
@@ -61,7 +66,7 @@ export async function submitSupportChatReply({
       return false;
     }
 
-    await ticketMessagesService.send({
+    const message = await ticketMessagesService.send({
       content: trimmedResponse,
       ticketId: selectedTicket.id,
       user: { id: user.id, role: 'user' },
@@ -70,10 +75,12 @@ export async function submitSupportChatReply({
       fecha_respuesta_cliente: now,
       status: 'in_conversation',
     });
+    void loadTickets();
+    return {
+      message,
+      ticketId: selectedTicket.id,
+    };
   }
-
-  await loadTickets();
-  return true;
 }
 
 export async function createSupportChatTicket({

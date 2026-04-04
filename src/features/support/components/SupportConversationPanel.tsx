@@ -14,6 +14,7 @@ interface SupportConversationPanelProps {
   createTicketOpen: boolean;
   draft: SupportDraftState;
   focusNonce: number;
+  isSubmittingReply: boolean;
   messages: TicketMessage[];
   open: boolean;
   responseText: string;
@@ -41,6 +42,7 @@ export default function SupportConversationPanel({
   createTicketOpen,
   draft,
   focusNonce,
+  isSubmittingReply,
   messages,
   open,
   responseText,
@@ -84,6 +86,7 @@ export default function SupportConversationPanel({
             clientRemainingMessages={clientRemainingMessages}
             fieldClassName={fieldClassName}
             focusNonce={focusNonce}
+            isSubmitting={isSubmittingReply}
             isAdmin={isAdmin}
             messages={messages}
             responseText={responseText}

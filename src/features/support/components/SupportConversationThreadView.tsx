@@ -13,6 +13,7 @@ interface SupportConversationThreadViewProps {
   canReply: boolean;
   fieldClassName: string;
   focusNonce: number;
+  isSubmitting: boolean;
   isAdmin: boolean;
   messages: TicketMessage[];
   responseText: string;
@@ -31,6 +32,7 @@ export default function SupportConversationThreadView({
   clientRemainingMessages,
   fieldClassName,
   focusNonce,
+  isSubmitting,
   isAdmin,
   messages,
   responseText,
@@ -107,14 +109,14 @@ export default function SupportConversationThreadView({
           <Textarea
             ref={inputRef}
             className={`${fieldClassName} min-h-[52px] max-h-[120px] resize-none rounded-[20px]`}
-            disabled={!replyEnabled}
+            disabled={!replyEnabled || isSubmitting}
             placeholder={replyEnabled ? 'Escribe tu mensaje...' : 'Espera la respuesta del equipo para continuar.'}
             value={responseText}
             onChange={(event) => onChange(event.target.value)}
           />
           <Button
             className="h-11 shrink-0 rounded-full bg-[var(--signal)] px-4 text-white hover:bg-[var(--signal-dim)]"
-            disabled={!replyEnabled || !responseText.trim()}
+            disabled={!replyEnabled || !responseText.trim() || isSubmitting}
             type="button"
             onClick={onSubmit}
           >

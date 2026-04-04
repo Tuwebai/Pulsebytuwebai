@@ -21,6 +21,7 @@ export default function SupportChatDock({ scope }: SupportChatDockProps) {
         createTicketOpen={chat.createTicketOpen}
         draft={chat.draft}
         focusNonce={chat.focusNonce}
+        isSubmittingReply={chat.isSubmittingReply}
         messages={chat.selectedMessages}
         open={chat.open}
         responseText={chat.responseText}
