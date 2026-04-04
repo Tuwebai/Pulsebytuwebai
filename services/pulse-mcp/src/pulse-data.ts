@@ -1,7 +1,7 @@
 export { fetchClientOverview } from './data/client-overview.js';
-export { createClientAccount, enableClientAccess, updateClientProfile } from './data/action-client.js';
+export { createClientAccount, disableClientAccess, enableClientAccess, updateClientProfile } from './data/action-client.js';
 export { createUserNotification } from './data/action-notifications.js';
-export { assignProjectGa4, createProject, updateProjectDetails } from './data/action-project.js';
+export { archiveProject, assignProjectGa4, createProject, deleteProject, previewProjectDeletion, updateProjectDetails } from './data/action-project.js';
 export { fetchDashboardSummary } from './data/dashboard.js';
 export { fetchPulseMetrics } from './data/metrics.js';
 export { fetchNotifications } from './data/notifications.js';

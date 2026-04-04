@@ -3,7 +3,7 @@ import { looksLikeEmail, looksLikeUuid, normalizeIdentifier, normalizeDomain } f
 import type { UserRow } from './types.js';
 
 const USER_BASE_SELECT = 'id, email, full_name, phone';
-const USER_DETAIL_SELECT = ['id', 'email', 'full_name', 'phone', 'role', 'website', 'onboarding_completed', 'onboarding_completed_at', 'pulse_access_status', 'pulse_access_granted_at', 'pulse_access_disabled_at', 'created_at', 'updated_at'].join(', ');
+const USER_DETAIL_SELECT = ['id', 'email', 'full_name', 'phone', 'role', 'website', 'onboarding_completed', 'onboarding_completed_at', 'pulse_access_status', 'pulse_access_granted_at', 'pulse_access_granted_by', 'pulse_access_disabled_at', 'created_at', 'updated_at'].join(', ');
 
 export async function resolveUserIdentifier(userIdentifier: string) {
   const identifier = normalizeIdentifier(userIdentifier);

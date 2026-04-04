@@ -5,6 +5,7 @@ export interface ProjectRow {
   domain: string | null;
   ga4_property_id: string | null;
   completion_percentage: number | null;
+  is_active?: boolean | null;
   created_at?: string | null;
   updated_at: string | null;
   created_by?: string | null;
@@ -21,6 +22,7 @@ export interface UserRow {
   onboarding_completed_at?: string | null;
   pulse_access_status?: 'pending' | 'invited' | 'active' | 'disabled' | null;
   pulse_access_granted_at?: string | null;
+  pulse_access_granted_by?: string | null;
   pulse_access_disabled_at?: string | null;
   created_at?: string | null;
   updated_at?: string | null;

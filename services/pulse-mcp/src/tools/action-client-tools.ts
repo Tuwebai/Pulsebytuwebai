@@ -1,7 +1,7 @@
 import * as z from 'zod/v4';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
-import { createClientAccount, enableClientAccess, updateClientProfile } from '../pulse-data.js';
+import { createClientAccount, disableClientAccess, enableClientAccess, updateClientProfile } from '../pulse-data.js';
 import { asConfirmationResult, asToolError, asToolResult, assertMutationsEnabled, resolveUserFromInput } from './shared.js';
 
 export function registerClientActionTools(server: McpServer) {
@@ -78,6 +78,49 @@ export function registerClientActionTools(server: McpServer) {
         executed: true,
         message: 'Acceso operativo actualizado en Pulse.',
         result: await enableClientAccess({ userIdentifier: resolvedUser.id, operatorUserId }),
+      });
+    } catch (error) {
+      return asToolError(error);
+    }
+  });
+
+  server.registerTool('disable_client', {
+    title: 'Deshabilitar acceso a Pulse',
+    description: 'Deshabilita el acceso operativo a Pulse para un cliente existente usando email, nombre, telefono o UUID.',
+    inputSchema: {
+      userIdentifier: z.string().min(1),
+      operatorUserId: z.string().uuid().optional(),
+      disableAdmin: z.boolean().default(false),
+      confirm: z.boolean().default(false),
+    },
+    outputSchema: z.object({
+      executed: z.boolean(),
+      requires_confirmation: z.boolean().optional(),
+      message: z.string(),
+      preview: z.unknown().optional(),
+      result: z.unknown().optional(),
+    }),
+  }, async ({ userIdentifier, operatorUserId, disableAdmin, confirm }) => {
+    try {
+      assertMutationsEnabled();
+      const resolvedUser = await resolveUserFromInput(userIdentifier);
+
+      if (!confirm) {
+        return asConfirmationResult('Esta accion va a deshabilitar el acceso operativo del cliente en Pulse. Reintentá con confirm=true para ejecutarla.', {
+          resolvedUser: {
+            id: resolvedUser.id,
+            email: resolvedUser.email,
+            full_name: resolvedUser.full_name,
+          },
+          operatorUserId: operatorUserId ?? null,
+          disableAdmin,
+        });
+      }
+
+      return asToolResult({
+        executed: true,
+        message: 'Acceso operativo deshabilitado en Pulse.',
+        result: await disableClientAccess({ userIdentifier: resolvedUser.id, operatorUserId, disableAdmin }),
       });
     } catch (error) {
       return asToolError(error);

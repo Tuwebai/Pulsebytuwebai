@@ -14,6 +14,19 @@ function requireOperatorUserId(operatorUserId?: string) {
   return resolvedOperatorUserId;
 }
 
+async function countOpenTickets(userId: string) {
+  const { count, error } = await supabase
+    .from('tickets')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .not('status', 'in', '(closed,resolved)')
+    .not('estado', 'in', '(cerrado,resuelto)');
+
+  if (error) throw error;
+
+  return count ?? 0;
+}
+
 export async function createClientAccount(input: {
   email: string;
   fullName: string;
@@ -124,6 +137,47 @@ export async function enableClientAccess(input: {
   return {
     user: updatedUser,
     delivery,
+  };
+}
+
+export async function disableClientAccess(input: {
+  userIdentifier: string;
+  operatorUserId?: string;
+  disableAdmin?: boolean;
+}) {
+  const user = await resolveUserIdentifier(input.userIdentifier);
+  const operatorUserId = requireOperatorUserId(input.operatorUserId);
+  const currentUser = await fetchUserById(user.id);
+
+  if (currentUser.pulse_access_status === 'disabled') {
+    throw new Error('El cliente ya tiene el acceso a Pulse deshabilitado.');
+  }
+
+  if (currentUser.role === 'admin' && input.disableAdmin !== true) {
+    throw new Error('No podemos deshabilitar un usuario admin sin disableAdmin=true.');
+  }
+
+  const timestamp = new Date().toISOString();
+  const openTickets = await countOpenTickets(user.id);
+  const { data: updatedUser, error } = await supabase
+    .from('users')
+    .update({
+      pulse_access_status: 'disabled',
+      pulse_access_disabled_at: timestamp,
+      updated_at: timestamp,
+    })
+    .eq('id', user.id)
+    .select('id, email, full_name, role, pulse_access_status, pulse_access_granted_at, pulse_access_granted_by, pulse_access_disabled_at')
+    .single();
+
+  if (error) throw error;
+
+  return {
+    user: updatedUser,
+    disabled_at: timestamp,
+    warning: openTickets > 0 ? `El cliente tiene ${openTickets} ticket(s) abierto(s).` : null,
+    open_tickets: openTickets,
+    operatorUserId,
   };
 }
 
