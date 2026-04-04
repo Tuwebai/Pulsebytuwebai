@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import { PulseLoaderScreen } from '@/components/PulseLoaderScreen';
 import { config } from '@/config/environment';
 import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
 import { authService } from '@/features/auth/services/auth.service';
@@ -60,12 +60,5 @@ export default function AuthCallback() {
     void handleAuthCallback();
   }, [navigate]);
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="text-center">
-        <LoadingSpinner size="lg" />
-        <p className="mt-4 text-white">Procesando autenticación...</p>
-      </div>
-    </div>
-  );
+  return <PulseLoaderScreen />;
 }
