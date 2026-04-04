@@ -5,6 +5,12 @@ export type GoogleSearchConsoleConnectionStatus =
   | 'reauthorization_required'
   | 'error';
 
+export type GoogleSearchConsolePeriod = 'last_24_hours' | 'last_7_days' | 'last_28_days' | 'last_3_months';
+
+export type GoogleSearchConsoleMetricKey = 'clicks' | 'impressions' | 'ctr' | 'position';
+
+export type GoogleSearchConsoleTableTab = 'queries' | 'pages' | 'days';
+
 export interface GoogleSearchConsoleConnection {
   id: string;
   projectId: string;
@@ -52,9 +58,11 @@ export interface GoogleSearchConsoleDimensionRow {
 }
 
 export interface GoogleSearchConsoleChartPoint {
+  ctr: number | null;
   clicks: number;
   date: string;
   impressions: number;
+  position: number | null;
 }
 
 export interface GoogleSearchConsoleOverview {
@@ -72,9 +80,11 @@ export interface GoogleSearchConsoleOverview {
   lastSyncError: string | null;
   lastSyncLabel: string;
   lastUpdatedAt: string | null;
+  period: GoogleSearchConsolePeriod;
   position: number | null;
   positionDelta: number | null;
   topPages: GoogleSearchConsoleDimensionRow[];
   topQueries: GoogleSearchConsoleDimensionRow[];
   chartData: GoogleSearchConsoleChartPoint[];
+  topDays: GoogleSearchConsoleMetricRow[];
 }

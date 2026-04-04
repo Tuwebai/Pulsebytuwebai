@@ -8,6 +8,10 @@ import { createSyncRun, finishSyncRun, getConnectedProperty, replaceDimensionMet
 import { buildDateWindow, resolveRequestContext } from './request.ts';
 import { corsHeaders, jsonResponse, SyncSearchConsoleError, type SearchConsoleDailyMetricRow, type SearchConsoleDimensionMetricRow } from './types.ts';
 
+function getDimensionWindows(syncDays: number) {
+  return [1, 7, 28, 90].filter((days) => days <= syncDays);
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 200, headers: corsHeaders });
@@ -30,10 +34,15 @@ serve(async (req) => {
 
     const refreshToken = await decryptRefreshToken(credentials.refresh_token_ciphertext, credentials.refresh_token_iv);
     const accessToken = await exchangeRefreshToken(refreshToken);
-    const [metricsByDate, topQueries, topPages] = await Promise.all([
+    const [metricsByDate, ...windowDimensionResults] = await Promise.all([
       fetchDailyMetrics(property.site_url, accessToken, dateWindow.startDate, dateWindow.endDate),
-      fetchTopDimensionMetrics(property.site_url, accessToken, dateWindow.startDate, dateWindow.endDate, 'query'),
-      fetchTopDimensionMetrics(property.site_url, accessToken, dateWindow.startDate, dateWindow.endDate, 'page'),
+      ...getDimensionWindows(requestContext.syncDays).flatMap((days) => {
+        const window = buildDateWindow(days);
+        return [
+          fetchTopDimensionMetrics(property.site_url, accessToken, window.startDate, window.endDate, 'query'),
+          fetchTopDimensionMetrics(property.site_url, accessToken, window.startDate, window.endDate, 'page'),
+        ];
+      }),
     ]);
     const updatedAt = new Date().toISOString();
 
@@ -53,41 +62,60 @@ serve(async (req) => {
       };
     });
 
-    const dimensionRows: SearchConsoleDimensionMetricRow[] = [
-      ...topQueries.map((row) => ({
-        clicks: row.clicks,
-        ctr: row.ctr,
-        dimension_key: row.dimensionKey,
-        dimension_type: 'query' as const,
-        impressions: row.impressions,
-        metric_window_from: dateWindow.startDate,
-        metric_window_to: dateWindow.endDate,
-        position: row.position,
-        project_id: property.project_id,
-        property_id: property.id,
-        updated_at: updatedAt,
-      })),
-      ...topPages.map((row) => ({
-        clicks: row.clicks,
-        ctr: row.ctr,
-        dimension_key: row.dimensionKey,
-        dimension_type: 'page' as const,
-        impressions: row.impressions,
-        metric_window_from: dateWindow.startDate,
-        metric_window_to: dateWindow.endDate,
-        position: row.position,
-        project_id: property.project_id,
-        property_id: property.id,
-        updated_at: updatedAt,
-      })),
-    ];
+    const dimensionRowsByWindow = getDimensionWindows(requestContext.syncDays).map((days, index) => {
+      const window = buildDateWindow(days);
+      const topQueries = windowDimensionResults[index * 2] ?? [];
+      const topPages = windowDimensionResults[index * 2 + 1] ?? [];
+      const rows: SearchConsoleDimensionMetricRow[] = [
+        ...topQueries.map((row) => ({
+          clicks: row.clicks,
+          ctr: row.ctr,
+          dimension_key: row.dimensionKey,
+          dimension_type: 'query' as const,
+          impressions: row.impressions,
+          metric_window_from: window.startDate,
+          metric_window_to: window.endDate,
+          position: row.position,
+          project_id: property.project_id,
+          property_id: property.id,
+          updated_at: updatedAt,
+        })),
+        ...topPages.map((row) => ({
+          clicks: row.clicks,
+          ctr: row.ctr,
+          dimension_key: row.dimensionKey,
+          dimension_type: 'page' as const,
+          impressions: row.impressions,
+          metric_window_from: window.startDate,
+          metric_window_to: window.endDate,
+          position: row.position,
+          project_id: property.project_id,
+          property_id: property.id,
+          updated_at: updatedAt,
+        })),
+      ];
+
+      return {
+        days,
+        rows,
+        topPages,
+        topQueries,
+        window,
+      };
+    });
+    const dimensionRows = dimensionRowsByWindow.flatMap((entry) => entry.rows);
 
     await upsertDailyMetrics(rows);
-    await replaceDimensionMetrics(property.project_id, dateWindow.startDate, dateWindow.endDate, dimensionRows);
+    for (const entry of dimensionRowsByWindow) {
+      await replaceDimensionMetrics(property.project_id, entry.window.startDate, entry.window.endDate, entry.rows);
+    }
     await updatePropertySyncState(property.project_id, 'success', null);
     await finishSyncRun(syncRunId, 'success', rows.length + dimensionRows.length, null, null, {
-      pages: topPages.length,
-      queries: topQueries.length,
+      dimensionWindows: dimensionRowsByWindow.map((entry) => ({
+        days: entry.days,
+        pages: entry.topPages.length,
+        queries: entry.topQueries.length,
+      })),
       endDate: dateWindow.endDate,
       startDate: dateWindow.startDate,
     });

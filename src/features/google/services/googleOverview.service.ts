@@ -5,6 +5,7 @@ import type {
   GoogleSearchConsoleDimensionRow,
   GoogleSearchConsoleMetricRow,
   GoogleSearchConsoleOverview,
+  GoogleSearchConsolePeriod,
 } from '@/data/types/google';
 
 function toIsoDate(date: Date) {
@@ -23,6 +24,38 @@ function getDateRange(days: number) {
     from: toIsoDate(from),
     to: toIsoDate(to),
   };
+}
+
+export function getGooglePeriodDays(period: GoogleSearchConsolePeriod) {
+  if (period === 'last_24_hours') {
+    return 1;
+  }
+
+  if (period === 'last_7_days') {
+    return 7;
+  }
+
+  if (period === 'last_3_months') {
+    return 90;
+  }
+
+  return 28;
+}
+
+export function getGooglePeriodLabel(period: GoogleSearchConsolePeriod) {
+  if (period === 'last_24_hours') {
+    return '24 horas';
+  }
+
+  if (period === 'last_7_days') {
+    return '7 días';
+  }
+
+  if (period === 'last_3_months') {
+    return '3 meses';
+  }
+
+  return '28 días';
 }
 
 function getPreviousDateRange(from: string, days: number) {
@@ -92,9 +125,11 @@ function getLastUpdatedAt(rows: GoogleSearchConsoleMetricRow[]) {
 
 function formatChartData(rows: GoogleSearchConsoleMetricRow[]): GoogleSearchConsoleChartPoint[] {
   return rows.map((row) => ({
+    ctr: row.impressions > 0 ? Math.round((row.clicks / row.impressions) * 1000) / 10 : null,
     clicks: row.clicks,
     date: new Intl.DateTimeFormat('es-AR', { day: '2-digit', month: 'short' }).format(new Date(`${row.date}T00:00:00`)),
     impressions: row.impressions,
+    position: row.impressions > 0 ? Math.round(row.position * 100) / 100 : null,
   }));
 }
 
@@ -110,7 +145,11 @@ function sortDimensions(rows: GoogleSearchConsoleDimensionRow[], type: 'page' | 
     });
 }
 
-function formatLastSyncLabel(connection: GoogleSearchConsoleConnection | null, lastUpdatedAt: string | null) {
+function formatLastSyncLabel(
+  connection: GoogleSearchConsoleConnection | null,
+  lastUpdatedAt: string | null,
+  period: GoogleSearchConsolePeriod,
+) {
   if (connection?.lastSyncStatus === 'error') {
     return 'La última actualización necesitó revisión.';
   }
@@ -120,7 +159,7 @@ function formatLastSyncLabel(connection: GoogleSearchConsoleConnection | null, l
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
-    }).format(new Date(lastUpdatedAt))}.`;
+    }).format(new Date(lastUpdatedAt))} para ${getGooglePeriodLabel(period)}.`;
   }
 
   return 'Todavía no hay datos sincronizados para mostrar.';
@@ -129,9 +168,11 @@ function formatLastSyncLabel(connection: GoogleSearchConsoleConnection | null, l
 export async function getGoogleSearchConsoleOverview(
   projectId: string,
   connection: GoogleSearchConsoleConnection | null,
+  period: GoogleSearchConsolePeriod,
 ): Promise<GoogleSearchConsoleOverview> {
-  const dateRange = getDateRange(28);
-  const previousRange = getPreviousDateRange(dateRange.from, 28);
+  const days = getGooglePeriodDays(period);
+  const dateRange = getDateRange(days);
+  const previousRange = getPreviousDateRange(dateRange.from, days);
   const [currentRows, previousRows, dimensionRows] = await Promise.all([
     getGoogleSearchConsoleMetricsByRange(projectId, dateRange.from, dateRange.to),
     getGoogleSearchConsoleMetricsByRange(projectId, previousRange.from, previousRange.to),
@@ -157,11 +198,19 @@ export async function getGoogleSearchConsoleOverview(
     impressionsDelta: calcDelta(currentSummary.impressions, previousSummary.impressions),
     chartData: formatChartData(currentRows),
     lastSyncError: connection?.lastSyncError ?? null,
-    lastSyncLabel: formatLastSyncLabel(connection, lastUpdatedAt),
+    lastSyncLabel: formatLastSyncLabel(connection, lastUpdatedAt, period),
     lastUpdatedAt,
+    period,
     position: currentPosition,
     positionDelta:
       currentPosition !== null && previousPosition !== null ? Math.round((previousPosition - currentPosition) * 100) / 100 : null,
+    topDays: [...currentRows].sort((left, right) => {
+      if (right.clicks !== left.clicks) {
+        return right.clicks - left.clicks;
+      }
+
+      return right.impressions - left.impressions;
+    }),
     topPages: sortDimensions(dimensionRows, 'page'),
     topQueries: sortDimensions(dimensionRows, 'query'),
   };

@@ -1,11 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import type { GoogleSearchConsoleConnection, GoogleSearchConsoleOverview } from '@/data/types/google';
+import type { GoogleSearchConsoleConnection, GoogleSearchConsoleOverview, GoogleSearchConsolePeriod } from '@/data/types/google';
 import { getGoogleSearchConsoleOverview } from '../services/googleOverview.service';
 
-export function useGoogleSearchConsoleOverview(projectId: string | null, connection: GoogleSearchConsoleConnection | null) {
+export function useGoogleSearchConsoleOverview(
+  projectId: string | null,
+  connection: GoogleSearchConsoleConnection | null,
+  period: GoogleSearchConsolePeriod,
+) {
   return useQuery<GoogleSearchConsoleOverview>({
-    queryKey: ['google-search-console-overview', projectId, connection?.updatedAt],
-    queryFn: () => getGoogleSearchConsoleOverview(projectId!, connection),
+    queryKey: ['google-search-console-overview', projectId, period, connection?.updatedAt],
+    queryFn: () => getGoogleSearchConsoleOverview(projectId!, connection, period),
     enabled: Boolean(projectId && connection?.connectionStatus === 'connected'),
     staleTime: 60_000,
     refetchOnReconnect: true,

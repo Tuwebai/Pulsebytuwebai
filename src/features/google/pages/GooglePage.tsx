@@ -1,114 +1,34 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { CircleAlert, CircleCheckBig } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { startGoogleSearchConsoleConnect } from '@/api/googleSearchConsole.api';
+import type { GoogleSearchConsoleMetricKey, GoogleSearchConsolePeriod } from '@/data/types/google';
 import GoogleConnectionCard from '../components/GoogleConnectionCard';
+import GoogleFiltersBar from '../components/GoogleFiltersBar';
 import GoogleOverviewCard from '../components/GoogleOverviewCard';
 import GooglePageHeader from '../components/GooglePageHeader';
 import GoogleTopTableCard from '../components/GoogleTopTableCard';
 import { useGoogleSearchConsoleOverview } from '../hooks/useGoogleSearchConsoleOverview';
 import { useGooglePageState } from '../hooks/useGooglePageState';
-
-type GoogleFeedbackStatus = 'connected' | 'property-not-found' | 'error' | null;
-type GoogleFeedbackReason =
-  | 'access-denied'
-  | 'api-disabled'
-  | 'invalid-client'
-  | 'invalid-session'
-  | 'missing-refresh-token'
-  | 'project-not-found'
-  | 'property-not-found'
-  | 'token-exchange-failed'
-  | 'unknown'
-  | null;
-
-function getGoogleFeedback(status: GoogleFeedbackStatus, reason: GoogleFeedbackReason) {
-  if (status === 'connected') {
-    return {
-      className: 'border-[var(--success)]/25 bg-[var(--success-dim)] text-[var(--text-primary)]',
-      description: 'Pulse ya puede usar esta conexión para traer datos del proyecto.',
-      icon: CircleCheckBig,
-      title: 'Google ya quedó conectado',
-    };
-  }
-
-  if (status === 'property-not-found') {
-    return {
-      className: 'border-[var(--warning)]/25 bg-[var(--warning-dim)] text-[var(--text-primary)]',
-      description: 'La cuenta se conectó, pero no devolvió una propiedad que coincida con tu dominio.',
-      icon: CircleAlert,
-      title: 'No encontramos la propiedad correcta',
-    };
-  }
-
-  if (status === 'error') {
-    if (reason === 'api-disabled') {
-      return {
-        className: 'border-[var(--warning)]/25 bg-[var(--warning-dim)] text-[var(--text-primary)]',
-        description: 'La cuenta respondió bien, pero en Google Cloud todavía falta habilitar Search Console API para este cliente OAuth.',
-        icon: CircleAlert,
-        title: 'Falta habilitar la API de Search Console',
-      };
-    }
-
-    if (reason === 'access-denied') {
-      return {
-        className: 'border-[var(--warning)]/25 bg-[var(--warning-dim)] text-[var(--text-primary)]',
-        description: 'La conexión se canceló antes de terminar. Cuando quieras, podés volver a intentarlo desde esta misma página.',
-        icon: CircleAlert,
-        title: 'No se completó el permiso de Google',
-      };
-    }
-
-    if (reason === 'missing-refresh-token') {
-      return {
-        className: 'border-[var(--warning)]/25 bg-[var(--warning-dim)] text-[var(--text-primary)]',
-        description: 'Google no devolvió el permiso persistente que Pulse necesita para mantener esta conexión activa. Probá conectarlo otra vez.',
-        icon: CircleAlert,
-        title: 'Google no entregó acceso persistente',
-      };
-    }
-
-    if (reason === 'invalid-session') {
-      return {
-        className: 'border-[var(--warning)]/25 bg-[var(--warning-dim)] text-[var(--text-primary)]',
-        description: 'La conexión venció antes de completarse o perdió validez. Podés intentarlo de nuevo ahora.',
-        icon: CircleAlert,
-        title: 'La conexión con Google venció',
-      };
-    }
-
-    if (reason === 'invalid-client') {
-      return {
-        className: 'border-[var(--danger)]/25 bg-[var(--danger-dim)] text-[var(--text-primary)]',
-        description: 'La configuración segura de Google quedó desalineada. Ya tenemos un motivo concreto para revisarlo sin tocar tu proyecto.',
-        icon: CircleAlert,
-        title: 'La conexión segura de Google necesita ajuste',
-      };
-    }
-
-    return {
-      className: 'border-[var(--danger)]/25 bg-[var(--danger-dim)] text-[var(--text-primary)]',
-      description: 'Probá de nuevo en unos minutos. Si persiste, revisamos la conexión desde soporte.',
-      icon: CircleAlert,
-      title: 'No pudimos conectar Google',
-    };
-  }
-
-  return null;
-}
+import {
+  getGoogleFeedback,
+  type GoogleFeedbackReason,
+  type GoogleFeedbackStatus,
+} from '../services/googleFeedback.service';
 
 export default function GooglePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isConnecting, setIsConnecting] = useState(false);
+  const [period, setPeriod] = useState<GoogleSearchConsolePeriod>('last_28_days');
+  const [activeMetrics, setActiveMetrics] = useState<GoogleSearchConsoleMetricKey[]>(['clicks', 'impressions', 'ctr', 'position']);
   const [feedbackStatus, setFeedbackStatus] = useState<GoogleFeedbackStatus>(null);
   const [feedbackReason, setFeedbackReason] = useState<GoogleFeedbackReason>(null);
   const { connectionCopy, connectionRecord, connectionState, domain, hasProject, projectId } = useGooglePageState();
-  const overviewQuery = useGoogleSearchConsoleOverview(projectId, connectionRecord);
+  const overviewQuery = useGoogleSearchConsoleOverview(projectId, connectionRecord, period);
   const feedback = useMemo(() => getGoogleFeedback(feedbackStatus, feedbackReason), [feedbackReason, feedbackStatus]);
+  const isConnected = connectionRecord?.connectionStatus === 'connected';
 
   useEffect(() => {
     const status = searchParams.get('google') as GoogleFeedbackStatus;
@@ -166,6 +86,16 @@ export default function GooglePage() {
         ? `Propiedad activa: ${connectionRecord.siteUrl}`
         : null;
 
+  const toggleMetric = (metric: GoogleSearchConsoleMetricKey) => {
+    setActiveMetrics((current) => {
+      if (current.includes(metric)) {
+        return current.length === 1 ? current : current.filter((item) => item !== metric);
+      }
+
+      return [...current, metric];
+    });
+  };
+
   return (
     <div className="space-y-6">
       <GooglePageHeader
@@ -187,7 +117,22 @@ export default function GooglePage() {
         </section>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+      {isConnected ? (
+        <>
+          <GoogleFiltersBar onPeriodChange={setPeriod} period={period} />
+          <GoogleOverviewCard
+            activeMetrics={activeMetrics}
+            data={overviewQuery.data}
+            isLoading={overviewQuery.isLoading}
+            onToggleMetric={toggleMetric}
+          />
+          <GoogleTopTableCard
+            pages={overviewQuery.data?.topPages ?? []}
+            queries={overviewQuery.data?.topQueries ?? []}
+            topDays={overviewQuery.data?.topDays ?? []}
+          />
+        </>
+      ) : (
         <GoogleConnectionCard
           actionLabel={connectionCopy.actionLabel}
           description={connectionCopy.description}
@@ -196,17 +141,7 @@ export default function GooglePage() {
           secondaryText={secondaryText}
           title={connectionCopy.title}
         />
-        <GoogleOverviewCard
-          data={overviewQuery.data}
-          isConnected={connectionRecord?.connectionStatus === 'connected'}
-          isLoading={overviewQuery.isLoading}
-        />
-      </div>
-
-      <GoogleTopTableCard
-        pages={overviewQuery.data?.topPages ?? []}
-        queries={overviewQuery.data?.topQueries ?? []}
-      />
+      )}
     </div>
   );
 }
