@@ -2,6 +2,7 @@ import { createSupabaseAdminClient } from '../google-search-console-connect/shar
 import type {
   SearchConsoleCredentialRow,
   SearchConsoleDailyMetricRow,
+  SearchConsoleDimensionMetricRow,
   SearchConsolePropertyRow,
 } from './types.ts';
 import { SyncSearchConsoleError } from './types.ts';
@@ -128,5 +129,34 @@ export async function upsertDailyMetrics(rows: SearchConsoleDailyMetricRow[]) {
 
   if (error) {
     throw error;
+  }
+}
+
+export async function replaceDimensionMetrics(
+  projectId: string,
+  from: string,
+  to: string,
+  rows: SearchConsoleDimensionMetricRow[],
+) {
+  const supabase = createSupabaseAdminClient();
+  const { error: deleteError } = await supabase
+    .from('search_console_dimension_metrics')
+    .delete()
+    .eq('project_id', projectId)
+    .eq('metric_window_from', from)
+    .eq('metric_window_to', to);
+
+  if (deleteError) {
+    throw deleteError;
+  }
+
+  if (rows.length === 0) {
+    return;
+  }
+
+  const { error: insertError } = await supabase.from('search_console_dimension_metrics').insert(rows);
+
+  if (insertError) {
+    throw insertError;
   }
 }

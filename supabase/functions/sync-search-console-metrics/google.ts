@@ -13,6 +13,13 @@ interface SearchAnalyticsRow {
   position?: number;
 }
 
+interface SearchAnalyticsRequestBody {
+  dimensions: string[];
+  endDate: string;
+  rowLimit?: number;
+  startDate: string;
+}
+
 function toNumber(value: unknown) {
   return typeof value === 'number' && Number.isFinite(value) ? value : 0;
 }
@@ -45,7 +52,7 @@ export async function exchangeRefreshToken(refreshToken: string) {
   return tokenPayload.access_token;
 }
 
-export async function fetchDailyMetrics(siteUrl: string, accessToken: string, startDate: string, endDate: string) {
+async function fetchSearchAnalytics(siteUrl: string, accessToken: string, body: SearchAnalyticsRequestBody) {
   const response = await fetch(
     `https://searchconsole.googleapis.com/webmasters/v3/sites/${encodeURIComponent(siteUrl)}/searchAnalytics/query`,
     {
@@ -54,12 +61,7 @@ export async function fetchDailyMetrics(siteUrl: string, accessToken: string, st
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        startDate,
-        endDate,
-        dimensions: ['date'],
-        rowLimit: 25000,
-      }),
+      body: JSON.stringify(body),
     },
   );
 
@@ -69,7 +71,16 @@ export async function fetchDailyMetrics(siteUrl: string, accessToken: string, st
     throw new SyncSearchConsoleError(500, 'No pudimos consultar las métricas de Google Search Console.', 'SEARCH_ANALYTICS_FAILED');
   }
 
-  const payload = (await response.json()) as { rows?: SearchAnalyticsRow[] };
+  return (await response.json()) as { rows?: SearchAnalyticsRow[] };
+}
+
+export async function fetchDailyMetrics(siteUrl: string, accessToken: string, startDate: string, endDate: string) {
+  const payload = await fetchSearchAnalytics(siteUrl, accessToken, {
+    startDate,
+    endDate,
+    dimensions: ['date'],
+    rowLimit: 25000,
+  });
   const metricsByDate = new Map<string, { clicks: number; ctr: number; impressions: number; position: number; raw: SearchAnalyticsRow }>();
 
   for (const row of payload.rows || []) {
@@ -89,4 +100,29 @@ export async function fetchDailyMetrics(siteUrl: string, accessToken: string, st
   }
 
   return metricsByDate;
+}
+
+export async function fetchTopDimensionMetrics(
+  siteUrl: string,
+  accessToken: string,
+  startDate: string,
+  endDate: string,
+  dimensionType: 'page' | 'query',
+) {
+  const payload = await fetchSearchAnalytics(siteUrl, accessToken, {
+    startDate,
+    endDate,
+    dimensions: [dimensionType],
+    rowLimit: 10,
+  });
+
+  return (payload.rows || [])
+    .map((row) => ({
+      clicks: Math.round(toNumber(row.clicks)),
+      ctr: toNumber(row.ctr),
+      dimensionKey: row.keys?.[0] || '',
+      impressions: Math.round(toNumber(row.impressions)),
+      position: toNumber(row.position),
+    }))
+    .filter((row) => row.dimensionKey.length > 0);
 }

@@ -6,6 +6,7 @@ import { startGoogleSearchConsoleConnect } from '@/api/googleSearchConsole.api';
 import GoogleConnectionCard from '../components/GoogleConnectionCard';
 import GoogleOverviewCard from '../components/GoogleOverviewCard';
 import GooglePageHeader from '../components/GooglePageHeader';
+import GoogleTopTableCard from '../components/GoogleTopTableCard';
 import { useGoogleSearchConsoleOverview } from '../hooks/useGoogleSearchConsoleOverview';
 import { useGooglePageState } from '../hooks/useGooglePageState';
 
@@ -201,6 +202,11 @@ export default function GooglePage() {
           isLoading={overviewQuery.isLoading}
         />
       </div>
+
+      <GoogleTopTableCard
+        pages={overviewQuery.data?.topPages ?? []}
+        queries={overviewQuery.data?.topQueries ?? []}
+      />
     </div>
   );
 }

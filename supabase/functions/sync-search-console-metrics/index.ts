@@ -3,10 +3,10 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { GoogleSearchConsoleError } from '../google-search-console-connect/shared.ts';
 import { decryptRefreshToken } from './crypto.ts';
-import { exchangeRefreshToken, fetchDailyMetrics } from './google.ts';
-import { createSyncRun, finishSyncRun, getConnectedProperty, updatePropertySyncState, upsertDailyMetrics } from './persistence.ts';
+import { exchangeRefreshToken, fetchDailyMetrics, fetchTopDimensionMetrics } from './google.ts';
+import { createSyncRun, finishSyncRun, getConnectedProperty, replaceDimensionMetrics, updatePropertySyncState, upsertDailyMetrics } from './persistence.ts';
 import { buildDateWindow, resolveRequestContext } from './request.ts';
-import { corsHeaders, jsonResponse, SyncSearchConsoleError, type SearchConsoleDailyMetricRow } from './types.ts';
+import { corsHeaders, jsonResponse, SyncSearchConsoleError, type SearchConsoleDailyMetricRow, type SearchConsoleDimensionMetricRow } from './types.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -30,7 +30,11 @@ serve(async (req) => {
 
     const refreshToken = await decryptRefreshToken(credentials.refresh_token_ciphertext, credentials.refresh_token_iv);
     const accessToken = await exchangeRefreshToken(refreshToken);
-    const metricsByDate = await fetchDailyMetrics(property.site_url, accessToken, dateWindow.startDate, dateWindow.endDate);
+    const [metricsByDate, topQueries, topPages] = await Promise.all([
+      fetchDailyMetrics(property.site_url, accessToken, dateWindow.startDate, dateWindow.endDate),
+      fetchTopDimensionMetrics(property.site_url, accessToken, dateWindow.startDate, dateWindow.endDate, 'query'),
+      fetchTopDimensionMetrics(property.site_url, accessToken, dateWindow.startDate, dateWindow.endDate, 'page'),
+    ]);
     const updatedAt = new Date().toISOString();
 
     const rows: SearchConsoleDailyMetricRow[] = dateWindow.dates.map((metricDate) => {
@@ -49,9 +53,41 @@ serve(async (req) => {
       };
     });
 
+    const dimensionRows: SearchConsoleDimensionMetricRow[] = [
+      ...topQueries.map((row) => ({
+        clicks: row.clicks,
+        ctr: row.ctr,
+        dimension_key: row.dimensionKey,
+        dimension_type: 'query' as const,
+        impressions: row.impressions,
+        metric_window_from: dateWindow.startDate,
+        metric_window_to: dateWindow.endDate,
+        position: row.position,
+        project_id: property.project_id,
+        property_id: property.id,
+        updated_at: updatedAt,
+      })),
+      ...topPages.map((row) => ({
+        clicks: row.clicks,
+        ctr: row.ctr,
+        dimension_key: row.dimensionKey,
+        dimension_type: 'page' as const,
+        impressions: row.impressions,
+        metric_window_from: dateWindow.startDate,
+        metric_window_to: dateWindow.endDate,
+        position: row.position,
+        project_id: property.project_id,
+        property_id: property.id,
+        updated_at: updatedAt,
+      })),
+    ];
+
     await upsertDailyMetrics(rows);
+    await replaceDimensionMetrics(property.project_id, dateWindow.startDate, dateWindow.endDate, dimensionRows);
     await updatePropertySyncState(property.project_id, 'success', null);
-    await finishSyncRun(syncRunId, 'success', rows.length, null, null, {
+    await finishSyncRun(syncRunId, 'success', rows.length + dimensionRows.length, null, null, {
+      pages: topPages.length,
+      queries: topQueries.length,
       endDate: dateWindow.endDate,
       startDate: dateWindow.startDate,
     });
@@ -59,6 +95,7 @@ serve(async (req) => {
     return jsonResponse(200, {
       endDate: dateWindow.endDate,
       projectId: property.project_id,
+      dimensionRowsUpserted: dimensionRows.length,
       rowsUpserted: rows.length,
       startDate: dateWindow.startDate,
       status: 'success',

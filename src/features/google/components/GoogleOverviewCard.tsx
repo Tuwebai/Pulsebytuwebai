@@ -1,4 +1,5 @@
 import GoogleOverviewMetrics from './GoogleOverviewMetrics';
+import GooglePerformanceChart from './GooglePerformanceChart';
 import type { GoogleSearchConsoleOverview } from '@/data/types/google';
 
 interface GoogleOverviewCardProps {
@@ -26,6 +27,16 @@ export default function GoogleOverviewCard({
 
       <div className="mt-5">
         <GoogleOverviewMetrics data={data} loading={isLoading} />
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-white/10 bg-[var(--bg-elevated)]/55 p-4">
+        <div className="mb-4">
+          <p className="text-sm font-medium text-[var(--text-primary)]">Rendimiento</p>
+          <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">
+            Curva de clics e impresiones del mismo período, con una lectura más cercana a Search Console.
+          </p>
+        </div>
+        <GooglePerformanceChart data={data?.chartData ?? []} loading={isLoading} />
       </div>
 
       <div className="mt-5 rounded-2xl border border-white/10 bg-[var(--bg-elevated)]/55 p-4">

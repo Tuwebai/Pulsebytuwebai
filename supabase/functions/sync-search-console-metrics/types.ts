@@ -49,3 +49,17 @@ export interface SearchConsoleDailyMetricRow {
   raw_payload: Record<string, unknown>;
   updated_at: string;
 }
+
+export interface SearchConsoleDimensionMetricRow {
+  clicks: number;
+  ctr: number;
+  dimension_key: string;
+  dimension_type: 'page' | 'query';
+  impressions: number;
+  metric_window_from: string;
+  metric_window_to: string;
+  position: number;
+  project_id: string;
+  property_id: string;
+  updated_at: string;
+}

@@ -2,6 +2,7 @@ import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@s
 import type {
   GoogleSearchConsoleConnectResponse,
   GoogleSearchConsoleConnection,
+  GoogleSearchConsoleDimensionRow,
   GoogleSearchConsoleMetricRow,
 } from '@/data/types/google';
 import { supabase } from '@/lib/supabase/supabase';
@@ -33,6 +34,21 @@ interface GoogleSearchConsoleMetricApiRow {
   updated_at: string | null;
 }
 
+interface GoogleSearchConsoleDimensionApiRow {
+  clicks: number | null;
+  ctr: number | null;
+  dimension_key: string;
+  dimension_type: 'page' | 'query';
+  id: string;
+  impressions: number | null;
+  metric_window_from: string;
+  metric_window_to: string;
+  position: number | null;
+  project_id: string;
+  property_id: string;
+  updated_at: string | null;
+}
+
 function mapConnectionRow(row: GoogleSearchConsoleApiRow): GoogleSearchConsoleConnection {
   return {
     id: row.id,
@@ -57,6 +73,23 @@ function mapMetricRow(row: GoogleSearchConsoleMetricApiRow): GoogleSearchConsole
     date: row.metric_date,
     id: row.id,
     impressions: row.impressions ?? 0,
+    position: row.position ?? 0,
+    projectId: row.project_id,
+    propertyId: row.property_id,
+    updatedAt: row.updated_at,
+  };
+}
+
+function mapDimensionRow(row: GoogleSearchConsoleDimensionApiRow): GoogleSearchConsoleDimensionRow {
+  return {
+    clicks: row.clicks ?? 0,
+    ctr: row.ctr ?? 0,
+    dimensionKey: row.dimension_key,
+    dimensionType: row.dimension_type,
+    id: row.id,
+    impressions: row.impressions ?? 0,
+    metricWindowFrom: row.metric_window_from,
+    metricWindowTo: row.metric_window_to,
     position: row.position ?? 0,
     projectId: row.project_id,
     propertyId: row.property_id,
@@ -111,6 +144,28 @@ export async function getGoogleSearchConsoleMetricsByRange(
   }
 
   return ((data || []) as GoogleSearchConsoleMetricApiRow[]).map(mapMetricRow);
+}
+
+export async function getGoogleSearchConsoleDimensionsByRange(
+  projectId: string,
+  from: string,
+  to: string,
+): Promise<GoogleSearchConsoleDimensionRow[]> {
+  const { data, error } = await supabase
+    .from('search_console_dimension_metrics')
+    .select(
+      'id, project_id, property_id, metric_window_from, metric_window_to, dimension_type, dimension_key, clicks, impressions, ctr, position, updated_at',
+    )
+    .eq('project_id', projectId)
+    .eq('metric_window_from', from)
+    .eq('metric_window_to', to)
+    .order('clicks', { ascending: false });
+
+  if (error) {
+    throw new Error('No pudimos consultar las búsquedas y páginas de Google para este proyecto.');
+  }
+
+  return ((data || []) as GoogleSearchConsoleDimensionApiRow[]).map(mapDimensionRow);
 }
 
 export async function startGoogleSearchConsoleConnect(

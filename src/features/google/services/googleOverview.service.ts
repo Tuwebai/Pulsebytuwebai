@@ -1,5 +1,11 @@
-import { getGoogleSearchConsoleMetricsByRange } from '@/api/googleSearchConsole.api';
-import type { GoogleSearchConsoleConnection, GoogleSearchConsoleMetricRow, GoogleSearchConsoleOverview } from '@/data/types/google';
+import { getGoogleSearchConsoleDimensionsByRange, getGoogleSearchConsoleMetricsByRange } from '@/api/googleSearchConsole.api';
+import type {
+  GoogleSearchConsoleChartPoint,
+  GoogleSearchConsoleConnection,
+  GoogleSearchConsoleDimensionRow,
+  GoogleSearchConsoleMetricRow,
+  GoogleSearchConsoleOverview,
+} from '@/data/types/google';
 
 function toIsoDate(date: Date) {
   return date.toISOString().slice(0, 10);
@@ -84,6 +90,26 @@ function getLastUpdatedAt(rows: GoogleSearchConsoleMetricRow[]) {
   }, null);
 }
 
+function formatChartData(rows: GoogleSearchConsoleMetricRow[]): GoogleSearchConsoleChartPoint[] {
+  return rows.map((row) => ({
+    clicks: row.clicks,
+    date: new Intl.DateTimeFormat('es-AR', { day: '2-digit', month: 'short' }).format(new Date(`${row.date}T00:00:00`)),
+    impressions: row.impressions,
+  }));
+}
+
+function sortDimensions(rows: GoogleSearchConsoleDimensionRow[], type: 'page' | 'query') {
+  return rows
+    .filter((row) => row.dimensionType === type)
+    .sort((left, right) => {
+      if (right.clicks !== left.clicks) {
+        return right.clicks - left.clicks;
+      }
+
+      return right.impressions - left.impressions;
+    });
+}
+
 function formatLastSyncLabel(connection: GoogleSearchConsoleConnection | null, lastUpdatedAt: string | null) {
   if (connection?.lastSyncStatus === 'error') {
     return 'La última actualización necesitó revisión.';
@@ -106,9 +132,10 @@ export async function getGoogleSearchConsoleOverview(
 ): Promise<GoogleSearchConsoleOverview> {
   const dateRange = getDateRange(28);
   const previousRange = getPreviousDateRange(dateRange.from, 28);
-  const [currentRows, previousRows] = await Promise.all([
+  const [currentRows, previousRows, dimensionRows] = await Promise.all([
     getGoogleSearchConsoleMetricsByRange(projectId, dateRange.from, dateRange.to),
     getGoogleSearchConsoleMetricsByRange(projectId, previousRange.from, previousRange.to),
+    getGoogleSearchConsoleDimensionsByRange(projectId, dateRange.from, dateRange.to),
   ]);
 
   const currentSummary = sumMetrics(currentRows);
@@ -128,11 +155,14 @@ export async function getGoogleSearchConsoleOverview(
     hasData: currentRows.some((row) => row.clicks > 0 || row.impressions > 0),
     impressions: currentSummary.impressions,
     impressionsDelta: calcDelta(currentSummary.impressions, previousSummary.impressions),
+    chartData: formatChartData(currentRows),
     lastSyncError: connection?.lastSyncError ?? null,
     lastSyncLabel: formatLastSyncLabel(connection, lastUpdatedAt),
     lastUpdatedAt,
     position: currentPosition,
     positionDelta:
       currentPosition !== null && previousPosition !== null ? Math.round((previousPosition - currentPosition) * 100) / 100 : null,
+    topPages: sortDimensions(dimensionRows, 'page'),
+    topQueries: sortDimensions(dimensionRows, 'query'),
   };
 }
