@@ -24,6 +24,15 @@ export function useSupabaseAuth() {
       }
 
       if (sessionError) {
+        if (authService.isCorruptedSessionError(sessionError)) {
+          await authService.clearCorruptedSession();
+          setError(null);
+          setSession(null);
+          setUser(null);
+          setLoading(false);
+          return false;
+        }
+
         setError(getFriendlyAuthErrorMessage(sessionError));
         setLoading(false);
         return false;

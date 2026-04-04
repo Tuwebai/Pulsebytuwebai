@@ -3,6 +3,44 @@ import { supabase } from '@/lib/supabase/supabase';
 import { config } from '@/config/environment';
 
 type AuthChangeCallback = (event: AuthChangeEvent, session: Session | null) => void | Promise<void>;
+const SUPABASE_AUTH_STORAGE_KEY = 'pulse.auth.supabase';
+const SUPABASE_AUTH_STORAGE_KEYS = [SUPABASE_AUTH_STORAGE_KEY, `${SUPABASE_AUTH_STORAGE_KEY}-code-verifier`];
+
+function canUseLocalStorage() {
+  return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+}
+
+function normalizeAuthErrorMessage(error: unknown) {
+  if (!(error instanceof Error)) {
+    return '';
+  }
+
+  return error.message.trim().toLowerCase();
+}
+
+function isCorruptedSessionError(error: unknown) {
+  const message = normalizeAuthErrorMessage(error);
+
+  return (
+    message.includes('refresh token') ||
+    message.includes('refresh_token') ||
+    message.includes('invalid grant') ||
+    message.includes('jwt') ||
+    message.includes('session') && message.includes('not found')
+  );
+}
+
+async function clearLocalAuthState() {
+  await supabase.auth.signOut({ scope: 'local' }).catch(() => undefined);
+
+  if (!canUseLocalStorage()) {
+    return;
+  }
+
+  for (const storageKey of SUPABASE_AUTH_STORAGE_KEYS) {
+    window.localStorage.removeItem(storageKey);
+  }
+}
 
 function readOAuthHashParams() {
   if (typeof window === 'undefined' || !window.location.hash) {
@@ -104,4 +142,10 @@ export const authService = {
   async signOut() {
     return supabase.auth.signOut();
   },
+
+  async clearCorruptedSession() {
+    await clearLocalAuthState();
+  },
+
+  isCorruptedSessionError,
 };

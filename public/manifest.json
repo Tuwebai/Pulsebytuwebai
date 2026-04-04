@@ -44,18 +44,11 @@
   ],
   "screenshots": [
     {
-      "src": "/screenshot-wide.png",
-      "sizes": "1280x720",
+      "src": "/dashboardcliente.png",
+      "sizes": "1920x1080",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Panel principal de Pulse by TuWebAI"
-    },
-    {
-      "src": "/screenshot-narrow.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Vista movil de Pulse"
     }
   ],
   "shortcuts": [
