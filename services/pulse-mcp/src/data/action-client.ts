@@ -2,6 +2,7 @@ import { pulseMcpConfig } from '../env.js';
 import { supabase } from './client.js';
 import { findAuthUserByEmail, isValidEmail, normalizeEmail, normalizeUserRole, waitForProfileRow } from './admin.js';
 import { deliverPulseAccessEmail } from './pulse-access-delivery.js';
+import { getCanonicalTicketState } from './support.js';
 import { fetchUserById, resolveUserIdentifier } from './users.js';
 
 function requireOperatorUserId(operatorUserId?: string) {
@@ -15,16 +16,16 @@ function requireOperatorUserId(operatorUserId?: string) {
 }
 
 async function countOpenTickets(userId: string) {
-  const { count, error } = await supabase
+  const { data, error } = await supabase
     .from('tickets')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .not('status', 'in', '(closed,resolved)')
-    .not('estado', 'in', '(cerrado,resuelto)');
+    .select('id, estado, status')
+    .eq('user_id', userId);
 
   if (error) throw error;
 
-  return count ?? 0;
+  return ((data ?? []) as Array<{ estado?: string | null; status?: string | null }>).filter((ticket) => (
+    getCanonicalTicketState({ estado: ticket.estado ?? null, status: ticket.status ?? null }) !== 'closed'
+  )).length;
 }
 
 export async function createClientAccount(input: {

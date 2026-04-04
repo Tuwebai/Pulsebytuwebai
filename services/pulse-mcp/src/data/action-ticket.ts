@@ -1,7 +1,7 @@
 import { pulseMcpConfig } from '../env.js';
 import { supabase } from './client.js';
 import { normalizeEmail } from './admin.js';
-import { resolveTicketIdentifier } from './support.js';
+import { buildTicketStatePatch, resolveTicketIdentifier } from './support.js';
 import { fetchUserById, resolveUserIdentifier } from './users.js';
 
 function requireOperatorUserId(operatorUserId?: string) {
@@ -95,8 +95,7 @@ export async function createTicket(input: {
       mensaje: message,
       email: normalizeEmail(currentUser.email),
       user_id: user.id,
-      estado: 'abierto',
-      status: 'open',
+      ...buildTicketStatePatch('open'),
       ...(priority ?? {}),
     })
     .select('id, asunto, estado, prioridad, status, priority, user_id, created_at, updated_at')
@@ -147,8 +146,7 @@ export async function replyToTicket(input: {
 
   const ticketUpdates = authorRole === 'admin'
     ? {
-        estado: 'respondido',
-        status: 'in_conversation',
+        ...buildTicketStatePatch('in_conversation'),
         respuesta: message,
         respondido_por: senderId,
         fecha_respuesta: new Date().toISOString(),
@@ -156,8 +154,7 @@ export async function replyToTicket(input: {
         updated_at: new Date().toISOString(),
       }
     : {
-        estado: 'abierto',
-        status: 'open',
+        ...buildTicketStatePatch('open'),
         respuesta_cliente: message,
         fecha_respuesta_cliente: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -193,7 +190,7 @@ export async function closeTicket(input: {
 }) {
   const ticket = await resolveTicketIdentifier(input.ticketIdentifier);
 
-  if (ticket.estado === 'cerrado') {
+  if (ticket.canonical_state === 'closed') {
     throw new Error('El ticket ya esta cerrado en Pulse.');
   }
 
@@ -203,8 +200,7 @@ export async function closeTicket(input: {
   const { data: updatedTicket, error } = await supabase
     .from('tickets')
     .update({
-      estado: 'cerrado',
-      status: 'closed',
+      ...buildTicketStatePatch('closed'),
       respuesta: resolutionNote ?? ticket.mensaje ?? ticket.asunto ?? 'Ticket cerrado.',
       respondido_por: operatorUserId,
       fecha_respuesta: closedAt,
@@ -241,7 +237,7 @@ export async function reopenTicket(input: {
 }) {
   const ticket = await resolveTicketIdentifier(input.ticketIdentifier);
 
-  if (ticket.estado !== 'cerrado') {
+  if (ticket.canonical_state !== 'closed') {
     throw new Error('Solo podemos reabrir tickets que ya esten cerrados en Pulse.');
   }
 
@@ -251,8 +247,7 @@ export async function reopenTicket(input: {
   const { data: updatedTicket, error } = await supabase
     .from('tickets')
     .update({
-      estado: 'abierto',
-      status: 'open',
+      ...buildTicketStatePatch('open'),
       updated_at: reopenedAt,
     })
     .eq('id', ticket.id)

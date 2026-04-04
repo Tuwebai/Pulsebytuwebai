@@ -2,6 +2,7 @@ import { type PulsePeriod } from '../date-ranges.js';
 import { fetchPulseMetrics } from './metrics.js';
 import { fetchNotifications } from './notifications.js';
 import { fetchLatestProjectForUser } from './projects.js';
+import { getCanonicalTicketState } from './support.js';
 import { fetchSupportTickets } from './support.js';
 import { fetchUserById } from './users.js';
 
@@ -36,7 +37,7 @@ export async function fetchClientOverview(userId: string, metricsPeriod: PulsePe
       latest: notifications.notifications.slice(0, 5),
     },
     support: {
-      openTickets: tickets.tickets.filter((ticket) => ticket.estado === 'abierto' || ticket.estado === 'open').length,
+      openTickets: tickets.tickets.filter((ticket) => getCanonicalTicketState(ticket) === 'open').length,
       latest: tickets.tickets.slice(0, 5),
     },
   };

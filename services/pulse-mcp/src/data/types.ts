@@ -59,6 +59,8 @@ export interface TicketRow {
   prioridad: string | null;
   status?: string | null;
   priority?: string | null;
+  canonical_state?: 'open' | 'in_conversation' | 'closed' | null;
+  canonical_priority?: 'low' | 'medium' | 'high' | null;
   user_id?: string | null;
   assigned_admin_id?: string | null;
   created_at: string | null;
