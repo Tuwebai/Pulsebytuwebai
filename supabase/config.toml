@@ -336,6 +336,9 @@ verify_jwt = false
 [functions.review-account-deletion-request]
 verify_jwt = false
 
+[functions.review-user-website]
+verify_jwt = false
+
 [functions.create-mercadopago-preference]
 verify_jwt = false
 
