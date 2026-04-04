@@ -4,8 +4,9 @@ import { CircleAlert, CircleCheckBig } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { startGoogleSearchConsoleConnect } from '@/api/googleSearchConsole.api';
 import GoogleConnectionCard from '../components/GoogleConnectionCard';
-import GoogleModulePreviewCard from '../components/GoogleModulePreviewCard';
+import GoogleOverviewCard from '../components/GoogleOverviewCard';
 import GooglePageHeader from '../components/GooglePageHeader';
+import { useGoogleSearchConsoleOverview } from '../hooks/useGoogleSearchConsoleOverview';
 import { useGooglePageState } from '../hooks/useGooglePageState';
 
 type GoogleFeedbackStatus = 'connected' | 'property-not-found' | 'error' | null;
@@ -105,6 +106,7 @@ export default function GooglePage() {
   const [feedbackStatus, setFeedbackStatus] = useState<GoogleFeedbackStatus>(null);
   const [feedbackReason, setFeedbackReason] = useState<GoogleFeedbackReason>(null);
   const { connectionCopy, connectionRecord, connectionState, domain, hasProject, projectId } = useGooglePageState();
+  const overviewQuery = useGoogleSearchConsoleOverview(projectId, connectionRecord);
   const feedback = useMemo(() => getGoogleFeedback(feedbackStatus, feedbackReason), [feedbackReason, feedbackStatus]);
 
   useEffect(() => {
@@ -117,6 +119,7 @@ export default function GooglePage() {
 
     if (status === 'connected') {
       void queryClient.invalidateQueries({ queryKey: ['google-search-console-connection', projectId] });
+      void queryClient.invalidateQueries({ queryKey: ['google-search-console-overview', projectId] });
     }
 
     setFeedbackStatus(status);
@@ -192,7 +195,11 @@ export default function GooglePage() {
           secondaryText={secondaryText}
           title={connectionCopy.title}
         />
-        <GoogleModulePreviewCard />
+        <GoogleOverviewCard
+          data={overviewQuery.data}
+          isConnected={connectionRecord?.connectionStatus === 'connected'}
+          isLoading={overviewQuery.isLoading}
+        />
       </div>
     </div>
   );

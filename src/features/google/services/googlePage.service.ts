@@ -80,7 +80,7 @@ export function getGoogleConnectionStatusCopy(connection: GoogleSearchConsoleCon
       badgeLabel: 'Google conectado',
       badgeVariant: 'success',
       description:
-        'Pulse ya quedó vinculado con Google para este proyecto. En el próximo slice vamos a traer métricas reales y oportunidades desde esa propiedad.',
+        'Pulse ya quedó vinculado con Google para este proyecto. Desde acá vas a empezar a ver señales reales de visibilidad y el estado de la conexión.',
       title: 'La conexión con Google ya está activa',
     };
   }

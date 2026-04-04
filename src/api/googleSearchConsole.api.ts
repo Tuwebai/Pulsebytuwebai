@@ -2,6 +2,7 @@ import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@s
 import type {
   GoogleSearchConsoleConnectResponse,
   GoogleSearchConsoleConnection,
+  GoogleSearchConsoleMetricRow,
 } from '@/data/types/google';
 import { supabase } from '@/lib/supabase/supabase';
 
@@ -15,7 +16,21 @@ interface GoogleSearchConsoleApiRow {
   connection_status: GoogleSearchConsoleConnection['connectionStatus'];
   connected_at: string | null;
   last_validated_at: string | null;
+  last_sync_error: string | null;
+  last_sync_status: 'idle' | 'success' | 'error' | null;
   updated_at: string;
+}
+
+interface GoogleSearchConsoleMetricApiRow {
+  clicks: number | null;
+  ctr: number | null;
+  id: string;
+  impressions: number | null;
+  metric_date: string;
+  position: number | null;
+  project_id: string;
+  property_id: string;
+  updated_at: string | null;
 }
 
 function mapConnectionRow(row: GoogleSearchConsoleApiRow): GoogleSearchConsoleConnection {
@@ -29,6 +44,22 @@ function mapConnectionRow(row: GoogleSearchConsoleApiRow): GoogleSearchConsoleCo
     connectionStatus: row.connection_status,
     connectedAt: row.connected_at,
     lastValidatedAt: row.last_validated_at,
+    lastSyncError: row.last_sync_error,
+    lastSyncStatus: row.last_sync_status,
+    updatedAt: row.updated_at,
+  };
+}
+
+function mapMetricRow(row: GoogleSearchConsoleMetricApiRow): GoogleSearchConsoleMetricRow {
+  return {
+    clicks: row.clicks ?? 0,
+    ctr: row.ctr ?? 0,
+    date: row.metric_date,
+    id: row.id,
+    impressions: row.impressions ?? 0,
+    position: row.position ?? 0,
+    projectId: row.project_id,
+    propertyId: row.property_id,
     updatedAt: row.updated_at,
   };
 }
@@ -46,7 +77,7 @@ export async function getGoogleSearchConsoleConnection(projectId: string): Promi
   const { data, error } = await supabase
     .from('search_console_properties')
     .select(
-      'id, project_id, site_url, property_type, permission_level, google_account_email, connection_status, connected_at, last_validated_at, updated_at',
+      'id, project_id, site_url, property_type, permission_level, google_account_email, connection_status, connected_at, last_validated_at, last_sync_error, last_sync_status, updated_at',
     )
     .eq('project_id', projectId)
     .maybeSingle();
@@ -60,6 +91,26 @@ export async function getGoogleSearchConsoleConnection(projectId: string): Promi
   }
 
   return mapConnectionRow(data as GoogleSearchConsoleApiRow);
+}
+
+export async function getGoogleSearchConsoleMetricsByRange(
+  projectId: string,
+  from: string,
+  to: string,
+): Promise<GoogleSearchConsoleMetricRow[]> {
+  const { data, error } = await supabase
+    .from('search_console_daily_metrics')
+    .select('id, project_id, property_id, metric_date, clicks, impressions, ctr, position, updated_at')
+    .eq('project_id', projectId)
+    .gte('metric_date', from)
+    .lte('metric_date', to)
+    .order('metric_date', { ascending: true });
+
+  if (error) {
+    throw new Error('No pudimos consultar las métricas de Google para este proyecto.');
+  }
+
+  return ((data || []) as GoogleSearchConsoleMetricApiRow[]).map(mapMetricRow);
 }
 
 export async function startGoogleSearchConsoleConnect(
