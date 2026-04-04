@@ -9,8 +9,19 @@ import GooglePageHeader from '../components/GooglePageHeader';
 import { useGooglePageState } from '../hooks/useGooglePageState';
 
 type GoogleFeedbackStatus = 'connected' | 'property-not-found' | 'error' | null;
+type GoogleFeedbackReason =
+  | 'access-denied'
+  | 'api-disabled'
+  | 'invalid-client'
+  | 'invalid-session'
+  | 'missing-refresh-token'
+  | 'project-not-found'
+  | 'property-not-found'
+  | 'token-exchange-failed'
+  | 'unknown'
+  | null;
 
-function getGoogleFeedback(status: GoogleFeedbackStatus) {
+function getGoogleFeedback(status: GoogleFeedbackStatus, reason: GoogleFeedbackReason) {
   if (status === 'connected') {
     return {
       className: 'border-[var(--success)]/25 bg-[var(--success-dim)] text-[var(--text-primary)]',
@@ -30,6 +41,51 @@ function getGoogleFeedback(status: GoogleFeedbackStatus) {
   }
 
   if (status === 'error') {
+    if (reason === 'api-disabled') {
+      return {
+        className: 'border-[var(--warning)]/25 bg-[var(--warning-dim)] text-[var(--text-primary)]',
+        description: 'La cuenta respondió bien, pero en Google Cloud todavía falta habilitar Search Console API para este cliente OAuth.',
+        icon: CircleAlert,
+        title: 'Falta habilitar la API de Search Console',
+      };
+    }
+
+    if (reason === 'access-denied') {
+      return {
+        className: 'border-[var(--warning)]/25 bg-[var(--warning-dim)] text-[var(--text-primary)]',
+        description: 'La conexión se canceló antes de terminar. Cuando quieras, podés volver a intentarlo desde esta misma página.',
+        icon: CircleAlert,
+        title: 'No se completó el permiso de Google',
+      };
+    }
+
+    if (reason === 'missing-refresh-token') {
+      return {
+        className: 'border-[var(--warning)]/25 bg-[var(--warning-dim)] text-[var(--text-primary)]',
+        description: 'Google no devolvió el permiso persistente que Pulse necesita para mantener esta conexión activa. Probá conectarlo otra vez.',
+        icon: CircleAlert,
+        title: 'Google no entregó acceso persistente',
+      };
+    }
+
+    if (reason === 'invalid-session') {
+      return {
+        className: 'border-[var(--warning)]/25 bg-[var(--warning-dim)] text-[var(--text-primary)]',
+        description: 'La conexión venció antes de completarse o perdió validez. Podés intentarlo de nuevo ahora.',
+        icon: CircleAlert,
+        title: 'La conexión con Google venció',
+      };
+    }
+
+    if (reason === 'invalid-client') {
+      return {
+        className: 'border-[var(--danger)]/25 bg-[var(--danger-dim)] text-[var(--text-primary)]',
+        description: 'La configuración segura de Google quedó desalineada. Ya tenemos un motivo concreto para revisarlo sin tocar tu proyecto.',
+        icon: CircleAlert,
+        title: 'La conexión segura de Google necesita ajuste',
+      };
+    }
+
     return {
       className: 'border-[var(--danger)]/25 bg-[var(--danger-dim)] text-[var(--text-primary)]',
       description: 'Probá de nuevo en unos minutos. Si persiste, revisamos la conexión desde soporte.',
@@ -47,11 +103,13 @@ export default function GooglePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isConnecting, setIsConnecting] = useState(false);
   const [feedbackStatus, setFeedbackStatus] = useState<GoogleFeedbackStatus>(null);
+  const [feedbackReason, setFeedbackReason] = useState<GoogleFeedbackReason>(null);
   const { connectionCopy, connectionRecord, connectionState, domain, hasProject, projectId } = useGooglePageState();
-  const feedback = useMemo(() => getGoogleFeedback(feedbackStatus), [feedbackStatus]);
+  const feedback = useMemo(() => getGoogleFeedback(feedbackStatus, feedbackReason), [feedbackReason, feedbackStatus]);
 
   useEffect(() => {
     const status = searchParams.get('google') as GoogleFeedbackStatus;
+    const reason = searchParams.get('reason') as GoogleFeedbackReason;
 
     if (!status) {
       return;
@@ -62,6 +120,7 @@ export default function GooglePage() {
     }
 
     setFeedbackStatus(status);
+    setFeedbackReason(reason ?? null);
 
     const nextParams = new URLSearchParams(searchParams);
     nextParams.delete('google');

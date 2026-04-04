@@ -222,9 +222,29 @@ export async function ensureAuthorizedProject(req: Request, projectId: string) {
   };
 }
 
-export function buildCallbackUrl(appUrl: string, status: 'connected' | 'property-not-found' | 'error') {
+export type GoogleCallbackStatus = 'connected' | 'property-not-found' | 'error';
+
+export type GoogleCallbackReason =
+  | 'access-denied'
+  | 'api-disabled'
+  | 'invalid-client'
+  | 'invalid-session'
+  | 'missing-refresh-token'
+  | 'project-not-found'
+  | 'property-not-found'
+  | 'token-exchange-failed'
+  | 'unknown';
+
+export function buildCallbackUrl(appUrl: string, status: GoogleCallbackStatus, reason?: GoogleCallbackReason) {
   const baseUrl = appUrl.replace(/\/+$/, '');
-  return `${baseUrl}/dashboard/google?google=${status}`;
+  const callbackUrl = new URL(`${baseUrl}/dashboard/google`);
+  callbackUrl.searchParams.set('google', status);
+
+  if (reason) {
+    callbackUrl.searchParams.set('reason', reason);
+  }
+
+  return callbackUrl.toString();
 }
 
 export function resolveReturnAppUrl(requestedUrl: string | null | undefined) {

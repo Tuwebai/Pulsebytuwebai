@@ -11,42 +11,17 @@ import {
   readSignedState,
   resolveMatchingSite,
 } from '../google-search-console-connect/shared.ts';
+import {
+  normalizeErrorMessage,
+  persistConnectionError,
+  resolveErrorRedirectUrl,
+  resolveReasonFromGoogleError,
+} from './errorSupport.ts';
 
-interface GoogleTokenResponse {
-  access_token?: string;
-  expires_in?: number;
-  refresh_token?: string;
-  scope?: string;
-  token_type?: string;
-}
-
-interface SearchConsoleSiteEntry {
-  permissionLevel?: string;
-  siteUrl?: string;
-}
-
-interface SignedStatePayload {
-  exp: number;
-  projectId: string;
-  returnAppUrl?: string;
-  userId: string;
-}
+interface GoogleTokenResponse { access_token?: string; expires_in?: number; refresh_token?: string; scope?: string; token_type?: string; }
 
 function redirectTo(url: string) {
   return Response.redirect(url, 302);
-}
-
-async function resolveErrorRedirectUrl(rawState: string | null, fallbackAppUrl: string) {
-  if (!rawState) {
-    return buildCallbackUrl(fallbackAppUrl, 'error');
-  }
-
-  try {
-    const signedState = await readSignedState<SignedStatePayload>(rawState);
-    return buildCallbackUrl(signedState.returnAppUrl || fallbackAppUrl, 'error');
-  } catch {
-    return buildCallbackUrl(fallbackAppUrl, 'error');
-  }
 }
 
 serve(async (req) => {
@@ -57,7 +32,8 @@ serve(async (req) => {
     const code = requestUrl.searchParams.get('code');
     const state = requestUrl.searchParams.get('state');
     const oauthError = requestUrl.searchParams.get('error');
-    const errorRedirectUrl = await resolveErrorRedirectUrl(state, appUrl);
+    const oauthReason = oauthError === 'access_denied' ? 'access-denied' : 'unknown';
+    const errorRedirectUrl = await resolveErrorRedirectUrl(state, appUrl, oauthReason);
 
     if (oauthError) {
       return redirectTo(errorRedirectUrl);
@@ -67,7 +43,7 @@ serve(async (req) => {
       throw new GoogleSearchConsoleError(400, 'No pudimos validar la conexión con Google.', 'INVALID_CALLBACK');
     }
 
-    const signedState = await readSignedState<SignedStatePayload>(state);
+    const signedState = await readSignedState<{ exp: number; projectId: string; returnAppUrl?: string; userId: string }>(state);
     const returnAppUrl = signedState.returnAppUrl || appUrl;
     const successUrl = buildCallbackUrl(returnAppUrl, 'connected');
     const propertyNotFoundUrl = buildCallbackUrl(returnAppUrl, 'property-not-found');
@@ -108,7 +84,11 @@ serve(async (req) => {
     if (!tokenResponse.ok) {
       const payload = await tokenResponse.text().catch(() => '');
       console.error('[google-search-console-callback] token', payload);
-      throw new GoogleSearchConsoleError(500, 'No pudimos completar la autorización con Google.', 'TOKEN_EXCHANGE_FAILED');
+      throw new GoogleSearchConsoleError(
+        500,
+        'No pudimos completar la autorización con Google.',
+        `TOKEN_EXCHANGE_FAILED:${payload || 'EMPTY_PAYLOAD'}`,
+      );
     }
 
     const tokenPayload = (await tokenResponse.json()) as GoogleTokenResponse;
@@ -130,10 +110,14 @@ serve(async (req) => {
     if (!siteResponse.ok) {
       const payload = await siteResponse.text().catch(() => '');
       console.error('[google-search-console-callback] sites.list', payload);
-      throw new GoogleSearchConsoleError(500, 'No pudimos consultar tus propiedades de Google.', 'SITES_LIST_FAILED');
+      throw new GoogleSearchConsoleError(
+        500,
+        'No pudimos consultar tus propiedades de Google.',
+        `SITES_LIST_FAILED:${payload || 'EMPTY_PAYLOAD'}`,
+      );
     }
 
-    const sitePayload = (await siteResponse.json()) as { siteEntry?: SearchConsoleSiteEntry[] };
+    const sitePayload = (await siteResponse.json()) as { siteEntry?: Array<{ permissionLevel?: string; siteUrl?: string }> };
     const matchedSite = resolveMatchingSite(project.domain, sitePayload.siteEntry ?? []);
 
     if (!matchedSite?.siteUrl) {
@@ -214,7 +198,27 @@ serve(async (req) => {
     return redirectTo(successUrl);
   } catch (error) {
     const requestUrl = new URL(req.url);
-    const errorRedirectUrl = await resolveErrorRedirectUrl(requestUrl.searchParams.get('state'), appUrl);
+    const rawErrorCode = error instanceof GoogleSearchConsoleError ? error.code : normalizeErrorMessage(error);
+    const separatorIndex = rawErrorCode.indexOf(':');
+    const errorCode = separatorIndex >= 0 ? rawErrorCode.slice(0, separatorIndex) : rawErrorCode;
+    const errorPayload = separatorIndex >= 0 ? rawErrorCode.slice(separatorIndex + 1) : '';
+    const errorReason = resolveReasonFromGoogleError(errorCode, errorPayload);
+    const rawState = requestUrl.searchParams.get('state');
+    const errorRedirectUrl = await resolveErrorRedirectUrl(rawState, appUrl, errorReason);
+
+    if (rawState) {
+      try {
+        const signedState = await readSignedState<{
+          exp: number;
+          projectId: string;
+          returnAppUrl?: string;
+          userId: string;
+        }>(rawState);
+        await persistConnectionError(signedState.projectId, errorCode);
+      } catch (stateError) {
+        console.error('[google-search-console-callback] persist-error', stateError);
+      }
+    }
 
     if (!(error instanceof GoogleSearchConsoleError)) {
       console.error('[google-search-console-callback]', error);
