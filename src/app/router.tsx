@@ -24,19 +24,49 @@ type LazyComponentModule = {
 };
 
 const ROUTE_CHUNK_RELOAD_KEY = 'pulse.route.chunk-reload';
+const MAX_ROUTE_RECOVERY_ATTEMPTS = 1;
 
-function isRecoverableChunkError(error: unknown) {
-  if (!(error instanceof Error)) {
+function getRouteRecoveryAttempts() {
+  if (typeof window === 'undefined') {
+    return 0;
+  }
+
+  const rawValue = window.sessionStorage.getItem(ROUTE_CHUNK_RELOAD_KEY);
+  const parsedValue = Number(rawValue ?? '0');
+  return Number.isFinite(parsedValue) ? parsedValue : 0;
+}
+
+function markRouteRecoveryAttempt() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const nextValue = getRouteRecoveryAttempts() + 1;
+  window.sessionStorage.setItem(ROUTE_CHUNK_RELOAD_KEY, String(nextValue));
+}
+
+function clearRouteRecoveryAttempts() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  window.sessionStorage.removeItem(ROUTE_CHUNK_RELOAD_KEY);
+}
+
+function recoverFailedRouteImport() {
+  if (typeof window === 'undefined') {
     return false;
   }
 
-  const message = error.message.toLowerCase();
-  return (
-    message.includes('failed to fetch dynamically imported module') ||
-    message.includes('importing a module script failed') ||
-    message.includes('dynamically imported module') ||
-    message.includes('chunk')
-  );
+  if (getRouteRecoveryAttempts() >= MAX_ROUTE_RECOVERY_ATTEMPTS) {
+    return false;
+  }
+
+  markRouteRecoveryAttempt();
+  const currentUrl = new URL(window.location.href);
+  currentUrl.searchParams.set('pulseRouteReload', String(Date.now()));
+  window.location.replace(currentUrl.toString());
+  return true;
 }
 
 const createLazyComponent = (importFn: () => Promise<LazyComponentModule>) =>
@@ -44,13 +74,8 @@ const createLazyComponent = (importFn: () => Promise<LazyComponentModule>) =>
     importFn().catch((error): Promise<LazyComponentModule> => {
       console.error('Error loading component:', error);
 
-      if (typeof window !== 'undefined' && isRecoverableChunkError(error)) {
-        const alreadyRetried = window.sessionStorage.getItem(ROUTE_CHUNK_RELOAD_KEY) === '1';
-
-        if (!alreadyRetried) {
-          window.sessionStorage.setItem(ROUTE_CHUNK_RELOAD_KEY, '1');
-          window.location.reload();
-        }
+      if (recoverFailedRouteImport()) {
+        return new Promise(() => undefined);
       }
 
       return Promise.resolve({
@@ -88,6 +113,8 @@ function PulseLoaderDismissBoundary({ children }: { children: React.ReactNode })
   const { authReady } = useApp();
 
   React.useEffect(() => {
+    clearRouteRecoveryAttempts();
+
     if (!authReady || !window.__removePulseLoader) {
       return;
     }
