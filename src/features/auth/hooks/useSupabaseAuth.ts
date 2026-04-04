@@ -87,8 +87,6 @@ export function useSupabaseAuth() {
     if (typeof window !== 'undefined') {
       window.addEventListener('focus', reconcileSession);
       window.addEventListener('online', reconcileSession);
-      window.addEventListener('storage', reconcileSession);
-      document.addEventListener('visibilitychange', reconcileSession);
     }
 
     return () => {
@@ -98,8 +96,6 @@ export function useSupabaseAuth() {
       if (typeof window !== 'undefined') {
         window.removeEventListener('focus', reconcileSession);
         window.removeEventListener('online', reconcileSession);
-        window.removeEventListener('storage', reconcileSession);
-        document.removeEventListener('visibilitychange', reconcileSession);
       }
     };
   }, []);
