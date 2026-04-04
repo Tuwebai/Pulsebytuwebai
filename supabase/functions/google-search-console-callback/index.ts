@@ -36,18 +36,31 @@ function redirectTo(url: string) {
   return Response.redirect(url, 302);
 }
 
+async function resolveErrorRedirectUrl(rawState: string | null, fallbackAppUrl: string) {
+  if (!rawState) {
+    return buildCallbackUrl(fallbackAppUrl, 'error');
+  }
+
+  try {
+    const signedState = await readSignedState<SignedStatePayload>(rawState);
+    return buildCallbackUrl(signedState.returnAppUrl || fallbackAppUrl, 'error');
+  } catch {
+    return buildCallbackUrl(fallbackAppUrl, 'error');
+  }
+}
+
 serve(async (req) => {
   const { appUrl, clientId, clientSecret, redirectUri } = getGoogleConnectEnv();
-  const defaultErrorUrl = buildCallbackUrl(appUrl, 'error');
 
   try {
     const requestUrl = new URL(req.url);
     const code = requestUrl.searchParams.get('code');
     const state = requestUrl.searchParams.get('state');
     const oauthError = requestUrl.searchParams.get('error');
+    const errorRedirectUrl = await resolveErrorRedirectUrl(state, appUrl);
 
     if (oauthError) {
-      return redirectTo(defaultErrorUrl);
+      return redirectTo(errorRedirectUrl);
     }
 
     if (!code || !state) {
@@ -200,10 +213,13 @@ serve(async (req) => {
 
     return redirectTo(successUrl);
   } catch (error) {
+    const requestUrl = new URL(req.url);
+    const errorRedirectUrl = await resolveErrorRedirectUrl(requestUrl.searchParams.get('state'), appUrl);
+
     if (!(error instanceof GoogleSearchConsoleError)) {
       console.error('[google-search-console-callback]', error);
     }
 
-    return redirectTo(defaultErrorUrl);
+    return redirectTo(errorRedirectUrl);
   }
 });
