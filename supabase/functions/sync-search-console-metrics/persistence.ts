@@ -54,6 +54,60 @@ export async function getConnectedProperty(projectId: string) {
   };
 }
 
+export async function getConnectedProperties(projectId?: string | null) {
+  const supabase = createSupabaseAdminClient();
+  const baseQuery = supabase
+    .from('search_console_properties')
+    .select('id, project_id, site_url')
+    .eq('connection_status', 'connected');
+
+  const propertyQuery = projectId ? baseQuery.eq('project_id', projectId) : baseQuery;
+  const { data: properties, error: propertiesError } = await propertyQuery;
+
+  if (propertiesError) {
+    throw propertiesError;
+  }
+
+  const typedProperties = (properties || []).filter(
+    (property): property is SearchConsolePropertyRow => Boolean(property?.id && property?.project_id && property?.site_url),
+  );
+
+  if (typedProperties.length === 0) {
+    throw new SyncSearchConsoleError(
+      409,
+      'Primero necesitamos una propiedad de Google conectada para sincronizar métricas.',
+      'PROPERTY_NOT_CONNECTED',
+    );
+  }
+
+  const { data: credentials, error: credentialsError } = await supabase
+    .from('search_console_credentials')
+    .select('project_id, property_id, refresh_token_ciphertext, refresh_token_iv')
+    .in(
+      'property_id',
+      typedProperties.map((property) => property.id),
+    );
+
+  if (credentialsError) {
+    throw credentialsError;
+  }
+
+  const credentialsByPropertyId = new Map(
+    ((credentials || []) as SearchConsoleCredentialRow[]).map((credential) => [credential.property_id as string, credential]),
+  );
+
+  return typedProperties
+    .map((property) => ({
+      credentials: credentialsByPropertyId.get(property.id) || null,
+      property,
+      supabase,
+    }))
+    .filter(
+      (entry): entry is { credentials: SearchConsoleCredentialRow; property: SearchConsolePropertyRow; supabase: ReturnType<typeof createSupabaseAdminClient> } =>
+        Boolean(entry.credentials?.refresh_token_ciphertext && entry.credentials?.refresh_token_iv),
+    );
+}
+
 export async function createSyncRun(projectId: string, propertyId: string) {
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase

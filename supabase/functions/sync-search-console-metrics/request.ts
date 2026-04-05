@@ -9,6 +9,7 @@ import {
 } from './types.ts';
 
 const GOOGLE_SEARCH_CONSOLE_DATA_LAG_DAYS = 2;
+const DEFAULT_CRON_SYNC_DAYS = 90;
 
 interface SyncSearchConsoleRequestBody {
   days?: number;
@@ -21,6 +22,12 @@ function getCronSecret() {
 
 function getSearchConsoleSyncSecret() {
   return Deno.env.get('GOOGLE_SEARCH_CONSOLE_SYNC_SECRET') || '';
+}
+
+function hasBearerSecret(req: Request, expectedSecret: string) {
+  const authorization = req.headers.get('Authorization') || '';
+  const [scheme, token] = authorization.trim().split(/\s+/, 2);
+  return Boolean(expectedSecret && scheme?.toLowerCase() === 'bearer' && token === expectedSecret);
 }
 
 function hasServiceRoleAuthorization(req: Request) {
@@ -71,39 +78,49 @@ export function buildDateWindow(days: number) {
 export async function resolveRequestContext(req: Request) {
   const body = (await req.json().catch(() => null)) as SyncSearchConsoleRequestBody | null;
   const projectId = body?.projectId?.trim();
-
-  if (!projectId) {
-    throw new SyncSearchConsoleError(400, 'Necesitamos un proyecto válido para sincronizar Google.', 'PROJECT_ID_REQUIRED');
-  }
-
-  const syncDays = normalizeSyncDays(body?.days);
   const cronSecret = req.headers.get('x-pulse-cron-secret') || '';
   const syncSecret = req.headers.get('x-google-search-console-sync-secret') || '';
+  const cronSecretValue = getCronSecret();
+  const syncSecretValue = getSearchConsoleSyncSecret();
+  const isInternalRequest =
+    (cronSecret && cronSecret === cronSecretValue) ||
+    (syncSecret && syncSecret === syncSecretValue) ||
+    hasBearerSecret(req, cronSecretValue) ||
+    hasBearerSecret(req, syncSecretValue) ||
+    hasServiceRoleAuthorization(req);
+  const syncDays = normalizeSyncDays(body?.days ?? (isInternalRequest ? DEFAULT_CRON_SYNC_DAYS : DEFAULT_SYNC_DAYS));
 
-  if (
-    (cronSecret && cronSecret === getCronSecret()) ||
-    (syncSecret && syncSecret === getSearchConsoleSyncSecret()) ||
-    hasServiceRoleAuthorization(req)
-  ) {
+  if (isInternalRequest) {
     const supabase = createSupabaseAdminClient();
-    const { data: project, error } = await supabase
-      .from('projects')
-      .select('id, domain, created_by')
-      .eq('id', projectId)
-      .maybeSingle();
+    if (projectId) {
+      const { data: project, error } = await supabase
+        .from('projects')
+        .select('id, domain, created_by')
+        .eq('id', projectId)
+        .maybeSingle();
 
-    if (error) {
-      throw error;
-    }
+      if (error) {
+        throw error;
+      }
 
-    if (!project?.id || !project.domain) {
-      throw new SyncSearchConsoleError(404, 'No encontramos el proyecto para sincronizar Google.', 'PROJECT_NOT_FOUND');
+      if (!project?.id || !project.domain) {
+        throw new SyncSearchConsoleError(404, 'No encontramos el proyecto para sincronizar Google.', 'PROJECT_NOT_FOUND');
+      }
+
+      return {
+        projectId: project.id as string,
+        syncDays,
+      };
     }
 
     return {
-      projectId: project.id as string,
+      projectId: null,
       syncDays,
     };
+  }
+
+  if (!projectId) {
+    throw new SyncSearchConsoleError(400, 'Necesitamos un proyecto válido para sincronizar Google.', 'PROJECT_ID_REQUIRED');
   }
 
   const { project } = await ensureAuthorizedProject(req, projectId);

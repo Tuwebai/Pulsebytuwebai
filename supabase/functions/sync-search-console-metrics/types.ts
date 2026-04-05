@@ -34,6 +34,8 @@ export interface SearchConsolePropertyRow {
 }
 
 export interface SearchConsoleCredentialRow {
+  project_id?: string;
+  property_id?: string;
   refresh_token_ciphertext: string;
   refresh_token_iv: string;
 }
