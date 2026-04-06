@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 export interface PeriodSelectorProps {
   value: 'this_month' | 'last_month' | 'last_7_days' | 'last_30_days' | 'this_year';

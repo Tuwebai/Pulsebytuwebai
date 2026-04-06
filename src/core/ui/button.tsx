@@ -2,7 +2,7 @@ import React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import { buttonSizeStyles, buttonVariantStyles } from '@/core/ui/button.variants';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'link';

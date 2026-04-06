@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/core/ui/tabs';
 import { PlayCircle, Search } from 'lucide-react';
 import type { TutorialFlow } from '@/features/help/types/helpFlow.types';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 import { HelpCenterSearchPanel } from './HelpCenterSearchPanel';
 import { HelpCenterSidebarHeader } from './HelpCenterSidebarHeader';

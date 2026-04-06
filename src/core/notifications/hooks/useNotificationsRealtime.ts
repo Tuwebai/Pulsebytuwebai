@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { Notification } from '@/data/types/notifications';
-import { playPulseNotificationSound } from '@/lib/audio/notificationSound';
-import { supabase } from '@/lib/supabase/supabase';
+import { playPulseNotificationSound } from '@/core/notifications/utils/notificationSound';
+import { supabase } from '@/data/supabase/client';
 import { showForegroundNotification } from '../services/browserNotifications.service';
 import { notificationQueryKeys } from './notificationQueryKeys';
 

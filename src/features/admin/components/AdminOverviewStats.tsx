@@ -1,5 +1,5 @@
 import { DollarSign, FolderOpen, Ticket, Users } from 'lucide-react';
-import { formatCurrency } from '@/lib/integrations/mercadopago';
+import { formatCurrency } from '@/features/payments/services/mercadoPago';
 
 interface AdminOverviewStatsProps {
   usuariosActivos: number;

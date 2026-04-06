@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 import { detectProjectType } from '@/utils/projectTypeDetector';
 import type { CreateProjectData, Project, UpdateProjectData } from '@/types/project.types';
 

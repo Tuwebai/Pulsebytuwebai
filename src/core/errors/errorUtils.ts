@@ -1,4 +1,4 @@
-import type { AppError } from '@/lib/errors/error.types';
+import type { AppError } from '@/core/errors/error.types';
 
 export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {

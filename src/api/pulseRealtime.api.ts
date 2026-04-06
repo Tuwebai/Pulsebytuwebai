@@ -1,5 +1,5 @@
 import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 import type { PulseRealtimeSnapshot } from '@/data/types/pulse';
 
 export async function fetchPulseRealtimeSnapshot(projectId: string): Promise<PulseRealtimeSnapshot> {

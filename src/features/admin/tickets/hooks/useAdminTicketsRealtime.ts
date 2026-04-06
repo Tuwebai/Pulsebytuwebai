@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 
 interface UseAdminTicketsRealtimeParams {
   enabled: boolean;

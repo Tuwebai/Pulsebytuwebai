@@ -2,8 +2,8 @@ import { motion } from '@/core/components/OptimizedMotion';
 import { Badge } from '@/core/ui/badge';
 import { Button } from '@/core/ui/button';
 import { CardHeader, CardTitle } from '@/core/ui/card';
-import type { TutorialFlow, TutorialStep } from '@/contexts/TutorialContext';
-import { cn } from '@/lib/utils';
+import type { TutorialFlow, TutorialStep } from '@/contexts/tutorialContext.types';
+import { cn } from '@/core/utils/cn';
 import { Volume2, VolumeX, X } from 'lucide-react';
 
 interface TutorialOverlayHeaderProps {

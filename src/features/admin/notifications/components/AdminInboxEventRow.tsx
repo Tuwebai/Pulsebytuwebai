@@ -15,7 +15,7 @@ import {
   getEventTypeLabel,
   getSeverityLabel,
 } from '@/features/admin/notifications/services/adminNotifications.service';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 interface AdminInboxEventRowProps {
   event: OperationalEvent;

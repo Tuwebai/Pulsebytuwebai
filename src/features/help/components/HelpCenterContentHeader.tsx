@@ -1,7 +1,7 @@
 import { Menu, X } from 'lucide-react';
 
 import { Button } from '@/core/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 interface HelpCenterContentHeaderProps {
   activeTab: string;

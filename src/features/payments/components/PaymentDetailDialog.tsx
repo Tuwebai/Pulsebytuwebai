@@ -2,7 +2,7 @@ import { Download, RefreshCcw } from 'lucide-react';
 import { Button } from '@/core/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/core/ui/dialog';
 import { Badge } from '@/core/components';
-import { formatCurrency } from '@/lib/integrations/mercadopago';
+import { formatCurrency } from '@/features/payments/services/mercadoPago';
 import type { Payment } from '@/types';
 import {
   getPaymentPlanFeatures,

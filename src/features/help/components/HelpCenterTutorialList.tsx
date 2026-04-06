@@ -3,7 +3,7 @@ import { Target } from 'lucide-react';
 import { Button } from '@/core/ui/button';
 import type { TutorialFlow } from '@/features/help/types/helpFlow.types';
 import { getDifficultyColor } from '@/features/help/utils/helpCenter.utils';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 interface HelpCenterTutorialListProps {
   completedFlows: string[];

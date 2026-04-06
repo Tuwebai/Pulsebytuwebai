@@ -5,7 +5,7 @@ import type {
   GoogleSearchConsoleDimensionRow,
   GoogleSearchConsoleMetricRow,
 } from '@/data/types/google';
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 
 interface GoogleSearchConsoleApiRow {
   id: string;

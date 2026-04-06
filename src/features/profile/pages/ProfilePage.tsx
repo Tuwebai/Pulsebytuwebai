@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Tabs, TabsContent } from '@/core/ui/tabs';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { PulseFeedbackState } from '@/core/components';
 import { ProfileAvatarCard } from '@/features/profile/components/ProfileAvatarCard';
 import { ProfileTabsNav } from '@/features/profile/components/ProfileTabsNav';
@@ -15,7 +15,7 @@ import { PRODUCT_TOUR_STEP_CHANGE_EVENT } from '@/features/product-tour/services
 import type { ProductTourStep } from '@/features/product-tour/types/productTour.types';
 import { useSessionStorageState } from '@/core/hooks/useSessionStorageState';
 import { toast } from '@/core/notifications/hooks/useToast';
-import { getDisplayAvatar } from '@/lib/identity/userIdentity';
+import { getDisplayAvatar } from '@/core/identity/userIdentity';
 
 export default function ProfilePage() {
   const { user } = useApp();

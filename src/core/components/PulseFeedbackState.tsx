@@ -1,6 +1,6 @@
 import { AlertCircle, Inbox, LoaderCircle } from 'lucide-react';
 import { Button } from '@/core/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 type PulseFeedbackVariant = 'loading' | 'error' | 'empty';
 

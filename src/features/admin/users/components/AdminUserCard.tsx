@@ -13,7 +13,7 @@ import {
 } from '@/features/admin/users/components/adminUserCard.utils';
 import type { PulseAccessActionMode } from '@/features/admin/users/hooks/useAdminUsers';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
-import { getDisplayAvatar, getIdentityInitials } from '@/lib/identity/userIdentity';
+import { getDisplayAvatar, getIdentityInitials } from '@/core/identity/userIdentity';
 
 interface AdminUserCardWebsiteUpdate {
   website?: string | null;

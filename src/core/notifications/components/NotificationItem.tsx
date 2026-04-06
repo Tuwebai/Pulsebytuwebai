@@ -1,7 +1,7 @@
 import { AlertTriangle, BarChart2, Bell, CheckCircle, MessageSquare, ShieldAlert, XCircle } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { Notification } from '@/data/types/notifications';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 import { formatNotificationTime } from '../services/notifications.service';
 
 interface NotificationItemProps {

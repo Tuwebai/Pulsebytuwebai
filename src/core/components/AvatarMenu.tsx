@@ -21,7 +21,7 @@ import {
   getDisplayEmail,
   getDisplayName,
   getIdentityInitials,
-} from '@/lib/identity/userIdentity';
+} from '@/core/identity/userIdentity';
 
 interface AvatarMenuProps {
   onLogout: () => Promise<void>;

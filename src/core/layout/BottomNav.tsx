@@ -2,7 +2,7 @@ import { Activity, FolderOpen, LayoutDashboard, LifeBuoy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import { NavLink } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 const bottomNavItems = [
   { icon: LayoutDashboard, label: 'Inicio', to: '/dashboard' },

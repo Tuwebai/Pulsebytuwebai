@@ -4,7 +4,7 @@ import { useCallback, useEffect } from 'react';
 import { deleteCachedData, setCachedData } from '@/contexts/appContext.cache';
 import type { Project, ProjectLog, User } from '@/contexts/appContext.types';
 import { projectService } from '@/features/project/services';
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 
 interface UseProjectCollectionParams {
   setError: (value: string | null) => void;

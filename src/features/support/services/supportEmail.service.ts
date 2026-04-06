@@ -1,5 +1,5 @@
 import { SUPPORT_CONTACT } from '@/config/supportContact';
-import { EMAIL_CONFIG, sendEmailWithEmailJS } from '@/lib/config/emailConfig';
+import { EMAIL_CONFIG, sendEmailWithEmailJS } from '@/features/support/services/supportEmail.config';
 import type {
   SupportEmailResult,
   SupportEmailTemplateParams,

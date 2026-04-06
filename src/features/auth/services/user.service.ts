@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 
 export class TransientUserFetchError extends Error {
   constructor(message = 'USER_FETCH_TRANSIENT') {

@@ -1,7 +1,7 @@
 import { Bell, Lock, UserCircle2 } from 'lucide-react';
 import { TabsList, TabsTrigger } from '@/core/ui/tabs';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 const triggerClassName =
   'rounded-[14px] border border-transparent px-3 py-3 text-[13px] font-medium text-[var(--text-secondary)] transition-colors duration-150 data-[state=active]:border-[var(--signal-border)] data-[state=active]:bg-[var(--bg-elevated)] data-[state=active]:text-[var(--text-primary)] data-[state=active]:shadow-[0_0_0_1px_var(--signal-glow)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]';

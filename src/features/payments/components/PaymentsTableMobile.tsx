@@ -1,7 +1,7 @@
 import { Download, FileText } from 'lucide-react';
 import { Button } from '@/core/ui/button';
 import { Badge } from '@/core/components';
-import { formatCurrency } from '@/lib/integrations/mercadopago';
+import { formatCurrency } from '@/features/payments/services/mercadoPago';
 import type { Payment } from '@/types';
 import {
   getPaymentPlanName,

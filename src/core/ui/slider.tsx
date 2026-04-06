@@ -2,7 +2,7 @@ import * as React from "react"
 import * as SliderPrimitive from "@radix-ui/react-slider"
 
 import { useReducedMotionPreference } from "@/core/hooks/useReducedMotionPreference"
-import { cn } from "@/lib/utils"
+import { cn } from "@/core/utils/cn"
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,

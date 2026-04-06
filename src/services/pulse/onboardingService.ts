@@ -1,5 +1,5 @@
 import { onboardingApi } from '@/api/pulse/onboardingApi';
-import { validateBusinessDomain } from '@/lib/utils/domain';
+import { validateBusinessDomain } from '@/features/pulse/utils/domainValidation';
 
 export const onboardingService = {
   async getState(userId: string) {

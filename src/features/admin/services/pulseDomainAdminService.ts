@@ -1,7 +1,7 @@
 import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js';
 
-import { supabase } from '@/lib/supabase/supabase';
-import { validateBusinessDomain } from '@/lib/utils/domain';
+import { supabase } from '@/data/supabase/client';
+import { validateBusinessDomain } from '@/features/pulse/utils/domainValidation';
 
 export type WebsiteReviewStatus = 'missing' | 'pending_review' | 'approved' | 'rejected';
 export type WebsiteReviewAction = 'save_pending' | 'approve' | 'reject';

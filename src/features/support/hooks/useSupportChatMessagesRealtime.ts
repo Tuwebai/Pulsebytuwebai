@@ -1,5 +1,5 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 import { ticketMessagesService } from '@/features/support/services/ticketMessages.service';
 import type { TicketMessage } from '@/features/support/ticketMessages.types';
 

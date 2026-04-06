@@ -2,8 +2,8 @@ import { motion } from '@/core/components/OptimizedMotion';
 import { TutorialOverlayHeader } from '@/features/product-tour/components/TutorialOverlayHeader';
 import { Button } from '@/core/ui/button';
 import { CardContent } from '@/core/ui/card';
-import type { TutorialFlow, TutorialStep } from '@/contexts/TutorialContext';
-import { cn } from '@/lib/utils';
+import type { TutorialFlow, TutorialStep } from '@/contexts/tutorialContext.types';
+import { cn } from '@/core/utils/cn';
 import { ChevronLeft, ChevronRight, Lightbulb, SkipForward, Star } from 'lucide-react';
 
 interface TutorialOverlayPanelProps {

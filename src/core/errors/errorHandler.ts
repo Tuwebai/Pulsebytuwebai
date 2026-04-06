@@ -1,6 +1,6 @@
 import { toast } from '@/core/notifications/hooks/useToast';
-import type { AppError } from '@/lib/errors/error.types';
-import { getErrorCode, getErrorMessage, getErrorTitle, isRecoverableError } from '@/lib/errors/errorUtils';
+import type { AppError } from '@/core/errors/error.types';
+import { getErrorCode, getErrorMessage, getErrorTitle, isRecoverableError } from '@/core/errors/errorUtils';
 
 export class AppErrorHandler {
   private static instance: AppErrorHandler;

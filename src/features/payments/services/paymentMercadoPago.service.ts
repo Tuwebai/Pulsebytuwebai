@@ -1,6 +1,6 @@
 import { requestMercadoPagoPreference } from '@/api/payments/mercadoPago.api';
-import { PAYMENT_TYPES, formatCurrency } from '@/lib/integrations/mercadopago';
-import { supabase } from '@/lib/supabase/supabase';
+import { PAYMENT_TYPES, formatCurrency } from '@/features/payments/services/mercadoPago';
+import { supabase } from '@/data/supabase/client';
 import type { CreatePaymentData } from '@/types';
 
 import { type PaymentRow } from '@/features/payments/services/payment.service.types';

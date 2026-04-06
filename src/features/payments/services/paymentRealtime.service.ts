@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 import type { Payment } from '@/types';
 
 import { normalizePayment, type PaymentRow } from '@/features/payments/services/payment.service.types';

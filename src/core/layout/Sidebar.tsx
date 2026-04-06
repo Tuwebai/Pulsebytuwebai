@@ -2,15 +2,15 @@ import { Activity, CreditCard, FolderOpen, LayoutDashboard, LifeBuoy, Search } f
 import { NavLink } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/core/ui/avatar';
 import { PulseLogo } from '@/core/components';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import {
   getDisplayAvatar,
   getDisplayEmail,
   getDisplayName,
   getIdentityInitials,
-} from '@/lib/identity/userIdentity';
-import { cn } from '@/lib/utils';
+} from '@/core/identity/userIdentity';
+import { cn } from '@/core/utils/cn';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Inicio', to: '/dashboard' },

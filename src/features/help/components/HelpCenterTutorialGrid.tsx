@@ -4,7 +4,7 @@ import type { TutorialFlow } from '@/features/help/types/helpFlow.types';
 import { Badge } from '@/core/ui/badge';
 import { Button } from '@/core/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/core/ui/card';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 import {
   getCategoryColor,

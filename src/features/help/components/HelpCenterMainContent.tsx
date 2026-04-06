@@ -1,7 +1,7 @@
 import type { HelpArticle } from '@/features/help/types/helpContent.types';
 import type { TutorialFlow } from '@/features/help/types/helpFlow.types';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 import { HelpCenterArticleList } from './HelpCenterArticleList';
 import { HelpCenterArticleDetail } from './HelpCenterArticleDetail';

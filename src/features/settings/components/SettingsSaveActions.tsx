@@ -1,7 +1,7 @@
 import { LoaderCircle, Save, ShieldCheck } from 'lucide-react';
 import { Button } from '@/core/ui/button';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 interface SettingsSaveActionsProps {
   dirty: boolean;

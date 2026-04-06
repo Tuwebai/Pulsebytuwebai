@@ -11,7 +11,7 @@ import { useHelpCenterState } from '@/features/help/hooks/useHelpCenterState';
 import { PRODUCT_TOUR_CLOSE_EVENT, PRODUCT_TOUR_OPEN_EVENT } from '@/features/product-tour/services/productTour.service';
 import type { ProductTourScope } from '@/features/product-tour/types/productTour.types';
 import { useResponsiveHelpCenter } from '@/features/help/hooks/useResponsiveHelpCenter';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 import { HelpCenterMainContent } from './HelpCenterMainContent';
 import { HelpCenterSidebar } from './HelpCenterSidebar';

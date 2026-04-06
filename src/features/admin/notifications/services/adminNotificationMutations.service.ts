@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 import type { CreateNotificationData, Notification } from '@/types';
 
 export async function createAdminNotification(notificationData: CreateNotificationData): Promise<Notification> {

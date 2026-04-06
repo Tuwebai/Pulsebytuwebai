@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Session, User as SupabaseUser } from '@supabase/supabase-js';
 import { userService } from '@/features/auth/services/user.service';
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 import { toast as toastGlobal } from '@/core/notifications/hooks/useToast';
 import { userPreferencesService } from '@/features/auth/services/userPreferences.service';
 import { clearCache, getCachedData, setCachedData } from '@/contexts/appContext.cache';
 import type { User } from '@/contexts/appContext.types';
-import { realAvatarService } from '@/lib/config/avatarProviders';
+import { realAvatarService } from '@/features/profile/services/realAvatar.service';
 import { onboardingApi } from '@/api/pulse/onboardingApi';
 import { hasPulseAccess } from '@/features/auth/utils/pulseAccess';
 import { createFallbackAppUser, mergeOnboardingSnapshot, normalizeAppUser } from '@/features/auth/hooks/useCurrentUser.utils';

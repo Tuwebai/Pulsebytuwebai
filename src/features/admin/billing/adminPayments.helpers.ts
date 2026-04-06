@@ -1,5 +1,5 @@
 import type { AdminPaymentRecord } from '@/api/admin/adminDashboard.api';
-import { PAYMENT_TYPES } from '@/lib/integrations/mercadopago';
+import { PAYMENT_TYPES } from '@/features/payments/services/mercadoPago';
 
 export function getAdminPaymentDisplayName(payment: AdminPaymentRecord): string {
   const paymentType = PAYMENT_TYPES[payment.payment_type as keyof typeof PAYMENT_TYPES];

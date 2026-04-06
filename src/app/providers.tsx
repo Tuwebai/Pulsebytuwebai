@@ -7,7 +7,7 @@ import { PulseToaster } from '@/core/notifications/components/PulseToaster';
 import { PushSubscriptionBootstrap } from '@/core/notifications/components/PushSubscriptionBootstrap';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { TutorialProvider } from '@/contexts/TutorialContext';
-import i18n from '@/lib/config/i18n';
+import i18n from '@/app/i18n';
 
 interface AppProvidersProps {
   children: ReactNode;

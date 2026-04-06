@@ -1,5 +1,5 @@
 import { userService } from '@/features/auth/services/user.service';
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 
 export interface ProjectCreatorInfo {
   full_name: string;

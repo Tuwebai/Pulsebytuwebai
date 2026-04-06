@@ -4,7 +4,7 @@ import { Bookmark, BookmarkCheck, Clock, Eye, Search, ThumbsUp, User, Video } fr
 import { Badge } from '@/core/ui/badge';
 import { Button } from '@/core/ui/button';
 import { Card, CardContent } from '@/core/ui/card';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 import {
   getArticlePreview,

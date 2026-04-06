@@ -1,4 +1,4 @@
-import { errorHandler } from '@/lib/errors/errorHandler';
+import { errorHandler } from '@/core/errors/errorHandler';
 
 export function setupGlobalErrorHandling(): void {
   window.addEventListener('error', (event) => {

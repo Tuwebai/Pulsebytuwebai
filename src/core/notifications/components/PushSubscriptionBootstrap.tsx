@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { usePushNotifications } from '@/core/notifications/hooks/usePushNotifications';
-import { playPulseNotificationSound } from '@/lib/audio/notificationSound';
+import { playPulseNotificationSound } from '@/core/notifications/utils/notificationSound';
 
 export function PushSubscriptionBootstrap() {
   usePushNotifications();

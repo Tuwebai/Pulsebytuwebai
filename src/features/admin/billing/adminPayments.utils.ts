@@ -1,5 +1,5 @@
 import type { AdminPaymentRecord } from '@/api/admin/adminDashboard.api';
-import { formatCurrency } from '@/lib/integrations/mercadopago';
+import { formatCurrency } from '@/features/payments/services/mercadoPago';
 
 export function normalizeAdminPaymentStatus(status: string | null | undefined) {
   switch (status) {

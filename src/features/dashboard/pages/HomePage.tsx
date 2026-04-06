@@ -1,7 +1,7 @@
 import { CreditCard, FolderOpen, LifeBuoy, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AnimatedList from '@/core/components/AnimatedList';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import HomeHero from '@/features/dashboard/components/HomeHero';
 import HomeShortcutCard from '@/features/dashboard/components/HomeShortcutCard';
 import {
@@ -17,7 +17,7 @@ import { resolvePulseConnectionState } from '@/features/pulse/hooks/usePulseConn
 import { usePulseMetrics } from '@/features/pulse/hooks/usePulseMetrics';
 import { usePulsePeriod } from '@/features/pulse/hooks/usePulsePeriod';
 import { usePulseRealtime } from '@/features/pulse/hooks/usePulseRealtime';
-import { formatCurrency } from '@/lib/integrations/mercadopago';
+import { formatCurrency } from '@/features/payments/services/mercadoPago';
 
 function buildProjectSummary(hasProject: boolean, connectionState: string, remainingTasks: number | null) {
   if (!hasProject) {

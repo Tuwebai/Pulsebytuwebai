@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { motion } from '@/core/components/OptimizedMotion';
 import { Button } from '@/core/ui/button';
 import { HelpButtonQuickMenu } from './HelpButtonQuickMenu';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 import { HelpCircle } from 'lucide-react';
 
 interface HelpButtonFloatingProps {

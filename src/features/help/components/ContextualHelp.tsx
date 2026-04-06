@@ -11,7 +11,7 @@ import {
 } from '@/features/help/utils/contextualHelp.utils';
 import { HelpCircle } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 import { ContextualHelpCard } from './ContextualHelpCard';
 import { ContextualHint } from './ContextualHint';

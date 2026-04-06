@@ -8,7 +8,7 @@ import {
   PROFILE_AVATAR_ACCEPT,
   PROFILE_SURFACE_CLASSNAME,
 } from '@/features/profile/constants/profile.constants';
-import { getIdentityInitials } from '@/lib/identity/userIdentity';
+import { getIdentityInitials } from '@/core/identity/userIdentity';
 
 interface ProfileAvatarCardProps {
   avatarUrl?: string;

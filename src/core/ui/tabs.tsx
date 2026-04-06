@@ -2,7 +2,7 @@ import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
 
 import { useReducedMotionPreference } from "@/core/hooks/useReducedMotionPreference"
-import { cn } from "@/lib/utils"
+import { cn } from "@/core/utils/cn"
 
 const Tabs = TabsPrimitive.Root
 

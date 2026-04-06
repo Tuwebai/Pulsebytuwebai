@@ -1,7 +1,7 @@
 import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js';
 
 import type { AccountDeletionRequestSnapshot } from '@/features/profile/types/accountDeletion';
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 
 function mapDeletionSnapshot(row: Record<string, unknown> | null): AccountDeletionRequestSnapshot {
   if (!row) {

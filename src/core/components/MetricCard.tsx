@@ -1,6 +1,6 @@
 import { useCountUp } from '@/core/hooks/useCountUp';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 import FadeIn from './FadeIn';
 import Skeleton from './Skeleton';
 

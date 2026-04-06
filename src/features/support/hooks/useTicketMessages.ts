@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useApp } from '@/contexts/AppContext';
-import { supabase } from '@/lib/supabase/supabase';
+import { useApp } from '@/contexts/useApp';
+import { supabase } from '@/data/supabase/client';
 import { ticketMessagesService } from '@/features/support/services/ticketMessages.service';
 import type { TicketMessage } from '@/features/support/ticketMessages.types';
 

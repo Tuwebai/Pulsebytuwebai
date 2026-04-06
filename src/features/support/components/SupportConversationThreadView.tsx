@@ -5,7 +5,7 @@ import { Textarea } from '@/core/ui/textarea';
 import type { SupportAdminTicketRecord } from '@/features/support/services/ticket.service';
 import type { SupportConversationSummary, TicketMessage } from '@/features/support/ticketMessages.types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/core/ui/avatar';
-import { getIdentityInitials } from '@/lib/identity/userIdentity';
+import { getIdentityInitials } from '@/core/identity/userIdentity';
 import SupportMessageBubble from './SupportMessageBubble';
 
 interface SupportConversationThreadViewProps {

@@ -1,5 +1,5 @@
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 import { config } from '@/config/environment';
 
 type AuthChangeCallback = (event: AuthChangeEvent, session: Session | null) => void | Promise<void>;

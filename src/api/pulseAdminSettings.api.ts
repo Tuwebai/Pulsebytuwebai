@@ -1,5 +1,5 @@
 import type { PulseExperienceSettings } from '@/data/types/pulse';
-import { supabase } from '@/lib/supabase/supabase';
+import { supabase } from '@/data/supabase/client';
 
 interface PulseAdminSettingsRow {
   scope: 'global';

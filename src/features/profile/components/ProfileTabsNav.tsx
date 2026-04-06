@@ -2,7 +2,7 @@ import { AlertTriangle, BriefcaseBusiness, Shield, UserRound } from 'lucide-reac
 import { TabsList, TabsTrigger } from '@/core/ui/tabs';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import { PROFILE_TABS } from '@/features/profile/constants/profile.constants';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 const PROFILE_TAB_ICONS = {
   datos: UserRound,

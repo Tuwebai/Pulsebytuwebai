@@ -1,6 +1,3 @@
-import type { ProfileRow } from '@/data/types/profile';
-import type { User } from '@/contexts/appContext.types';
-
 interface IdentityProfile {
   avatar_url?: string | null;
   email?: string | null;

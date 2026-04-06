@@ -4,8 +4,8 @@ import { AnimatePresence, motion } from '@/core/components/OptimizedMotion';
 import { TutorialOverlayPanel } from '@/features/product-tour/components/TutorialOverlayPanel';
 import { getTutorialTooltipPosition } from '@/features/product-tour/components/tutorialOverlayPosition';
 import { useResponsiveTutorial } from '@/features/product-tour/components/useResponsiveTutorial';
-import { useTutorial } from '@/contexts/TutorialContext';
-import { cn } from '@/lib/utils';
+import { useTutorial } from '@/contexts/tutorialContext.shared';
+import { cn } from '@/core/utils/cn';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function TutorialOverlay() {

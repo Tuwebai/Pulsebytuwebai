@@ -36,7 +36,7 @@ export const sendEmailWithEmailJS = async (templateId: string, templateParams: u
       const response = await window.emailjs.send(
         EMAIL_CONFIG.SERVICE_ID,
         templateId,
-        templateParams
+        templateParams,
       );
 
       return { success: true, message: 'Email enviado correctamente', response };

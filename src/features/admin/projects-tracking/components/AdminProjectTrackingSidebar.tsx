@@ -11,7 +11,7 @@ import { NavLink } from 'react-router-dom';
 
 import { Button } from '@/core/ui/button';
 import type { AdminProjectTrackingNavItem } from '@/features/admin/projects-tracking/components/AdminProjectTrackingFrame';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 const trackingNavItems = [
   { id: 'resumen', label: 'Resumen', icon: ClipboardList, iconClassName: 'text-[var(--signal)] border-[var(--signal-border)] bg-[var(--signal-glow)]' },

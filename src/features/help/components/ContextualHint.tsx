@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from '@/core/components/OptimizedMotion';
 import { Lightbulb } from 'lucide-react';
 
 import type { ContextualHintProps } from '@/features/help/types/contextualHelp.types';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 function getHintPositionClasses(position: string) {
   switch (position) {

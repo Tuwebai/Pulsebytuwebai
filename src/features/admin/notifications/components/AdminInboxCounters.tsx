@@ -1,6 +1,6 @@
 import { AlertTriangle, CircleDot, Clock3, FolderKanban, UserRoundX } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 type CounterFilterId = 'all' | 'critical' | 'unassigned' | 'in_progress' | 'resolved_today';
 

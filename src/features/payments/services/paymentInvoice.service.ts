@@ -1,4 +1,4 @@
-import { PAYMENT_TYPES, formatCurrency } from '@/lib/integrations/mercadopago';
+import { PAYMENT_TYPES, formatCurrency } from '@/features/payments/services/mercadoPago';
 import type { User } from '@/contexts/appContext.types';
 import type { Payment } from '@/types';
 import { getPaymentPlanName, getPaymentStatusLabel } from '../payments.utils';

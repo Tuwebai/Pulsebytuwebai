@@ -1,7 +1,7 @@
 import { ArrowRight, Clock3, CreditCard } from 'lucide-react';
 import { Button } from '@/core/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/core/ui/dialog';
-import { PAYMENT_TYPES, formatCurrency } from '@/lib/integrations/mercadopago';
+import { PAYMENT_TYPES, formatCurrency } from '@/features/payments/services/mercadoPago';
 
 interface CreatePaymentDialogProps {
   onClose: () => void;

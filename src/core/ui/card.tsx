@@ -1,6 +1,6 @@
 import React from 'react';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'elevated' | 'outlined' | 'glass';

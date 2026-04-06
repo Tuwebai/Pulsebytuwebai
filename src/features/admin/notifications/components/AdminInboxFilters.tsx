@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react';
 
 import { Input } from '@/core/ui/input';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 export type InboxSegmentId =
   | 'all'

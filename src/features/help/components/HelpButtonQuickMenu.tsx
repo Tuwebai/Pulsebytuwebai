@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { motion } from '@/core/components/OptimizedMotion';
 import { Button } from '@/core/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 interface HelpButtonQuickMenuProps {
   completedFlows: string[];
