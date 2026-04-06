@@ -4,10 +4,8 @@ export { SettingsSectionCard } from './SettingsSectionCard';
 export { SettingsSaveActions } from './SettingsSaveActions';
 export { GeneralSettingsTab } from './GeneralSettingsTab';
 export { SettingsNotificationsTab } from './SettingsNotificationsTab';
-export { PerformanceSettingsTab } from './PerformanceSettingsTab';
 export { SecuritySettingsTab } from './SecuritySettingsTab';
 export type {
   SettingsTabValue,
-  PerformanceSettings,
   SecuritySettings,
 } from './settings.types';

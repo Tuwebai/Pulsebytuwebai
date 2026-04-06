@@ -1,4 +1,4 @@
-import { Bell, Lock, Monitor, UserCircle2 } from 'lucide-react';
+import { Bell, Lock, UserCircle2 } from 'lucide-react';
 import { TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import { cn } from '@/lib/utils';
@@ -8,7 +8,6 @@ const triggerClassName =
 
 const tabs = [
   { value: 'general', label: 'Cuenta', icon: UserCircle2 },
-  { value: 'rendimiento', label: 'Experiencia', icon: Monitor },
   { value: 'notificaciones', label: 'Notificaciones', icon: Bell },
   { value: 'seguridad', label: 'Seguridad', icon: Lock },
 ] as const;
@@ -19,7 +18,7 @@ export function SettingsTabsNav() {
   return (
     <TabsList
       className={cn(
-        'grid h-auto w-full grid-cols-2 gap-2 rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-2 sm:grid-cols-2 lg:grid-cols-4',
+        'grid h-auto w-full grid-cols-2 gap-2 rounded-[20px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-2 lg:grid-cols-3',
       )}
     >
       {tabs.map(({ value, label, icon: Icon }) => (

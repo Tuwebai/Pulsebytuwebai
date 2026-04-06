@@ -10,7 +10,6 @@ import type { ProductTourStep } from '@/features/product-tour/types/productTour.
 import { useClientSettings } from '@/features/settings/hooks/useClientSettings';
 import {
   GeneralSettingsTab,
-  PerformanceSettingsTab,
   SecuritySettingsTab,
   SettingsNotificationsTab,
   SettingsPageHeader,
@@ -24,6 +23,7 @@ const SettingsPage = React.memo(() => {
 
   useEffect(() => {
     if (activeTab === 'privacidad' || activeTab === 'admin') setActiveTab('seguridad');
+    if (activeTab === 'rendimiento') setActiveTab('general');
   }, [activeTab, setActiveTab]);
 
   useEffect(() => {
@@ -60,13 +60,6 @@ const SettingsPage = React.memo(() => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6" data-tour="settings-tabs">
             <SettingsTabsNav />
             <GeneralSettingsTab user={user} projectsCount={getUserProjects().length} />
-            <PerformanceSettingsTab
-              dirty={settings.performanceDirty}
-              loading={settings.loading}
-              settings={settings.performanceSettings}
-              setSettings={settings.setPerformanceSettings}
-              onSave={settings.handleSavePerformanceSettings}
-            />
             <SettingsNotificationsTab />
             <SecuritySettingsTab
               dirty={settings.securityDirty}

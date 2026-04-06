@@ -2,25 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { toast } from '@/core/notifications/hooks/useToast';
 import { useApp } from '@/contexts/AppContext';
 import type { AppContextType } from '@/contexts/AppContext';
-import type { PerformanceSettings, SecuritySettings } from '@/features/settings/components/settings.types';
-import {
-  getInitialPerformanceSettings,
-  getInitialSecuritySettings,
-} from '@/features/settings/services/settings.service';
+import type { SecuritySettings } from '@/features/settings/components/settings.types';
+import { getInitialSecuritySettings } from '@/features/settings/services/settings.service';
 
 export function useClientSettings() {
   const { updateUserSettings, user } = useApp() as AppContextType;
   const [loading, setLoading] = useState(false);
-  const [performanceBaseline, setPerformanceBaseline] = useState<PerformanceSettings>({
-    animations_enabled: true,
-    low_bandwidth_mode: false,
-  });
   const [securityBaseline, setSecurityBaseline] = useState<SecuritySettings>({
     session_timeout: 30,
-  });
-  const [performanceSettings, setPerformanceSettings] = useState<PerformanceSettings>({
-    animations_enabled: true,
-    low_bandwidth_mode: false,
   });
   const [securitySettings, setSecuritySettings] = useState<SecuritySettings>({
     session_timeout: 30,
@@ -31,12 +20,9 @@ export function useClientSettings() {
       return;
     }
 
-    const nextPerformance = getInitialPerformanceSettings(user);
     const nextSecurity = getInitialSecuritySettings(user);
 
-    setPerformanceBaseline(nextPerformance);
     setSecurityBaseline(nextSecurity);
-    setPerformanceSettings(nextPerformance);
     setSecuritySettings(nextSecurity);
   }, [user]);
 
@@ -74,25 +60,6 @@ export function useClientSettings() {
     [],
   );
 
-  const handleSavePerformanceSettings = useCallback(async () => {
-    if (!user) {
-      return;
-    }
-
-    const saved = await runSettingsSave({
-      request: updateUserSettings(performanceSettings).then((success) => {
-        if (!success) {
-          throw new Error('settings_update_failed');
-        }
-      }),
-      successDescription: 'Los cambios de experiencia se aplicaron correctamente.',
-      errorDescription: 'No se pudieron guardar los cambios de experiencia.',
-    });
-    if (saved) {
-      setPerformanceBaseline(performanceSettings);
-    }
-  }, [performanceSettings, runSettingsSave, updateUserSettings, user]);
-
   const handleSaveSecuritySettings = useCallback(async () => {
     if (!user) {
       return;
@@ -112,22 +79,14 @@ export function useClientSettings() {
     }
   }, [runSettingsSave, securitySettings, updateUserSettings, user]);
 
-  const performanceDirty =
-    performanceSettings.animations_enabled !== performanceBaseline.animations_enabled ||
-    performanceSettings.low_bandwidth_mode !== performanceBaseline.low_bandwidth_mode;
-
   const securityDirty =
     securitySettings.session_timeout !== securityBaseline.session_timeout;
 
   return {
     loading,
-    performanceDirty,
-    performanceSettings,
     securityDirty,
     securitySettings,
-    setPerformanceSettings,
     setSecuritySettings,
-    handleSavePerformanceSettings,
     handleSaveSecuritySettings,
   };
 }
