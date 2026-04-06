@@ -1,16 +1,15 @@
-import React from 'react';
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useApp } from '@/contexts/AppContext';
+import React, { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from '@/hooks/use-toast';
-import { Eye, EyeOff } from 'lucide-react';
 import PulseLogo from '@/core/components/PulseLogo';
+import { useApp } from '@/contexts/AppContext';
+import { toast } from '@/hooks/use-toast';
 
-export default function Register() {
+export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,14 +19,14 @@ export default function Register() {
   const { register } = useApp();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
 
     if (password !== confirmPassword) {
       toast({
         title: 'Error',
         description: 'Las contraseñas no coinciden.',
-        variant: 'destructive',
+        variant: 'destructive'
       });
       return;
     }
@@ -36,7 +35,7 @@ export default function Register() {
       toast({
         title: 'Error',
         description: 'La contraseña debe tener al menos 6 caracteres.',
-        variant: 'destructive',
+        variant: 'destructive'
       });
       return;
     }
@@ -48,14 +47,14 @@ export default function Register() {
     if (success) {
       toast({
         title: '¡Cuenta creada!',
-        description: 'Te has registrado correctamente.',
+        description: 'Te has registrado correctamente.'
       });
       navigate('/dashboard');
     } else {
       toast({
         title: 'Error',
         description: 'No se pudo crear la cuenta. Intenta de nuevo o usa otro email.',
-        variant: 'destructive',
+        variant: 'destructive'
       });
     }
 
@@ -73,13 +72,11 @@ export default function Register() {
               <span className="sm:hidden">Pulse</span>
             </h1>
           </div>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Tu web, en numeros reales.
-          </p>
+          <p className="text-sm sm:text-base text-muted-foreground">Tu web, en numeros reales.</p>
         </div>
 
         <div className="relative">
-          <div className="absolute inset-0 bg-[#00CCFF] rounded-lg blur-xl opacity-30 -z-10"></div>
+          <div className="absolute inset-0 bg-[#00CCFF] rounded-lg blur-xl opacity-30 -z-10" />
           <Card className="bg-card border-border shadow-card relative z-10">
             <CardHeader className="space-y-1 p-4 sm:p-6">
               <CardTitle className="text-xl sm:text-2xl font-bold">Crear Cuenta</CardTitle>
@@ -90,40 +87,46 @@ export default function Register() {
             <CardContent className="p-4 sm:p-6">
               <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm font-medium">Nombre completo</Label>
+                  <Label htmlFor="name" className="text-sm font-medium">
+                    Nombre completo
+                  </Label>
                   <Input
                     id="name"
                     type="text"
                     placeholder="Juan Perez"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(event) => setName(event.target.value)}
                     required
                     className="bg-input border-border h-10 sm:h-11 text-sm"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                  <Label htmlFor="email" className="text-sm font-medium">
+                    Email
+                  </Label>
                   <Input
                     id="email"
                     type="email"
                     placeholder="tu@email.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(event) => setEmail(event.target.value)}
                     required
                     className="bg-input border-border h-10 sm:h-11 text-sm"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium">Contraseña</Label>
+                  <Label htmlFor="password" className="text-sm font-medium">
+                    Contraseña
+                  </Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(event) => setPassword(event.target.value)}
                       required
                       className="bg-input border-border pr-10 h-10 sm:h-11 text-sm"
                     />
@@ -132,7 +135,7 @@ export default function Register() {
                       variant="ghost"
                       size="sm"
                       className="absolute right-0 top-0 h-full px-2 sm:px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={() => setShowPassword((current) => !current)}
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -144,13 +147,15 @@ export default function Register() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirmar contraseña</Label>
+                  <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                    Confirmar contraseña
+                  </Label>
                   <Input
                     id="confirmPassword"
                     type="password"
                     placeholder="••••••••"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={(event) => setConfirmPassword(event.target.value)}
                     required
                     className="bg-input border-border h-10 sm:h-11 text-sm"
                   />

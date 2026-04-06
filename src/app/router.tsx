@@ -2,20 +2,23 @@ import React, { Suspense, lazy } from 'react';
 import type { ComponentType } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import { PulseLoaderScreen } from '@/components/PulseLoaderScreen';
+import NotFoundPage from '@/app/pages/NotFoundPage';
 import RouteLoadErrorState from '@/core/components/RouteLoadErrorState';
 import TouchGestureProvider from '@/core/components/TouchGestureProvider';
 import { renderAdminRoutes } from '@/app/adminRoutes';
 import { useApp } from '@/contexts/AppContext';
 import { renderAuthRoutes } from '@/features/auth/routes/AuthRoutes';
 import ProtectedRoute from '@/features/auth/components/ProtectedRoute';
+import AuthCallbackPage from '@/features/auth/pages/AuthCallbackPage';
+import LoginPage from '@/features/auth/pages/LoginPage';
+import RegisterPage from '@/features/auth/pages/RegisterPage';
+import PrivacyPolicyPage from '@/features/legal/pages/PrivacyPolicyPage';
+import TermsAndConditionsPage from '@/features/legal/pages/TermsAndConditionsPage';
+import PulsePublicHomePage from '@/features/marketing/pages/PulsePublicHomePage';
 import OnboardingGate from '@/features/onboarding/components/OnboardingGate';
+import OnboardingPage from '@/features/onboarding/pages/OnboardingPage';
 import DashboardShell from '@/core/layout/DashboardLayout';
 import { serviceWorkerManager } from '@/utils/serviceWorker';
-import Index from '@/pages/Index';
-import Login from '@/pages/Login';
-import AuthCallback from '@/pages/AuthCallback';
-import PoliticaPrivacidad from '@/pages/PoliticaPrivacidad';
-import TerminosCondiciones from '@/pages/TerminosCondiciones';
 import PulseAccessPendingPage from '@/features/auth/pages/PulseAccessPendingPage';
 import SSOPage from '@/features/auth/pages/SSOPage';
 
@@ -83,8 +86,8 @@ const createLazyComponent = (importFn: () => Promise<LazyComponentModule>) =>
       });
     })
   );
-const Onboarding = createLazyComponent(() => import('@/pages/Onboarding'));
-const Register = createLazyComponent(() => import('@/pages/Register'));
+const Onboarding = OnboardingPage;
+const Register = RegisterPage;
 const HomePage = createLazyComponent(() => import('@/features/dashboard/pages/HomePage'));
 const GooglePage = createLazyComponent(() => import('@/features/google/pages/GooglePage'));
 const PulsePage = createLazyComponent(() => import('@/features/pulse/pages/PulsePage'));
@@ -100,7 +103,7 @@ const ProfilePage = createLazyComponent(() => import('@/features/profile/pages/P
 const Configuracion = createLazyComponent(() => import('@/features/settings/pages/SettingsPage'));
 const Facturacion = createLazyComponent(() => import('@/features/payments/pages/PaymentsPage'));
 const Soporte = createLazyComponent(() => import('@/features/support/pages/SupportPage'));
-const NotFound = createLazyComponent(() => import('@/pages/NotFound'));
+const NotFound = NotFoundPage;
 
 const ServiceWorkerInitializer = () => {
   React.useEffect(() => {
@@ -131,12 +134,12 @@ function PulseLoaderDismissBoundary({ children }: { children: React.ReactNode })
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
-      <Route path="/terminos-condiciones" element={<TerminosCondiciones />} />
+      <Route path="/" element={<PulsePublicHomePage />} />
+      <Route path="/politica-privacidad" element={<PrivacyPolicyPage />} />
+      <Route path="/terminos-condiciones" element={<TermsAndConditionsPage />} />
       {renderAuthRoutes({
-        AuthCallback,
-        Login,
+        AuthCallback: AuthCallbackPage,
+        Login: LoginPage,
         Onboarding,
         PulseAccessPendingPage,
         Register,

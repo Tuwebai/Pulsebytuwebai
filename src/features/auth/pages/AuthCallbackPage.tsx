@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PulseLoaderScreen } from '@/components/PulseLoaderScreen';
 import { config } from '@/config/environment';
-import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
 import { authService } from '@/features/auth/services/auth.service';
 import { userService } from '@/features/auth/services/user.service';
+import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
 
-export default function AuthCallback() {
+export default function AuthCallbackPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function AuthCallback() {
               pulse_access_status: 'pending',
               avatar_url: avatar,
               created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
             });
 
             appUser = await userService.getUserById(session.user.id);
