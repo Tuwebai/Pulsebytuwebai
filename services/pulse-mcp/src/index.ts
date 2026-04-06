@@ -12,6 +12,7 @@ import { createPulseMcpServer } from './tools.js';
 type SessionEntry = {
   server: ReturnType<typeof createPulseMcpServer>;
   transport: StreamableHTTPServerTransport;
+  isClosing: boolean;
 };
 
 const app = createMcpExpressApp({
@@ -44,6 +45,11 @@ async function closeSession(sessionId: string) {
     return;
   }
 
+  if (session.isClosing) {
+    return;
+  }
+
+  session.isClosing = true;
   sessionTransports.delete(sessionId);
   await session.transport.close();
   await session.server.close();
@@ -56,6 +62,12 @@ function attachSessionLifecycle(session: SessionEntry) {
       return;
     }
 
+    if (session.isClosing) {
+      sessionTransports.delete(sessionId);
+      return;
+    }
+
+    session.isClosing = true;
     sessionTransports.delete(sessionId);
     void session.server.close();
   };
@@ -92,15 +104,18 @@ app.post('/mcp', pulseMcpAuthMiddleware, async (req, res) => {
 
     if (!sessionId && isInitializeRequest(req.body)) {
       const server = createPulseMcpServer();
+      let session: SessionEntry;
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => randomUUID(),
         onsessioninitialized: (createdSessionId) => {
-          sessionTransports.set(createdSessionId, { server, transport });
+          sessionTransports.set(createdSessionId, session);
           console.log('[pulse-mcp] sesion MCP inicializada', { sessionId: createdSessionId });
         },
       });
 
-      const session = { server, transport };
+      session.server = server;
+      session.transport = transport;
+      session.isClosing = false;
       attachSessionLifecycle(session);
 
       await server.connect(transport);
@@ -110,7 +125,7 @@ app.post('/mcp', pulseMcpAuthMiddleware, async (req, res) => {
 
     const server = createPulseMcpServer();
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
-    const session = { server, transport };
+    const session = { server, transport, isClosing: false };
 
     attachStatelessCleanup(res, session);
 
