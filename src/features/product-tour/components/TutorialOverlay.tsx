@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import { AnimatePresence, motion } from '@/components/OptimizedMotion';
-import { TutorialOverlayPanel } from '@/components/tutorial/TutorialOverlayPanel';
-import { getTutorialTooltipPosition } from '@/components/tutorial/tutorialOverlayPosition';
-import { useResponsiveTutorial } from '@/components/tutorial/useResponsiveTutorial';
+import { AnimatePresence, motion } from '@/core/components/OptimizedMotion';
+import { TutorialOverlayPanel } from '@/features/product-tour/components/TutorialOverlayPanel';
+import { getTutorialTooltipPosition } from '@/features/product-tour/components/tutorialOverlayPosition';
+import { useResponsiveTutorial } from '@/features/product-tour/components/useResponsiveTutorial';
 import { useTutorial } from '@/contexts/TutorialContext';
 import { cn } from '@/lib/utils';
 import { useLocation, useNavigate } from 'react-router-dom';

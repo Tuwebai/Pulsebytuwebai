@@ -1,11 +1,11 @@
 import type { FormEvent } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/core/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/core/ui/dialog';
+import { Input } from '@/core/ui/input';
+import { Label } from '@/core/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/core/ui/select';
+import { Textarea } from '@/core/ui/textarea';
 import type { TicketFormData, TicketPriority, TicketStatus } from '@/features/admin/tickets/types/adminTicket.types';
 
 interface AdminTicketFormDialogProps {

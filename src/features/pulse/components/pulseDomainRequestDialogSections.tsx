@@ -1,7 +1,7 @@
 import { MessageCircle, Send, ShieldCheck } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/core/ui/button';
+import { Input } from '@/core/ui/input';
 
 export function PulseDialogCard({
   children,

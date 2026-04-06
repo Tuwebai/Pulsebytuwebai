@@ -1,5 +1,5 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/core/ui/alert';
+import { Button } from '@/core/ui/button';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface SupabaseErrorProps {

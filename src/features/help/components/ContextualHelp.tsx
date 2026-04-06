@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { AnimatePresence, motion } from '@/components/OptimizedMotion';
+import { AnimatePresence, motion } from '@/core/components/OptimizedMotion';
 import { useHelpCenterState } from '@/features/help/hooks/useHelpCenterState';
 import type { HelpArticle } from '@/features/help/types/helpContent.types';
 import type { ContextualHelpProps } from '@/features/help/types/contextualHelp.types';

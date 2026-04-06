@@ -1,8 +1,8 @@
 import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/core/ui/button';
+import { Input } from '@/core/ui/input';
 import { SUPPORT_CONTACT } from '@/config/supportContact';
 import { PulseLogo } from '@/core/components';
 import { useApp } from '@/contexts/AppContext';

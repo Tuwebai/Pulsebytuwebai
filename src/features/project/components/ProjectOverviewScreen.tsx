@@ -1,5 +1,5 @@
-import { ErrorMessage } from '@/components/ErrorBoundary';
-import { SectionSpinner } from '@/components/LoadingSpinner';
+import { ErrorMessage } from '@/core/components/ErrorBoundary';
+import { SectionSpinner } from '@/core/components/LoadingSpinner';
 import { ProjectCard, ProjectStatsRow } from '@/features/project/components';
 import ProjectOverviewDialogs from '@/features/project/components/ProjectOverviewDialogs';
 import ProjectOverviewEmptyState from '@/features/project/components/ProjectOverviewEmptyState';

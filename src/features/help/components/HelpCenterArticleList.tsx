@@ -1,9 +1,9 @@
 import type { HelpArticle } from '@/features/help/types/helpContent.types';
 import { Bookmark, BookmarkCheck, Clock, Eye, Search, ThumbsUp, User, Video } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/core/ui/badge';
+import { Button } from '@/core/ui/button';
+import { Card, CardContent } from '@/core/ui/card';
 import { cn } from '@/lib/utils';
 
 import {

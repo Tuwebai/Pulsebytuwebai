@@ -2,8 +2,8 @@ import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/core/ui/button';
+import { Skeleton } from '@/core/ui/skeleton';
 import { useApp } from '@/contexts/AppContext';
 import {
   buildInboxFilters,

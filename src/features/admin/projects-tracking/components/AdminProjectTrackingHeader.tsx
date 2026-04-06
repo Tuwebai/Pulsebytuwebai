@@ -1,6 +1,6 @@
 import { FolderKanban, SquarePen } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import type { AdminProjectTrackingProject } from '@/features/admin/projects-tracking/types/adminProjectTracking';
 
 interface AdminProjectTrackingHeaderProps {

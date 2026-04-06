@@ -1,5 +1,27 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 
+interface PerformanceMonitor {
+  recordError: (error: Error, context?: string) => void;
+}
+
+interface WindowWithPerformanceMonitor extends Window {
+  performanceMonitor?: PerformanceMonitor;
+}
+
+type AsyncFunction = (...args: never[]) => unknown;
+
+const isPromiseResult = (value: unknown): value is Promise<unknown> => {
+  return typeof value === 'object' && value !== null && 'then' in value;
+};
+
+const getPerformanceMonitor = (): PerformanceMonitor | undefined => {
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+
+  return (window as WindowWithPerformanceMonitor).performanceMonitor;
+};
+
 // =====================================================
 // INTERFACES
 // =====================================================
@@ -72,9 +94,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
 
     // Registrar error en performance monitor
     // Registrar error de forma segura
-    if (typeof window !== 'undefined' && (window as any).performanceMonitor) {
-      (window as any).performanceMonitor.recordError(error, 'ErrorBoundary');
-    }
+    getPerformanceMonitor()?.recordError(error, 'ErrorBoundary');
 
     // Llamar callback personalizado si existe
     if (onError) {
@@ -301,9 +321,7 @@ export const useErrorHandler = () => {
   const captureError = React.useCallback((error: Error, context?: string) => {
     setError(error);
     // Registrar error de forma segura
-    if (typeof window !== 'undefined' && (window as any).performanceMonitor) {
-      (window as any).performanceMonitor.recordError(error, context);
-    }
+    getPerformanceMonitor()?.recordError(error, context);
   }, []);
 
   // Si hay un error, lanzarlo para que sea capturado por el Error Boundary
@@ -383,9 +401,7 @@ export const withErrorBoundary = <P extends object>(
 export const createErrorHandler = (context: string) => {
   return (error: Error) => {
     // Registrar error de forma segura
-    if (typeof window !== 'undefined' && (window as any).performanceMonitor) {
-      (window as any).performanceMonitor.recordError(error, context);
-    }
+    getPerformanceMonitor()?.recordError(error, context);
     console.error(`Error in ${context}:`, error);
   };
 };
@@ -403,7 +419,7 @@ export const handleAsyncError = async <T,>(
   }
 };
 
-export const withErrorHandling = <T extends (...args: any[]) => any>(
+export const withErrorHandling = <T extends AsyncFunction>(
   fn: T,
   context: string
 ): T => {
@@ -412,11 +428,11 @@ export const withErrorHandling = <T extends (...args: any[]) => any>(
       const result = fn(...args);
       
       // Si es una promesa, manejar errores asincrónicos
-      if (result && typeof result.catch === 'function') {
+      if (isPromiseResult(result)) {
         return result.catch((error: Error) => {
           createErrorHandler(context)(error);
           throw error;
-        });
+        }) as ReturnType<T>;
       }
       
       return result;

@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import type { ComponentType } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
-import { PulseLoaderScreen } from '@/components/PulseLoaderScreen';
+import { PulseLoaderScreen } from '@/core/components/PulseLoaderScreen';
 import NotFoundPage from '@/app/pages/NotFoundPage';
 import RouteLoadErrorState from '@/core/components/RouteLoadErrorState';
 import TouchGestureProvider from '@/core/components/TouchGestureProvider';

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FolderOpen, Loader2 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import type { CreateProjectData, Project, UpdateProjectData } from '@/types/project.types';
 
 import { AdminProjectDialogShell } from '@/features/admin/projects/components/AdminProjectDialogShell';

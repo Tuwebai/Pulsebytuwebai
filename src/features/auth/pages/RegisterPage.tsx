@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/core/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/core/ui/card';
+import { Input } from '@/core/ui/input';
+import { Label } from '@/core/ui/label';
 import PulseLogo from '@/core/components/PulseLogo';
 import { useApp } from '@/contexts/AppContext';
 import { toast } from '@/core/notifications/hooks/useToast';

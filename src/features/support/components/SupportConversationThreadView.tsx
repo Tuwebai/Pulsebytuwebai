@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { ArrowLeft, Send, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/core/ui/button';
+import { Textarea } from '@/core/ui/textarea';
 import type { SupportAdminTicketRecord } from '@/features/support/services/ticket.service';
 import type { SupportConversationSummary, TicketMessage } from '@/features/support/ticketMessages.types';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/core/ui/avatar';
 import { getIdentityInitials } from '@/lib/identity/userIdentity';
 import SupportMessageBubble from './SupportMessageBubble';
 

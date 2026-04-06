@@ -4,9 +4,9 @@ import { AlertTriangle, Eye, EyeOff, LogOut, Save } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/core/notifications/hooks/useToast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/core/ui/button';
+import { Input } from '@/core/ui/input';
+import { Label } from '@/core/ui/label';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+} from '@/core/ui/alert-dialog';
 import { useApp } from '@/contexts/AppContext';
 import {
   PROFILE_INPUT_CLASSNAME,

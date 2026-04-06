@@ -1,8 +1,8 @@
 import { Search, SortAsc, SortDesc } from 'lucide-react';
 
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/core/ui/input';
+import { Label } from '@/core/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/core/ui/select';
 import type { TicketFilters } from '@/features/admin/tickets/types/adminTicket.types';
 
 interface AdminTicketsFiltersProps {

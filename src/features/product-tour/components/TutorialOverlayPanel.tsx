@@ -1,7 +1,7 @@
-import { motion } from '@/components/OptimizedMotion';
-import { TutorialOverlayHeader } from '@/components/tutorial/TutorialOverlayHeader';
-import { Button } from '@/components/ui/button';
-import { CardContent } from '@/components/ui/card';
+import { motion } from '@/core/components/OptimizedMotion';
+import { TutorialOverlayHeader } from '@/features/product-tour/components/TutorialOverlayHeader';
+import { Button } from '@/core/ui/button';
+import { CardContent } from '@/core/ui/card';
 import type { TutorialFlow, TutorialStep } from '@/contexts/TutorialContext';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, Lightbulb, SkipForward, Star } from 'lucide-react';

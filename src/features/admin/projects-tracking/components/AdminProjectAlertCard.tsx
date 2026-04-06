@@ -1,7 +1,7 @@
 import { AlertTriangle, ArrowRight, FolderKanban, ListTodo } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import type { AdminProjectAlertItem } from '@/features/admin/projects-tracking/components/adminProjectAlerts.utils';
 
 interface AdminProjectAlertCardProps {

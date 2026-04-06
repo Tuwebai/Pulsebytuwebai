@@ -7,8 +7,8 @@ import {
   User,
 } from 'lucide-react';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/core/ui/avatar';
+import { Badge } from '@/core/ui/badge';
 import type { OperationalEvent } from '@/features/admin/notifications/services/adminNotifications.service';
 import {
   formatEventAge,

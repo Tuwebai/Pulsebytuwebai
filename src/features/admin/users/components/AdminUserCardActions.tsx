@@ -1,13 +1,13 @@
 import { ChevronDown, Edit, Trash2, UserCheck } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+} from '@/core/ui/dropdown-menu';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/core/ui/select';
 import { AdminUserDomainReviewDialog } from '@/features/admin/components/AdminUserDomainReviewDialog';
 import type { PulseAccessActionMode } from '@/features/admin/users/hooks/useAdminUsers';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';

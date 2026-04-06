@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/core/ui/tabs';
 import { useApp } from '@/contexts/AppContext';
 import { PulseFeedbackState } from '@/core/components';
 import { ProfileAvatarCard } from '@/features/profile/components/ProfileAvatarCard';

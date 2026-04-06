@@ -1,5 +1,5 @@
 import { MessageSquareText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import Badge from '@/core/components/Badge';
 import { formatDateSafe } from '@/utils/formatDateSafe';
 import { getPriorityLabel, getPriorityVariant, getStatusLabel, getStatusVariant } from '../support.utils';

@@ -1,7 +1,7 @@
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/core/ui/label';
+import { Input } from '@/core/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/core/ui/select';
+import { Textarea } from '@/core/ui/textarea';
 import { ADMIN_PROJECT_STATUS_OPTIONS } from '@/features/admin/projects/components/adminProjectForm.constants';
 import { AdminProjectTechnologyField } from '@/features/admin/projects/components/AdminProjectTechnologyField';
 import type { CreateProjectData } from '@/types/project.types';

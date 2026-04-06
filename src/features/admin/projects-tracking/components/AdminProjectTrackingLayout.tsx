@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Menu } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { AdminProjectTrackingSidebar } from '@/features/admin/projects-tracking/components/AdminProjectTrackingSidebar';
 import type { AdminProjectTrackingNavItem } from '@/features/admin/projects-tracking/components/AdminProjectTrackingFrame';
 import { cn } from '@/lib/utils';

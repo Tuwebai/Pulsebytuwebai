@@ -1,6 +1,6 @@
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/core/ui/badge';
+import { Button } from '@/core/ui/button';
+import { Card, CardContent } from '@/core/ui/card';
 import type { HelpArticle } from '@/features/help/types/helpContent.types';
 import { BookOpen, ChevronRight, Lightbulb, MessageCircle, ThumbsUp, X } from 'lucide-react';
 

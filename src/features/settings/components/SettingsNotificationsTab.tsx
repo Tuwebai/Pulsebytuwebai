@@ -1,5 +1,5 @@
 import { Bell, CheckCircle2, LoaderCircle } from 'lucide-react';
-import { TabsContent } from '@/components/ui/tabs';
+import { TabsContent } from '@/core/ui/tabs';
 import { NotificationSettingsSection } from '@/core/notifications/components/NotificationSettingsSection';
 import { SettingsSectionCard } from './SettingsSectionCard';
 import { useSettingsNotifications } from '../hooks/useSettingsNotifications';

@@ -11,10 +11,10 @@ import {
   XCircle,
 } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/core/ui/badge';
+import { Button } from '@/core/ui/button';
+import { ScrollArea } from '@/core/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/core/ui/select';
 import type { AdminTicket } from '@/features/admin/tickets/types/adminTicket.types';
 import {
   getPriorityLabel,

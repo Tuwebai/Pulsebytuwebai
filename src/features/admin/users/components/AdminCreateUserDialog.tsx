@@ -1,15 +1,15 @@
 import { Mail, ShieldCheck, UserPlus, Users } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/core/ui/button';
+import { Input } from '@/core/ui/input';
+import { Label } from '@/core/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/core/ui/select';
 import { AdminUserDialogShell } from '@/features/admin/users/components/AdminUserDialogShell';
 import { AdminUserRoleSummary } from '@/features/admin/users/components/AdminUserRoleSummary';
 import type { AdminUserFormData } from '@/features/admin/users/types/adminUser';

@@ -1,6 +1,6 @@
 import { Ticket } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { AdminPageActionsBar } from '@/features/admin/components/AdminPageActionsBar';
 import { AdminTicketFormDialog } from '@/features/admin/tickets/components/AdminTicketFormDialog';
 import { AdminTicketsFilters } from '@/features/admin/tickets/components/AdminTicketsFilters';

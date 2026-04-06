@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 
-import LoadingSpinner from '@/components/LoadingSpinner';
+import LoadingSpinner from '@/core/components/LoadingSpinner';
 import { AdminProjectCriticalTasksHero } from '@/features/admin/projects-tracking/components/AdminProjectCriticalTasksHero';
 import { AdminProjectCriticalTasksResults } from '@/features/admin/projects-tracking/components/AdminProjectCriticalTasksResults';
 import { AdminProjectTaskDialog } from '@/features/admin/projects-tracking/components/AdminProjectTaskDialog';

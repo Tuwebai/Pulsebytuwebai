@@ -1,8 +1,8 @@
 import { useApp } from '@/contexts/AppContext';
 import type { AppContextType } from '@/contexts/AppContext';
 import React, { useEffect } from 'react';
-import { motion } from '@/components/OptimizedMotion';
-import { Tabs } from '@/components/ui/tabs';
+import { motion } from '@/core/components/OptimizedMotion';
+import { Tabs } from '@/core/ui/tabs';
 import { PulseFeedbackState } from '@/core/components';
 import { useSessionStorageState } from '@/core/hooks/useSessionStorageState';
 import { PRODUCT_TOUR_STEP_CHANGE_EVENT } from '@/features/product-tour/services/productTour.service';

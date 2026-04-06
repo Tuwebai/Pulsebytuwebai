@@ -1,9 +1,9 @@
 import type { FormEvent } from 'react';
 import { Plus, Send } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/core/ui/button';
+import { Input } from '@/core/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/core/ui/select';
+import { Textarea } from '@/core/ui/textarea';
 import type { SupportDraftState, SupportPriority } from '../types';
 
 interface SupportTicketFormProps {

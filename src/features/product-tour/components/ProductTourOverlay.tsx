@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import type { ProductTourPlacement, ProductTourStep } from '@/features/product-tour/types/productTour.types';
 

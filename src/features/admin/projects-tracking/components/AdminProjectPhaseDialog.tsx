@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { KanbanSquare, Loader2 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { AdminProjectDialogShell } from '@/features/admin/projects/components/AdminProjectDialogShell';
 import { AdminProjectPhaseDialogFields } from '@/features/admin/projects-tracking/components/AdminProjectPhaseDialogFields';
 import type {

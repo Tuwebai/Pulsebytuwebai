@@ -7,7 +7,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/core/ui/dialog';
 
 interface AdminProjectDialogShellProps {
   open: boolean;

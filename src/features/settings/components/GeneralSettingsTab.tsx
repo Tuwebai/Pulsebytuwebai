@@ -1,5 +1,5 @@
 import { Globe, Mail, ShieldCheck, UserCircle2 } from 'lucide-react';
-import { TabsContent } from '@/components/ui/tabs';
+import { TabsContent } from '@/core/ui/tabs';
 import type { User } from '@/contexts/appContext.types';
 import AccentIcon from '@/core/components/AccentIcon';
 import { SettingsSectionCard } from './SettingsSectionCard';

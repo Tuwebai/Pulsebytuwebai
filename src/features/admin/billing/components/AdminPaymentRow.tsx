@@ -1,6 +1,6 @@
 import { CalendarDays, Mail, Wallet } from 'lucide-react';
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/core/ui/select';
 import { Badge } from '@/core/components';
 import type { AdminPaymentRecord } from '@/api/admin/adminDashboard.api';
 import {

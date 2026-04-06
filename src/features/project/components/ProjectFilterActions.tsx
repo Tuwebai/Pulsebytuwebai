@@ -1,6 +1,6 @@
 import { RefreshCw, X } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 
 interface ProjectFilterActionsProps {
   hasFilters: boolean;

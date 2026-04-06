@@ -1,6 +1,6 @@
 import { Activity, CreditCard, FolderOpen, LayoutDashboard, LifeBuoy, Search } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/core/ui/avatar';
 import { PulseLogo } from '@/core/components';
 import { useApp } from '@/contexts/AppContext';
 import { useProfile } from '@/features/profile/hooks/useProfile';

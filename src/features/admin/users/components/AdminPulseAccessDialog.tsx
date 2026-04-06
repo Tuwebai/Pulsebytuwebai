@@ -1,7 +1,7 @@
 import { ArrowRight, Clock3, Mail, ShieldCheck, UserCheck } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/core/ui/badge';
+import { Button } from '@/core/ui/button';
 import { AdminUserDialogShell } from '@/features/admin/users/components/AdminUserDialogShell';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 

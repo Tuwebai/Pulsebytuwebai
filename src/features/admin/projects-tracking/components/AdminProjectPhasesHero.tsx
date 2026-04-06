@@ -1,6 +1,6 @@
 import { KanbanSquare, Plus } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 
 interface AdminProjectPhasesHeroProps {
   phasesCount: number;

@@ -1,6 +1,6 @@
 import { Lock } from 'lucide-react';
 import type { Dispatch, SetStateAction } from 'react';
-import { TabsContent } from '@/components/ui/tabs';
+import { TabsContent } from '@/core/ui/tabs';
 import { SettingsSectionCard } from './SettingsSectionCard';
 import type { SecuritySettings } from './settings.types';
 

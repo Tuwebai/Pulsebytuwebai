@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { PulseLogo } from './PulseLogo';
 
 export interface PulseEmptyStateProps {

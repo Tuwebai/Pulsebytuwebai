@@ -1,6 +1,6 @@
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 
 interface AdminProjectAlertsEmptyStateProps {
   onBackToTracking: () => void;

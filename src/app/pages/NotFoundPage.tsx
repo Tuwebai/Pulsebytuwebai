@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { ArrowLeft, Home } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/core/ui/button';
+import { Card, CardContent } from '@/core/ui/card';
 
 export default function NotFoundPage() {
   const location = useLocation();

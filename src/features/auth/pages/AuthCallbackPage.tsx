@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PulseLoaderScreen } from '@/components/PulseLoaderScreen';
+import { PulseLoaderScreen } from '@/core/components/PulseLoaderScreen';
 import { config } from '@/config/environment';
 import { authService } from '@/features/auth/services/auth.service';
 import { userService } from '@/features/auth/services/user.service';

@@ -1,6 +1,6 @@
 import { Trash2 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { AdminUserDialogShell } from '@/features/admin/users/components/AdminUserDialogShell';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 

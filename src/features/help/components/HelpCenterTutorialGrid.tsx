@@ -1,9 +1,9 @@
 import { CheckCircle, Clock, PlayCircle, Star, Target } from 'lucide-react';
 import type { TutorialFlow } from '@/features/help/types/helpFlow.types';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/core/ui/badge';
+import { Button } from '@/core/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/core/ui/card';
 import { cn } from '@/lib/utils';
 
 import {

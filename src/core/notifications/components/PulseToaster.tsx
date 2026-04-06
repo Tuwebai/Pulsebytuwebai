@@ -7,7 +7,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from '@/components/ui/toast';
+} from '@/core/ui/toast';
 
 export function PulseToaster() {
   const { toasts } = useToast();

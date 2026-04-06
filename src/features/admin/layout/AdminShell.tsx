@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import { RefreshCw } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { useApp } from '@/contexts/AppContext';
 import { AvatarMenu } from '@/core/components';
 import { NotificationsBellTrigger } from '@/core/notifications/components/NotificationsBellTrigger';

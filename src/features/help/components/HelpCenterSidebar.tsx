@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 
-import { AnimatePresence, motion } from '@/components/OptimizedMotion';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AnimatePresence, motion } from '@/core/components/OptimizedMotion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/core/ui/tabs';
 import { PlayCircle, Search } from 'lucide-react';
 import type { TutorialFlow } from '@/features/help/types/helpFlow.types';
 

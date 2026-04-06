@@ -1,6 +1,6 @@
 import { ArrowLeft, Plus, SquarePen } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import type { AdminProjectTrackingPhase } from '@/features/admin/projects-tracking/types/adminProjectTracking';
 
 interface AdminProjectPhaseDetailHeroProps {

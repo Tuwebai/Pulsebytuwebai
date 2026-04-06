@@ -1,8 +1,8 @@
 import { BookOpen, HelpCircle, MessageCircle, Target, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import { motion } from '@/components/OptimizedMotion';
-import { Button } from '@/components/ui/button';
+import { motion } from '@/core/components/OptimizedMotion';
+import { Button } from '@/core/ui/button';
 import { cn } from '@/lib/utils';
 
 interface HelpButtonQuickMenuProps {

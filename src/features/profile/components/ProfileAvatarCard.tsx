@@ -1,8 +1,8 @@
 import { useRef } from 'react';
 import { Camera, LoaderCircle, Sparkles } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/core/ui/avatar';
+import { Badge } from '@/core/ui/badge';
+import { Button } from '@/core/ui/button';
 import type { ProfileRow } from '@/data/types/profile';
 import {
   PROFILE_AVATAR_ACCEPT,

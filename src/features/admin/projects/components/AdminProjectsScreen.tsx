@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
 
-import LoadingSpinner from '@/components/LoadingSpinner';
+import LoadingSpinner from '@/core/components/LoadingSpinner';
 import { AdminPageActionsBar } from '@/features/admin/components/AdminPageActionsBar';
 import { AdminProjectPagination } from '@/features/admin/projects/components/AdminProjectPagination';
 import { AdminProjectsEmptyState } from '@/features/admin/projects/components/AdminProjectsEmptyState';

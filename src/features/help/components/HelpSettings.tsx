@@ -1,6 +1,6 @@
 import { Bell, BellOff, Zap } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { useHelpCenterState } from '@/features/help/hooks/useHelpCenterState';
 
 export function HelpSettings() {

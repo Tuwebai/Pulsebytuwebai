@@ -1,5 +1,5 @@
 import { LoaderCircle, Save, ShieldCheck } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import { cn } from '@/lib/utils';
 

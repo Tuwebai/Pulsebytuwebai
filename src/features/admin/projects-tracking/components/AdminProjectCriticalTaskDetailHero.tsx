@@ -1,6 +1,6 @@
 import { ArrowLeft, SquarePen } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import type { AdminProjectCriticalTaskItem } from '@/features/admin/projects-tracking/components/adminProjectCriticalTasks.utils';
 
 interface AdminProjectCriticalTaskDetailHeroProps {

@@ -1,6 +1,6 @@
 import { Trash2 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import type { Project } from '@/types/project.types';
 
 import { AdminProjectDialogShell } from '@/features/admin/projects/components/AdminProjectDialogShell';

@@ -3,7 +3,7 @@ import * as React from 'react';
 import type {
   ToastActionElement,
   ToastProps,
-} from '@/components/ui/toast';
+} from '@/core/ui/toast';
 
 const TOAST_LIMIT = 1;
 const TOAST_DURATION = 5000;

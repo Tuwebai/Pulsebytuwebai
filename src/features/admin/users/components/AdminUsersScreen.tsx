@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { AdminPageActionsBar } from '@/features/admin/components/AdminPageActionsBar';
 import { AdminUserCard } from '@/features/admin/users/components/AdminUserCard';
 import { AdminUsersFilters } from '@/features/admin/users/components/AdminUsersFilters';

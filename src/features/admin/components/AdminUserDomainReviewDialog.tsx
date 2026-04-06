@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { CheckCircle2, Globe, XCircle } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/core/ui/badge';
+import { Button } from '@/core/ui/button';
 import { AdminUserDomainReviewFields } from '@/features/admin/components/AdminUserDomainReviewFields';
 import { AdminUserDialogShell } from '@/features/admin/users/components/AdminUserDialogShell';
 import {

@@ -1,7 +1,7 @@
-import { motion } from '@/components/OptimizedMotion';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { CardHeader, CardTitle } from '@/components/ui/card';
+import { motion } from '@/core/components/OptimizedMotion';
+import { Badge } from '@/core/ui/badge';
+import { Button } from '@/core/ui/button';
+import { CardHeader, CardTitle } from '@/core/ui/card';
 import type { TutorialFlow, TutorialStep } from '@/contexts/TutorialContext';
 import { cn } from '@/lib/utils';
 import { Volume2, VolumeX, X } from 'lucide-react';

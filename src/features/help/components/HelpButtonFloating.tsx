@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { motion } from '@/components/OptimizedMotion';
-import { Button } from '@/components/ui/button';
+import { motion } from '@/core/components/OptimizedMotion';
+import { Button } from '@/core/ui/button';
 import { HelpButtonQuickMenu } from './HelpButtonQuickMenu';
 import { cn } from '@/lib/utils';
 import { HelpCircle } from 'lucide-react';

@@ -1,5 +1,5 @@
 import { RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { AdminPageActionsBar } from '@/features/admin/components/AdminPageActionsBar';
 import { AdminSettingsImpactCard } from '@/features/admin/settings/components/AdminSettingsImpactCard';
 import { AdminSettingsMetrics } from '@/features/admin/settings/components/AdminSettingsMetrics';

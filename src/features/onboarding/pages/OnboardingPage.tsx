@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/core/ui/button';
+import { Input } from '@/core/ui/input';
 import { PulseLogo } from '@/core/components';
 import { usePulseOnboarding } from '@/features/onboarding/hooks/usePulseOnboarding';
 

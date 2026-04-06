@@ -1,4 +1,4 @@
-import { getRouteAwareOverlayPosition } from '@/components/tutorial/tutorialOverlayRouteConfig';
+import { getRouteAwareOverlayPosition } from '@/features/product-tour/components/tutorialOverlayRouteConfig';
 
 interface TooltipPositionParams {
   currentPosition: 'top' | 'bottom' | 'left' | 'right' | 'center';

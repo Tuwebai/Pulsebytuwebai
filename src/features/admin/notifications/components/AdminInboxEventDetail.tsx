@@ -1,15 +1,15 @@
 import { Bell, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/core/ui/badge';
+import { Button } from '@/core/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/core/ui/select';
 import { AdminInboxDetailSection } from '@/features/admin/notifications/components/AdminInboxDetailSection';
 import { AdminInboxEventDetailEmpty } from '@/features/admin/notifications/components/AdminInboxEventDetailEmpty';
 import type {

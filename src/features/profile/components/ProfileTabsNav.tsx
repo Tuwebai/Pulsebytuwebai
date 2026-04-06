@@ -1,5 +1,5 @@
 import { AlertTriangle, BriefcaseBusiness, Shield, UserRound } from 'lucide-react';
-import { TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TabsList, TabsTrigger } from '@/core/ui/tabs';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import { PROFILE_TABS } from '@/features/profile/constants/profile.constants';
 import { cn } from '@/lib/utils';

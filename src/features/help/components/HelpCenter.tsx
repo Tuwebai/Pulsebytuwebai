@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/core/ui/dialog';
 import { useHelpCenterState } from '@/features/help/hooks/useHelpCenterState';
 import { PRODUCT_TOUR_CLOSE_EVENT, PRODUCT_TOUR_OPEN_EVENT } from '@/features/product-tour/services/productTour.service';
 import type { ProductTourScope } from '@/features/product-tour/types/productTour.types';

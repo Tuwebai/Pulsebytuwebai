@@ -1,6 +1,6 @@
 import { Edit3, ExternalLink, Trash2 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 
 interface AdminProjectCardActionsProps {
   projectId: string;

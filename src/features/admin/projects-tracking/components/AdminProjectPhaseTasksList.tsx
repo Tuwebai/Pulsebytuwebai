@@ -1,6 +1,6 @@
 import { CalendarClock, CircleAlert, SquarePen, UserRound } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { AdminProjectTrackingQuickActions } from '@/features/admin/projects-tracking/components/AdminProjectTrackingQuickActions';
 import type { AdminProjectTrackingResolutionAction } from '@/features/admin/projects-tracking/components/AdminProjectTrackingResolutionPanel';
 import type { AdminProjectTrackingTask } from '@/features/admin/projects-tracking/types/adminProjectTracking';

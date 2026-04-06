@@ -1,7 +1,7 @@
 import { AlertTriangle } from 'lucide-react';
 
 import { toast } from '@/core/notifications/hooks/useToast';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/core/ui/badge';
 import { AccountDeletionRequestDialog } from '@/features/profile/components/AccountDeletionRequestDialog';
 import { PROFILE_SURFACE_CLASSNAME } from '@/features/profile/constants/profile.constants';
 import { useAccountDeletionRequest } from '@/features/profile/hooks/useAccountDeletionRequest';

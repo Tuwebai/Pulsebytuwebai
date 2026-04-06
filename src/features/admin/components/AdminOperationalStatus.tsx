@@ -8,7 +8,7 @@ import {
   Users,
 } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/core/ui/badge';
 import type { AdminSectionChangeHandler } from '@/features/admin/types/adminNavigation';
 import { formatCurrency } from '@/lib/integrations/mercadopago';
 

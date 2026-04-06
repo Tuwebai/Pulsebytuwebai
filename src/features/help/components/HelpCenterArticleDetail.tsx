@@ -2,8 +2,8 @@ import { Fragment, type ReactNode } from 'react';
 import { ArrowLeft, BookmarkCheck, CalendarDays, User } from 'lucide-react';
 import type { HelpArticle } from '@/features/help/types/helpContent.types';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/core/ui/badge';
+import { Button } from '@/core/ui/button';
 
 import {
   getCategoryColor,

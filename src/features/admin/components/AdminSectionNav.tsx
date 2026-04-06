@@ -8,7 +8,7 @@ import {
   Users,
 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { cn } from '@/lib/utils';
 import {
   ADMIN_OPERATIONAL_SECTION_IDS,

@@ -1,6 +1,6 @@
 import { ShieldAlert } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 
 interface AdminProjectTrackingContextBannerProps {
   ctaLabel: string;

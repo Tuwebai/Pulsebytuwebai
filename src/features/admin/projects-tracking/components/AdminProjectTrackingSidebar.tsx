@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import type { AdminProjectTrackingNavItem } from '@/features/admin/projects-tracking/components/AdminProjectTrackingFrame';
 import { cn } from '@/lib/utils';
 

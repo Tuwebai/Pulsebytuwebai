@@ -1,7 +1,7 @@
 import { Shield } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/core/ui/avatar';
+import { Badge } from '@/core/ui/badge';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 
 interface AdminUserCardIdentityProps {

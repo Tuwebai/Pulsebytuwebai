@@ -1,5 +1,5 @@
 import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 
 interface PaymentsHeaderProps {
   onCreatePayment: () => void;

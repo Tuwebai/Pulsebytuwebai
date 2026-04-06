@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { AnimatePresence, motion } from '@/components/OptimizedMotion';
+import { AnimatePresence, motion } from '@/core/components/OptimizedMotion';
 import { Lightbulb } from 'lucide-react';
 
 import type { ContextualHintProps } from '@/features/help/types/contextualHelp.types';

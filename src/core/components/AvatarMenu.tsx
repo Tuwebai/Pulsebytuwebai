@@ -1,7 +1,7 @@
 import { Compass, LogOut, Settings, UserCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/core/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/core/ui/dropdown-menu';
 import type { User } from '@/contexts/appContext.types';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import {

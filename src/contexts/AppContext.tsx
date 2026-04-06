@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
-import { SupabaseError } from '@/components/SupabaseError';
+import { SupabaseError } from '@/core/components/SupabaseError';
 import type { AppContextType, Project, ProjectLog } from '@/contexts/appContext.types';
 import { defaultAppContext } from '@/contexts/appContext.default';
 import { useAppAuth } from '@/features/auth/hooks/useAppAuth';

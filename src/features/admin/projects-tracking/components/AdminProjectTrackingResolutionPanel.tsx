@@ -1,6 +1,6 @@
 import { AlertTriangle, CalendarClock, KanbanSquare, UserRound } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 
 export interface AdminProjectTrackingResolutionAction {
   id: string;

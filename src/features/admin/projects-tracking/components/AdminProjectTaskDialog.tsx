@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ListTodo, Loader2 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { AdminProjectDialogShell } from '@/features/admin/projects/components/AdminProjectDialogShell';
 import { AdminProjectTaskDialogFields } from '@/features/admin/projects-tracking/components/AdminProjectTaskDialogFields';
 import type {

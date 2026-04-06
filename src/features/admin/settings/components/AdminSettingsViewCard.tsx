@@ -1,5 +1,5 @@
 import { BarChart3 } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/core/ui/select';
 import type { PulseExperienceSettings } from '@/data/types/pulse';
 import {
   pulseChartModeOptions,

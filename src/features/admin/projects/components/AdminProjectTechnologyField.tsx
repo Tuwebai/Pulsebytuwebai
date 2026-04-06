@@ -1,7 +1,7 @@
 import { Plus, X } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/core/ui/button';
+import { Input } from '@/core/ui/input';
 
 interface AdminProjectTechnologyFieldProps {
   value: string[];

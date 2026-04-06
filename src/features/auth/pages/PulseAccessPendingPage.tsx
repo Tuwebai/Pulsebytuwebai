@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ShieldAlert } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import { PulseLogo } from '@/core/components';
 import { useApp } from '@/contexts/AppContext';
 import { toast } from '@/core/notifications/hooks/useToast';

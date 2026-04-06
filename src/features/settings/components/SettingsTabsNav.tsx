@@ -1,5 +1,5 @@
 import { Bell, Lock, UserCircle2 } from 'lucide-react';
-import { TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TabsList, TabsTrigger } from '@/core/ui/tabs';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
 import { cn } from '@/lib/utils';
 

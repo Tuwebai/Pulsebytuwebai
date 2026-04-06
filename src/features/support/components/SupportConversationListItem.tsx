@@ -1,6 +1,6 @@
 import { formatDistanceToNowStrict } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/core/ui/avatar';
 import { getIdentityInitials } from '@/lib/identity/userIdentity';
 import type { SupportConversationSummary } from '@/features/support/ticketMessages.types';
 

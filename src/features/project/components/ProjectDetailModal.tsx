@@ -1,6 +1,6 @@
 import { FolderOpen, MessageCircle, X } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/core/ui/button';
 import Badge from '@/core/components/Badge';
 
 import ProjectDetailDialogShell from './ProjectDetailDialogShell';

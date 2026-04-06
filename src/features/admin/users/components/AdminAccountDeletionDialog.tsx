@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/core/ui/button';
+import { Textarea } from '@/core/ui/textarea';
 import { AdminUserDialogShell } from '@/features/admin/users/components/AdminUserDialogShell';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
 
