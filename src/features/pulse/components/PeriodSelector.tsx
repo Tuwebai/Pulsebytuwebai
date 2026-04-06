@@ -16,25 +16,24 @@ const periods = [
 
 export default function PeriodSelector({ value, onChange, disabled = false }: PeriodSelectorProps) {
   return (
-    <div className="flex flex-wrap items-center gap-[var(--cliente-filter-gap)]">
+    <div className="flex w-full min-w-0 items-center gap-[var(--cliente-filter-gap)] overflow-x-auto whitespace-nowrap pb-1 md:w-auto md:overflow-visible">
       {periods.map((period) => {
         const isActive = value === period.value;
         return (
           <button
             key={period.value}
             className={cn(
-              'rounded-full border px-[var(--cliente-badge-padding-x)] text-xs transition-colors',
+              'inline-flex h-[var(--cliente-badge-height)] shrink-0 items-center justify-center rounded-full border px-[var(--cliente-badge-padding-x)] text-xs transition-colors',
               isActive
                 ? 'border-[var(--signal-border)] bg-[var(--signal-glow)] text-[var(--signal)]'
                 : 'border-[var(--border-default)] bg-transparent text-[var(--text-tertiary)]',
-              !period.mobile && 'hidden md:inline-flex'
+              disabled && 'cursor-not-allowed opacity-50'
             )}
             disabled={disabled}
             onClick={() => onChange(period.value)}
-            style={{ height: 'var(--cliente-badge-height)' }}
             type="button"
           >
-            <span className="md:hidden">{period.mobile ?? period.desktop}</span>
+            <span className={cn('md:hidden', !period.mobile && 'hidden')}>{period.mobile ?? period.desktop}</span>
             <span className="hidden md:inline">{period.desktop}</span>
           </button>
         );
