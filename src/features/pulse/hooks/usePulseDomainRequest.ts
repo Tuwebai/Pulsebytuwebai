@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import {
   canSubmitDomainRequest,
   getDomainRequestAttemptCount,

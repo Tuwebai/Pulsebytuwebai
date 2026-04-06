@@ -13,7 +13,7 @@ import {
   filterAndSortTickets,
 } from '@/features/admin/tickets/utils/adminTicket.utils';
 import { ticketService } from '@/features/support/services/ticket.service';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 
 export function useAdminTicketsScreen({ tickets: externalTickets, refreshData }: AdminTicketsScreenProps) {
   const { user } = useApp();

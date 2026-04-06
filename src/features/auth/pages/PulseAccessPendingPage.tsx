@@ -4,7 +4,7 @@ import { ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PulseLogo } from '@/core/components';
 import { useApp } from '@/contexts/AppContext';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
 import { hasPulseAccess } from '@/features/auth/utils/pulseAccess';
 

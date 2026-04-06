@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import { getDeletionReviewSuccessToast } from '@/features/admin/users/hooks/adminUsers.feedback';
 import { reviewAdminAccountDeletionRequest } from '@/features/admin/users/services/accountDeletionAdminService';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';

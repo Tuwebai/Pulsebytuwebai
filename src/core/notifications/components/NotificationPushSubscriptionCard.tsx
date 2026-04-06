@@ -1,5 +1,5 @@
 import { BellRing, Smartphone } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import { usePushNotifications } from '@/core/notifications/hooks/usePushNotifications';
 import { requestPushPermission } from '@/core/notifications/services/pushNotifications.service';
 import { NotificationPreferenceToggle } from './NotificationPreferenceToggle';

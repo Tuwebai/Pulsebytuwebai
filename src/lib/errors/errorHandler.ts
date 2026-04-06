@@ -1,4 +1,4 @@
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import type { AppError } from '@/lib/errors/error.types';
 import { getErrorCode, getErrorMessage, getErrorTitle, isRecoverableError } from '@/lib/errors/errorUtils';
 

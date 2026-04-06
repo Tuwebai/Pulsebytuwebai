@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useApp } from '@/contexts/AppContext';
 import { projectService } from '@/features/project/services/project.service';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import type { CreateProjectData, Project, ProjectFilters, ProjectSort, UpdateProjectData } from '@/types/project.types';
 
 export function useAdminProjectsData() {

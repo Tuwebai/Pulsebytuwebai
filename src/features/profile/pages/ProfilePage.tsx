@@ -14,7 +14,7 @@ import { useUpdateProfile } from '@/features/profile/hooks/useUpdateProfile';
 import { PRODUCT_TOUR_STEP_CHANGE_EVENT } from '@/features/product-tour/services/productTour.service';
 import type { ProductTourStep } from '@/features/product-tour/types/productTour.types';
 import { useSessionStorageState } from '@/core/hooks/useSessionStorageState';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import { getDisplayAvatar } from '@/lib/identity/userIdentity';
 
 export default function ProfilePage() {

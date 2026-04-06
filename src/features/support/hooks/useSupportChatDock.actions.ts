@@ -1,4 +1,4 @@
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import type { User } from '@/contexts/appContext.types';
 import { submitSupportTicket } from '@/features/support/hooks/supportTicketMutations';
 import { ticketMessagesService } from '@/features/support/services/ticketMessages.service';

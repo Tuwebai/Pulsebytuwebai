@@ -9,7 +9,7 @@ import {
 } from '@/features/admin/screens/adminScreenRegistry';
 import type { AdminUsersFilterId } from '@/features/admin/users/constants/adminUsersFilters';
 import type { AdminManagedUser } from '@/features/admin/users/types/adminUser';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 
 interface UseAdminScreenRegistryParams {
   user: User | null;

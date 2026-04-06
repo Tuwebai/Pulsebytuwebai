@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import PulseLogo from '@/core/components/PulseLogo';
 import { useApp } from '@/contexts/AppContext';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -62,8 +62,17 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-3 sm:p-4">
-      <div className="w-full max-w-sm sm:max-w-md space-y-6 sm:space-y-8">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[var(--bg-base)] px-3 py-6 sm:px-4 sm:py-10">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 opacity-[0.14] [background-image:linear-gradient(rgba(240,244,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(240,244,255,0.08)_1px,transparent_1px),radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.95)_1.2px,transparent_0)] [background-position:center_center,center_center,center_center] [background-size:24px_24px,24px_24px,24px_24px]"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,158,245,0.12),transparent_42%)]"
+      />
+
+      <div className="relative z-10 w-full max-w-sm sm:max-w-md space-y-6 text-center sm:space-y-8">
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
             <PulseLogo size={40} variant="night" animated />

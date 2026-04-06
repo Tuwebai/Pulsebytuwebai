@@ -8,7 +8,7 @@ import {
 } from '@/features/admin/tickets/hooks/adminTicketMutationActions';
 import type { AdminTicket, TicketFormData } from '@/features/admin/tickets/types/adminTicket.types';
 import { storeSupportChatIntent } from '@/features/support/supportChat.events';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 
 interface UseAdminTicketMutationsParams {
   editingTicket: AdminTicket | null;

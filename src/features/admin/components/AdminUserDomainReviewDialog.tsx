@@ -10,7 +10,7 @@ import {
   type AdminWebsiteReviewResult,
   type WebsiteReviewStatus,
 } from '@/features/admin/services/pulseDomainAdminService';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 
 export interface AdminDomainUser {
   id: string;

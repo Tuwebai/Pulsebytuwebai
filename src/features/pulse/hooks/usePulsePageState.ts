@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import { useApp } from '@/contexts/AppContext';
 import { useUserProject } from '@/features/project/hooks/useUserProject';
 import { usePulseMetrics } from './usePulseMetrics';

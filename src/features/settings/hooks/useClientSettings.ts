@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import { useApp } from '@/contexts/AppContext';
 import type { AppContextType } from '@/contexts/AppContext';
 import type { PerformanceSettings, SecuritySettings } from '@/features/settings/components/settings.types';

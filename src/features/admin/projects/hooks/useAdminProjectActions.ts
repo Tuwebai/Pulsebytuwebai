@@ -1,4 +1,4 @@
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import type { CreateProjectData, UpdateProjectData } from '@/types/project.types';
 
 

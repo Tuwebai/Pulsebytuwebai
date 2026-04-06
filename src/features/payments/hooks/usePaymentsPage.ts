@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createMercadoPagoPreference, getUserPayments } from '@/features/payments/services/payment.service';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import type { User } from '@/contexts/appContext.types';
 import type { Payment } from '@/types';
 import { downloadPaymentInvoicePdf } from '../services/paymentInvoice.service';

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Session, User as SupabaseUser } from '@supabase/supabase-js';
 import { userService } from '@/features/auth/services/user.service';
 import { supabase } from '@/lib/supabase/supabase';
-import { toast as toastGlobal } from '@/hooks/use-toast';
+import { toast as toastGlobal } from '@/core/notifications/hooks/useToast';
 import { userPreferencesService } from '@/features/auth/services/userPreferences.service';
 import { clearCache, getCachedData, setCachedData } from '@/contexts/appContext.cache';
 import type { User } from '@/contexts/appContext.types';

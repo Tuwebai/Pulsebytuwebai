@@ -19,7 +19,7 @@ import {
   updateCountsFromTransition,
 } from '@/features/admin/notifications/hooks/useAdminNotificationsInbox.optimistic';
 import { syncOperationalEvents, type OperationalEventSyncSummary } from '@/features/admin/notifications/services/adminOperationalEventSyncAction.service';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 
 const DEFAULT_FILTERS: EventFilters = { status: ['open', 'in_progress'] };
 

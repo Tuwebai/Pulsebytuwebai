@@ -7,7 +7,7 @@ import { AdminSettingsModulesCard } from '@/features/admin/settings/components/A
 import { AdminPushNotificationsCard } from '@/features/admin/settings/components/AdminPushNotificationsCard';
 import { AdminSettingsViewCard } from '@/features/admin/settings/components/AdminSettingsViewCard';
 import { useAdminPulseSettings } from '@/features/admin/settings/hooks/useAdminPulseSettings';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 
 interface AdminSettingsScreenProps {
   onSaveReference: () => void;

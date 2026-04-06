@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 
 interface UseSessionTimeoutParams {
   enabled: boolean;

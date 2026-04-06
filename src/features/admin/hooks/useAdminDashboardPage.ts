@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import type { AdminPaymentRecord, AdminProjectRecord } from '@/api/admin/adminDashboard.api';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import {
   getAdminDashboardData,
   type AdminDashboardTicket,

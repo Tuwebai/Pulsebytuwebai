@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/core/notifications/hooks/useToast';
 import { createAdminUser, deleteAdminUser, updateAdminUser } from '@/features/admin/users/services/adminUserManagementService';
 import type { AdminManagedUser, AdminUserFormData } from '@/features/admin/users/types/adminUser';
 
