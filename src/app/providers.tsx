@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { I18nextProvider } from 'react-i18next';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { Toaster as Sonner } from '@/components/ui/sonner';
 import { AppProvider } from '@/contexts/AppContext';
 import { PulseToaster } from '@/core/notifications/components/PulseToaster';
 import { PushSubscriptionBootstrap } from '@/core/notifications/components/PushSubscriptionBootstrap';
@@ -36,7 +35,6 @@ export function AppProviders({ children }: AppProvidersProps) {
                 <PushSubscriptionBootstrap />
                 {children}
                 <PulseToaster />
-                <Sonner />
               </TutorialProvider>
             </AppProvider>
           </TooltipProvider>
