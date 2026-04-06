@@ -106,7 +106,21 @@ function isConnectResponse(value: unknown): value is GoogleSearchConsoleConnectR
   return typeof payload.authorizationUrl === 'string' && payload.authorizationUrl.length > 0;
 }
 
+async function ensureAuthenticatedGoogleSession() {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session?.access_token) {
+    throw new Error('Tu sesión de Pulse todavía se está recuperando. Reintentá en unos segundos.');
+  }
+
+  return session;
+}
+
 export async function getGoogleSearchConsoleConnection(projectId: string): Promise<GoogleSearchConsoleConnection | null> {
+  await ensureAuthenticatedGoogleSession();
+
   const { data, error } = await supabase
     .from('search_console_properties')
     .select(
@@ -131,6 +145,8 @@ export async function getGoogleSearchConsoleMetricsByRange(
   from: string,
   to: string,
 ): Promise<GoogleSearchConsoleMetricRow[]> {
+  await ensureAuthenticatedGoogleSession();
+
   const { data, error } = await supabase
     .from('search_console_daily_metrics')
     .select('id, project_id, property_id, metric_date, clicks, impressions, ctr, position, updated_at')
@@ -151,6 +167,8 @@ export async function getGoogleSearchConsoleDimensionsByRange(
   from: string,
   to: string,
 ): Promise<GoogleSearchConsoleDimensionRow[]> {
+  await ensureAuthenticatedGoogleSession();
+
   const { data, error } = await supabase
     .from('search_console_dimension_metrics')
     .select(
@@ -172,13 +190,7 @@ export async function startGoogleSearchConsoleConnect(
   projectId: string,
   returnToOrigin: string,
 ): Promise<GoogleSearchConsoleConnectResponse> {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session?.access_token) {
-    throw new Error('Tu sesión no está disponible para conectar Google.');
-  }
+  const session = await ensureAuthenticatedGoogleSession();
 
   const { data, error } = await supabase.functions.invoke('google-search-console-connect', {
     headers: {
