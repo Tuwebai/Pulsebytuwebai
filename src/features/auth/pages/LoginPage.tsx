@@ -9,13 +9,17 @@ import { useApp } from '@/contexts/useApp';
 import { getPostLoginPath } from '../utils/getPostLoginPath';
 
 export default function LoginPage() {
-  const { isAuthenticated, user, login, loginWithGoogle, error, clearError } = useApp();
+  const { isAuthenticated, user, authReady, login, loginWithGoogle, error, clearError } = useApp();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const destination = useMemo(() => getPostLoginPath(user), [user]);
+
+  if (!authReady) {
+    return null;
+  }
 
   if (isAuthenticated) {
     return <Navigate replace to={destination} />;
