@@ -104,7 +104,7 @@ app.post('/mcp', pulseMcpAuthMiddleware, async (req, res) => {
 
     if (!sessionId && isInitializeRequest(req.body)) {
       const server = createPulseMcpServer();
-      let session: SessionEntry;
+      let session!: SessionEntry;
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => randomUUID(),
         onsessioninitialized: (createdSessionId) => {

@@ -1,113 +1,89 @@
-import { supabase } from './client.js';
+import { insertNotificationForUser, listActiveNotificationRecipients, type NotificationWriteInput } from './notification-write-helpers.js';
 import { resolveUserIdentifier } from './users.js';
 
-async function findRecentNotification(input: {
-  userId: string;
-  title: string;
-  message: string;
-  category: string;
-  type: string;
-  actionUrl: string | null;
-  isUrgent: boolean;
-  windowMs?: number;
-}) {
-  const createdAfter = new Date(Date.now() - (input.windowMs ?? 30_000)).toISOString();
-  let query = supabase
-    .from('notifications')
-    .select('id, user_id, title, message, type, category, is_read, is_urgent, action_url, created_at')
-    .eq('user_id', input.userId)
-    .eq('title', input.title)
-    .eq('message', input.message)
-    .eq('type', input.type)
-    .eq('category', input.category)
-    .eq('is_urgent', input.isUrgent)
-    .gte('created_at', createdAfter)
-    .order('created_at', { ascending: false })
-    .limit(1);
-
-  query = input.actionUrl
-    ? query.eq('action_url', input.actionUrl)
-    : query.is('action_url', null);
-
-  const { data, error } = await query.maybeSingle();
-  if (error) throw error;
-  return data;
+interface BulkNotificationResultItem {
+  input: string;
+  success: boolean;
+  resolvedUser: {
+    id: string;
+    email: string | null;
+    full_name: string | null;
+  } | null;
+  notification?: unknown;
+  error?: string;
 }
 
-export async function createUserNotification(input: {
+async function sendNotificationToResolvedUser(userId: string, input: NotificationWriteInput) {
+  const user = await resolveUserIdentifier(userId);
+  return insertNotificationForUser(user, input);
+}
+
+export async function createUserNotification(input: NotificationWriteInput & {
   userIdentifier: string;
-  title: string;
-  message: string;
-  category?: string;
-  type?: string;
-  actionUrl?: string;
-  isUrgent?: boolean;
 }) {
   const user = await resolveUserIdentifier(input.userIdentifier);
-  const title = input.title.trim();
-  const message = input.message.trim();
+  return insertNotificationForUser(user, input);
+}
 
-  if (!title) {
-    throw new Error('Necesitamos un titulo para enviar la notificacion.');
-  }
+export async function sendNotificationBulk(input: NotificationWriteInput & {
+  userIdentifiers?: string[];
+  allUsers?: boolean;
+}) {
+  const results: BulkNotificationResultItem[] = [];
 
-  if (!message) {
-    throw new Error('Necesitamos un mensaje para enviar la notificacion.');
-  }
+  if (input.allUsers) {
+    const activeUsers = await listActiveNotificationRecipients();
+    const deliveries = await Promise.all(activeUsers.map(async (user) => {
+      try {
+        const delivery = await insertNotificationForUser(user, input);
+        return {
+          input: user.id,
+          success: true,
+          resolvedUser: delivery.resolvedUser,
+          notification: delivery.notification,
+        } satisfies BulkNotificationResultItem;
+      } catch (error) {
+        return {
+          input: user.id,
+          success: false,
+          resolvedUser: { id: user.id, email: user.email, full_name: user.full_name },
+          error: error instanceof Error ? error.message : 'No pudimos crear la notificacion.',
+        } satisfies BulkNotificationResultItem;
+      }
+    }));
 
-  const payload = {
-    user_id: user.id,
-    title,
-    message,
-    type: input.type ?? 'info',
-    category: input.category ?? 'system',
-    is_read: false,
-    is_urgent: input.isUrgent ?? false,
-    action_url: input.actionUrl?.trim() || null,
-    metadata: {
-      source: 'pulse_mcp',
-    },
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  };
+    results.push(...deliveries);
+  } else {
+    const identifiers = (input.userIdentifiers ?? []).map((item) => item.trim()).filter(Boolean);
 
-  const recentDuplicate = await findRecentNotification({
-    userId: user.id,
-    title,
-    message,
-    type: payload.type,
-    category: payload.category,
-    actionUrl: payload.action_url,
-    isUrgent: payload.is_urgent,
-  });
+    if (identifiers.length === 0) {
+      throw new Error('Necesitamos al menos un userIdentifier o usar all_users=true para enviar notificaciones en lote.');
+    }
 
-  if (recentDuplicate) {
-    return {
-      resolvedUser: {
-        id: user.id,
-        email: user.email,
-        full_name: user.full_name,
-      },
-      notification: recentDuplicate,
-    };
-  }
-
-  const { data, error } = await supabase
-    .from('notifications')
-    .insert(payload)
-    .select('id, user_id, title, message, type, category, is_read, is_urgent, action_url, created_at')
-    .single();
-
-  if (error) {
-    throw error;
+    for (const identifier of identifiers) {
+      try {
+        const delivery = await sendNotificationToResolvedUser(identifier, input);
+        results.push({
+          input: identifier,
+          success: true,
+          resolvedUser: delivery.resolvedUser,
+          notification: delivery.notification,
+        });
+      } catch (error) {
+        results.push({
+          input: identifier,
+          success: false,
+          resolvedUser: null,
+          error: error instanceof Error ? error.message : 'No pudimos crear la notificacion.',
+        });
+      }
+    }
   }
 
   return {
-    resolvedUser: {
-      id: user.id,
-      email: user.email,
-      full_name: user.full_name,
-    },
-    notification: data,
+    total: results.length,
+    succeeded: results.filter((result) => result.success).length,
+    failed: results.filter((result) => !result.success).length,
+    results,
   };
 }

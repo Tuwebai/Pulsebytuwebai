@@ -1,7 +1,9 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import { registerClientActionTools } from './tools/action-client-tools.js';
-import { registerNotificationActionTools } from './tools/action-notification-tools.js';
+import { registerNotificationEmailTools } from './tools/action-email-tools.js';
+import { registerNotificationSendTools } from './tools/action-notification-send-tools.js';
+import { registerNotificationStateTools } from './tools/action-notification-state-tools.js';
 import { registerProjectActionTools } from './tools/action-project-tools.js';
 import { registerTicketActionTools } from './tools/action-ticket-tools.js';
 import { registerClientActivityTools } from './tools/client-activity-tools.js';
@@ -20,9 +22,11 @@ export function createPulseMcpServer() {
   registerClientTools(server);
   registerClientActivityTools(server);
   registerClientActionTools(server);
+  registerNotificationEmailTools(server);
+  registerNotificationSendTools(server);
+  registerNotificationStateTools(server);
   registerProjectActionTools(server);
   registerTicketActionTools(server);
-  registerNotificationActionTools(server);
 
   return server;
 }
