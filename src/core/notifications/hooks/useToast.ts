@@ -6,7 +6,8 @@ import type {
 } from '@/components/ui/toast';
 
 const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000000;
+const TOAST_DURATION = 5000;
+const TOAST_REMOVE_DELAY = 200;
 
 type PulseToast = ToastProps & {
   id: string;
@@ -46,6 +47,20 @@ interface State {
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
+const clearRemoveQueue = (toastId?: string) => {
+  if (!toastId) {
+    toastTimeouts.forEach((timeout) => clearTimeout(timeout));
+    toastTimeouts.clear();
+    return;
+  }
+
+  const timeout = toastTimeouts.get(toastId);
+  if (timeout) {
+    clearTimeout(timeout);
+    toastTimeouts.delete(toastId);
+  }
+};
+
 const addToRemoveQueue = (toastId: string) => {
   if (toastTimeouts.has(toastId)) {
     return;
@@ -65,6 +80,9 @@ const addToRemoveQueue = (toastId: string) => {
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'ADD_TOAST':
+      state.toasts.forEach((toast) => {
+        clearRemoveQueue(toast.id);
+      });
       return {
         ...state,
         toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
@@ -104,12 +122,14 @@ export const reducer = (state: State, action: Action): State => {
 
     case 'REMOVE_TOAST':
       if (action.toastId === undefined) {
+        clearRemoveQueue();
         return {
           ...state,
           toasts: [],
         };
       }
 
+      clearRemoveQueue(action.toastId);
       return {
         ...state,
         toasts: state.toasts.filter((toast) => toast.id !== action.toastId),
@@ -144,6 +164,7 @@ function toast({ ...props }: Toast) {
     type: 'ADD_TOAST',
     toast: {
       ...props,
+      duration: props.duration ?? TOAST_DURATION,
       id,
       open: true,
       onOpenChange: (open) => {
