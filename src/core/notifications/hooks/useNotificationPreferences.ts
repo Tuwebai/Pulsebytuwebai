@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { fetchPreferences, updatePreferences } from '@/api/notifications/notificationsApi';
 import type { NotificationPreferences } from '@/data/types/notifications';
 import { notificationQueryKeys } from './notificationQueryKeys';

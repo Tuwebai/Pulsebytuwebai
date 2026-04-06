@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { useUserProject } from '@/features/project/hooks/useUserProject';
 import { useGoogleSearchConsoleConnection } from './useGoogleSearchConsoleConnection';
 import {

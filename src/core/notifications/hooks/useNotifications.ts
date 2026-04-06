@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { fetchNotifications, fetchUnreadCount, markAllAsRead, markAsRead } from '@/api/notifications/notificationsApi';
 import type { Notification } from '@/data/types/notifications';
 import { groupNotificationsByDay } from '../services/notifications.service';

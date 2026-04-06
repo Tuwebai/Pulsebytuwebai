@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/cor
 import { Input } from '@/core/ui/input';
 import { Label } from '@/core/ui/label';
 import PulseLogo from '@/core/components/PulseLogo';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { toast } from '@/core/notifications/hooks/useToast';
 
 export default function RegisterPage() {

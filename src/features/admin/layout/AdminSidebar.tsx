@@ -1,7 +1,7 @@
 import { BarChart3 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { AdminSidebarFooter } from '@/features/admin/layout/AdminSidebarFooter';
 import { AdminSidebarNavItem } from '@/features/admin/layout/AdminSidebarNavItem';
 import { AdminSidebarProfile } from '@/features/admin/layout/AdminSidebarProfile';

@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import {
   changeAdminTicketStatus,
   removeAdminTicket,

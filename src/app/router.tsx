@@ -6,7 +6,7 @@ import NotFoundPage from '@/app/pages/NotFoundPage';
 import RouteLoadErrorState from '@/core/components/RouteLoadErrorState';
 import TouchGestureProvider from '@/core/components/TouchGestureProvider';
 import { renderAdminRoutes } from '@/app/adminRoutes';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { renderAuthRoutes } from '@/features/auth/routes/AuthRoutes';
 import ProtectedRoute from '@/features/auth/components/ProtectedRoute';
 import AuthCallbackPage from '@/features/auth/pages/AuthCallbackPage';

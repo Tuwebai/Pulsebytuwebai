@@ -1,5 +1,5 @@
-import { useApp } from '@/contexts/AppContext';
-import type { AppContextType } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
+import type { AppContextType } from '@/contexts/appContext.types';
 import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 
 export function useReducedMotionPreference(): boolean {

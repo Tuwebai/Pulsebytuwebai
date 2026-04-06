@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSessionStorageState } from '@/core/hooks/useSessionStorageState';
 import { toast } from '@/core/notifications/hooks/useToast';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { ticketService } from '@/features/support/services/ticket.service';
 import { useSupportTicketsRealtime } from '@/features/support/hooks/useSupportTicketsRealtime';
 import { submitSupportTicket } from '@/features/support/hooks/supportTicketMutations';

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { getAccountDeletionRequest } from '@/features/profile/services/accountDeletion.service';
 
 export function useAccountDeletionRequest() {

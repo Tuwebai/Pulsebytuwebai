@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useSessionStorageState } from '@/core/hooks/useSessionStorageState';
 import { toast } from '@/core/notifications/hooks/useToast';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import type { SupportDraftState } from '@/features/support';
 import { buildSupportConversationSummary } from '@/features/support/services/ticketMessages.service';
 import { type SupportConversationSummary } from '@/features/support/ticketMessages.types';

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { projectService } from '@/features/project/services/project.service';
 import { toast } from '@/core/notifications/hooks/useToast';
 import type { CreateProjectData, Project, ProjectFilters, ProjectSort, UpdateProjectData } from '@/types/project.types';

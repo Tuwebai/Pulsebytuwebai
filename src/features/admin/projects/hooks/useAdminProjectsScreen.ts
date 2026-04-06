@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import type { CreateProjectData, Project, UpdateProjectData } from '@/types/project.types';
 
 import { getAdminProjectStats } from '@/features/admin/projects/hooks/adminProjectsScreen.utils';

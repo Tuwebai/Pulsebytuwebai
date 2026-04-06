@@ -8,7 +8,7 @@ interface TooltipProps {
   }>;
 }
 
-export function formatMetricLabel(mode: PulseChartMode, value: number) {
+function formatMetricLabel(mode: PulseChartMode, value: number) {
   return mode === 'contacts' ? `${value.toLocaleString('es-AR')} consultas` : `${value.toLocaleString('es-AR')} visitas`;
 }
 

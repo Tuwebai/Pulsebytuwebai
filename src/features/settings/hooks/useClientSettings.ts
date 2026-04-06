@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from '@/core/notifications/hooks/useToast';
-import { useApp } from '@/contexts/AppContext';
-import type { AppContextType } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
+import type { AppContextType } from '@/contexts/appContext.types';
 import type { SecuritySettings } from '@/features/settings/components/settings.types';
 import { getInitialSecuritySettings } from '@/features/settings/services/settings.service';
 

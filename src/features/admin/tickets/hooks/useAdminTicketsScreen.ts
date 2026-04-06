@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { useAdminTicketMutations } from '@/features/admin/tickets/hooks/useAdminTicketMutations';
 import { useAdminTicketsRealtime } from '@/features/admin/tickets/hooks/useAdminTicketsRealtime';
 import type { AdminTicket, AdminTicketsScreenProps, TicketFormData } from '@/features/admin/tickets/types/adminTicket.types';

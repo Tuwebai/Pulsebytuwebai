@@ -14,7 +14,7 @@ const corsHeaders = {
 };
 
 // Helper para crear cliente de Supabase
-function createSupabaseClient(req: globalThis.Request): ReturnType<typeof createClient> {
+function createSupabaseClient(): ReturnType<typeof createClient> {
   const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
   const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_ANON_KEY') || '';
   
@@ -55,7 +55,7 @@ serve(async (req) => {
     });
   }
 
-  const supabase = createSupabaseClient(req);
+  const supabase = createSupabaseClient();
   const userId = getUserIdFromAuth(req);
   
   // Extraer el ID del proyecto de la URL si existe

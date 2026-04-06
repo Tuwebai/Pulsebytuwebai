@@ -1,4 +1,4 @@
-import { Project, User } from '@/contexts/AppContext';
+import type { Project, User } from '@/contexts/appContext.types';
 
 type ExportableRecord = Record<string, string | number | boolean | null | undefined>;
 

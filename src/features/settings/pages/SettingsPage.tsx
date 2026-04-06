@@ -1,5 +1,5 @@
-import { useApp } from '@/contexts/AppContext';
-import type { AppContextType } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
+import type { AppContextType } from '@/contexts/appContext.types';
 import React, { useEffect } from 'react';
 import { motion } from '@/core/components/OptimizedMotion';
 import { Tabs } from '@/core/ui/tabs';

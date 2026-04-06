@@ -1,4 +1,4 @@
-import { useTutorial } from '@/contexts/TutorialContext';
+import { useTutorial } from '@/contexts/tutorialContext.shared';
 
 export function useHelpCenterState() {
   const {

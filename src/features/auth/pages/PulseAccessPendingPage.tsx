@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ShieldAlert } from 'lucide-react';
 import { Button } from '@/core/ui/button';
 import { PulseLogo } from '@/core/components';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { toast } from '@/core/notifications/hooks/useToast';
 import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
 import { hasPulseAccess } from '@/features/auth/utils/pulseAccess';

@@ -8,12 +8,6 @@ interface WindowWithPerformanceMonitor extends Window {
   performanceMonitor?: PerformanceMonitor;
 }
 
-type AsyncFunction = (...args: never[]) => unknown;
-
-const isPromiseResult = (value: unknown): value is Promise<unknown> => {
-  return typeof value === 'object' && value !== null && 'then' in value;
-};
-
 const getPerformanceMonitor = (): PerformanceMonitor | undefined => {
   if (typeof window === 'undefined') {
     return undefined;
@@ -308,31 +302,6 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
 }
 
 // =====================================================
-// HOOK PARA ERROR BOUNDARY
-// =====================================================
-
-export const useErrorHandler = () => {
-  const [error, setError] = React.useState<Error | null>(null);
-
-  const resetError = React.useCallback(() => {
-    setError(null);
-  }, []);
-
-  const captureError = React.useCallback((error: Error, context?: string) => {
-    setError(error);
-    // Registrar error de forma segura
-    getPerformanceMonitor()?.recordError(error, context);
-  }, []);
-
-  // Si hay un error, lanzarlo para que sea capturado por el Error Boundary
-  if (error) {
-    throw error;
-  }
-
-  return { captureError, resetError };
-};
-
-// =====================================================
 // COMPONENTE DE ERROR FALLBACK PERSONALIZADO
 // =====================================================
 
@@ -374,74 +343,6 @@ export function ErrorFallback({ error, resetError, errorId }: ErrorFallbackProps
     </div>
   );
 }
-
-// =====================================================
-// HOC PARA ERROR BOUNDARY
-// =====================================================
-
-export const withErrorBoundary = <P extends object>(
-  Component: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
-) => {
-  const WrappedComponent = (props: P) => (
-    <ErrorBoundary {...errorBoundaryProps}>
-      <Component {...props} />
-    </ErrorBoundary>
-  );
-
-  WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
-
-  return WrappedComponent;
-};
-
-// =====================================================
-// UTILIDADES DE ERROR HANDLING
-// =====================================================
-
-export const createErrorHandler = (context: string) => {
-  return (error: Error) => {
-    // Registrar error de forma segura
-    getPerformanceMonitor()?.recordError(error, context);
-    console.error(`Error in ${context}:`, error);
-  };
-};
-
-export const handleAsyncError = async <T,>(
-  asyncFn: () => Promise<T>,
-  context: string
-): Promise<T | null> => {
-  try {
-    return await asyncFn();
-  } catch (error) {
-    const errorHandler = createErrorHandler(context);
-    errorHandler(error as Error);
-    return null;
-  }
-};
-
-export const withErrorHandling = <T extends AsyncFunction>(
-  fn: T,
-  context: string
-): T => {
-  return ((...args: Parameters<T>) => {
-    try {
-      const result = fn(...args);
-      
-      // Si es una promesa, manejar errores asincrónicos
-      if (isPromiseResult(result)) {
-        return result.catch((error: Error) => {
-          createErrorHandler(context)(error);
-          throw error;
-        }) as ReturnType<T>;
-      }
-      
-      return result;
-    } catch (error) {
-      createErrorHandler(context)(error as Error);
-      throw error;
-    }
-  }) as T;
-};
 
 // =====================================================
 // COMPONENTE ERROR MESSAGE

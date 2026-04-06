@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import CreatePaymentDialog from '../components/CreatePaymentDialog';
 import PaymentDetailDialog from '../components/PaymentDetailDialog';
 import PaymentsHeader from '../components/PaymentsHeader';

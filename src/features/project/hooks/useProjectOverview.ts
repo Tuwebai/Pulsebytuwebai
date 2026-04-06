@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { toast } from '@/core/notifications/hooks/useToast';
 
 import type { ProjectsPageProject } from '@/features/project/components/projectPage.types';

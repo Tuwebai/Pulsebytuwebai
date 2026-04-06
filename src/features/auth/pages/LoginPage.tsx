@@ -5,7 +5,7 @@ import { Button } from '@/core/ui/button';
 import { Input } from '@/core/ui/input';
 import { SUPPORT_CONTACT } from '@/config/supportContact';
 import { PulseLogo } from '@/core/components';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { getPostLoginPath } from '../utils/getPostLoginPath';
 
 export default function LoginPage() {

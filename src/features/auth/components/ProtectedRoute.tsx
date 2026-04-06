@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { hasPulseAccess, isPulseAccessDisabled } from '@/features/auth/utils/pulseAccess';
 
 interface ProtectedRouteProps {

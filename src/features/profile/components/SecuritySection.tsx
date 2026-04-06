@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/core/ui/alert-dialog';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import {
   PROFILE_INPUT_CLASSNAME,
   PROFILE_SURFACE_CLASSNAME,

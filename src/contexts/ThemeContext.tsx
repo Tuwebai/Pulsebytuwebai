@@ -1,16 +1,9 @@
-import React, { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import React, { useEffect, useMemo, useState, type ReactNode } from 'react';
 
-import { useApp } from './AppContext';
+import { useApp } from '@/contexts/useApp';
+import { ThemeContext } from '@/contexts/themeContext.shared';
+import type { ThemeContextType } from '@/contexts/themeContext.types';
 import { userPreferencesService } from '@/features/auth/services/userPreferences.service';
-
-interface ThemeContextType {
-  theme: 'dark';
-  toggleTheme: () => void;
-  setTheme: (theme: 'dark') => void;
-  loading: boolean;
-}
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -66,12 +59,4 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
-};
-
-export const useTheme = (): ThemeContextType => {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
 };

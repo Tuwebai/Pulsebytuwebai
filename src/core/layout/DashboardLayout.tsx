@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotionPreference } from '@/core/hooks/useReducedMotionPreference';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { ProductTourOverlay } from '@/features/product-tour/components/ProductTourOverlay';
 import { useProductTour } from '@/features/product-tour/hooks/useProductTour';
 import SupportChatDock from '@/features/support/components/SupportChatDock';

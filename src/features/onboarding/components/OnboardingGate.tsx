@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 
 interface OnboardingGateProps {
   children: ReactNode;

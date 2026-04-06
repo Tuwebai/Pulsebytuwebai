@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ProfileRow, ProfileUpdatePayload } from '@/data/types/profile';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { saveProfile } from '@/features/profile/services/profile.service';
 
 export function useUpdateProfile() {

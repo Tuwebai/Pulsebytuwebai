@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import type { GoogleSearchConsoleConnection } from '@/data/types/google';
 import { getGoogleSearchConsoleConnection } from '@/api/googleSearchConsole.api';
 

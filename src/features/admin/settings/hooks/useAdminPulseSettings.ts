@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { PulseExperienceSettings } from '@/data/types/pulse';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { DEFAULT_PULSE_EXPERIENCE_SETTINGS } from '@/api/pulseAdminSettings.api';
 import {
   getAdminPulseSettings,

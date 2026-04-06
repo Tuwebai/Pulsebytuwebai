@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { RefreshCw } from 'lucide-react';
 
 import { Button } from '@/core/ui/button';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { AvatarMenu } from '@/core/components';
 import { NotificationsBellTrigger } from '@/core/notifications/components/NotificationsBellTrigger';
 import { NotificationsPanel } from '@/core/notifications/components/NotificationsPanel';

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 
 export function useUserProject() {
   const { getUserProjects, loading, projectsReady } = useApp();

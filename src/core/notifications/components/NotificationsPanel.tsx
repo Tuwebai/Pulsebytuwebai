@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 import { flushSync } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { PulseLogo } from '@/core/components';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import type { Notification } from '@/data/types/notifications';
 import { storeSupportChatIntent } from '@/features/support/supportChat.events';
 import Skeleton from '@/core/components/Skeleton';

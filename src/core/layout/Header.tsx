@@ -3,7 +3,7 @@ import { NotificationsBellTrigger } from '@/core/notifications/components/Notifi
 import { NotificationsPanel } from '@/core/notifications/components/NotificationsPanel';
 import { useNotifications } from '@/core/notifications/hooks/useNotifications';
 import { useNotificationsPanelState } from '@/core/notifications/hooks/useNotificationsPanelState';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import HelpButton from '@/features/help/components/HelpButton';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 

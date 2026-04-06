@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/core/ui/button';
 import { Skeleton } from '@/core/ui/skeleton';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import {
   buildInboxFilters,
   EMPTY_COUNTS,

@@ -2,7 +2,7 @@ import { ArrowRight, Bell, ChartNoAxesCombined, LifeBuoy, ShieldCheck } from 'lu
 import { Link } from 'react-router-dom';
 import { SUPPORT_CONTACT } from '@/config/supportContact';
 import { PulseLogo } from '@/core/components';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
 import { pulsePublicHomeHighlights, pulsePublicHomeSections } from '@/features/marketing/pulsePublicHome.content';
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { toast } from '@/core/notifications/hooks/useToast';
 import {
   canSubmitDomainRequest,

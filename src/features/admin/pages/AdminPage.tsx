@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { AdminPageLoader } from '@/features/admin/components/AdminPageLoader';
 import { useAdminAccessGate } from '@/features/admin/hooks/useAdminAccessGate';
 import { useAdminDashboardMetrics } from '@/features/admin/hooks/useAdminDashboardMetrics';

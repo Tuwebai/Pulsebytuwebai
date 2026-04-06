@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { submitAccountDeletionRequest } from '@/features/profile/services/accountDeletion.service';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 
 export function useRequestAccountDeletion() {
   const { user } = useApp();
