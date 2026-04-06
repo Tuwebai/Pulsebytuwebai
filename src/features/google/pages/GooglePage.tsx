@@ -127,6 +127,7 @@ export default function GooglePage() {
             onToggleMetric={toggleMetric}
           />
           <GoogleTopTableCard
+            activeMetrics={activeMetrics}
             pages={overviewQuery.data?.topPages ?? []}
             queries={overviewQuery.data?.topQueries ?? []}
             topDays={overviewQuery.data?.topDays ?? []}

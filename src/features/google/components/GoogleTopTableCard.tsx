@@ -1,7 +1,13 @@
 import { useMemo, useState } from 'react';
-import type { GoogleSearchConsoleDimensionRow, GoogleSearchConsoleMetricRow, GoogleSearchConsoleTableTab } from '@/data/types/google';
+import type {
+  GoogleSearchConsoleDimensionRow,
+  GoogleSearchConsoleMetricKey,
+  GoogleSearchConsoleMetricRow,
+  GoogleSearchConsoleTableTab,
+} from '@/data/types/google';
 
 interface GoogleTopTableCardProps {
+  activeMetrics: GoogleSearchConsoleMetricKey[];
   pages: GoogleSearchConsoleDimensionRow[];
   queries: GoogleSearchConsoleDimensionRow[];
   topDays: GoogleSearchConsoleMetricRow[];
@@ -14,14 +20,53 @@ function formatCtr(value: number) {
 function formatPageLabel(value: string) {
   try {
     const parsed = new URL(value);
-    return parsed.pathname === '/' ? parsed.hostname : parsed.pathname;
+    return `${parsed.origin}${parsed.pathname}`.replace(/\/$/, '');
   } catch {
     return value;
   }
 }
 
-export default function GoogleTopTableCard({ pages, queries, topDays }: GoogleTopTableCardProps) {
+const metricColumnMap: Record<
+  GoogleSearchConsoleMetricKey,
+  {
+    colorClassName: string;
+    format: (row: { clicks: number; ctr: number; impressions: number; position: number }) => string;
+    label: string;
+  }
+> = {
+  clicks: {
+    colorClassName: 'bg-[#5AA7FF]/18 text-[#86C5FF]',
+    format: (row) => row.clicks.toLocaleString('es-AR'),
+    label: 'Clics',
+  },
+  impressions: {
+    colorClassName: 'bg-[#7F64FF]/18 text-[#A994FF]',
+    format: (row) => row.impressions.toLocaleString('es-AR'),
+    label: 'Impresiones',
+  },
+  ctr: {
+    colorClassName: 'bg-[#10B981]/18 text-[#5BE0AD]',
+    format: (row) => formatCtr(row.ctr),
+    label: 'CTR',
+  },
+  position: {
+    colorClassName: 'bg-[#F59E0B]/18 text-[#FFD166]',
+    format: (row) => row.position.toLocaleString('es-AR'),
+    label: 'Posición',
+  },
+};
+
+export default function GoogleTopTableCard({ activeMetrics, pages, queries, topDays }: GoogleTopTableCardProps) {
   const [tab, setTab] = useState<GoogleSearchConsoleTableTab>('queries');
+  const isPagesTab = tab === 'pages';
+  const visibleMetrics = useMemo(
+    () => ['clicks', 'impressions', 'ctr', 'position'].filter((metric) => activeMetrics.includes(metric as GoogleSearchConsoleMetricKey)),
+    [activeMetrics],
+  );
+  const gridTemplateColumns = useMemo(() => {
+    const metricColumns = visibleMetrics.map(() => 'minmax(5.5rem, 0.8fr)').join(' ');
+    return isPagesTab ? `minmax(0, 2.8fr) ${metricColumns}` : `minmax(0, 2.3fr) ${metricColumns}`;
+  }, [isPagesTab, visibleMetrics]);
 
   const rows = useMemo(() => {
     if (tab === 'queries') {
@@ -79,12 +124,16 @@ export default function GoogleTopTableCard({ pages, queries, topDays }: GoogleTo
       </div>
 
       <div className="mt-5 overflow-hidden rounded-2xl border border-white/10">
-        <div className="grid grid-cols-[minmax(0,1.8fr)_0.6fr_0.9fr_0.7fr_0.7fr] gap-3 bg-[var(--bg-elevated)]/65 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+        <div
+          className="grid gap-3 bg-[var(--bg-elevated)]/65 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-tertiary)]"
+          style={{ gridTemplateColumns }}
+        >
           <span>{tab === 'queries' ? 'Consulta' : tab === 'pages' ? 'Página' : 'Día'}</span>
-          <span className="text-right">Clics</span>
-          <span className="text-right">Impresiones</span>
-          <span className="text-right">CTR</span>
-          <span className="text-right">Posición</span>
+          {visibleMetrics.map((metric) => (
+            <span key={metric} className="text-right">
+              {metricColumnMap[metric as GoogleSearchConsoleMetricKey].label}
+            </span>
+          ))}
         </div>
 
         {rows.length === 0 ? (
@@ -96,13 +145,24 @@ export default function GoogleTopTableCard({ pages, queries, topDays }: GoogleTo
             {rows.map((row) => (
               <div
                 key={`${tab}-${row.key}`}
-                className="grid grid-cols-[minmax(0,1.8fr)_0.6fr_0.9fr_0.7fr_0.7fr] gap-3 px-4 py-3 text-[14px] text-[var(--text-secondary)]"
+                className="grid gap-3 px-4 py-3 text-[14px] text-[var(--text-secondary)]"
+                style={{ gridTemplateColumns }}
               >
-                <span className="truncate text-[var(--text-primary)]">{row.label}</span>
-                <span className="text-right">{row.clicks.toLocaleString('es-AR')}</span>
-                <span className="text-right">{row.impressions.toLocaleString('es-AR')}</span>
-                <span className="text-right">{formatCtr(row.ctr)}</span>
-                <span className="text-right">{row.position.toLocaleString('es-AR')}</span>
+                <span
+                  className={`text-[var(--text-primary)] ${isPagesTab ? 'break-all text-[13px] leading-5' : 'truncate'}`}
+                  title={row.label}
+                >
+                  {row.label}
+                </span>
+                {visibleMetrics.map((metric) => (
+                  <span key={`${row.key}-${metric}`} className="text-right">
+                    <span
+                      className={`inline-flex min-w-[3.5rem] justify-end rounded-full px-2.5 py-1 font-semibold ${metricColumnMap[metric as GoogleSearchConsoleMetricKey].colorClassName}`}
+                    >
+                      {metricColumnMap[metric as GoogleSearchConsoleMetricKey].format(row)}
+                    </span>
+                  </span>
+                ))}
               </div>
             ))}
           </div>
