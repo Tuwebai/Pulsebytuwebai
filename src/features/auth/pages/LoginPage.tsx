@@ -46,7 +46,14 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[var(--bg-base)] px-4 py-10">
-      <div className="absolute inset-0 opacity-[0.03] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:24px_24px]" />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 opacity-[0.14] [background-image:linear-gradient(rgba(240,244,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(240,244,255,0.08)_1px,transparent_1px),radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.95)_1.2px,transparent_0)] [background-position:center_center,center_center,center_center] [background-size:24px_24px,24px_24px,24px_24px]"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,158,245,0.12),transparent_42%)]"
+      />
 
       <div className="relative z-10 w-full max-w-md text-center">
         <div className="mb-8 flex flex-col items-center">
@@ -54,8 +61,10 @@ export default function LoginPage() {
           <div className="mt-4 text-[11px] tracking-[0.16em] text-[var(--text-tertiary)]">by TuWebAI</div>
         </div>
 
-        <div className="rounded-[28px] border border-[var(--border-default)] bg-[var(--bg-surface)] p-6 text-left shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-          <Button
+        <div className="relative">
+          <div className="pointer-events-none absolute -inset-4 -z-10 rounded-[36px] bg-[#00CCFF] opacity-30 blur-2xl" />
+          <div className="relative rounded-[28px] border border-border bg-card p-6 text-left shadow-card">
+            <Button
             className="h-12 w-full rounded-[10px] border border-[var(--border-default)] bg-transparent text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
             disabled={submitting}
             onClick={handleGoogleLogin}
@@ -130,10 +139,11 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-5 text-center">
-            <Link className="text-sm text-[var(--text-secondary)] underline underline-offset-4" to="/register">
-              ¿Olvidaste tu contraseña?
-            </Link>
+            <div className="mt-5 text-center">
+              <Link className="text-sm text-[var(--text-secondary)] underline underline-offset-4" to="/register">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
           </div>
         </div>
 
