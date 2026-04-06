@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import type { HelpArticle } from '@/features/help/types/helpContent.types';
 import { useHelpSearch } from '@/features/help/hooks/useHelpSearch';
 
-import { useApp } from './AppContext';
+import { useApp } from './useApp';
 import {
   HELP_ARTICLES,
   TUTORIAL_FLOWS,
@@ -21,10 +21,6 @@ import type {
 } from './tutorialContext.types';
 import { useTutorialAudio } from './useTutorialAudio';
 import { useTutorialAutoStart } from './useTutorialAutoStart';
-
-export type { TutorialContextType, TutorialFlow, TutorialProgress, TutorialStep } from './tutorialContext.types';
-export type { HelpArticle } from '@/features/help/types/helpContent.types';
-export { useTutorial } from './tutorialContext.shared';
 
 export const TutorialProvider: React.FC<{ children: React.ReactNode }> = ({
   children,

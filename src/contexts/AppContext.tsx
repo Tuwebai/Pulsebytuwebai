@@ -1,15 +1,11 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { SupabaseError } from '@/core/components/SupabaseError';
-import type { AppContextType, Project, ProjectLog } from '@/contexts/appContext.types';
-import { defaultAppContext } from '@/contexts/appContext.default';
+import type { Project, ProjectLog } from '@/contexts/appContext.types';
+import { AppContext } from '@/contexts/appContext.shared';
 import { useAppAuth } from '@/features/auth/hooks/useAppAuth';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
 import { useSupabaseAuth } from '@/features/auth/hooks/useSupabaseAuth';
 import { useAppProjects } from '@/features/project/hooks/useAppProjects';
-
-export type { AppContextType, Project, ProjectLog, User } from '@/contexts/appContext.types';
-
-const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -120,14 +116,4 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }
 
   return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
-}
-
-export function useApp() {
-  const context = useContext(AppContext);
-
-  if (context === undefined) {
-    return defaultAppContext;
-  }
-
-  return context;
 }
