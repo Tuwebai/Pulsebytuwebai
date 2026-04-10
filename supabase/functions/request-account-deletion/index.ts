@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+import { enforceRateLimit } from '../_shared/rateLimit.ts';
 
 import {
   corsHeaders,
@@ -43,6 +44,21 @@ serve(async (req) => {
 
   try {
     const { adminClient, user } = await ensureAuthenticatedClient(authorization);
+    const rateLimit = await enforceRateLimit({
+      action: 'request-account-deletion',
+      key: user.id,
+      limit: 3,
+      windowSeconds: 60 * 60,
+    });
+
+    if (!rateLimit.allowed) {
+      return jsonResponse(429, {
+        error: 'RATE_LIMITED',
+        message: 'Esperá un poco antes de volver a enviar otra solicitud.',
+        retry_after_seconds: rateLimit.retryAfterSeconds,
+      });
+    }
+
     const reason = body.reason.trim();
 
     await ensureNoOpenDeletionRequest(adminClient, user.id);

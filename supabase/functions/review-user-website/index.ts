@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+import { enforceRateLimit } from '../_shared/rateLimit.ts';
 import { corsHeaders, ensureAuthenticatedAdmin, getErrorReason, isPlainObject, jsonResponse, validateBusinessDomain } from './shared.ts';
 
 type WebsiteReviewStatus = 'missing' | 'pending_review' | 'approved' | 'rejected';
@@ -89,6 +90,21 @@ serve(async (req) => {
 
   try {
     const { adminClient, authUserId } = await ensureAuthenticatedAdmin(authorization);
+    const rateLimit = await enforceRateLimit({
+      action: 'review-user-website',
+      key: authUserId,
+      limit: 40,
+      windowSeconds: 10 * 60,
+    });
+
+    if (!rateLimit.allowed) {
+      return jsonResponse(429, {
+        error: 'RATE_LIMITED',
+        message: 'Hiciste demasiadas revisiones seguidas. Esperá un momento antes de continuar.',
+        retry_after_seconds: rateLimit.retryAfterSeconds,
+      });
+    }
+
     const payload = body as ReviewUserWebsiteBody;
     const normalizedNotes = normalizeOptionalNotes(payload.notes);
     const normalizedGa4PropertyId = normalizeOptionalGa4PropertyId(payload.ga4PropertyId);

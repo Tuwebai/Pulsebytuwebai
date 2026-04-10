@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+import { enforceRateLimit } from '../_shared/rateLimit.ts';
 import {
   corsHeaders,
   ensureAuthenticatedUser,
@@ -26,6 +27,20 @@ serve(async (req) => {
     const body = await req.json().catch(() => null);
     const action = (body?.action as ManagePushAction | undefined) ?? 'get-active';
     const { adminClient, user } = await ensureAuthenticatedUser(authorization);
+    const rateLimit = await enforceRateLimit({
+      action: `manage-push-subscription:${action}`,
+      key: user.id,
+      limit: action === 'get-active' ? 60 : 20,
+      windowSeconds: 10 * 60,
+    });
+
+    if (!rateLimit.allowed) {
+      return jsonResponse(429, {
+        error: 'RATE_LIMITED',
+        message: 'Demasiadas operaciones seguidas sobre las notificaciones push.',
+        retry_after_seconds: rateLimit.retryAfterSeconds,
+      });
+    }
 
     if (action === 'get-active') {
       const { data, error } = await adminClient

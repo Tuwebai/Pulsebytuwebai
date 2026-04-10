@@ -3,6 +3,7 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 // @ts-expect-error - Deno import for Supabase
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { enforceRateLimit, getRequestIp } from '../_shared/rateLimit.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -166,6 +167,19 @@ serve(async (req) => {
   const supabase = createSupabaseAdminClient();
 
   try {
+    const rateLimit = await enforceRateLimit({
+      action: 'project-update-webhook',
+      key: `${project_id.trim()}:${getRequestIp(req)}`,
+      limit: 120,
+      windowSeconds: 10 * 60,
+    });
+
+    if (!rateLimit.allowed) {
+      return jsonResponse(429, {
+        error: 'Rate limit exceeded'
+      });
+    }
+
     const { data: user, error: userError } = await supabase
       .from('users')
       .select('id, notif_project_update')
