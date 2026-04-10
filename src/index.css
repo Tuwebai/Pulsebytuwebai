@@ -35,6 +35,7 @@ body {
   min-height: 100%;
   height: 100%;
   background-color: var(--bg-base);
+  margin: 0;
 }
 
 #root {
@@ -51,6 +52,73 @@ body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: auto;
   scroll-behavior: auto;
+}
+
+.pulse-loader-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  background: #0b0f1e;
+  font-family: system-ui, sans-serif;
+}
+
+.pulse-loader-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.pulse-loader-mark {
+  width: 56px;
+  height: 56px;
+}
+
+.pulse-loader-footer {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  box-sizing: border-box;
+  display: flex;
+  width: calc(100% - 48px);
+  transform: translateX(-50%);
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0 24px 28px;
+  text-align: center;
+}
+
+.pulse-loader-title {
+  color: #f0f4ff;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+}
+
+.pulse-loader-subtitle {
+  color: rgba(240, 244, 255, 0.86);
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 2.5px;
+}
+
+.pulse-loader-brand {
+  background: linear-gradient(135deg, #3b9ef5 0%, #7b4cd4 40%, #e040a0 75%, #ff9d00 100%);
+  background-clip: text;
+  color: transparent;
+  font-weight: 500;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.pulse-loader-exit {
+  opacity: 0;
+  transition: opacity 300ms ease;
 }
 
 /* Tipografía Profesional - Escala Tipográfica */

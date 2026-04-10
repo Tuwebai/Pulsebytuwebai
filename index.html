@@ -1,28 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pulse by TuWebAI</title>
-
-    <!-- PULSE ES DARK-FIRST DESDE EL PRIMER PAINT -->
-    <script>
-      (function () {
-        var savedTheme = null;
-
-        try {
-          savedTheme = localStorage.getItem('theme');
-        } catch (error) {
-          savedTheme = null;
-        }
-
-        var initialTheme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark';
-
-        document.documentElement.style.colorScheme = initialTheme;
-        document.documentElement.classList.remove('light', 'dark');
-        document.documentElement.classList.add(initialTheme);
-      })();
-    </script>
+    <script src="/pulse-bootstrap.js"></script>
     <meta
       name="description"
       content="Pulse by TuWebAI. El rendimiento de tu web, en tu idioma."
@@ -63,38 +45,16 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate icon" href="/favicon.ico" />
 
-    <style>
-      body {
-        margin: 0;
-        background: #0b0f1e;
-      }
-    </style>
-
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   </head>
 
   <body>
     <div id="root">
-      <div id="pulse-loader" style="
-        position: fixed;
-        inset: 0;
-        background: #0B0F1E;
-        overflow: hidden;
-        font-family: system-ui, sans-serif;
-        z-index: 9999;
-      ">
-        <div style="
-          position: absolute;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 24px;
-        ">
+      <div id="pulse-loader" class="pulse-loader-shell">
+        <div class="pulse-loader-center">
           <svg
+            class="pulse-loader-mark"
             viewBox="0 0 100 100"
-            width="56"
-            height="56"
             xmlns="http://www.w3.org/2000/svg"
             role="img"
             aria-label="Pulse"
@@ -133,58 +93,16 @@
           </svg>
         </div>
 
-        <div style="
-          position: absolute;
-          left: 50%;
-          bottom: 0;
-          transform: translateX(-50%);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 6px;
-          width: calc(100% - 48px);
-          padding: 0 24px 28px;
-          box-sizing: border-box;
-          text-align: center;
-        ">
-          <span style="
-            font-size: 18px;
-            font-weight: 500;
-            letter-spacing: 6px;
-            color: #F0F4FF;
-            text-transform: uppercase;
-          ">PULSE</span>
+        <div class="pulse-loader-footer">
+          <span class="pulse-loader-title">PULSE</span>
 
-          <span style="
-            font-size: 11px;
-            font-weight: 300;
-            letter-spacing: 2.5px;
-            color: rgba(240,244,255,0.86);
-          ">
+          <span class="pulse-loader-subtitle">
             by
-            <span style="
-              background: linear-gradient(135deg, #3B9EF5 0%, #7B4CD4 40%, #E040A0 75%, #FF9D00 100%);
-              -webkit-background-clip: text;
-              -webkit-text-fill-color: transparent;
-              background-clip: text;
-              color: transparent;
-              font-weight: 500;
-            ">TuWebAI</span>
+            <span class="pulse-loader-brand">TuWebAI</span>
           </span>
         </div>
       </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      window.__removePulseLoader = function() {
-        var el = document.getElementById('pulse-loader');
-        if (!el) return;
-        el.style.transition = 'opacity 300ms ease';
-        el.style.opacity = '0';
-        setTimeout(function() {
-          if (el && el.parentNode) el.parentNode.removeChild(el);
-        }, 300);
-      };
-    </script>
   </body>
 </html>
