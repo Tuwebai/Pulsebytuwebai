@@ -58,6 +58,15 @@ interface RequestUserRow {
   role: string | null;
 }
 
+interface PendingPaymentRow {
+  created_at: string | null;
+  id: string;
+  init_point?: string | null;
+  mercadopago_id?: string | null;
+  payment_type?: string | null;
+  status?: string | null;
+}
+
 export type PaymentTypeKey = keyof typeof PAYMENT_TYPES;
 
 export function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -132,6 +141,34 @@ export async function ensureAuthenticatedCustomer(authorization: string) {
   return { adminClient, user };
 }
 
+export async function ensureNoRecentPendingPayment(
+  adminClient: ReturnType<typeof createSupabaseAdminClient>,
+  userId: string,
+  paymentType: PaymentTypeKey,
+) {
+  const cooldownStart = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+  const { data, error } = await adminClient
+    .from('payments')
+    .select('id, status, payment_type, mercadopago_id, init_point, created_at')
+    .eq('user_id', userId)
+    .eq('payment_type', paymentType)
+    .in('status', ['pending', 'in_process'])
+    .gte('created_at', cooldownStart)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  const pendingPayment = data as PendingPaymentRow | null;
+
+  if (pendingPayment?.id) {
+    throw new Error('PAYMENT_ALREADY_PENDING');
+  }
+}
+
 export function getPaymentTypeConfig(paymentType: PaymentTypeKey) {
   return PAYMENT_TYPES[paymentType];
 }
@@ -158,16 +195,10 @@ function normalizePublicAppUrl(rawUrl: string, environment: string) {
 }
 
 export function getMercadoPagoConfig() {
-  const accessToken = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || Deno.env.get('VITE_MERCADOPAGO_ACCESS_TOKEN') || '';
-  const environment = Deno.env.get('MERCADOPAGO_ENVIRONMENT') || Deno.env.get('VITE_MERCADOPAGO_ENVIRONMENT') || 'production';
-  const appUrl = normalizePublicAppUrl(
-    Deno.env.get('PULSE_PUBLIC_URL') || Deno.env.get('VITE_PUBLIC_URL') || '',
-    environment,
-  );
-  const webhookUrl =
-    Deno.env.get('MERCADOPAGO_WEBHOOK_URL') ||
-    Deno.env.get('VITE_MERCADOPAGO_WEBHOOK_URL') ||
-    `${appUrl}/api/webhooks/mercadopago`;
+  const accessToken = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || '';
+  const environment = Deno.env.get('MERCADOPAGO_ENVIRONMENT') || 'production';
+  const appUrl = normalizePublicAppUrl(Deno.env.get('PULSE_PUBLIC_URL') || '', environment);
+  const webhookUrl = Deno.env.get('MERCADOPAGO_WEBHOOK_URL') || `${appUrl}/api/webhooks/mercadopago`;
 
   if (!accessToken) {
     throw new Error('MERCADOPAGO_CONFIG_MISSING');

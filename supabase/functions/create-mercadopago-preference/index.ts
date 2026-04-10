@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import {
   corsHeaders,
+  ensureNoRecentPendingPayment,
   ensureAuthenticatedCustomer,
   getMercadoPagoConfig,
   getPaymentTypeConfig,
@@ -51,6 +52,7 @@ serve(async (req) => {
   try {
     const { adminClient, user } = await ensureAuthenticatedCustomer(authorization);
     const paymentType = getPaymentTypeConfig(body.paymentType);
+    await ensureNoRecentPendingPayment(adminClient, user.id, body.paymentType);
     const amount = body.customAmount ?? paymentType.price;
     const config = getMercadoPagoConfig();
     const now = new Date().toISOString();
@@ -170,6 +172,12 @@ serve(async (req) => {
 
     if (message === 'MERCADOPAGO_CONFIG_MISSING') {
       return jsonResponse(500, { error: 'La configuración de Mercado Pago todavía no está lista.' });
+    }
+
+    if (message === 'PAYMENT_ALREADY_PENDING') {
+      return jsonResponse(409, {
+        error: 'Ya hay un checkout pendiente para este plan. Esperá unos minutos antes de intentar nuevamente.',
+      });
     }
 
     console.error('Error en create-mercadopago-preference:', message);

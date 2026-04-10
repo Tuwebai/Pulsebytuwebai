@@ -1,172 +1,121 @@
-// @ts-ignore - Deno module resolution
+// @ts-expect-error - Deno module resolution
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 
-serve(async (req) => {
-  console.log('Edge Function called:', {
-    method: req.method,
-    url: req.url,
-    headers: Object.fromEntries(req.headers.entries())
-  });
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+} as const;
 
-  // Manejar CORS preflight
+function jsonResponse(status: number, body: Record<string, unknown>) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      ...corsHeaders,
+      'Content-Type': 'application/json',
+    },
+  });
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isAllowedOrigin(origin: string | null) {
+  if (!origin) return true;
+
+  const configuredOrigins = (Deno.env.get('GITHUB_ALLOWED_ORIGINS') || Deno.env.get('PULSE_PUBLIC_URL') || '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  const defaultOrigins = ['http://localhost:8083', 'http://127.0.0.1:8083'];
+  const allowedOrigins = new Set([...configuredOrigins, ...defaultOrigins]);
+
+  return allowedOrigins.has(origin);
+}
+
+serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    console.log('Handling CORS preflight');
     return new Response(null, {
       status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
+      headers: corsHeaders,
     });
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
-      status: 405,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
+    return jsonResponse(405, { error: 'METHOD_NOT_ALLOWED' });
+  }
+
+  if (!isAllowedOrigin(req.headers.get('origin'))) {
+    return jsonResponse(403, { error: 'ORIGIN_NOT_ALLOWED' });
+  }
+
+  let body: unknown;
+
+  try {
+    body = await req.json();
+  } catch {
+    return jsonResponse(400, { error: 'INVALID_JSON' });
+  }
+
+  if (!isPlainObject(body)) {
+    return jsonResponse(400, { error: 'INVALID_PAYLOAD' });
+  }
+
+  const code = typeof body.code === 'string' ? body.code.trim() : '';
+  const state = typeof body.state === 'string' ? body.state.trim() : '';
+
+  if (!code) {
+    return jsonResponse(400, { error: 'MISSING_CODE' });
   }
 
   try {
-    console.log('Parsing request body...');
-    const body = await req.json();
-    console.log('Request body parsed:', {
-      code: body.code ? '***' + body.code.slice(-4) : 'MISSING',
-      state: body.state || 'MISSING',
-      hasCode: !!body.code,
-      hasState: !!body.state
-    });
+    const githubClientId = Deno.env.get('GITHUB_CLIENT_ID');
+    const githubClientSecret = Deno.env.get('GITHUB_CLIENT_SECRET');
+    const githubRedirectUri = Deno.env.get('GITHUB_REDIRECT_URI') || 'http://localhost:8083/auth/github/callback';
 
-    const { code, state } = body;
-
-    if (!code) {
-      console.error('Missing code parameter');
-      return new Response(JSON.stringify({ error: 'Missing code parameter' }), {
-        status: 400,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
+    if (!githubClientId || !githubClientSecret) {
+      return jsonResponse(500, {
+        error: 'GITHUB_OAUTH_CONFIG_MISSING',
       });
     }
 
-    // Obtener variables de entorno - SIN prefijo VITE_ para Edge Functions
-    const GITHUB_CLIENT_ID = Deno.env.get('GITHUB_CLIENT_ID');
-    const GITHUB_CLIENT_SECRET = Deno.env.get('GITHUB_CLIENT_SECRET');
-    const GITHUB_REDIRECT_URI = Deno.env.get('GITHUB_REDIRECT_URI') || 'http://localhost:8083/auth/github/callback';
-
-    console.log('GitHub OAuth Config:', {
-      clientId: GITHUB_CLIENT_ID ? '***' + GITHUB_CLIENT_ID.slice(-4) : 'MISSING',
-      clientSecret: GITHUB_CLIENT_SECRET ? '***' + GITHUB_CLIENT_SECRET.slice(-4) : 'MISSING',
-      redirectUri: GITHUB_REDIRECT_URI,
-      allEnvVars: Object.keys(Deno.env.toObject()).filter(key => key.includes('GITHUB'))
-    });
-
-    if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
-      console.error('Missing GitHub OAuth credentials:', {
-        clientId: !!GITHUB_CLIENT_ID,
-        clientSecret: !!GITHUB_CLIENT_SECRET,
-        availableEnvVars: Object.keys(Deno.env.toObject()).filter(key => key.includes('GITHUB'))
-      });
-      
-      return new Response(JSON.stringify({ 
-        error: 'Server configuration error: Missing GitHub OAuth credentials',
-        details: 'Please configure GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in Supabase Edge Functions environment variables (without VITE_ prefix)'
-      }), {
-        status: 500,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-    }
-
-    // Intercambiar código por token con GitHub
     const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: GITHUB_CLIENT_ID,
-        client_secret: GITHUB_CLIENT_SECRET,
-        code: code,
-        redirect_uri: GITHUB_REDIRECT_URI,
-        state: state || '',
+        client_id: githubClientId,
+        client_secret: githubClientSecret,
+        code,
+        redirect_uri: githubRedirectUri,
+        state,
       }),
     });
 
+    const tokenData = await tokenResponse.json().catch(() => null);
+
     if (!tokenResponse.ok) {
-      const errorData = await tokenResponse.text();
-      console.error('GitHub token exchange failed:', {
-        status: tokenResponse.status,
-        statusText: tokenResponse.statusText,
-        error: errorData,
-        requestData: {
-          clientId: GITHUB_CLIENT_ID ? '***' + GITHUB_CLIENT_ID.slice(-4) : 'MISSING',
-          redirectUri: GITHUB_REDIRECT_URI,
-          code: code ? '***' + code.slice(-4) : 'MISSING'
-        }
-      });
-      
-      return new Response(JSON.stringify({ 
-        error: 'GitHub token exchange failed',
-        details: errorData,
-        status: tokenResponse.status,
-        statusText: tokenResponse.statusText
-      }), {
-        status: 400,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
+      return jsonResponse(400, {
+        error: 'GITHUB_TOKEN_EXCHANGE_FAILED',
       });
     }
 
-    const tokenData = await tokenResponse.json();
-
-    if (tokenData.error) {
-      return new Response(JSON.stringify({ 
-        error: 'GitHub OAuth error',
-        details: tokenData.error_description || tokenData.error 
-      }), {
-        status: 400,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
+    if (!tokenData || typeof tokenData !== 'object' || 'error' in tokenData) {
+      return jsonResponse(400, {
+        error: 'GITHUB_OAUTH_ERROR',
       });
     }
 
-    return new Response(JSON.stringify(tokenData), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
+    return jsonResponse(200, tokenData as Record<string, unknown>);
   } catch (error) {
-    console.error('Error in GitHub token exchange Edge Function:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
-    return new Response(JSON.stringify({ 
-      error: 'Internal Server Error',
-      details: error.message,
-      stack: error.stack
-    }), {
-      status: 500,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+    const message = error instanceof Error ? error.message : 'UNKNOWN_ERROR';
+    console.error('github-token-exchange failed:', message);
+    return jsonResponse(500, {
+      error: 'INTERNAL_SERVER_ERROR',
     });
   }
 });
