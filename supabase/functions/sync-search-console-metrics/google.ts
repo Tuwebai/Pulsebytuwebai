@@ -38,8 +38,10 @@ export async function exchangeRefreshToken(refreshToken: string) {
   });
 
   if (!tokenResponse.ok) {
-    const payload = await tokenResponse.text().catch(() => '');
-    console.error('[sync-search-console-metrics] token', payload);
+    await tokenResponse.text().catch(() => '');
+    console.error('[sync-search-console-metrics] token-refresh-failed', {
+      status: tokenResponse.status,
+    });
     throw new SyncSearchConsoleError(500, 'No pudimos renovar la conexión con Google.', 'TOKEN_REFRESH_FAILED');
   }
 
@@ -66,8 +68,10 @@ async function fetchSearchAnalytics(siteUrl: string, accessToken: string, body: 
   );
 
   if (!response.ok) {
-    const payload = await response.text().catch(() => '');
-    console.error('[sync-search-console-metrics] searchAnalytics', payload);
+    await response.text().catch(() => '');
+    console.error('[sync-search-console-metrics] search-analytics-failed', {
+      status: response.status,
+    });
     throw new SyncSearchConsoleError(500, 'No pudimos consultar las métricas de Google Search Console.', 'SEARCH_ANALYTICS_FAILED');
   }
 

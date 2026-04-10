@@ -24,6 +24,11 @@ function redirectTo(url: string) {
   return Response.redirect(url, 302);
 }
 
+function buildExternalErrorCode(prefix: string, payload: string) {
+  const sanitizedPayload = payload.trim().slice(0, 120);
+  return `${prefix}:${sanitizedPayload || 'EMPTY_PAYLOAD'}`;
+}
+
 serve(async (req) => {
   const { appUrl, clientId, clientSecret, redirectUri } = getGoogleConnectEnv();
 
@@ -83,11 +88,13 @@ serve(async (req) => {
 
     if (!tokenResponse.ok) {
       const payload = await tokenResponse.text().catch(() => '');
-      console.error('[google-search-console-callback] token', payload);
+      console.error('[google-search-console-callback] token-exchange-failed', {
+        status: tokenResponse.status,
+      });
       throw new GoogleSearchConsoleError(
         500,
         'No pudimos completar la autorización con Google.',
-        `TOKEN_EXCHANGE_FAILED:${payload || 'EMPTY_PAYLOAD'}`,
+        buildExternalErrorCode('TOKEN_EXCHANGE_FAILED', payload),
       );
     }
 
@@ -109,11 +116,13 @@ serve(async (req) => {
 
     if (!siteResponse.ok) {
       const payload = await siteResponse.text().catch(() => '');
-      console.error('[google-search-console-callback] sites.list', payload);
+      console.error('[google-search-console-callback] sites-list-failed', {
+        status: siteResponse.status,
+      });
       throw new GoogleSearchConsoleError(
         500,
         'No pudimos consultar tus propiedades de Google.',
-        `SITES_LIST_FAILED:${payload || 'EMPTY_PAYLOAD'}`,
+        buildExternalErrorCode('SITES_LIST_FAILED', payload),
       );
     }
 
@@ -213,15 +222,17 @@ serve(async (req) => {
           projectId: string;
           returnAppUrl?: string;
           userId: string;
-        }>(rawState);
-        await persistConnectionError(signedState.projectId, errorCode);
+      }>(rawState);
+      await persistConnectionError(signedState.projectId, errorCode);
       } catch (stateError) {
-        console.error('[google-search-console-callback] persist-error', stateError);
+        const message = stateError instanceof Error ? stateError.message : 'UNKNOWN_ERROR';
+        console.error('[google-search-console-callback] persist-error', message);
       }
     }
 
     if (!(error instanceof GoogleSearchConsoleError)) {
-      console.error('[google-search-console-callback]', error);
+      const message = error instanceof Error ? error.message : 'UNKNOWN_ERROR';
+      console.error('[google-search-console-callback]', message);
     }
 
     return redirectTo(errorRedirectUrl);
