@@ -1,10 +1,10 @@
-import { ArrowRight, Eye, EyeOff } from 'lucide-react';
+﻿import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { Button } from '@/core/ui/button';
 import { Input } from '@/core/ui/input';
 import { SUPPORT_CONTACT } from '@/config/supportContact';
-import { PulseLogo } from '@/core/components';
+import { PulseLogo, PulseWordmark } from '@/core/components';
 import { useApp } from '@/contexts/useApp';
 import { getPostLoginPath } from '../utils/getPostLoginPath';
 
@@ -62,7 +62,7 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-md text-center">
         <div className="mb-8 flex flex-col items-center">
           <PulseLogo animated size={72} variant="night" />
-          <div className="mt-4 text-[11px] tracking-[0.16em] text-[var(--text-tertiary)]">by TuWebAI</div>
+          <PulseWordmark className="mt-4 text-[11px] tracking-[0.16em] text-[var(--text-tertiary)]" />
         </div>
 
         <div className="relative">
@@ -167,3 +167,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

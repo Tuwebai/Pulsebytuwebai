@@ -1,7 +1,7 @@
-import { ArrowRight, Bell, ChartNoAxesCombined, LifeBuoy, ShieldCheck } from 'lucide-react';
+﻿import { ArrowRight, Bell, ChartNoAxesCombined, LifeBuoy, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SUPPORT_CONTACT } from '@/config/supportContact';
-import { PulseLogo } from '@/core/components';
+import { PulseLogo, PulseWordmark } from '@/core/components';
 import { useApp } from '@/contexts/useApp';
 import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
 import { pulsePublicHomeHighlights, pulsePublicHomeSections } from '@/features/marketing/pulsePublicHome.content';
@@ -23,7 +23,7 @@ export default function PulsePublicHomePage() {
           <div className="flex items-center gap-3">
             <PulseLogo animated size={42} variant="night" />
             <div>
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Pulse by TuWebAI</p>
+              <PulseWordmark className="text-[11px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]" />
               <p className="text-sm text-[var(--text-secondary)]">Dashboard privado para clientes</p>
             </div>
           </div>
@@ -52,7 +52,7 @@ export default function PulsePublicHomePage() {
             </div>
 
             <h1 className="mt-5 max-w-3xl text-4xl font-medium tracking-[-0.04em] text-[var(--text-primary)] sm:text-5xl">
-              Pulse by TuWebAI ordena métricas, proyecto y soporte en una sola vista.
+              <PulseWordmark /> ordena métricas, proyecto y soporte en una sola vista.
             </h1>
 
             <p className="mt-5 max-w-2xl text-base leading-8 text-[var(--text-secondary)] sm:text-lg">
@@ -123,3 +123,6 @@ export default function PulsePublicHomePage() {
     </div>
   );
 }
+
+
+

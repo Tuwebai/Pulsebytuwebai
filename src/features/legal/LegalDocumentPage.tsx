@@ -1,6 +1,6 @@
-import { ArrowLeft, Dot } from 'lucide-react';
+﻿import { ArrowLeft, Dot } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { PulseLogo } from '@/core/components';
+import { PulseLogo, PulseWordmark } from '@/core/components';
 import { SUPPORT_CONTACT } from '@/config/supportContact';
 import type { LegalDocumentContent } from '@/features/legal/legalContent';
 
@@ -18,7 +18,7 @@ export default function LegalDocumentPage({ content }: LegalDocumentPageProps) {
           <div className="flex items-center gap-3">
             <PulseLogo size={38} variant="night" />
             <div>
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Pulse by TuWebAI</p>
+              <PulseWordmark className="text-[11px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]" />
               <h1 className="text-sm font-medium text-[var(--text-primary)]">{content.title}</h1>
             </div>
           </div>
@@ -115,3 +115,4 @@ export default function LegalDocumentPage({ content }: LegalDocumentPageProps) {
     </div>
   );
 }
+

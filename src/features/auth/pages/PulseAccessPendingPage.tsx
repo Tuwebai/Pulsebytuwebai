@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef } from 'react';
+﻿import { useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ShieldAlert } from 'lucide-react';
 import { Button } from '@/core/ui/button';
-import { PulseLogo } from '@/core/components';
+import { PulseLogo, PulseWordmark } from '@/core/components';
 import { useApp } from '@/contexts/useApp';
 import { toast } from '@/core/notifications/hooks/useToast';
 import { getPostLoginPath } from '@/features/auth/utils/getPostLoginPath';
@@ -72,9 +72,7 @@ export default function PulseAccessPendingPage() {
           <div className="flex items-center gap-4">
             <PulseLogo animated size={56} variant="night" />
             <div>
-              <p className="text-[11px] tracking-[0.16em] text-[var(--text-tertiary)]">
-                Pulse by TuWebAI
-              </p>
+              <PulseWordmark className="text-[11px] tracking-[0.16em] text-[var(--text-tertiary)]" />
               <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
                 {title}
               </h1>
@@ -117,3 +115,5 @@ export default function PulseAccessPendingPage() {
     </div>
   );
 }
+
+

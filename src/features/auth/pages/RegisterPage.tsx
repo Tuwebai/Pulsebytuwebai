@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/core/ui/button';
@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/cor
 import { Input } from '@/core/ui/input';
 import { Label } from '@/core/ui/label';
 import PulseLogo from '@/core/components/PulseLogo';
+import PulseWordmark from '@/core/components/PulseWordmark';
 import { useApp } from '@/contexts/useApp';
 import { toast } from '@/core/notifications/hooks/useToast';
 
@@ -77,8 +78,7 @@ export default function RegisterPage() {
           <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
             <PulseLogo size={40} variant="night" animated />
             <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
-              <span className="hidden sm:inline">Pulse by TuWebAI</span>
-              <span className="sm:hidden">Pulse</span>
+              <PulseWordmark />
             </h1>
           </div>
           <p className="text-sm sm:text-base text-muted-foreground">Tu web, en numeros reales.</p>
@@ -197,3 +197,6 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+
+

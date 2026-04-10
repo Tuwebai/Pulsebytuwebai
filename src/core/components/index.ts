@@ -1,3 +1,4 @@
+﻿export { default as PulseWordmark } from './PulseWordmark';
 export { PulseLogo } from './PulseLogo';
 export { default as DefaultPulseLogo } from './PulseLogo';
 export { default as Skeleton } from './Skeleton';
@@ -14,3 +15,4 @@ export type { BadgeProps } from './Badge';
 export { default as AvatarMenu } from './AvatarMenu';
 export { default as AccentIcon } from './AccentIcon';
 export type { AccentIconProps } from './AccentIcon';
+
