@@ -7,7 +7,7 @@ import { generateMonthlyEmailHtml, generateMonthlyEmailSubject, type MonthlyEmai
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-pulse-cron-secret',
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
 
@@ -127,9 +127,13 @@ serve(async (req) => {
   }
 
   const authHeader = req.headers.get('Authorization');
+  const headerCronSecret = req.headers.get('x-pulse-cron-secret');
   const cronSecret = Deno.env.get('CRON_SECRET');
+  const isAuthorizedCronRequest =
+    Boolean(cronSecret) &&
+    ((authHeader && authHeader === `Bearer ${cronSecret}`) || (headerCronSecret && headerCronSecret === cronSecret));
 
-  if (authHeader && authHeader !== `Bearer ${cronSecret}`) {
+  if (!isAuthorizedCronRequest) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

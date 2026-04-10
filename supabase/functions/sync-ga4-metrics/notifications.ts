@@ -1,5 +1,6 @@
 import { createSupabaseAdminClient } from './request.ts';
-import { type ProjectRow, type UserPreferenceRow } from './types.ts';
+import { sendConsultationAlertEmail } from './delivery.ts';
+import { type ConsultationAlertRecipient, type ProjectRow, type UserPreferenceRow } from './types.ts';
 
 export async function insertConsultationNotification(params: {
   supabase: ReturnType<typeof createSupabaseAdminClient>;
@@ -13,7 +14,7 @@ export async function insertConsultationNotification(params: {
 
   const { data: userPrefs, error: userPrefsError } = await params.supabase
     .from('users')
-    .select('notif_new_consultation')
+    .select('notif_new_consultation, full_name')
     .eq('id', params.project.created_by)
     .maybeSingle();
 
@@ -24,6 +25,23 @@ export async function insertConsultationNotification(params: {
   if ((userPrefs as UserPreferenceRow | null)?.notif_new_consultation === false) {
     return;
   }
+
+  const { data: authUser, error: authUserError } = await params.supabase.auth.admin.getUserById(params.project.created_by);
+
+  if (authUserError) {
+    throw authUserError;
+  }
+
+  const recipient: ConsultationAlertRecipient = {
+    id: params.project.created_by,
+    email: authUser.user?.email ?? null,
+    full_name:
+      (userPrefs as (UserPreferenceRow & { full_name?: string | null }) | null)?.full_name ??
+      authUser.user?.user_metadata?.full_name ??
+      authUser.user?.user_metadata?.name ??
+      null,
+    notif_new_consultation: (userPrefs as UserPreferenceRow | null)?.notif_new_consultation ?? null,
+  };
 
   const { data: existingNotification, error: existingNotificationError } = await params.supabase
     .from('notifications')
@@ -51,6 +69,7 @@ export async function insertConsultationNotification(params: {
     title: conversionLabel,
     message: 'Alguien se contacto a traves de tu web.',
     is_read: false,
+    action_url: '/dashboard/pulse',
     metadata: {
       project_id: params.project.id,
       date: params.date,
@@ -61,4 +80,11 @@ export async function insertConsultationNotification(params: {
   if (notificationError) {
     throw notificationError;
   }
+
+  await sendConsultationAlertEmail({
+    recipient,
+    domain: params.project.domain,
+    consultations: params.conversions,
+    date: params.date,
+  });
 }

@@ -19,6 +19,13 @@ export interface UserPreferenceRow {
   notif_new_consultation: boolean | null;
 }
 
+export interface ConsultationAlertRecipient {
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  notif_new_consultation: boolean | null;
+}
+
 export interface Ga4Metrics {
   sessions: number;
   conversions: number;

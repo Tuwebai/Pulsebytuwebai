@@ -81,63 +81,147 @@ export async function getGoogleAccessToken(credentialsJson: string): Promise<str
   return tokenData.access_token as string;
 }
 
-function parseGa4Response(raw: unknown): Ga4Metrics {
-  const response = raw as {
-    rows?: Array<{
-      dimensionValues?: Array<{ value?: string }>;
-      metricValues?: Array<{ value?: string }>;
-    }>;
-  };
+const CONSULTATION_EVENT_NAMES = new Set([
+  'contact',
+  'contact_form_submit',
+  'form_submit',
+  'generate_lead',
+  'submit_form',
+]);
 
-  const rows = response.rows || [];
-  const topPages = rows.slice(0, 5).map((row) => ({
-    label: row.dimensionValues?.[1]?.value || null,
-    path: row.dimensionValues?.[0]?.value || '/',
-    visits: parseInt(row.metricValues?.[3]?.value || '0', 10),
-  }));
+interface Ga4ReportRow {
+  dimensionValues?: Array<{ value?: string }>;
+  metricValues?: Array<{ value?: string }>;
+}
 
-  const sessions = rows.reduce((total, row) => total + parseInt(row.metricValues?.[0]?.value || '0', 10), 0);
-  const conversions = rows.reduce((total, row) => total + parseInt(row.metricValues?.[1]?.value || '0', 10), 0);
-  const durationBase = rows.reduce((total, row) => total + parseFloat(row.metricValues?.[2]?.value || '0'), 0);
-  const avgSessionSec = rows.length > 0 ? Math.round(durationBase / rows.length) : 0;
+interface Ga4ReportResponse {
+  rows?: Ga4ReportRow[];
+  totals?: Array<{ metricValues?: Array<{ value?: string }> }>;
+}
+
+function parseInteger(value: string | undefined): number {
+  return parseInt(value || '0', 10);
+}
+
+function parseFloatValue(value: string | undefined): number {
+  return parseFloat(value || '0');
+}
+
+function parseTotalsReport(raw: unknown) {
+  const response = raw as Ga4ReportResponse;
+  const metrics = response.totals?.[0]?.metricValues || [];
 
   return {
-    sessions,
-    conversions,
-    avgSessionSec,
-    topPage: topPages[0]?.path || null,
-    topPageViews: topPages[0]?.visits || 0,
-    topPages,
-    raw,
+    sessions: parseInteger(metrics[0]?.value),
+    avgSessionSec: Math.round(parseFloatValue(metrics[1]?.value)),
   };
 }
 
-export async function fetchGa4Metrics(propertyId: string, date: string, accessToken: string): Promise<Ga4Metrics> {
-  const response = await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      dateRanges: [{ startDate: date, endDate: date }],
-      metrics: [
-        { name: 'sessions' },
-        { name: 'conversions' },
-        { name: 'averageSessionDuration' },
-        { name: 'screenPageViews' },
-      ],
-      dimensions: [{ name: 'pagePath' }, { name: 'pageTitle' }],
-      orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
-      limit: 10,
-    }),
-  });
+function parseTopPagesReport(raw: unknown) {
+  const response = raw as Ga4ReportResponse;
+  const rows = response.rows || [];
 
-  if (!response.ok) {
-    throw new Error(`GA4 API error: ${response.status} ${await response.text()}`);
+  return rows.slice(0, 5).map((row) => ({
+    label: row.dimensionValues?.[1]?.value || null,
+    path: row.dimensionValues?.[0]?.value || '/',
+    visits: parseInteger(row.metricValues?.[0]?.value),
+  }));
+}
+
+function parseConsultationEventsReport(raw: unknown) {
+  const response = raw as Ga4ReportResponse;
+  const rows = response.rows || [];
+
+  return rows.reduce((total, row) => {
+    const rawName = row.dimensionValues?.[0]?.value?.trim().toLowerCase() || '';
+
+    if (!CONSULTATION_EVENT_NAMES.has(rawName)) {
+      return total;
+    }
+
+    return total + parseInteger(row.metricValues?.[0]?.value);
+  }, 0);
+}
+
+export async function fetchGa4Metrics(propertyId: string, date: string, accessToken: string): Promise<Ga4Metrics> {
+  const endpoint = `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`;
+  const requestHeaders = {
+    Authorization: `Bearer ${accessToken}`,
+    'Content-Type': 'application/json',
+  };
+
+  const [totalsResponse, pagesResponse, eventsResponse] = await Promise.all([
+    fetch(endpoint, {
+      method: 'POST',
+      headers: requestHeaders,
+      body: JSON.stringify({
+        dateRanges: [{ startDate: date, endDate: date }],
+        metrics: [{ name: 'sessions' }, { name: 'averageSessionDuration' }],
+      }),
+    }),
+    fetch(endpoint, {
+      method: 'POST',
+      headers: requestHeaders,
+      body: JSON.stringify({
+        dateRanges: [{ startDate: date, endDate: date }],
+        metrics: [{ name: 'screenPageViews' }],
+        dimensions: [{ name: 'pagePath' }, { name: 'pageTitle' }],
+        orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
+        limit: 10,
+      }),
+    }),
+    fetch(endpoint, {
+      method: 'POST',
+      headers: requestHeaders,
+      body: JSON.stringify({
+        dateRanges: [{ startDate: date, endDate: date }],
+        metrics: [{ name: 'eventCount' }],
+        dimensions: [{ name: 'eventName' }],
+        dimensionFilter: {
+          filter: {
+            fieldName: 'eventName',
+            inListFilter: {
+              values: Array.from(CONSULTATION_EVENT_NAMES),
+            },
+          },
+        },
+        limit: 20,
+      }),
+    }),
+  ]);
+
+  if (!totalsResponse.ok) {
+    throw new Error(`GA4 totals API error: ${totalsResponse.status} ${await totalsResponse.text()}`);
   }
 
-  return parseGa4Response(await response.json());
+  if (!pagesResponse.ok) {
+    throw new Error(`GA4 pages API error: ${pagesResponse.status} ${await pagesResponse.text()}`);
+  }
+
+  if (!eventsResponse.ok) {
+    throw new Error(`GA4 events API error: ${eventsResponse.status} ${await eventsResponse.text()}`);
+  }
+
+  const totalsRaw = await totalsResponse.json();
+  const pagesRaw = await pagesResponse.json();
+  const eventsRaw = await eventsResponse.json();
+  const totals = parseTotalsReport(totalsRaw);
+  const topPages = parseTopPagesReport(pagesRaw);
+  const conversions = parseConsultationEventsReport(eventsRaw);
+
+  return {
+    sessions: totals.sessions,
+    conversions,
+    avgSessionSec: totals.avgSessionSec,
+    topPage: topPages[0]?.path || null,
+    topPageViews: topPages[0]?.visits || 0,
+    topPages,
+    raw: {
+      totals: totalsRaw,
+      topPages: pagesRaw,
+      consultationEvents: eventsRaw,
+    },
+  };
 }
 
 export function buildDryRunMetrics(project: ProjectRow, date: string): Ga4Metrics {
