@@ -12,6 +12,33 @@ function buildNotificationBody(data) {
   return senderName ? `${senderName}\n${message}` : message;
 }
 
+function buildNotificationTag(data) {
+  if (typeof data.ticketId === 'string' && data.ticketId.trim()) {
+    return `support-ticket:${data.ticketId.trim()}`;
+  }
+
+  return data.primaryKey || undefined;
+}
+
+function buildNotificationMessages(existingMessages, nextBody) {
+  const messages = Array.isArray(existingMessages) ? existingMessages.filter((message) => typeof message === 'string' && message.trim()) : [];
+  return [...messages, nextBody].slice(-5);
+}
+
+function buildGroupedNotificationBody(messages) {
+  if (!messages.length) {
+    return 'Tienes una nueva notificacion en Pulse';
+  }
+
+  if (messages.length === 1) {
+    return messages[0];
+  }
+
+  const latestMessages = messages.slice(-3);
+  const summary = `${messages.length} mensajes nuevos`;
+  return `${summary}\n${latestMessages.join('\n')}`;
+}
+
 function notifyClientsToPlayPushSound(payload) {
   return clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
     if (!clientList.length) {
@@ -69,23 +96,34 @@ self.addEventListener('push', (event) => {
     data = { title: 'Pulse', body: event.data.text() };
   }
 
-  const options = {
-    badge: '/favicon.ico',
-    body: buildNotificationBody(data),
-    data: {
-      category: data.category || 'system',
-      primaryKey: data.primaryKey || null,
-      senderName: data.senderName || null,
-      ticketId: data.ticketId || null,
-      ticketSubject: data.ticketSubject || null,
-      url: data.url || '/dashboard',
-    },
-    icon: '/favicon.ico',
-    requireInteraction: false,
-    tag: data.primaryKey || undefined,
-  };
+  const nextBody = buildNotificationBody(data);
+  const tag = buildNotificationTag(data);
 
-  event.waitUntil(Promise.all([self.registration.showNotification(buildNotificationTitle(data), options), notifyClientsToPlayPushSound(options.data)]));
+  event.waitUntil(
+    self.registration.getNotifications(tag ? { tag } : undefined).then((existingNotifications) => {
+      const existingNotification = existingNotifications[0];
+      const mergedMessages = buildNotificationMessages(existingNotification?.data?.messages, nextBody);
+      const options = {
+        badge: '/favicon.ico',
+        body: buildGroupedNotificationBody(mergedMessages),
+        data: {
+          category: data.category || 'system',
+          messages: mergedMessages,
+          primaryKey: data.primaryKey || null,
+          senderName: data.senderName || null,
+          ticketId: data.ticketId || null,
+          ticketSubject: data.ticketSubject || null,
+          url: data.url || '/dashboard',
+        },
+        icon: '/favicon.ico',
+        renotify: Boolean(existingNotification),
+        requireInteraction: false,
+        tag,
+      };
+
+      return Promise.all([self.registration.showNotification(buildNotificationTitle(data), options), notifyClientsToPlayPushSound(options.data)]);
+    }),
+  );
 });
 
 self.addEventListener('notificationclick', (event) => {
