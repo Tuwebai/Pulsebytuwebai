@@ -12,6 +12,9 @@ interface TicketMessageRow {
   ticket_id: string;
   sender_id: string;
   sender_role: TicketMessageSenderRole;
+  sender_avatar_url?: string | null;
+  sender_email?: string | null;
+  sender_full_name?: string | null;
   content: string;
   is_read: boolean;
   read_at: string | null;
@@ -24,6 +27,9 @@ const TICKET_MESSAGE_SELECT = [
   'ticket_id',
   'sender_id',
   'sender_role',
+  'sender_full_name',
+  'sender_email',
+  'sender_avatar_url',
   'content',
   'is_read',
   'read_at',
@@ -32,7 +38,17 @@ const TICKET_MESSAGE_SELECT = [
 ].join(', ');
 
 function mapTicketMessageRow(row: TicketMessageRow): TicketMessage {
-  const sender = Array.isArray(row.sender) ? row.sender[0] ?? null : row.sender ?? null;
+  const relatedSender = Array.isArray(row.sender) ? row.sender[0] ?? null : row.sender ?? null;
+  const sender =
+    relatedSender ??
+    (row.sender_email
+      ? {
+          avatar_url: row.sender_avatar_url ?? null,
+          email: row.sender_email,
+          full_name: row.sender_full_name ?? null,
+          id: row.sender_id,
+        }
+      : null);
 
   return {
     content: row.content,
