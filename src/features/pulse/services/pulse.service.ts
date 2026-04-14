@@ -56,10 +56,12 @@ export async function getPulseMetrics(projectId: string, period: Period): Promis
 
   const current = aggregateMetrics(currentRows);
   const previous = aggregateMetrics(previousRows);
-  const currentDailyAverage = Math.round((current.visits / Math.max(getDaysInRange(period), 1)) * 10) / 10;
-  const previousDailyAverage = Math.round((previous.visits / Math.max(getDaysInRange(prevDateRange), 1)) * 10) / 10;
-  const currentConsultationRate = calcConsultationRate(current.visits, current.contacts);
-  const previousConsultationRate = calcConsultationRate(previous.visits, previous.contacts);
+  const currentDailyAverageRaw = current.visits / Math.max(getDaysInRange(period), 1);
+  const previousDailyAverageRaw = previous.visits / Math.max(getDaysInRange(prevDateRange), 1);
+  const currentConsultationRateRaw = current.visits > 0 ? (current.contacts / current.visits) * 100 : 0;
+  const previousConsultationRateRaw = previous.visits > 0 ? (previous.contacts / previous.visits) * 100 : 0;
+  const currentDailyAverage = Math.round(currentDailyAverageRaw * 10) / 10;
+  const currentConsultationRate = Math.round(currentConsultationRateRaw * 10) / 10;
 
   return {
     visits: current.visits,
@@ -67,9 +69,9 @@ export async function getPulseMetrics(projectId: string, period: Period): Promis
     visitsDelta: calcDelta(current.visits, previous.visits),
     contactsDelta: calcDelta(current.contacts, previous.contacts),
     consultationRate: currentConsultationRate,
-    consultationRateDelta: calcDelta(currentConsultationRate ?? 0, previousConsultationRate ?? 0),
+    consultationRateDelta: calcDelta(currentConsultationRateRaw, previousConsultationRateRaw),
     dailyAverageVisits: currentDailyAverage,
-    dailyAverageVisitsDelta: calcDelta(currentDailyAverage, previousDailyAverage),
+    dailyAverageVisitsDelta: calcDelta(currentDailyAverageRaw, previousDailyAverageRaw),
     avgSessionSec: current.avgSessionSec,
     topPages: getTopPages(currentRows),
     chartData: formatChartData(currentRows, previousRows),

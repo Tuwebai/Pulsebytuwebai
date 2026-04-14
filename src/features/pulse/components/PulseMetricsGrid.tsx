@@ -29,16 +29,13 @@ function formatMetricValue(value: number | null, unit?: string) {
 }
 
 function formatDeltaDetail(delta: number | null) {
-  const prefix = delta !== null ? (delta > 0 ? '+' : '') : '';
-  return `${prefix}${delta ?? 0}% vs. mes anterior`;
+  const positive = (delta ?? 0) >= 0;
+  const icon = positive ? '▲' : '▼';
+  return `${icon} ${Math.abs(delta ?? 0).toLocaleString('es-AR')}% vs. mes anterior`;
 }
 
 function getDeltaClassName(delta: number | null) {
-  if (delta === null || delta === 0) {
-    return 'text-emerald-400';
-  }
-
-  return delta > 0 ? 'text-emerald-400' : 'text-rose-400';
+  return (delta ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400';
 }
 
 export default function PulseMetricsGrid({ averagePerDay, data, loading }: PulseMetricsGridProps) {

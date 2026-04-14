@@ -22,6 +22,14 @@ interface HomeHeroProps {
   visitsDelta: number | null;
 }
 
+function getDeltaMeta(delta: number | null) {
+  const positive = (delta ?? 0) >= 0;
+  return {
+    colorClassName: positive ? 'text-emerald-400' : 'text-rose-400',
+    icon: positive ? '▲' : '▼',
+  };
+}
+
 function MetricBlock({
   delta,
   label,
@@ -35,16 +43,18 @@ function MetricBlock({
   suffix?: string;
   value: number;
 }) {
+  const deltaMeta = getDeltaMeta(delta);
+
   return (
     <div className="space-y-1.5">
       <p className="text-sm font-medium text-slate-100">{label}</p>
       <div className="font-data text-[clamp(2.8rem,5vw,4rem)] font-light leading-none tracking-tight text-slate-50">
         {loading ? <Skeleton height="64px" rounded="sm" width="160px" /> : `${value.toLocaleString('es-AR')}${suffix ?? ''}`}
       </div>
-      <p className={`text-xs ${delta === null || delta === 0 ? 'text-emerald-400' : delta > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+      <p className={`text-xs ${deltaMeta.colorClassName}`}>
         {loading
           ? '...'
-          : `${delta !== null ? (delta > 0 ? '+' : '') : ''}${delta ?? 0}% vs. mes anterior`}
+          : `${deltaMeta.icon} ${Math.abs(delta ?? 0).toLocaleString('es-AR')}% vs. mes anterior`}
       </p>
     </div>
   );
