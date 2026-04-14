@@ -3,8 +3,8 @@ import type { ChartDataPoint, Period, PulseMetricRow, PulseMetricsTotals } from 
 import { aggregateMetrics, getDateRange, getDaysInRange, getPrevDateRange, getTopPages } from './pulseMetrics.utils';
 
 export function calcDelta(current: number, previous: number): number | null {
-  if (previous === 0) {
-    return current === 0 ? 0 : 100;
+  if (previous <= 0) {
+    return 0;
   }
 
   const value = Math.round(((current - previous) / previous) * 1000) / 10;

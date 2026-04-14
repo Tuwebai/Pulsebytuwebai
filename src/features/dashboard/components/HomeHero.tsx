@@ -41,10 +41,10 @@ function MetricBlock({
       <div className="font-data text-[clamp(2.8rem,5vw,4rem)] font-light leading-none tracking-tight text-slate-50">
         {loading ? <Skeleton height="64px" rounded="sm" width="160px" /> : `${value.toLocaleString('es-AR')}${suffix ?? ''}`}
       </div>
-      <p className="text-xs text-slate-400">
+      <p className={`text-xs ${delta === null || delta === 0 ? 'text-emerald-400' : delta > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
         {loading
           ? '...'
-          : `${delta !== null ? (delta > 0 ? '+' : '') : ''}${delta ?? 0}% vs. período anterior`}
+          : `${delta !== null ? (delta > 0 ? '+' : '') : ''}${delta ?? 0}% vs. mes anterior`}
       </p>
     </div>
   );

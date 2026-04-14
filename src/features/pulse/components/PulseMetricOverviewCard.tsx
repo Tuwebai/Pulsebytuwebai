@@ -2,6 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 
 interface PulseMetricOverviewCardProps {
   detail: string;
+  detailClassName?: string;
   icon: LucideIcon;
   label: string;
   tone: 'default' | 'signal' | 'success' | 'warning';
@@ -11,6 +12,7 @@ interface PulseMetricOverviewCardProps {
 
 export default function PulseMetricOverviewCard({
   detail,
+  detailClassName = 'text-slate-400',
   icon: Icon,
   label,
   tone,
@@ -40,7 +42,7 @@ export default function PulseMetricOverviewCard({
         <p className={`min-w-0 overflow-hidden text-ellipsis font-data font-light leading-none tracking-tight text-slate-50 ${valueClassName}`}>
           {value}
         </p>
-        <p className="text-xs text-slate-400">{detail}</p>
+        <p className={`text-xs ${detailClassName}`}>{detail}</p>
       </div>
     </article>
   );

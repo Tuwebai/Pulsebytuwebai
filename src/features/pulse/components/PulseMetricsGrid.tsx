@@ -11,6 +11,7 @@ interface PulseMetricsGridProps {
 
 interface PulseMetricItem {
   detail: string;
+  detailClassName: string;
   icon: typeof Activity;
   label: string;
   tone: 'default' | 'signal' | 'success' | 'warning';
@@ -29,13 +30,22 @@ function formatMetricValue(value: number | null, unit?: string) {
 
 function formatDeltaDetail(delta: number | null) {
   const prefix = delta !== null ? (delta > 0 ? '+' : '') : '';
-  return `${prefix}${delta ?? 0}% vs. período anterior`;
+  return `${prefix}${delta ?? 0}% vs. mes anterior`;
+}
+
+function getDeltaClassName(delta: number | null) {
+  if (delta === null || delta === 0) {
+    return 'text-emerald-400';
+  }
+
+  return delta > 0 ? 'text-emerald-400' : 'text-rose-400';
 }
 
 export default function PulseMetricsGrid({ averagePerDay, data, loading }: PulseMetricsGridProps) {
   const cards: PulseMetricItem[] = [
     {
       detail: formatDeltaDetail(data?.visitsDelta ?? 0),
+      detailClassName: getDeltaClassName(data?.visitsDelta ?? 0),
       icon: Activity,
       label: 'Visitas registradas',
       tone: 'signal' as const,
@@ -43,6 +53,7 @@ export default function PulseMetricsGrid({ averagePerDay, data, loading }: Pulse
     },
     {
       detail: formatDeltaDetail(data?.contactsDelta ?? 0),
+      detailClassName: getDeltaClassName(data?.contactsDelta ?? 0),
       icon: MousePointerClick,
       label: 'Consultas recibidas',
       tone: 'success' as const,
@@ -50,6 +61,7 @@ export default function PulseMetricsGrid({ averagePerDay, data, loading }: Pulse
     },
     {
       detail: formatDeltaDetail(data?.consultationRateDelta ?? 0),
+      detailClassName: getDeltaClassName(data?.consultationRateDelta ?? 0),
       icon: Gauge,
       label: 'Tasa de consulta',
       tone: 'warning' as const,
@@ -57,6 +69,7 @@ export default function PulseMetricsGrid({ averagePerDay, data, loading }: Pulse
     },
     {
       detail: formatDeltaDetail(data?.dailyAverageVisitsDelta ?? 0),
+      detailClassName: getDeltaClassName(data?.dailyAverageVisitsDelta ?? 0),
       icon: BarChart3,
       label: 'Promedio diario',
       tone: 'default' as const,
@@ -77,6 +90,7 @@ export default function PulseMetricsGrid({ averagePerDay, data, loading }: Pulse
         <PulseMetricOverviewCard
           key={card.label}
           detail={card.detail}
+          detailClassName={card.detailClassName}
           icon={card.icon}
           label={card.label}
           tone={card.tone}
