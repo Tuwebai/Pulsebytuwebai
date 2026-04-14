@@ -3,7 +3,12 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 // @ts-expect-error - Deno import for Supabase
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { generateMonthlyEmailHtml, generateMonthlyEmailSubject, type MonthlyEmailPayload } from './template.ts';
+import {
+  generateMonthlyEmailHtml,
+  generateMonthlyEmailSubject,
+  type MonthlyEmailPayload,
+  type MonthlyEmailTopPage,
+} from './template.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -28,6 +33,10 @@ interface ProjectRow {
 interface MetricRow {
   visits: number | null;
   contacts: number | null;
+  avg_session_sec: number | null;
+  top_page: string | null;
+  top_page_visits: number | null;
+  top_pages: Array<{ label?: string | null; path?: string | null; visits?: number | null }> | null;
 }
 
 function createSupabaseAdminClient() {
@@ -45,22 +54,61 @@ function toDateString(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
-function sumMetrics(rows: MetricRow[] | null): { visits: number; contacts: number } {
-  return (rows || []).reduce(
+function sumMetrics(rows: MetricRow[] | null): { visits: number; contacts: number; avgSessionSec: number | null } {
+  const items = rows || [];
+  const avgSessionTotal = items.reduce((total, row) => total + (row.avg_session_sec || 0), 0);
+  const avgSessionSec = items.length > 0 ? Number((avgSessionTotal / items.length).toFixed(1)) : null;
+
+  return items.reduce(
     (totals, row) => ({
       visits: totals.visits + (row.visits || 0),
-      contacts: totals.contacts + (row.contacts || 0)
+      contacts: totals.contacts + (row.contacts || 0),
+      avgSessionSec,
     }),
-    { visits: 0, contacts: 0 }
+    { visits: 0, contacts: 0, avgSessionSec }
   );
 }
 
 function calcDelta(current: number, previous: number): number | null {
   if (previous <= 0) {
-    return null;
+    return current === 0 ? 0 : null;
   }
 
   return Math.round(((current - previous) / previous) * 100);
+}
+
+function buildTopPages(rows: MetricRow[] | null, limit: number): MonthlyEmailTopPage[] {
+  const aggregate = new Map<string, { label: string | null; path: string; visits: number }>();
+
+  for (const row of rows || []) {
+    for (const page of row.top_pages || []) {
+      if (!page.path) {
+        continue;
+      }
+
+      const current = aggregate.get(page.path) || { label: page.label || null, path: page.path, visits: 0 };
+      current.visits += page.visits || 0;
+      aggregate.set(page.path, current);
+    }
+
+    if (row.top_page) {
+      const current = aggregate.get(row.top_page) || { label: null, path: row.top_page, visits: 0 };
+      current.visits += row.top_page_visits || 0;
+      aggregate.set(row.top_page, current);
+    }
+  }
+
+  const totalVisits = [...aggregate.values()].reduce((total, page) => total + page.visits, 0);
+
+  return [...aggregate.values()]
+    .sort((left, right) => right.visits - left.visits)
+    .slice(0, limit)
+    .map((page) => ({
+      label: page.label,
+      path: page.path,
+      visits: page.visits,
+      percentage: totalVisits > 0 ? Number(((page.visits / totalVisits) * 100).toFixed(1)) : 0,
+    }));
 }
 
 async function sendMonthlyEmail(payload: MonthlyEmailPayload): Promise<void> {
@@ -129,9 +177,10 @@ serve(async (req) => {
   const authHeader = req.headers.get('Authorization');
   const headerCronSecret = req.headers.get('x-pulse-cron-secret');
   const cronSecret = Deno.env.get('CRON_SECRET');
-  const isAuthorizedCronRequest =
-    Boolean(cronSecret) &&
-    ((authHeader && authHeader === `Bearer ${cronSecret}`) || (headerCronSecret && headerCronSecret === cronSecret));
+  const hasCronSecret = Boolean(cronSecret);
+  const matchesBearerToken = authHeader ? authHeader === `Bearer ${cronSecret}` : false;
+  const matchesHeaderToken = headerCronSecret ? headerCronSecret === cronSecret : false;
+  const isAuthorizedCronRequest = hasCronSecret ? matchesBearerToken || matchesHeaderToken : false;
 
   if (!isAuthorizedCronRequest) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -209,7 +258,7 @@ serve(async (req) => {
 
       const { data: metrics, error: metricsError } = await supabase
         .from('pulse_metrics')
-        .select('visits, contacts')
+        .select('visits, contacts, avg_session_sec, top_page, top_page_visits, top_pages')
         .eq('project_id', project.id)
         .gte('metric_date', fromDate)
         .lte('metric_date', toDate);
@@ -227,7 +276,7 @@ serve(async (req) => {
 
       const { data: previousMetrics, error: previousMetricsError } = await supabase
         .from('pulse_metrics')
-        .select('visits, contacts')
+        .select('visits, contacts, avg_session_sec, top_page, top_page_visits, top_pages')
         .eq('project_id', project.id)
         .gte('metric_date', previousFromDate)
         .lte('metric_date', previousToDate);
@@ -244,7 +293,10 @@ serve(async (req) => {
         visits: current.visits,
         contacts: current.contacts,
         deltaVisits: calcDelta(current.visits, previous.visits),
-        domain: project.domain
+        deltaContacts: calcDelta(current.contacts, previous.contacts),
+        avgSessionSec: current.avgSessionSec,
+        domain: project.domain,
+        topPages: buildTopPages(metrics as MetricRow[] | null, 3),
       };
 
       if (DRY_RUN) {
