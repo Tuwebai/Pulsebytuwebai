@@ -84,7 +84,7 @@ export function generateMonthlyEmailHtml(payload: MonthlyEmailPayload): string {
             </tr>
             <tr>
               <td style="padding-bottom: 16px; color: #8B9AC0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;">
-                PULSE BY TUWEBAI
+                PULSE By Tuwebai
               </td>
             </tr>
             <tr>
@@ -109,7 +109,7 @@ export function generateMonthlyEmailHtml(payload: MonthlyEmailPayload): string {
                               Tu web en ${safeMonthName}
                             </div>
                             <div style="font-size: 15px; line-height: 1.65; color: #8B9AC0;">
-                              Hola ${safeName}, este resumen usa el mismo lenguaje visual que tus comprobantes de pago para que revises resultados y contexto con una presentación consistente en Pulse.
+                              Hola ${safeName}, acá tenés el resumen de ${safeMonthName} para ver cómo se movió tu web en Pulse.
                             </div>
                           </td>
                           <td width="176" valign="top">
@@ -199,7 +199,7 @@ export function generateMonthlyEmailHtml(payload: MonthlyEmailPayload): string {
                         </tr>
                         <tr>
                           <td style="padding: 0 18px 18px; color: #334155; font-size: 14px; line-height: 1.7;">
-                            Pulse resume este período con la misma estética de tus comprobantes para que puedas pasar de pagos a resultados sin cambiar de contexto visual.
+                            Revisá tus visitas y consultas del mes en un solo lugar, con una lectura clara y rápida.
                           </td>
                         </tr>
                       </table>
@@ -208,7 +208,7 @@ export function generateMonthlyEmailHtml(payload: MonthlyEmailPayload): string {
                   <tr>
                     <td align="center" style="padding: 0 28px 28px; background-color: #0B0F1E;">
                       <a href="${DASHBOARD_URL}" style="display: inline-block; background-color: #3B9EF5; color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 999px; font-size: 14px; font-weight: 700;">
-                        Ver mi dashboard →
+                        Ver mi panel →
                       </a>
                     </td>
                   </tr>
@@ -222,7 +222,7 @@ export function generateMonthlyEmailHtml(payload: MonthlyEmailPayload): string {
                         </tr>
                         <tr>
                           <td style="padding: 0 18px 18px; color: #8B9AC0; font-size: 12px; line-height: 1.7;">
-                            Pulse traduce métricas y movimientos a lenguaje claro para que revises contexto, resultados y próximos pasos desde un mismo sistema visual.
+                            Pulse te ayuda a entender qué pasó este mes en tu web y a seguir lo importante sin vueltas.
                             <br />
                             Para dejar de recibir este resumen, ajustá tus preferencias en
                             <a href="${SETTINGS_URL}" style="color: #3B9EF5; text-decoration: none;">tu panel</a>.
