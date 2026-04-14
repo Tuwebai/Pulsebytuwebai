@@ -23,10 +23,11 @@ interface HomeHeroProps {
 }
 
 function getDeltaMeta(delta: number | null) {
-  const positive = (delta ?? 0) >= 0;
+  const neutral = (delta ?? 0) === 0;
+  const positive = (delta ?? 0) > 0;
   return {
-    colorClassName: positive ? 'text-emerald-400' : 'text-rose-400',
-    icon: positive ? '▲' : '▼',
+    colorClassName: neutral ? 'text-slate-400' : positive ? 'text-emerald-400' : 'text-rose-400',
+    icon: neutral ? '-' : positive ? '▲' : '▼',
   };
 }
 
@@ -54,7 +55,7 @@ function MetricBlock({
       <p className={`text-xs ${deltaMeta.colorClassName}`}>
         {loading
           ? '...'
-          : `${deltaMeta.icon} ${Math.abs(delta ?? 0).toLocaleString('es-AR')}% vs. mes anterior`}
+          : `${deltaMeta.icon} ${deltaMeta.icon === '-' ? '' : `${Math.abs(delta ?? 0).toLocaleString('es-AR')}% `}vs. mes anterior`}
       </p>
     </div>
   );

@@ -35,7 +35,11 @@ function escapeHtml(value: string): string {
 }
 
 function formatDeltaLabel(delta: number): string {
-  const positive = delta >= 0;
+  if (delta === 0) {
+    return `<span style="color: #94A3B8; font-size: 13px; font-weight: 700;">- vs mes anterior</span>`;
+  }
+
+  const positive = delta > 0;
   const color = positive ? '#22C55E' : '#EF4444';
   const icon = positive ? '▲' : '▼';
 
