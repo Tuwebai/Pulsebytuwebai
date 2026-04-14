@@ -295,6 +295,7 @@ serve(async (req) => {
         deltaVisits: calcDelta(current.visits, previous.visits),
         deltaContacts: calcDelta(current.contacts, previous.contacts),
         avgSessionSec: current.avgSessionSec,
+        deltaAvgSession: calcDelta(Math.round(current.avgSessionSec || 0), Math.round(previous.avgSessionSec || 0)),
         domain: project.domain,
         topPages: buildTopPages(metrics as MetricRow[] | null, 3),
       };
