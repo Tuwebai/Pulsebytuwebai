@@ -48,6 +48,8 @@ export { getDaysInRange };
 export async function getPulseMetrics(projectId: string, period: Period): Promise<PulseMetricsTotals> {
   const dateRange = getDateRange(period);
   const prevDateRange = getPrevDateRange(period);
+  const previousPeriodDays =
+    Math.max(1, Math.round((new Date(`${prevDateRange.to}T00:00:00`).getTime() - new Date(`${prevDateRange.from}T00:00:00`).getTime()) / (24 * 60 * 60 * 1000)) + 1);
 
   const [currentRows, previousRows] = await Promise.all([
     fetchMetricsByRange(projectId, dateRange.from, dateRange.to),
@@ -57,7 +59,7 @@ export async function getPulseMetrics(projectId: string, period: Period): Promis
   const current = aggregateMetrics(currentRows);
   const previous = aggregateMetrics(previousRows);
   const currentDailyAverageRaw = current.visits / Math.max(getDaysInRange(period), 1);
-  const previousDailyAverageRaw = previous.visits / Math.max(getDaysInRange(prevDateRange), 1);
+  const previousDailyAverageRaw = previous.visits / previousPeriodDays;
   const currentConsultationRateRaw = current.visits > 0 ? (current.contacts / current.visits) * 100 : 0;
   const previousConsultationRateRaw = previous.visits > 0 ? (previous.contacts / previous.visits) * 100 : 0;
   const currentDailyAverage = Math.round(currentDailyAverageRaw * 10) / 10;
