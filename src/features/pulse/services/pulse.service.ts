@@ -4,7 +4,7 @@ import { aggregateMetrics, getDateRange, getDaysInRange, getPrevDateRange, getTo
 
 export function calcDelta(current: number, previous: number): number | null {
   if (previous <= 0) {
-    return 0;
+    return current > 0 ? 100 : 0;
   }
 
   const value = Math.round(((current - previous) / previous) * 1000) / 10;
