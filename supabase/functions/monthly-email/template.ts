@@ -11,10 +11,12 @@ export interface MonthlyEmailPayload {
   monthName: string;
   visits: number;
   contacts: number;
-  deltaVisits: number | null;
-  deltaContacts: number | null;
-  avgSessionSec: number | null;
-  deltaAvgSession: number | null;
+  deltaVisits: number;
+  deltaContacts: number;
+  consultationRate: number;
+  deltaConsultationRate: number;
+  dailyAverageVisits: number;
+  deltaDailyAverageVisits: number;
   domain: string | null;
   topPages: MonthlyEmailTopPage[];
 }
@@ -32,11 +34,7 @@ function escapeHtml(value: string): string {
     .replaceAll("'", '&#39;');
 }
 
-function formatDeltaLabel(delta: number | null): string {
-  if (delta === null) {
-    return 'Sin comparación previa';
-  }
-
+function formatDeltaLabel(delta: number): string {
   const positive = delta >= 0;
   const color = positive ? '#22C55E' : '#EF4444';
   const icon = positive ? '▲' : '▼';
@@ -44,23 +42,12 @@ function formatDeltaLabel(delta: number | null): string {
   return `<span style="color: ${color}; font-size: 13px; font-weight: 700;">${icon} ${Math.abs(delta)}% vs mes anterior</span>`;
 }
 
-function formatSessionDuration(seconds: number | null): string {
-  if (!seconds || seconds <= 0) {
-    return '0s';
-  }
+function formatNumber(value: number): string {
+  return value.toLocaleString('es-AR');
+}
 
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.round(seconds % 60);
-
-  if (minutes <= 0) {
-    return `${remainingSeconds}s`;
-  }
-
-  if (remainingSeconds === 0) {
-    return `${minutes} min`;
-  }
-
-  return `${minutes} min ${remainingSeconds}s`;
+function formatPercentage(value: number): string {
+  return `${value.toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
 }
 
 function formatTopPages(topPages: MonthlyEmailTopPage[]): string {
@@ -98,7 +85,7 @@ function formatTopPages(topPages: MonthlyEmailTopPage[]): string {
               </tr>
               <tr>
                 <td style="padding: 0 0 16px; color: #334155; font-size: 13px; line-height: 1.5;">
-                  ${page.visits} visitas · ${page.percentage}% del interés del mes
+                  ${formatNumber(page.visits)} visitas · ${formatPercentage(page.percentage)} del interés del mes
                 </td>
               </tr>
             </table>
@@ -110,14 +97,16 @@ function formatTopPages(topPages: MonthlyEmailTopPage[]): string {
 }
 
 function buildIntro(payload: MonthlyEmailPayload): string {
+  const domain = payload.domain || 'tu web';
+
   if (payload.contacts > 0) {
-    return `Hola ${payload.name}, este es tu resumen real de ${payload.monthName} para ver cómo respondió ${payload.domain || 'tu web'} y dónde se concentró el interés.`;
+    return `Hola ${payload.name}, este es tu resumen de ${payload.monthName} para entender cómo respondió ${domain} y qué oportunidades se movieron mejor.`;
   }
 
-  return `Hola ${payload.name}, este es tu resumen real de ${payload.monthName} para seguir de cerca el movimiento de ${payload.domain || 'tu web'} y las páginas con más interés.`;
+  return `Hola ${payload.name}, este es tu resumen de ${payload.monthName} para seguir el movimiento de ${domain} y detectar dónde estuvo el mayor interés.`;
 }
 
-function renderMetricCard(input: { title: string; value: string; detail: string; delta: number | null }): string {
+function renderMetricCard(input: { title: string; value: string; detail: string; delta: number }): string {
   return `
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #FCFDFF; border: 1px solid #DBE8FB; border-radius: 18px;">
       <tr>
@@ -149,10 +138,9 @@ export function generateMonthlyEmailSubject(payload: MonthlyEmailPayload): strin
 }
 
 export function generateMonthlyEmailHtml(payload: MonthlyEmailPayload): string {
-  const safeName = escapeHtml(payload.name || 'cliente');
   const safeMonthName = escapeHtml(payload.monthName);
   const safeDomain = payload.domain ? escapeHtml(payload.domain) : 'tu web';
-  const intro = escapeHtml(buildIntro({ ...payload, name: safeName, domain: safeDomain }));
+  const intro = escapeHtml(buildIntro(payload));
   const topPagesRows = formatTopPages(payload.topPages);
 
   return `<!doctype html>
@@ -209,9 +197,9 @@ export function generateMonthlyEmailHtml(payload: MonthlyEmailPayload): string {
                         <tr>
                           <td style="padding: 0 8px 16px;">
                             ${renderMetricCard({
-                              title: 'Tráfico',
-                              value: String(payload.visits),
-                              detail: `Visitas registradas para ${safeDomain}.`,
+                              title: 'Visitas registradas',
+                              value: formatNumber(payload.visits),
+                              detail: `Movimiento total detectado en ${safeDomain}.`,
                               delta: payload.deltaVisits,
                             })}
                           </td>
@@ -219,9 +207,9 @@ export function generateMonthlyEmailHtml(payload: MonthlyEmailPayload): string {
                         <tr>
                           <td style="padding: 0 8px 16px;">
                             ${renderMetricCard({
-                              title: 'Oportunidades',
-                              value: String(payload.contacts),
-                              detail: `Consultas generadas durante ${safeMonthName}.`,
+                              title: 'Consultas recibidas',
+                              value: formatNumber(payload.contacts),
+                              detail: `Contactos generados durante ${safeMonthName}.`,
                               delta: payload.deltaContacts,
                             })}
                           </td>
@@ -229,10 +217,20 @@ export function generateMonthlyEmailHtml(payload: MonthlyEmailPayload): string {
                         <tr>
                           <td style="padding: 0 8px 16px;">
                             ${renderMetricCard({
-                              title: 'Tiempo promedio',
-                              value: formatSessionDuration(payload.avgSessionSec),
-                              detail: 'Permanencia promedio por sesión durante el mes.',
-                              delta: payload.deltaAvgSession,
+                              title: 'Tasa de consulta',
+                              value: formatPercentage(payload.consultationRate),
+                              detail: 'Relación entre visitas y consultas del mes.',
+                              delta: payload.deltaConsultationRate,
+                            })}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 0 8px 16px;">
+                            ${renderMetricCard({
+                              title: 'Promedio diario',
+                              value: formatNumber(payload.dailyAverageVisits),
+                              detail: 'Promedio de visitas por día durante el mes.',
+                              delta: payload.deltaDailyAverageVisits,
                             })}
                           </td>
                         </tr>

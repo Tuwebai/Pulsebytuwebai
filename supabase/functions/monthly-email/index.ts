@@ -1,4 +1,4 @@
-// @ts-expect-error - Deno runtime
+﻿// @ts-expect-error - Deno runtime
 /// <reference lib="deno.window" />
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 // @ts-expect-error - Deno import for Supabase
@@ -39,6 +39,13 @@ interface MetricRow {
   top_pages: Array<{ label?: string | null; path?: string | null; visits?: number | null }> | null;
 }
 
+interface MetricTotals {
+  visits: number;
+  contacts: number;
+  consultationRate: number;
+  dailyAverageVisits: number;
+}
+
 function createSupabaseAdminClient() {
   const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
@@ -54,24 +61,34 @@ function toDateString(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
-function sumMetrics(rows: MetricRow[] | null): { visits: number; contacts: number; avgSessionSec: number | null } {
-  const items = rows || [];
-  const avgSessionTotal = items.reduce((total, row) => total + (row.avg_session_sec || 0), 0);
-  const avgSessionSec = items.length > 0 ? Number((avgSessionTotal / items.length).toFixed(1)) : null;
-
-  return items.reduce(
-    (totals, row) => ({
-      visits: totals.visits + (row.visits || 0),
-      contacts: totals.contacts + (row.contacts || 0),
-      avgSessionSec,
-    }),
-    { visits: 0, contacts: 0, avgSessionSec }
-  );
+function roundMetric(value: number, digits = 1): number {
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
 }
 
-function calcDelta(current: number, previous: number): number | null {
+function sumMetrics(rows: MetricRow[] | null): MetricTotals {
+  const items = rows || [];
+  const visits = items.reduce((total, row) => total + (row.visits || 0), 0);
+  const contacts = items.reduce((total, row) => total + (row.contacts || 0), 0);
+  const days = items.length > 0 ? items.length : 1;
+  const consultationRate = visits > 0 ? roundMetric((contacts / visits) * 100, 1) : 0;
+  const dailyAverageVisits = roundMetric(visits / days, 1);
+
+  return {
+    visits,
+    contacts,
+    consultationRate,
+    dailyAverageVisits
+  };
+}
+
+function calcDelta(current: number, previous: number): number {
   if (previous <= 0) {
-    return current === 0 ? 0 : null;
+    if (current <= 0) {
+      return 0;
+    }
+
+    return 100;
   }
 
   return Math.round(((current - previous) / previous) * 100);
@@ -107,7 +124,7 @@ function buildTopPages(rows: MetricRow[] | null, limit: number): MonthlyEmailTop
       label: page.label,
       path: page.path,
       visits: page.visits,
-      percentage: totalVisits > 0 ? Number(((page.visits / totalVisits) * 100).toFixed(1)) : 0,
+      percentage: totalVisits > 0 ? roundMetric((page.visits / totalVisits) * 100, 1) : 0,
     }));
 }
 
@@ -294,15 +311,17 @@ serve(async (req) => {
         contacts: current.contacts,
         deltaVisits: calcDelta(current.visits, previous.visits),
         deltaContacts: calcDelta(current.contacts, previous.contacts),
-        avgSessionSec: current.avgSessionSec,
-        deltaAvgSession: calcDelta(Math.round(current.avgSessionSec || 0), Math.round(previous.avgSessionSec || 0)),
+        consultationRate: current.consultationRate,
+        deltaConsultationRate: calcDelta(current.consultationRate, previous.consultationRate),
+        dailyAverageVisits: current.dailyAverageVisits,
+        deltaDailyAverageVisits: calcDelta(current.dailyAverageVisits, previous.dailyAverageVisits),
         domain: project.domain,
         topPages: buildTopPages(metrics as MetricRow[] | null, 3),
       };
 
       if (DRY_RUN) {
         console.log(
-          `[DRY_RUN] ${email}: visits=${payload.visits} contacts=${payload.contacts} delta=${payload.deltaVisits ?? 'n/a'}`
+          `[DRY_RUN] ${email}: visits=${payload.visits} contacts=${payload.contacts} rate=${payload.consultationRate} daily=${payload.dailyAverageVisits}`
         );
         results.skipped += 1;
         continue;
