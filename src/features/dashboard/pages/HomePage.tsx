@@ -56,7 +56,7 @@ export default function HomePage() {
 
   usePulseRealtime(projectId);
 
-  const projectHydrating = isAuthenticated && authReady && !projectsReady;
+  const projectHydrating = isAuthenticated ? (authReady ? !projectsReady : false) : false;
   const loading = projectHydrating || projectLoading || isLoading;
   const hasProject = Boolean(projectId);
   const resolvedDomain = domain ?? user?.website ?? null;
@@ -80,9 +80,13 @@ export default function HomePage() {
       <HomeHero
         canOpenSite={Boolean(resolvedDomain)}
         chartData={data?.chartData ?? []}
+        consultationRate={data?.consultationRate ?? 0}
+        consultationRateDelta={data?.consultationRateDelta ?? 0}
         connectionReady={connectionState === 'connected_with_data'}
         contacts={data?.contacts ?? 0}
         contactsDelta={data?.contactsDelta ?? null}
+        dailyAverageVisits={data?.dailyAverageVisits ?? 0}
+        dailyAverageVisitsDelta={data?.dailyAverageVisitsDelta ?? 0}
         ga4PropertyId={ga4PropertyId}
         hasProject={hasProject}
         loading={loading}

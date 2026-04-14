@@ -4,7 +4,7 @@ import { aggregateMetrics, getDateRange, getDaysInRange, getPrevDateRange, getTo
 
 export function calcDelta(current: number, previous: number): number | null {
   if (previous === 0) {
-    return null;
+    return current === 0 ? 0 : 100;
   }
 
   const value = Math.round(((current - previous) / previous) * 1000) / 10;
@@ -12,8 +12,8 @@ export function calcDelta(current: number, previous: number): number | null {
 }
 
 export function calcConsultationRate(visits: number, contacts: number): number | null {
-  if (visits <= 0 || contacts <= 0) {
-    return null;
+  if (visits <= 0) {
+    return 0;
   }
 
   return Math.round((contacts / visits) * 1000) / 10;
@@ -56,13 +56,20 @@ export async function getPulseMetrics(projectId: string, period: Period): Promis
 
   const current = aggregateMetrics(currentRows);
   const previous = aggregateMetrics(previousRows);
+  const currentDailyAverage = Math.round((current.visits / Math.max(getDaysInRange(period), 1)) * 10) / 10;
+  const previousDailyAverage = Math.round((previous.visits / Math.max(getDaysInRange(prevDateRange), 1)) * 10) / 10;
+  const currentConsultationRate = calcConsultationRate(current.visits, current.contacts);
+  const previousConsultationRate = calcConsultationRate(previous.visits, previous.contacts);
 
   return {
     visits: current.visits,
     contacts: current.contacts,
     visitsDelta: calcDelta(current.visits, previous.visits),
     contactsDelta: calcDelta(current.contacts, previous.contacts),
-    consultationRate: calcConsultationRate(current.visits, current.contacts),
+    consultationRate: currentConsultationRate,
+    consultationRateDelta: calcDelta(currentConsultationRate ?? 0, previousConsultationRate ?? 0),
+    dailyAverageVisits: currentDailyAverage,
+    dailyAverageVisitsDelta: calcDelta(currentDailyAverage, previousDailyAverage),
     avgSessionSec: current.avgSessionSec,
     topPages: getTopPages(currentRows),
     chartData: formatChartData(currentRows, previousRows),

@@ -35,6 +35,9 @@ export interface PulseMetricsTotals {
   visitsDelta: number | null;
   contactsDelta: number | null;
   consultationRate: number | null;
+  consultationRateDelta: number | null;
+  dailyAverageVisits: number | null;
+  dailyAverageVisitsDelta: number | null;
   avgSessionSec: number;
   topPages: TopPage[];
   chartData: ChartDataPoint[];

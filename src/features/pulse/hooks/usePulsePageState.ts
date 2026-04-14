@@ -69,12 +69,12 @@ export function usePulsePageState() {
   const { projectId, domain, ga4PropertyId, loading: projectLoading, projectsReady } = useUserProject();
   const { data, isLoading } = usePulseMetrics(projectId, period);
 
-  const projectHydrating = isAuthenticated && authReady && !projectsReady;
+  const projectHydrating = isAuthenticated ? (authReady ? !projectsReady : false) : false;
   const hasProject = Boolean(projectId);
   const hasGa4 = Boolean(ga4PropertyId);
-  const averagePerDay = data ? Math.round(data.visits / getDaysInRange(period)) : null;
-  const websitePendingReview = user?.website_status === 'pending_review' && Boolean(user.website);
-  const websiteApprovedWithoutData = user?.website_status === 'approved' && Boolean(user.website);
+  const averagePerDay = data?.dailyAverageVisits ?? null;
+  const websitePendingReview = user?.website_status === 'pending_review' ? Boolean(user.website) : false;
+  const websiteApprovedWithoutData = user?.website_status === 'approved' ? Boolean(user.website) : false;
   const connectionState = resolvePulseConnectionState({
     domain,
     ga4PropertyId,
@@ -83,7 +83,7 @@ export function usePulsePageState() {
     website: user?.website,
     websiteStatus: user?.website_status,
   });
-  const shouldAutoSync = Boolean(projectId && ga4PropertyId);
+  const shouldAutoSync = projectId ? Boolean(ga4PropertyId) : false;
   const syncDays = Math.min(getDaysInRange(period), 90);
   const manualSyncDays = Math.min(syncDays, 2);
   const { isBootstrapping, refreshPulseData } = usePulseBootstrapSync({
@@ -97,7 +97,7 @@ export function usePulsePageState() {
 
   usePulseRealtime(projectId);
 
-  const canViewMetrics = Boolean(projectId && ga4PropertyId);
+  const canViewMetrics = projectId ? Boolean(ga4PropertyId) : false;
   const { data: realtimeData, isLoading: realtimeLoading, error: realtimeError } = usePulseRealtimeSnapshot(
     projectId,
     canViewMetrics,
@@ -146,7 +146,7 @@ export function usePulsePageState() {
       }
     },
     onOpenSite: () => {
-      if (typeof window !== 'undefined' && resolvedDomain) {
+      if (typeof window !== 'undefined' ? Boolean(resolvedDomain) : false) {
         window.open(`https://${resolvedDomain}`, '_blank', 'noopener,noreferrer');
       }
     },

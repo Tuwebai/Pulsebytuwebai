@@ -27,37 +27,36 @@ function formatMetricValue(value: number | null, unit?: string) {
   return unit ? `${formatted} ${unit}` : formatted;
 }
 
+function formatDeltaDetail(delta: number | null) {
+  const prefix = delta !== null ? (delta > 0 ? '+' : '') : '';
+  return `${prefix}${delta ?? 0}% vs. período anterior`;
+}
+
 export default function PulseMetricsGrid({ averagePerDay, data, loading }: PulseMetricsGridProps) {
   const cards: PulseMetricItem[] = [
     {
-      detail:
-        data?.visitsDelta !== null && data?.visitsDelta !== undefined
-          ? `${data.visitsDelta > 0 ? '+' : ''}${data.visitsDelta}% vs. período anterior`
-          : 'base de lectura',
+      detail: formatDeltaDetail(data?.visitsDelta ?? 0),
       icon: Activity,
       label: 'Visitas registradas',
       tone: 'signal' as const,
       value: loading ? '...' : formatMetricValue(data?.visits ?? null),
     },
     {
-      detail:
-        data?.contactsDelta !== null && data?.contactsDelta !== undefined
-          ? `${data.contactsDelta > 0 ? '+' : ''}${data.contactsDelta}% vs. período anterior`
-          : 'contactos detectados',
+      detail: formatDeltaDetail(data?.contactsDelta ?? 0),
       icon: MousePointerClick,
       label: 'Consultas recibidas',
       tone: 'success' as const,
       value: loading ? '...' : formatMetricValue(data?.contacts ?? null),
     },
     {
-      detail: 'señal comercial del período',
+      detail: formatDeltaDetail(data?.consultationRateDelta ?? 0),
       icon: Gauge,
       label: 'Tasa de consulta',
       tone: 'warning' as const,
       value: loading ? '...' : formatMetricValue(data?.consultationRate ?? null, '%'),
     },
     {
-      detail: 'visitas por día',
+      detail: formatDeltaDetail(data?.dailyAverageVisitsDelta ?? 0),
       icon: BarChart3,
       label: 'Promedio diario',
       tone: 'default' as const,
