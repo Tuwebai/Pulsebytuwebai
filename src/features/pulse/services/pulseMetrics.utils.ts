@@ -81,7 +81,7 @@ export function getPrevDateRange(period: Period): DateRange {
   if (period === 'this_month') {
     return {
       from: formatDate(new Date(today.getFullYear(), today.getMonth() - 1, 1)),
-      to: formatDate(getMonthSafeDate(today.getFullYear(), today.getMonth() - 1, today.getDate())),
+      to: formatDate(new Date(today.getFullYear(), today.getMonth(), 0)),
     };
   }
 
